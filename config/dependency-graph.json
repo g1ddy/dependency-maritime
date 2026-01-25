@@ -720,7 +720,7 @@
     "totalCruised": 19,
     "totalDependenciesCruised": 26,
     "optionsUsed": {
-      "baseDir": "/app",
+      "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,
