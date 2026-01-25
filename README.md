@@ -31,6 +31,7 @@ See [docs/PHASES.md](./docs/PHASES.md) for the roadmap.
 > **Note:** The project is currently in the planning/initialization phase. Code generation has not started yet.
 
 1.  Initialize the repo: `npm create vite@latest dependency-maritime -- --template react-ts`
-2.  Install dependencies: `npm install reactflow graphology zod`
-3.  Generate sample data: `npx dependency-cruiser src --output-type json > maritime-sample.json`
-4.  Run the application.
+2.  Install dependencies: `npm install reactflow graphology zod zustand dagre`
+3.  Initialize Shadcn/UI: Follow the [official installation guide](https://ui.shadcn.com/docs/installation/vite).
+4.  Generate sample data: `npx dependency-cruiser src --output-type json > maritime-sample.json`
+5.  Run the application: `npm run dev`

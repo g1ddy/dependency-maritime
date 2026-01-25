@@ -6,6 +6,8 @@ Dependency Maritime is designed as a high-performance, local-first engineering t
 
 The heavy lifting of graph theory happens in a framework-agnostic logic layer, which feeds a React-based renderer.
 
+> **Note:** This diagram represents the *target* architecture. Initial development phases will use a simpler data loading mechanism (e.g., loading a static JSON file directly) as noted in [Design Decisions](./DESIGN_DECISIONS.md).
+
 ```mermaid
 graph TD
     User[User / Developer] -->|Runs CLI| CLI[Maritime CLI]

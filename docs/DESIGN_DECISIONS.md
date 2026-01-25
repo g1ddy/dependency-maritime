@@ -23,6 +23,7 @@
     *   Graphology operations should happen outside the main render loop (possibly in a Web Worker if needed later).
 
 ## Development Workflow
+
 **Decision:** "Test-First" Development.
 *   **Strategy:** Write logic tests (Graphology, Zod validation) before UI components.
 *   **Tooling:** Vitest for unit testing.
