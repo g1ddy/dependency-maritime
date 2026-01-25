@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "depcruise": "depcruise src --config config/.dependency-cruiser.cjs",
     "preview": "vite preview",
-    "test": "npm run test:unit",
+    "test": "vitest",
     "test:unit": "vitest"
   },
   "dependencies": {
