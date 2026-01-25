@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
 export default defineConfig({
+  base: "/dependency-maritime/",
   plugins: [react()],
   resolve: {
     alias: {
