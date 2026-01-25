@@ -42,7 +42,7 @@ find src -name "*.ts" -not -name "*.test.ts" | xargs wc -l | sort -n | tail -n 1
 Run ESLint to find complex functions.
 
 ```bash
-npx eslint src --rulesdir config/eslint-rules --no-eslintrc --rule 'complexity: ["warn", 10]'
+npx eslint src --format json --rule 'complexity: ["warn", 10]' --parser @typescript-eslint/parser
 ```
 
 ---

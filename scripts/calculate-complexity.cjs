@@ -18,11 +18,12 @@ const THRESHOLDS = {
 
 function runCommand(cmd) {
     try {
-        return execSync(cmd, { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+        return execSync(cmd, { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
     } catch (e) {
         // ESLint exits with 1 if there are warnings, but we just want the output
         if (e.stdout) return e.stdout;
         console.error(`Command failed: ${cmd}`);
+        if (e.stderr) console.error(e.stderr);
         return '';
     }
 }
@@ -118,7 +119,6 @@ function main() {
 
     // 4. Calculate Repo Health Score
     let healthScore = 100;
-    let penalties = [];
 
     fileMetrics.forEach(f => {
         if (f.loc > THRESHOLDS.LOC) {
@@ -166,7 +166,6 @@ ${sortedByComplexity.map(f => `| \`${f.file}\` | **${f.complexity}** | ${f.loc} 
     let currentContent = fs.readFileSync(DOCS_FILE, 'utf8');
 
     const MARKER_START = '## 🚨 Automated Complexity Report';
-    const MARKER_END = '<!-- END AUTOMATED REPORT -->'; // Not used, we'll just append or replace end of file
 
     // Determine where to insert. If marker exists, replace everything after it.
     // If not, append to end.
