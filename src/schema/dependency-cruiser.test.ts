@@ -17,7 +17,7 @@ describe('Dependency Cruiser Schema', () => {
     }
 
     const fileContent = fs.readFileSync(sampleDataPath, 'utf-8');
-    const json = JSON.parse(fileContent);
+    const json: unknown = JSON.parse(fileContent);
 
     const result = CruiseResultSchema.safeParse(json);
 
