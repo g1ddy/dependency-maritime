@@ -19,7 +19,7 @@
 4.  **Layout Implementation**
     *   Implement `dagre` (via `@reactflow/dagre` or direct) to calculate node positions.
     *   Arrange nodes hierarchically (Top-Down or Left-Right) so standard dependency trees look logical.
-    *   Convert Graphology positions to React Flow node objects.
+    *   Transform the Graphology graph into React Flow primitives: create fully formed React Flow Nodes (merging data + layout positions) and Edges.
 
 5.  **React Flow Integration**
     *   Create the main Visualization component using React Flow.
