@@ -66,7 +66,7 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/components/layout/GraphOverlay.tsx` | **40.7** | 120 | 1 | 5 | 0.83 |
+| `src/features/visualization/components/GraphOverlay.tsx` | **40.7** | 120 | 1 | 5 | 0.83 |
 | `src/components/ui/sheet.tsx` | **39.9** | 139 | 2 | 1 | 1 |
 | `src/components/ui/dropdown-menu.tsx` | **36** | 200 | 2 | 1 | 0.5 |
 | `src/main.tsx` | **29.9** | 19 | 1 | 3 | 1 |
@@ -80,13 +80,13 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
-| `src/components/ui/separator.tsx` | **4** | 30 |
 | `src/components/theme-provider.tsx` | **4** | 77 |
+| `src/components/ui/separator.tsx` | **4** | 30 |
 | `src/components/ui/button.tsx` | **3** | 58 |
 | `src/components/ui/dropdown-menu.tsx` | **2** | 200 |
 | `src/components/ui/sheet.tsx` | **2** | 139 |
 | `src/components/ui/tooltip.tsx` | **2** | 31 |
 | `src/App.tsx` | **1** | 18 |
-| `src/components/layout/CanvasPlaceholder.tsx` | **1** | 8 |
-| `src/components/layout/GraphOverlay.tsx` | **1** | 120 |
+| `src/components/layout/Header.tsx` | **1** | 23 |
+| `src/components/mode-toggle.tsx` | **1** | 38 |
 | `src/lib/utils.ts` | **1** | 7 |

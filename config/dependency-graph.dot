@@ -4,16 +4,9 @@ strict digraph "dependency-cruiser output"{
     edge [arrowhead="normal" arrowsize="0.6" penwidth="2.0" color="#00000033" fontname="Helvetica" fontsize="9"]
 
     subgraph "cluster_src" {label="src" "src/App.tsx" [label=<App.tsx> tooltip="App.tsx" URL="src/App.tsx" fillcolor="#bbfeff"] }
-    "src/App.tsx" -> "src/components/layout/CanvasPlaceholder.tsx"
-    "src/App.tsx" -> "src/components/layout/GraphOverlay.tsx"
     "src/App.tsx" -> "src/components/layout/Header.tsx"
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/CanvasPlaceholder.tsx" [label=<CanvasPlaceholder.tsx> tooltip="CanvasPlaceholder.tsx" URL="src/components/layout/CanvasPlaceholder.tsx" fillcolor="#bbfeff"] } } }
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/GraphOverlay.tsx" [label=<GraphOverlay.tsx> tooltip="GraphOverlay.tsx" URL="src/components/layout/GraphOverlay.tsx" fillcolor="#bbfeff"] } } }
-    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/button.tsx"
-    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/card.tsx"
-    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/label.tsx"
-    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/separator.tsx"
-    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/switch.tsx"
+    "src/App.tsx" -> "src/features/visualization/components/CanvasPlaceholder.tsx"
+    "src/App.tsx" -> "src/features/visualization/components/GraphOverlay.tsx"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/Header.tsx" [label=<Header.tsx> tooltip="Header.tsx" URL="src/components/layout/Header.tsx" fillcolor="#bbfeff"] } } }
     "src/components/layout/Header.tsx" -> "src/components/mode-toggle.tsx"
     "src/components/layout/Header.tsx" -> "src/components/ui/button.tsx"
@@ -42,6 +35,13 @@ strict digraph "dependency-cruiser output"{
     "src/components/ui/switch.tsx" -> "src/lib/utils.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/tooltip.tsx" [label=<tooltip.tsx> tooltip="tooltip.tsx" URL="src/components/ui/tooltip.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/tooltip.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/CanvasPlaceholder.tsx" [label=<CanvasPlaceholder.tsx> tooltip="CanvasPlaceholder.tsx" URL="src/features/visualization/components/CanvasPlaceholder.tsx" fillcolor="#bbfeff"] } } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/GraphOverlay.tsx" [label=<GraphOverlay.tsx> tooltip="GraphOverlay.tsx" URL="src/features/visualization/components/GraphOverlay.tsx" fillcolor="#bbfeff"] } } } }
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/button.tsx"
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/card.tsx"
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/label.tsx"
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/separator.tsx"
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/switch.tsx"
     subgraph "cluster_src" {label="src" "src/index.css" [label=<index.css> tooltip="index.css" URL="src/index.css" ] }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/lib" {label="lib" "src/lib/utils.ts" [label=<utils.ts> tooltip="utils.ts" URL="src/lib/utils.ts" fillcolor="#ddfeff"] } }
     subgraph "cluster_src" {label="src" "src/main.tsx" [label=<main.tsx> tooltip="main.tsx" URL="src/main.tsx" fillcolor="#bbfeff"] }
