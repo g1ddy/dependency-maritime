@@ -1,73 +1,37 @@
-# React + TypeScript + Vite
+# Dependency Maritime ⚓️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Chart, navigate, and refactor your application's architecture. An interactive visualizer for dependency-cruiser that helps you enforce clear boundaries and navigate complex dependency graphs.
 
-Currently, two official plugins are available:
+## 🏗 High-Level Architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The application follows a "Headless Logic, Interactive UI" pattern. The heavy lifting of graph theory happens in a framework-agnostic logic layer (Graphology), which feeds a React-based renderer (React Flow).
 
-## React Compiler
+For full details, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Project Phases
 
-## Expanding the ESLint configuration
+The development is divided into 4 key phases:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1.  **Phase 1: The "Chartroom" (MVP)** - Basic visualization and layout.
+2.  **Phase 2: The "Inspector"** - Metrics and health heatmaps.
+3.  **Phase 3: The "Simulator"** - Refactoring playground with drag-and-drop.
+4.  **Phase 4: The "Cohesion" Assistant** - AI/Algo based suggestions.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+See [docs/PHASES.md](./docs/PHASES.md) for the roadmap.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 📚 Documentation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+*   [Architecture](./docs/ARCHITECTURE.md)
+*   [Phases & Roadmap](./docs/PHASES.md)
+*   [Design Decisions](./docs/DESIGN_DECISIONS.md)
+*   [Agent Context](./.jules/context.md)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠 Getting Started (Planned)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+> **Note:** The project is currently in the planning/initialization phase. Code generation has not started yet.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1.  Initialize the repo: `npm create vite@latest dependency-maritime -- --template react-ts`
+2.  Install dependencies: `npm install reactflow graphology zod zustand dagre`
+3.  Initialize Shadcn/UI: Follow the [official installation guide](https://ui.shadcn.com/docs/installation/vite).
+4.  Generate sample data: `npx dependency-cruiser src --output-type json > maritime-sample.json`
+5.  Run the application: `npm run dev`
