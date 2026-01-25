@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+
 bash scripts/setup.sh
 
 # Check if package-lock.json was modified
@@ -16,7 +18,7 @@ npm -v || { echo "NPM is missing"; exit 1; }
 
 # 2. Verify Playwright Browsers are actually present
 # (This checks if the folder exists, ensuring the huge download actually finished)
-if [ ! -d ~/.cache/ms-playwright ]; then
+if [ ! -d "$HOME/.cache/ms-playwright" ]; then
   echo "Playwright browsers not found!"
   exit 1
 fi
