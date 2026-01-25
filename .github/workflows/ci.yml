@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Calculate Version
+      id: version
+      run: |
+        if [[ "${{ github.ref_name }}" == "main" ]]; then
+          DATE_STR=$(date +'%Y.%m.%d')
+          # List tags matching today's pattern vYYYY.MM.DD.*
+          # Sort version numbers, taking the last one
+          LATEST_TAG=$(git tag -l "v$DATE_STR.*" | sort -V | tail -n1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            NEW_R=0
+          else
+            # Extract the R part (everything after the last dot)
+            LAST_R=${LATEST_TAG##*.}
+            NEW_R=$((LAST_R + 1))
+          fi
+
+          NEW_VERSION="$DATE_STR.$NEW_R"
+          NEW_TAG="v$NEW_VERSION"
+
+          echo "Calculated new version: $NEW_VERSION"
+          echo "New tag: $NEW_TAG"
+
+          echo "VITE_APP_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+        else
+          # Determine branch name safely
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH_NAME="${{ github.head_ref }}"
+          else
+            BRANCH_NAME="${{ github.ref_name }}"
+          fi
+
+          # Sanitize branch name (replace / with -)
+          SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '/' '-')
+
+          echo "VITE_APP_VERSION=DEV-${SAFE_BRANCH_NAME}" >> $GITHUB_ENV
+          echo "NEW_TAG=" >> $GITHUB_ENV
+        fi
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Dependency Check
+      run: npm run depcruise
+
+    - name: Build
+      run: npm run build
+      env:
+        VITE_APP_VERSION: ${{ env.VITE_APP_VERSION }}
+
+    - name: Test
+      run: npm test
+
+    - name: Create Release Tag
+      if: env.NEW_TAG != ''
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag ${{ env.NEW_TAG }}
+        git push origin ${{ env.NEW_TAG }}
+
+    - name: Upload artifact
+      if: env.NEW_TAG != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-output
+        path: dist/
