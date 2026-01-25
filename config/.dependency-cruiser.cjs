@@ -18,7 +18,7 @@ module.exports = {
       severity: 'error',
       comment: 'Shared UI components cannot import from features (prevents coupling).',
       from: {
-        path: '^src/components/ui',
+        path: '^src/components',
       },
       to: {
         path: '^src/features',
