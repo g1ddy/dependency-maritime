@@ -1,0 +1,51 @@
+name: Refactor Metrics
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+jobs:
+  generate-metrics:
+    if: contains(github.event.pull_request.labels.*.name, 'refactor')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Generate Dependency Graph (JSON)
+        run: npm run generate:json
+
+      - name: Generate Dependency Graph (DOT)
+        run: npm run generate:dot
+
+      - name: Generate Graph Images
+        run: npm run generate:graph
+
+      - name: Calculate Complexity
+        run: npm run calculate:complexity
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs(metrics): update dependency graph and complexity report [skip ci]"
+          file_pattern: 'docs/images/*.png docs/images/*.svg docs/COMPLEXITY.md config/dependency-graph.dot config/dependency-graph.json'

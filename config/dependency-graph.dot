@@ -1,0 +1,51 @@
+strict digraph "dependency-cruiser output"{
+    rankdir="LR" splines="true" overlap="false" nodesep="0.16" ranksep="0.18" fontname="Helvetica-bold" fontsize="9" style="rounded,bold,filled" fillcolor="#ffffff" compound="true"
+    node [shape="box" style="rounded, filled" height="0.2" color="black" fillcolor="#ffffcc" fontcolor="black" fontname="Helvetica" fontsize="9"]
+    edge [arrowhead="normal" arrowsize="0.6" penwidth="2.0" color="#00000033" fontname="Helvetica" fontsize="9"]
+
+    subgraph "cluster_src" {label="src" "src/App.tsx" [label=<App.tsx> tooltip="App.tsx" URL="src/App.tsx" fillcolor="#bbfeff"] }
+    "src/App.tsx" -> "src/components/layout/CanvasPlaceholder.tsx"
+    "src/App.tsx" -> "src/components/layout/GraphOverlay.tsx"
+    "src/App.tsx" -> "src/components/layout/Header.tsx"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/CanvasPlaceholder.tsx" [label=<CanvasPlaceholder.tsx> tooltip="CanvasPlaceholder.tsx" URL="src/components/layout/CanvasPlaceholder.tsx" fillcolor="#bbfeff"] } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/GraphOverlay.tsx" [label=<GraphOverlay.tsx> tooltip="GraphOverlay.tsx" URL="src/components/layout/GraphOverlay.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/button.tsx"
+    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/card.tsx"
+    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/label.tsx"
+    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/separator.tsx"
+    "src/components/layout/GraphOverlay.tsx" -> "src/components/ui/switch.tsx"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/Header.tsx" [label=<Header.tsx> tooltip="Header.tsx" URL="src/components/layout/Header.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/layout/Header.tsx" -> "src/components/mode-toggle.tsx"
+    "src/components/layout/Header.tsx" -> "src/components/ui/button.tsx"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/mode-toggle.tsx" [label=<mode-toggle.tsx> tooltip="mode-toggle.tsx" URL="src/components/mode-toggle.tsx" fillcolor="#bbfeff"] } }
+    "src/components/mode-toggle.tsx" -> "src/components/theme-provider.tsx"
+    "src/components/mode-toggle.tsx" -> "src/components/ui/button.tsx"
+    "src/components/mode-toggle.tsx" -> "src/components/ui/dropdown-menu.tsx"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/theme-provider.tsx" [label=<theme-provider.tsx> tooltip="theme-provider.tsx" URL="src/components/theme-provider.tsx" fillcolor="#bbfeff"] } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/badge.tsx" [label=<badge.tsx> tooltip="badge.tsx" URL="src/components/ui/badge.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/badge.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/button.tsx" [label=<button.tsx> tooltip="button.tsx" URL="src/components/ui/button.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/button.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/card.tsx" [label=<card.tsx> tooltip="card.tsx" URL="src/components/ui/card.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/card.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/dropdown-menu.tsx" [label=<dropdown-menu.tsx> tooltip="dropdown-menu.tsx" URL="src/components/ui/dropdown-menu.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/dropdown-menu.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/input.tsx" [label=<input.tsx> tooltip="input.tsx" URL="src/components/ui/input.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/input.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/label.tsx" [label=<label.tsx> tooltip="label.tsx" URL="src/components/ui/label.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/label.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/separator.tsx" [label=<separator.tsx> tooltip="separator.tsx" URL="src/components/ui/separator.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/separator.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/sheet.tsx" [label=<sheet.tsx> tooltip="sheet.tsx" URL="src/components/ui/sheet.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/sheet.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/switch.tsx" [label=<switch.tsx> tooltip="switch.tsx" URL="src/components/ui/switch.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/switch.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/tooltip.tsx" [label=<tooltip.tsx> tooltip="tooltip.tsx" URL="src/components/ui/tooltip.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/ui/tooltip.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" "src/index.css" [label=<index.css> tooltip="index.css" URL="src/index.css" ] }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/lib" {label="lib" "src/lib/utils.ts" [label=<utils.ts> tooltip="utils.ts" URL="src/lib/utils.ts" fillcolor="#ddfeff"] } }
+    subgraph "cluster_src" {label="src" "src/main.tsx" [label=<main.tsx> tooltip="main.tsx" URL="src/main.tsx" fillcolor="#bbfeff"] }
+    "src/main.tsx" -> "src/App.tsx"
+    "src/main.tsx" -> "src/index.css"
+    "src/main.tsx" -> "src/components/theme-provider.tsx"
+}
