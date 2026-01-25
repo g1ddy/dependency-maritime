@@ -2,6 +2,40 @@
 module.exports = {
   forbidden: [
     {
+      name: 'feature-isolation',
+      severity: 'error',
+      comment: 'Features should be isolated and not import from other features.',
+      from: {
+        path: '^src/features/([^/]+)',
+      },
+      to: {
+        path: '^src/features',
+        pathNot: '^src/features/$1',
+      },
+    },
+    {
+      name: 'shared-ui-purity',
+      severity: 'error',
+      comment: 'Shared UI components cannot import from features (prevents coupling).',
+      from: {
+        path: '^src/components/ui',
+      },
+      to: {
+        path: '^src/features',
+      },
+    },
+    {
+      name: 'logic-ui-separation',
+      severity: 'error',
+      comment: 'Headless logic (src/lib) cannot import from UI/Features.',
+      from: {
+        path: '^src/lib',
+      },
+      to: {
+        path: '^src/(components|features)',
+      },
+    },
+    {
       name: 'no-circular',
       severity: 'warn',
       comment:

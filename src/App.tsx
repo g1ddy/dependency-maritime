@@ -1,6 +1,6 @@
 import { Header } from "@/components/layout/Header"
-import { CanvasPlaceholder } from "@/components/layout/CanvasPlaceholder"
-import { GraphOverlay } from "@/components/layout/GraphOverlay"
+import { CanvasPlaceholder } from "@/features/visualization/components/CanvasPlaceholder"
+import { GraphOverlay } from "@/features/visualization/components/GraphOverlay"
 
 function App() {
   return (
