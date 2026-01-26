@@ -1,4 +1,4 @@
-import { describe, it, expect, fail } from 'vitest';
+import { describe, it, expect, assert } from 'vitest';
 import { CruiseResultSchema } from './dependency-cruiser';
 import fs from 'fs';
 import path from 'path';
@@ -22,7 +22,7 @@ describe('Dependency Cruiser Schema', () => {
     const result = CruiseResultSchema.safeParse(json);
 
     if (!result.success) {
-      console.error('Schema Validation Error:', JSON.stringify(result.error.format(), null, 2));
+      assert.fail(`Schema Validation Error: ${JSON.stringify(result.error.format(), null, 2)}`);
     }
 
     expect(result.success).toBe(true);
