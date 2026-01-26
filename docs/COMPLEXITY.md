@@ -56,10 +56,10 @@ Following the "AI to Rules" refactor and "Split Coach" initiative, here are the 
 
 **Last Updated:** 2026-01-26
 
-### 🏥 Repository Health Score: **100.0 / 100**
+### 🏥 Repository Health Score: **99.0 / 100**
 
 *   **Formula**: 100 - Penalties for Files exceeding thresholds (LOC > 300, Complexity > 10, Fan-Out > 15).
-*   **Total Files Scanned**: 20
+*   **Total Files Scanned**: 23
 
 ### 🔥 Top 10 High-Complexity Files (Compound Score)
 _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
@@ -68,25 +68,25 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `src/features/visualization/components/GraphOverlay.tsx` | **40.7** | 120 | 1 | 5 | 0.83 |
 | `src/components/ui/sheet.tsx` | **39.9** | 139 | 2 | 1 | 1 |
+| `src/features/visualization/store.ts` | **38.9** | 89 | 2 | 3 | 1 |
 | `src/components/ui/dropdown-menu.tsx` | **36** | 200 | 2 | 1 | 0.5 |
+| `src/features/visualization/logic/layout.ts` | **35.3** | 93 | 13 | 0 | 0 |
 | `src/main.tsx` | **29.9** | 19 | 1 | 3 | 1 |
 | `src/components/ui/tooltip.tsx` | **29.1** | 31 | 2 | 1 | 1 |
 | `src/components/ui/badge.tsx` | **27.7** | 37 | 1 | 1 | 1 |
+| `src/features/visualization/logic/transformer.ts` | **27.3** | 93 | 3 | 1 | 0.5 |
 | `src/components/mode-toggle.tsx` | **26.8** | 38 | 1 | 3 | 0.75 |
-| `src/components/ui/input.tsx` | **26.3** | 23 | 1 | 1 | 1 |
-| `src/App.tsx` | **24.8** | 18 | 1 | 3 | 0.75 |
-| `src/components/ui/separator.tsx` | **23** | 30 | 4 | 1 | 0.5 |
 
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
+| `src/features/visualization/logic/layout.ts` | **13** | 93 |
 | `src/components/theme-provider.tsx` | **4** | 77 |
 | `src/components/ui/separator.tsx` | **4** | 30 |
 | `src/components/ui/button.tsx` | **3** | 58 |
+| `src/features/visualization/logic/transformer.ts` | **3** | 93 |
 | `src/components/ui/dropdown-menu.tsx` | **2** | 200 |
 | `src/components/ui/sheet.tsx` | **2** | 139 |
 | `src/components/ui/tooltip.tsx` | **2** | 31 |
+| `src/features/visualization/store.ts` | **2** | 89 |
 | `src/App.tsx` | **1** | 18 |
-| `src/components/layout/Header.tsx` | **1** | 23 |
-| `src/components/mode-toggle.tsx` | **1** | 38 |
-| `src/lib/utils.ts` | **1** | 7 |
