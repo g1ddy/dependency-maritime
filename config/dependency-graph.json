@@ -709,15 +709,38 @@
       ],
       "orphan": false,
       "valid": true
+    },
+    {
+      "source": "src/schema/dependency-cruiser.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": false,
+      "rules": [
+        {
+          "severity": "info",
+          "name": "no-orphans"
+        }
+      ]
     }
   ],
   "summary": {
-    "violations": [],
+    "violations": [
+      {
+        "type": "module",
+        "from": "src/schema/dependency-cruiser.ts",
+        "to": "src/schema/dependency-cruiser.ts",
+        "rule": {
+          "severity": "info",
+          "name": "no-orphans"
+        }
+      }
+    ],
     "error": 0,
     "warn": 0,
-    "info": 0,
+    "info": 1,
     "ignore": 0,
-    "totalCruised": 19,
+    "totalCruised": 20,
     "totalDependenciesCruised": 26,
     "optionsUsed": {
       "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
