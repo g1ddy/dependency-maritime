@@ -15,7 +15,8 @@
     "generate:graph": "dot -T svg config/dependency-graph.dot > docs/images/dependency-graph.svg && dot -T png config/dependency-graph.dot > docs/images/dependency-graph.png",
     "preview": "vite preview",
     "test": "vitest",
-    "test:unit": "vitest"
+    "test:unit": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
