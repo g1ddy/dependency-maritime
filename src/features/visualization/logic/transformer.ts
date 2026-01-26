@@ -76,7 +76,7 @@ export function transformToReactFlow(graph: Graph): { nodes: Node[]; edges: Edge
     });
   });
 
-  graph.forEachEdge((edgeId, attributes, source, target) => {
+  graph.forEachEdge((_edgeId, attributes, source, target) => {
     edges.push({
       id: `e-${source}-${target}`, // Stable edge ID
       source,
