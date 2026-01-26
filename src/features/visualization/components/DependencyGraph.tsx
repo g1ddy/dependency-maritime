@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { ReactFlow, Background, Controls, MiniMap } from '@xyflow/react';
+// @ts-ignore - CSS import
 import '@xyflow/react/dist/style.css';
 
 import { useGraphStore } from '../store';
