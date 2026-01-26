@@ -75,6 +75,23 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../vite-env.d.ts",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/vite-env.d.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "@/components/mode-toggle",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -116,6 +133,15 @@
       ],
       "dependents": [
         "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/vite-env.d.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/components/layout/Header.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -870,13 +896,6 @@
           "name": "no-orphans"
         }
       ]
-    },
-    {
-      "source": "src/vite-env.d.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
     }
   ],
   "summary": {
@@ -896,7 +915,7 @@
     "info": 1,
     "ignore": 0,
     "totalCruised": 25,
-    "totalDependenciesCruised": 32,
+    "totalDependenciesCruised": 33,
     "optionsUsed": {
       "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
       "combinedDependencies": false,
