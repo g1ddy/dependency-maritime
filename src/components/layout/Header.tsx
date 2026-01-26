@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 
 export function Header() {
-  const appVersion = import.meta.env.VITE_APP_VERSION || 'DEV-LOCAL';
+  const appVersion = (import.meta as unknown as { env: { VITE_APP_VERSION?: string } }).env.VITE_APP_VERSION || 'DEV-LOCAL';
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 z-50 relative">
