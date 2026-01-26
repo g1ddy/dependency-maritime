@@ -18,7 +18,7 @@ describe('Graph Transformer Logic', () => {
         throw new Error(`Sample data not found at: ${sampleDataPath}`);
     }
     const fileContent = fs.readFileSync(sampleDataPath, 'utf-8');
-    const json = JSON.parse(fileContent);
+    const json: unknown = JSON.parse(fileContent);
     sampleData = CruiseResultSchema.parse(json);
   });
 
