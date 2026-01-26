@@ -1,10 +1,11 @@
+import "../../vite-env.d.ts"
 import { ArrowLeft, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 
 export function Header() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const appVersion = (import.meta as any).env.VITE_APP_VERSION || "DEV"
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const appVersion = import.meta.env.VITE_APP_VERSION || "DEV"
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 z-50 relative">
