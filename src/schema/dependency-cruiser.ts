@@ -22,7 +22,7 @@ export const DependencySchema = z.object({
   /** Types of dependency (e.g., "local", "npm", "import") */
   dependencyTypes: z.array(z.string()).optional(),
   /** The module system used (e.g., "es6", "cjs") */
-  moduleSystem: z.string().optional(),
+  moduleSystem: z.enum(['amd', 'cjs', 'es6', 'tsd']).optional(),
   /** Validity of the dependency */
   valid: z.boolean().optional(),
   /** Cycle path if circular */
@@ -57,12 +57,12 @@ export type IModule = z.infer<typeof ModuleSchema>;
  * Schema for a violation found by dependency-cruiser.
  */
 export const ViolationSchema = z.object({
-    type: z.string(),
+    type: z.enum(['dependency', 'module', 'reachability']),
     from: z.string(),
     to: z.string(),
     rule: z.object({
         name: z.string(),
-        severity: z.string(),
+        severity: z.enum(['error', 'warn', 'info', 'ignore']),
     }).passthrough().optional(),
 }).passthrough();
 

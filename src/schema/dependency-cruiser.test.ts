@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, fail } from 'vitest';
 import { CruiseResultSchema } from './dependency-cruiser';
 import fs from 'fs';
 import path from 'path';
