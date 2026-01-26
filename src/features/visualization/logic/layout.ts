@@ -12,6 +12,27 @@ export interface LayoutOptions {
 }
 
 /**
+ * Helper to determine node dimensions with proper fallback precedence.
+ */
+function getNodeDimensions(node: Node, options: LayoutOptions) {
+  // 1. Measured dimensions (from React Flow)
+  // 2. Explicit style dimensions
+  // 3. User-provided options
+  // 4. Hardcoded defaults
+  const width = node.measured?.width
+    ?? (typeof node.style?.width === 'number' ? node.style.width : undefined)
+    ?? options.nodeWidth
+    ?? DEFAULT_NODE_WIDTH;
+
+  const height = node.measured?.height
+    ?? (typeof node.style?.height === 'number' ? node.style.height : undefined)
+    ?? options.nodeHeight
+    ?? DEFAULT_NODE_HEIGHT;
+
+  return { width, height };
+}
+
+/**
  * Applies Dagre layout to the React Flow nodes and edges.
  *
  * @param nodes React Flow Nodes
@@ -36,11 +57,7 @@ export function applyDagreLayout(
 
   // 1. Add nodes to Dagre
   nodes.forEach((node) => {
-    // In @xyflow/react v12, dimensions are in node.measured.
-    // If not yet measured, fall back to defaults or style.
-    const width = node.measured?.width ?? node.style?.width ?? DEFAULT_NODE_WIDTH;
-    const height = node.measured?.height ?? node.style?.height ?? DEFAULT_NODE_HEIGHT;
-
+    const { width, height } = getNodeDimensions(node, options);
     dagreGraph.setNode(node.id, { width, height });
   });
 
@@ -57,17 +74,16 @@ export function applyDagreLayout(
   const layoutedNodes = nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
 
-    // We need the dimensions we used for calculation to offset correctly
-    const width = node.measured?.width ?? node.style?.width ?? DEFAULT_NODE_WIDTH;
-    const height = node.measured?.height ?? node.style?.height ?? DEFAULT_NODE_HEIGHT;
+    // Use the dimensions Dagre used for the calculation to ensure correct centering
+    const { width, height } = nodeWithPosition;
 
     return {
       ...node,
       targetPosition: isHorizontal ? Position.Left : Position.Top,
       sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
       position: {
-        x: nodeWithPosition.x - (typeof width === 'number' ? width / 2 : 0),
-        y: nodeWithPosition.y - (typeof height === 'number' ? height / 2 : 0),
+        x: nodeWithPosition.x - width / 2,
+        y: nodeWithPosition.y - height / 2,
       },
     };
   });

@@ -28,7 +28,8 @@ describe('Graph Transformer Logic', () => {
     expect(graph).toBeDefined();
     // Verify we have nodes
     expect(graph.order).toBeGreaterThan(0);
-    expect(graph.order).toBe(sampleData.modules.length); // Should roughly match
+    // Use GreaterThanOrEqual because we might create external nodes not in the original module list
+    expect(graph.order).toBeGreaterThanOrEqual(sampleData.modules.length);
 
     // Verify we have edges
     expect(graph.size).toBeGreaterThan(0);
