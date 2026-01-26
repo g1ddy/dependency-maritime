@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { ReactFlow, Background, Controls, MiniMap } from '@xyflow/react';
-// @ts-ignore - CSS import
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - CSS import might not be recognized by tsc but works in Vite
 import '@xyflow/react/dist/style.css';
 
 import { useGraphStore } from '../store';
 import sampleData from '../../../../sample-data/dependency-graph.json';
-import { type ICruiseResult } from '@/schema/dependency-cruiser';
+import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 
 export function DependencyGraph() {
   const {
@@ -18,8 +19,8 @@ export function DependencyGraph() {
 
   useEffect(() => {
     // Load sample data on mount
-    // We cast to unknown first because JSON import might be inferred narrowly or broadly
-    setGraphData(sampleData as unknown as ICruiseResult);
+    const parsedData = CruiseResultSchema.parse(sampleData);
+    setGraphData(parsedData);
   }, [setGraphData]);
 
   return (
