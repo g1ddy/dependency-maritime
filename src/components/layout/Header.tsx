@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 
 export function Header() {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const appVersion = import.meta.env.VITE_APP_VERSION
 
   return (
