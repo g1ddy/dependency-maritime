@@ -15,7 +15,8 @@ export function DependencyGraph() {
     edges,
     onNodesChange,
     onEdgesChange,
-    setGraphData
+    setGraphData,
+    selectNode
   } = useGraphStore();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode }), []);
@@ -33,6 +34,8 @@ export function DependencyGraph() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onNodeClick={(_, node) => selectNode(node.id)}
+        onPaneClick={() => selectNode(null)}
         nodeTypes={nodeTypes}
         fitView
       >
