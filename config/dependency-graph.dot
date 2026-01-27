@@ -36,8 +36,10 @@ strict digraph "dependency-cruiser output"{
     "src/components/ui/switch.tsx" -> "src/lib/utils.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/tooltip.tsx" [label=<tooltip.tsx> tooltip="tooltip.tsx" URL="src/components/ui/tooltip.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/tooltip.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/AppNode.tsx" [label=<AppNode.tsx> tooltip="AppNode.tsx" URL="src/features/visualization/components/AppNode.tsx" fillcolor="#bbfeff"] } } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DependencyGraph.tsx" [label=<DependencyGraph.tsx> tooltip="DependencyGraph.tsx" URL="src/features/visualization/components/DependencyGraph.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/store.ts"
+    "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/components/AppNode.tsx"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/schema/dependency-cruiser.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/GraphOverlay.tsx" [label=<GraphOverlay.tsx> tooltip="GraphOverlay.tsx" URL="src/features/visualization/components/GraphOverlay.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/button.tsx"

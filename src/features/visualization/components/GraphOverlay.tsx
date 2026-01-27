@@ -1,4 +1,4 @@
-import { Box, Layers, Hammer, Plus, Minus, Maximize, Globe, Wand2, Monitor, Cpu } from "lucide-react"
+import { Box, Hammer, Plus, Minus, Maximize, Globe, Wand2, Monitor, Cpu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -39,14 +39,6 @@ export function GraphOverlay() {
 
       {/* Spacer */}
       <div className="flex-1" />
-
-      {/* Center Fake Node (Visual Only) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-        <div className="border border-blue-500/50 bg-blue-950/30 backdrop-blur px-4 py-2 rounded-lg flex items-center gap-2 shadow-[0_0_30px_-5px_rgba(37,99,235,0.3)]">
-          <Layers className="h-4 w-4 text-blue-400" />
-          <span className="text-blue-100 font-mono text-sm">App.tsx</span>
-        </div>
-      </div>
 
       {/* Bottom Interface */}
       <div className="flex items-end justify-between pointer-events-auto">

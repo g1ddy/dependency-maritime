@@ -328,6 +328,23 @@
         },
         {
           "dynamic": false,
+          "module": "./AppNode",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/features/visualization/components/AppNode.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "@/schema/dependency-cruiser",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -459,6 +476,15 @@
       ],
       "dependents": [
         "src/features/visualization/store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/AppNode.tsx",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/components/DependencyGraph.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -914,8 +940,8 @@
     "warn": 0,
     "info": 1,
     "ignore": 0,
-    "totalCruised": 25,
-    "totalDependenciesCruised": 33,
+    "totalCruised": 26,
+    "totalDependenciesCruised": 34,
     "optionsUsed": {
       "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
       "combinedDependencies": false,

@@ -67,7 +67,7 @@ export function transformToReactFlow(graph: Graph): { nodes: Node[]; edges: Edge
     nodes.push({
       id: nodeId,
       // We will assume a default type for now, or 'default'
-      type: 'default',
+      type: 'appNode',
       position: { x: 0, y: 0 }, // Layout will fix this
       data: {
         label: attributes.label,
