@@ -12,6 +12,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/pages/GamePage.tsx",
           "coreModule": false,
           "followable": true,
@@ -29,6 +30,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/pages/SetupPage.tsx",
           "coreModule": false,
           "followable": true,
@@ -46,6 +48,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/styles/App.css",
           "coreModule": false,
           "followable": false,
@@ -90,6 +93,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/AggressiveBot.ts",
           "coreModule": false,
           "followable": true,
@@ -107,6 +111,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/BalancedBot.ts",
           "coreModule": false,
           "followable": true,
@@ -124,6 +129,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/CatanMCTSBot.ts",
           "coreModule": false,
           "followable": true,
@@ -141,6 +147,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/DefensiveBot.ts",
           "coreModule": false,
           "followable": true,
@@ -158,6 +165,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/ExpansiveBot.ts",
           "coreModule": false,
           "followable": true,
@@ -175,6 +183,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/GameClient.tsx",
           "coreModule": false,
           "followable": true,
@@ -202,6 +211,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/CatanBot.ts",
           "coreModule": false,
           "followable": true,
@@ -219,6 +229,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/profiles/BotProfile.ts",
           "coreModule": false,
           "followable": true,
@@ -246,6 +257,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -261,8 +273,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -280,6 +294,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/BotCoach.ts",
           "coreModule": false,
           "followable": true,
@@ -297,6 +312,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/profiles/BotProfile.ts",
           "coreModule": false,
           "followable": true,
@@ -328,6 +344,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -343,8 +360,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -362,6 +381,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -379,6 +399,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/adviceConstants.ts",
           "coreModule": false,
           "followable": true,
@@ -396,6 +417,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/advisors/SpatialAdvisor.ts",
           "coreModule": false,
           "followable": true,
@@ -414,7 +436,8 @@
               "name": "src/game/analysis/coach.ts",
               "dependencyTypes": [
                 "local",
-                "import"
+                "import",
+                "pre-compilation-only"
               ]
             }
           ],
@@ -429,6 +452,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/advisors/TradeAdvisor.ts",
           "coreModule": false,
           "followable": true,
@@ -462,13 +486,13 @@
         "src/game/analysis/coach.ts",
         "src/game/rules/queries.ts",
         "src/bots/CatanMCTSBot.ts",
-        "src/features/game/GameScreen.tsx",
         "src/features/coach/hooks/useCoachData.ts",
         "src/features/board/components/HexOverlays.tsx",
         "src/features/hud/hooks/useGameControls.ts",
         "src/features/hud/hooks/useTradeLogic.ts",
         "src/features/hud/components/controls/SetupControls.tsx",
         "src/features/hud/hooks/useGameStatusMessage.ts",
+        "src/features/game/hooks/useGameScreenState.ts",
         "src/game/Game.ts",
         "src/game/moves/robber.ts",
         "src/game/moves/setup.ts",
@@ -487,6 +511,7 @@
         "src/game/analysis/advisors/SpatialAdvisor.ts",
         "src/game/geometry/hexUtils.ts",
         "src/game/mechanics/resources.ts",
+        "src/game/core/config.ts",
         "src/game/rules/queries.ts",
         "src/game/mechanics/costs.ts",
         "src/game/rules/robberRules.ts",
@@ -504,20 +529,24 @@
         "src/features/shared/config/uiConfig.tsx",
         "src/features/board/components/HexOverlays.tsx",
         "src/game/geometry/staticGeometry.ts",
-        "src/features/board/hooks/useBoardInteractions.ts",
         "src/features/hud/components/GameControls.tsx",
         "src/features/hud/hooks/useGameControls.ts",
         "src/features/hud/hooks/useTradeLogic.ts",
         "src/features/hud/components/controls/TurnControls.tsx",
         "src/features/board/components/Port.tsx",
+        "src/features/board/hooks/useBoardInteractions.ts",
         "src/features/board/hooks/useGameEffects.ts",
         "src/features/coach/components/AnalystPanel.tsx",
         "src/features/coach/components/CoachPanel.tsx",
+        "src/features/coach/components/PlayerProductionPotential.tsx",
         "src/game/analysis/analyst.ts",
         "src/features/shared/components/ResourceIconRow.tsx",
+        "src/features/coach/components/PlayerProduction.tsx",
+        "src/features/coach/components/ResourceDistribution.tsx",
         "src/features/hud/components/GameNotification.tsx",
         "src/features/hud/components/PlayerPanel.tsx",
         "src/features/game/GameLayout.tsx",
+        "src/features/game/hooks/useGameScreenState.ts",
         "src/game/Game.ts",
         "src/game/analysis/CoachPlugin.ts",
         "src/game/generation/boardGen.ts",
@@ -545,8 +574,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -595,6 +626,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -612,6 +644,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -629,6 +662,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -646,6 +680,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -663,6 +698,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/resources.ts",
           "coreModule": false,
           "followable": true,
@@ -680,6 +716,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/scoring.ts",
           "coreModule": false,
           "followable": true,
@@ -697,6 +734,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/queries.ts",
           "coreModule": false,
           "followable": true,
@@ -712,8 +750,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -725,7 +765,8 @@
               "name": "src/game/analysis/coach.ts",
               "dependencyTypes": [
                 "local",
-                "import"
+                "import",
+                "pre-compilation-only"
               ]
             },
             {
@@ -774,8 +815,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -793,6 +836,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/math.ts",
           "coreModule": false,
           "followable": true,
@@ -839,7 +883,26 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../core/config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -854,8 +917,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -873,6 +938,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -887,6 +953,48 @@
         "src/game/rules/robberRules.ts",
         "src/game/Game.ts",
         "src/game/moves/setup.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/core/config.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/game/core/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/mechanics/resources.ts",
+        "src/game/mechanics/costs.ts",
+        "src/game/mechanics/trade.ts",
+        "src/features/board/BoardLayer.tsx",
+        "src/features/board/components/OverlayVertex.tsx",
+        "src/features/hud/components/controls/BuildBar.tsx",
+        "src/game/analysis/analyst.ts",
+        "src/features/game/GameLayout.tsx",
+        "src/game/Game.ts",
+        "src/game/mechanics/boardStats.ts",
+        "src/game/moves/build.ts",
+        "src/game/rules/moveValidation.ts",
+        "src/game/rules/economy.ts",
+        "src/game/moves/trade.ts",
+        "src/pages/SetupPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -912,6 +1020,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -927,8 +1036,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -946,6 +1057,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -963,6 +1075,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -980,6 +1093,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/costs.ts",
           "coreModule": false,
           "followable": true,
@@ -997,6 +1111,7 @@
             "local",
             "export"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/robberRules.ts",
           "coreModule": false,
           "followable": true,
@@ -1014,6 +1129,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/spatial.ts",
           "coreModule": false,
           "followable": true,
@@ -1025,8 +1141,8 @@
       ],
       "dependents": [
         "src/game/analysis/advisors/SpatialAdvisor.ts",
-        "src/features/game/GameScreen.tsx",
         "src/features/board/hooks/useBoardInteractions.ts",
+        "src/features/game/hooks/useGameScreenState.ts",
         "src/game/moves/robber.ts",
         "src/game/rules/enumerator.ts"
       ],
@@ -1045,6 +1161,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -1060,8 +1177,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1082,28 +1201,6 @@
       "valid": true
     },
     {
-      "source": "src/game/core/config.ts",
-      "dependencies": [],
-      "dependents": [
-        "src/game/mechanics/costs.ts",
-        "src/game/mechanics/trade.ts",
-        "src/features/board/BoardLayer.tsx",
-        "src/features/board/components/OverlayVertex.tsx",
-        "src/features/hud/components/controls/BuildBar.tsx",
-        "src/game/analysis/analyst.ts",
-        "src/features/game/GameLayout.tsx",
-        "src/game/Game.ts",
-        "src/game/mechanics/boardStats.ts",
-        "src/game/moves/build.ts",
-        "src/game/rules/moveValidation.ts",
-        "src/game/rules/economy.ts",
-        "src/game/moves/trade.ts",
-        "src/pages/SetupPage.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
       "source": "src/game/rules/robberRules.ts",
       "dependencies": [
         {
@@ -1115,6 +1212,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -1130,8 +1228,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1149,6 +1249,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -1166,6 +1267,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/resources.ts",
           "coreModule": false,
           "followable": true,
@@ -1194,6 +1296,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -1209,8 +1312,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1228,6 +1333,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -1245,6 +1351,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -1272,8 +1379,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1291,6 +1400,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -1308,6 +1418,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/trade.ts",
           "coreModule": false,
           "followable": true,
@@ -1325,6 +1436,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/adviceConstants.ts",
           "coreModule": false,
           "followable": true,
@@ -1352,6 +1464,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -1369,6 +1482,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -1384,8 +1498,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1416,8 +1532,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -1433,8 +1551,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1452,6 +1572,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -1469,6 +1590,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/costs.ts",
           "coreModule": false,
           "followable": true,
@@ -1486,6 +1608,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/logic/MoveScorer.ts",
           "coreModule": false,
           "followable": true,
@@ -1503,6 +1626,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/profiles/BotProfile.ts",
           "coreModule": false,
           "followable": true,
@@ -1520,6 +1644,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/utils/ActionUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -1545,8 +1670,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -1562,8 +1689,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1579,8 +1708,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/mechanics/costs.ts",
           "coreModule": false,
           "followable": true,
@@ -1596,8 +1727,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/bots/profiles/BotProfile.ts",
           "coreModule": false,
           "followable": true,
@@ -1615,6 +1748,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/utils/ActionUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -1655,8 +1789,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1685,6 +1821,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/CatanBot.ts",
           "coreModule": false,
           "followable": true,
@@ -1702,6 +1839,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/profiles/BotProfile.ts",
           "coreModule": false,
           "followable": true,
@@ -1729,6 +1867,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -1744,8 +1883,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -1773,6 +1914,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/CatanBot.ts",
           "coreModule": false,
           "followable": true,
@@ -1790,6 +1932,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/profiles/BotProfile.ts",
           "coreModule": false,
           "followable": true,
@@ -1817,6 +1960,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/CatanBot.ts",
           "coreModule": false,
           "followable": true,
@@ -1834,6 +1978,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/profiles/BotProfile.ts",
           "coreModule": false,
           "followable": true,
@@ -1861,6 +2006,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/bots/CatanBot.ts",
           "coreModule": false,
           "followable": true,
@@ -1878,6 +2024,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/game/GameScreen.tsx",
           "coreModule": false,
           "followable": true,
@@ -1895,6 +2042,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/Game.ts",
           "coreModule": false,
           "followable": true,
@@ -1922,24 +2070,8 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/coach.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../game/core/constants",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -1954,26 +2086,11 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../game/rules/queries",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/game/rules/queries.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -1990,6 +2107,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/BoardLayer.tsx",
           "coreModule": false,
           "followable": true,
@@ -2007,6 +2125,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/coach/CoachLayer.tsx",
           "coreModule": false,
           "followable": true,
@@ -2024,6 +2143,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/coach/hooks/useCoachData.ts",
           "coreModule": false,
           "followable": true,
@@ -2039,26 +2159,11 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/hud/components/GameControls.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../hud/hooks/useGameStatusMessage",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/hud/hooks/useGameStatusMessage.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2075,6 +2180,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/hooks/useTradeLogic.ts",
           "coreModule": false,
           "followable": true,
@@ -2092,6 +2198,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/HUDLayer.tsx",
           "coreModule": false,
           "followable": true,
@@ -2102,31 +2209,15 @@
         },
         {
           "dynamic": false,
-          "module": "../shared/hooks/useIsMobile",
+          "module": "./constants",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "src/features/shared/hooks/useIsMobile.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../shared/types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/shared/types.ts",
+          "preCompilationOnly": false,
+          "resolved": "src/features/game/constants.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2143,7 +2234,26 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/game/GameLayout.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./hooks/useGameScreenState",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/game/hooks/useGameScreenState.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2170,6 +2280,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -2185,8 +2296,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2202,8 +2315,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/coach/hooks/useCoachData.ts",
           "coreModule": false,
           "followable": true,
@@ -2221,6 +2336,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/constants/z-indices.ts",
           "coreModule": false,
           "followable": true,
@@ -2236,8 +2352,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2255,6 +2373,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/GameHex.tsx",
           "coreModule": false,
           "followable": true,
@@ -2272,6 +2391,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/helpers.tsx",
           "coreModule": false,
           "followable": true,
@@ -2289,7 +2409,26 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/HexOverlays.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./hooks/useBoardInteractions",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/board/hooks/useBoardInteractions.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2306,6 +2445,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/hooks/useGameEffects.ts",
           "coreModule": false,
           "followable": true,
@@ -2333,6 +2473,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -2350,6 +2491,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -2365,8 +2507,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2382,8 +2526,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2405,7 +2551,6 @@
       "source": "src/features/shared/types.ts",
       "dependencies": [],
       "dependents": [
-        "src/features/game/GameScreen.tsx",
         "src/features/board/BoardLayer.tsx",
         "src/features/coach/hooks/useCoachData.ts",
         "src/features/board/components/HexOverlays.tsx",
@@ -2413,8 +2558,9 @@
         "src/features/hud/hooks/useGameControls.ts",
         "src/features/hud/components/controls/BuildBar.tsx",
         "src/features/hud/components/controls/SetupControls.tsx",
+        "src/features/hud/components/GameStatusBanner.tsx",
         "src/features/hud/hooks/useGameStatusMessage.ts",
-        "src/features/hud/components/GameStatusBanner.tsx"
+        "src/features/game/hooks/useGameScreenState.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2441,8 +2587,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2460,6 +2608,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/config/uiConfig.tsx",
           "coreModule": false,
           "followable": true,
@@ -2477,6 +2626,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/NumberToken.tsx",
           "coreModule": false,
           "followable": true,
@@ -2504,6 +2654,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2518,6 +2669,8 @@
         "src/features/hud/components/controls/BuildBar.tsx",
         "src/features/board/components/Port.tsx",
         "src/features/shared/components/ResourceIconRow.tsx",
+        "src/features/coach/components/PlayerProduction.tsx",
+        "src/features/coach/components/ResourceDistribution.tsx",
         "src/features/hud/components/GameNotification.tsx",
         "src/features/game/GameLayout.tsx"
       ],
@@ -2543,8 +2696,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/coach/hooks/useCoachData.ts",
           "coreModule": false,
           "followable": true,
@@ -2572,6 +2727,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -2589,6 +2745,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -2604,8 +2761,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2623,6 +2782,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -2640,6 +2800,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/staticGeometry.ts",
           "coreModule": false,
           "followable": true,
@@ -2655,8 +2816,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2674,24 +2837,8 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/utils/feedback.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../hooks/useBoardInteractions",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/board/hooks/useBoardInteractions.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2708,6 +2855,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/OverlayEdge.tsx",
           "coreModule": false,
           "followable": true,
@@ -2725,6 +2873,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/OverlayVertex.tsx",
           "coreModule": false,
           "followable": true,
@@ -2742,6 +2891,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/Port.tsx",
           "coreModule": false,
           "followable": true,
@@ -2767,8 +2917,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -2786,6 +2938,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -2803,6 +2956,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/math.ts",
           "coreModule": false,
           "followable": true,
@@ -2830,50 +2984,6 @@
       "valid": true
     },
     {
-      "source": "src/features/board/hooks/useBoardInteractions.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../../../game/core/types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/game/core/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../../game/rules/queries",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/game/rules/queries.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/features/board/components/HexOverlays.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
       "source": "src/features/board/components/OverlayEdge.tsx",
       "dependencies": [],
       "dependents": [
@@ -2892,8 +3002,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -2911,6 +3023,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -2926,8 +3039,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/hud/components/GameControls.tsx",
           "coreModule": false,
           "followable": true,
@@ -2945,6 +3060,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/board/components/BuildingIcon.tsx",
           "coreModule": false,
           "followable": true,
@@ -2970,8 +3086,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -2987,8 +3105,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3004,8 +3124,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3023,6 +3145,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/utils/feedback.ts",
           "coreModule": false,
           "followable": true,
@@ -3040,6 +3163,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/hooks/useGameControls.ts",
           "coreModule": false,
           "followable": true,
@@ -3057,6 +3181,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/controls/BuildBar.tsx",
           "coreModule": false,
           "followable": true,
@@ -3074,6 +3199,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/controls/RobberControls.tsx",
           "coreModule": false,
           "followable": true,
@@ -3091,6 +3217,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/controls/SetupControls.tsx",
           "coreModule": false,
           "followable": true,
@@ -3108,6 +3235,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/controls/TurnControls.tsx",
           "coreModule": false,
           "followable": true,
@@ -3137,6 +3265,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -3154,6 +3283,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3171,6 +3301,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/costs.ts",
           "coreModule": false,
           "followable": true,
@@ -3186,8 +3317,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/mechanics/trade.ts",
           "coreModule": false,
           "followable": true,
@@ -3203,8 +3336,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3222,6 +3357,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/utils/feedback.ts",
           "coreModule": false,
           "followable": true,
@@ -3239,6 +3375,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/hooks/useTradeLogic.ts",
           "coreModule": false,
           "followable": true,
@@ -3266,6 +3403,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -3281,8 +3419,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3300,6 +3440,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/trade.ts",
           "coreModule": false,
           "followable": true,
@@ -3326,8 +3467,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -3345,6 +3488,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -3360,8 +3504,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/mechanics/trade.ts",
           "coreModule": false,
           "followable": true,
@@ -3379,6 +3525,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/config/uiConfig.tsx",
           "coreModule": false,
           "followable": true,
@@ -3394,8 +3541,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3423,6 +3572,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/controls/ActionButton.tsx",
           "coreModule": false,
           "followable": true,
@@ -3460,6 +3610,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -3475,8 +3626,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3494,6 +3647,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/controls/ActionButton.tsx",
           "coreModule": false,
           "followable": true,
@@ -3521,6 +3675,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3557,6 +3712,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3574,6 +3730,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/config/uiConfig.tsx",
           "coreModule": false,
           "followable": true,
@@ -3590,6 +3747,53 @@
       "valid": true
     },
     {
+      "source": "src/features/board/hooks/useBoardInteractions.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../game/core/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/game/core/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../game/rules/queries",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/game/rules/queries.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/board/BoardLayer.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/features/board/hooks/useGameEffects.ts",
       "dependencies": [
         {
@@ -3599,8 +3803,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3628,6 +3834,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/coach/components/AnalystPanel.tsx",
           "coreModule": false,
           "followable": true,
@@ -3645,6 +3852,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/coach/components/CoachPanel.tsx",
           "coreModule": false,
           "followable": true,
@@ -3670,8 +3878,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3692,30 +3902,15 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../../../game/analysis/analyst",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/game/analysis/analyst.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "../../../game/analysis/coach",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -3731,8 +3926,75 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/game/core/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PlayerProductionPotential",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
             "import"
           ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/coach/components/PlayerProductionPotential.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/coach/CoachLayer.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/coach/components/PlayerProductionPotential.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../game/analysis/analyst",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/game/analysis/analyst.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../game/core/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3750,7 +4012,44 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/components/ResourceIconRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PlayerProduction",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/coach/components/PlayerProduction.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ResourceDistribution",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/coach/components/ResourceDistribution.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -3760,7 +4059,7 @@
         }
       ],
       "dependents": [
-        "src/features/coach/CoachLayer.tsx"
+        "src/features/coach/components/CoachPanel.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -3777,6 +4076,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -3794,6 +4094,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -3809,8 +4110,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3828,6 +4131,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -3838,7 +4142,7 @@
         }
       ],
       "dependents": [
-        "src/features/coach/components/CoachPanel.tsx"
+        "src/features/coach/components/PlayerProductionPotential.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -3853,8 +4157,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -3872,6 +4178,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/config/uiConfig.tsx",
           "coreModule": false,
           "followable": true,
@@ -3882,25 +4189,27 @@
         }
       ],
       "dependents": [
-        "src/features/coach/components/CoachPanel.tsx",
+        "src/features/coach/components/PlayerProductionPotential.tsx",
         "src/features/hud/components/PlayerPanel.tsx"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "src/features/hud/hooks/useGameStatusMessage.ts",
+      "source": "src/features/coach/components/PlayerProduction.tsx",
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../../../game/core/constants",
+          "module": "../../../game/core/types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
-          "resolved": "src/game/core/constants.ts",
+          "preCompilationOnly": true,
+          "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -3910,31 +4219,15 @@
         },
         {
           "dynamic": false,
-          "module": "../../shared/types",
+          "module": "../../shared/config/uiConfig",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "src/features/shared/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../components/constants/emojis",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/features/hud/components/constants/emojis.ts",
+          "preCompilationOnly": false,
+          "resolved": "src/features/shared/config/uiConfig.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -3944,18 +4237,54 @@
         }
       ],
       "dependents": [
-        "src/features/game/GameScreen.tsx",
-        "src/features/hud/components/GameStatusBanner.tsx"
+        "src/features/coach/components/PlayerProductionPotential.tsx"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "src/features/hud/components/constants/emojis.ts",
-      "dependencies": [],
+      "source": "src/features/coach/components/ResourceDistribution.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../game/core/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/game/core/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shared/config/uiConfig",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/shared/config/uiConfig.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
-        "src/features/hud/hooks/useGameStatusMessage.ts",
-        "src/features/hud/components/GameNotification.tsx"
+        "src/features/coach/components/PlayerProductionPotential.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -3972,6 +4301,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/GameControls.tsx",
           "coreModule": false,
           "followable": true,
@@ -3989,6 +4319,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/GameNotification.tsx",
           "coreModule": false,
           "followable": true,
@@ -4006,6 +4337,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/GameStatusBanner.tsx",
           "coreModule": false,
           "followable": true,
@@ -4023,6 +4355,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/PlayerPanel.tsx",
           "coreModule": false,
           "followable": true,
@@ -4048,8 +4381,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4067,6 +4402,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -4084,6 +4420,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/components/DiceIcons.tsx",
           "coreModule": false,
           "followable": true,
@@ -4101,6 +4438,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/config/uiConfig.tsx",
           "coreModule": false,
           "followable": true,
@@ -4118,6 +4456,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/components/constants/emojis.ts",
           "coreModule": false,
           "followable": true,
@@ -4144,6 +4483,16 @@
       "valid": true
     },
     {
+      "source": "src/features/hud/components/constants/emojis.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/hud/components/GameNotification.tsx",
+        "src/features/hud/hooks/useGameStatusMessage.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/features/hud/components/GameStatusBanner.tsx",
       "dependencies": [
         {
@@ -4153,8 +4502,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/features/shared/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4172,6 +4523,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/hud/hooks/useGameStatusMessage.ts",
           "coreModule": false,
           "followable": true,
@@ -4188,6 +4540,72 @@
       "valid": true
     },
     {
+      "source": "src/features/hud/hooks/useGameStatusMessage.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../game/core/constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/game/core/constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shared/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/shared/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/constants/emojis",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/hud/components/constants/emojis.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/hud/components/GameStatusBanner.tsx",
+        "src/features/game/hooks/useGameScreenState.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/features/hud/components/PlayerPanel.tsx",
       "dependencies": [
         {
@@ -4197,8 +4615,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4216,6 +4636,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/components/ResourceIconRow.tsx",
           "coreModule": false,
           "followable": true,
@@ -4232,13 +4653,10 @@
       "valid": true
     },
     {
-      "source": "src/features/shared/hooks/useIsMobile.ts",
+      "source": "src/features/game/constants.ts",
       "dependencies": [],
       "dependents": [
-        "src/features/game/GameScreen.tsx",
-        "src/features/game/GameLayout.tsx",
-        "src/features/coach/components/AnalystShell.tsx",
-        "src/features/coach/components/CoachShell.tsx"
+        "src/features/game/GameScreen.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -4255,6 +4673,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -4270,8 +4689,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4289,6 +4710,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/coach/components/AnalystShell.tsx",
           "coreModule": false,
           "followable": true,
@@ -4306,6 +4728,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/coach/components/CoachShell.tsx",
           "coreModule": false,
           "followable": true,
@@ -4323,6 +4746,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/components/DiceIcons.tsx",
           "coreModule": false,
           "followable": true,
@@ -4340,6 +4764,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/config/uiConfig.tsx",
           "coreModule": false,
           "followable": true,
@@ -4357,6 +4782,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/constants/z-indices.ts",
           "coreModule": false,
           "followable": true,
@@ -4374,6 +4800,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/hooks/useIsMobile.ts",
           "coreModule": false,
           "followable": true,
@@ -4391,6 +4818,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/game/hooks/useViewportDvh.ts",
           "coreModule": false,
           "followable": true,
@@ -4418,6 +4846,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/constants/z-indices.ts",
           "coreModule": false,
           "followable": true,
@@ -4435,6 +4864,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/hooks/useIsMobile.ts",
           "coreModule": false,
           "followable": true,
@@ -4451,6 +4881,18 @@
       "valid": true
     },
     {
+      "source": "src/features/shared/hooks/useIsMobile.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/game/GameLayout.tsx",
+        "src/features/coach/components/AnalystShell.tsx",
+        "src/features/coach/components/CoachShell.tsx",
+        "src/features/game/hooks/useGameScreenState.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/features/coach/components/CoachShell.tsx",
       "dependencies": [
         {
@@ -4462,6 +4904,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/constants/z-indices.ts",
           "coreModule": false,
           "followable": true,
@@ -4479,6 +4922,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/shared/hooks/useIsMobile.ts",
           "coreModule": false,
           "followable": true,
@@ -4504,6 +4948,127 @@
       "valid": true
     },
     {
+      "source": "src/features/game/hooks/useGameScreenState.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../game/core/constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/game/core/constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../game/core/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/game/core/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../game/rules/queries",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/game/rules/queries.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../hud/hooks/useGameStatusMessage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/hud/hooks/useGameStatusMessage.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shared/hooks/useIsMobile",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/shared/hooks/useIsMobile.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shared/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/shared/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/game/GameScreen.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/game/Game.ts",
       "dependencies": [
         {
@@ -4515,6 +5080,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/sanitize.ts",
           "coreModule": false,
           "followable": true,
@@ -4532,6 +5098,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/CoachPlugin.ts",
           "coreModule": false,
           "followable": true,
@@ -4549,6 +5116,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -4566,6 +5134,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -4583,6 +5152,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4600,6 +5170,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/generation/boardGen.ts",
           "coreModule": false,
           "followable": true,
@@ -4617,6 +5188,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/boardStats.ts",
           "coreModule": false,
           "followable": true,
@@ -4634,6 +5206,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/resources.ts",
           "coreModule": false,
           "followable": true,
@@ -4651,6 +5224,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/turnOrder.ts",
           "coreModule": false,
           "followable": true,
@@ -4668,6 +5242,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/moves/build.ts",
           "coreModule": false,
           "followable": true,
@@ -4685,6 +5260,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/moves/robber.ts",
           "coreModule": false,
           "followable": true,
@@ -4702,6 +5278,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/moves/roll.ts",
           "coreModule": false,
           "followable": true,
@@ -4719,6 +5296,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/moves/setup.ts",
           "coreModule": false,
           "followable": true,
@@ -4736,6 +5314,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/moves/trade.ts",
           "coreModule": false,
           "followable": true,
@@ -4753,6 +5332,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/enumerator.ts",
           "coreModule": false,
           "followable": true,
@@ -4787,8 +5367,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4806,6 +5388,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/analysis/coach.ts",
           "coreModule": false,
           "followable": true,
@@ -4833,6 +5416,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -4850,6 +5434,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4867,6 +5452,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -4895,6 +5481,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -4910,8 +5497,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -4949,6 +5538,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -4966,6 +5556,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -4981,8 +5572,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5000,6 +5593,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -5017,6 +5611,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/validator.ts",
           "coreModule": false,
           "followable": true,
@@ -5042,8 +5637,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5061,6 +5658,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/moveValidation.ts",
           "coreModule": false,
           "followable": true,
@@ -5078,6 +5676,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/spatial.ts",
           "coreModule": false,
           "followable": true,
@@ -5110,6 +5709,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -5127,6 +5727,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -5142,8 +5743,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5161,6 +5764,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -5178,6 +5782,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -5195,6 +5800,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/trade.ts",
           "coreModule": false,
           "followable": true,
@@ -5212,6 +5818,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/economy.ts",
           "coreModule": false,
           "followable": true,
@@ -5229,6 +5836,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/robberRules.ts",
           "coreModule": false,
           "followable": true,
@@ -5246,6 +5854,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/spatial.ts",
           "coreModule": false,
           "followable": true,
@@ -5273,6 +5882,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -5288,8 +5898,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5307,6 +5919,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -5324,6 +5937,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/costs.ts",
           "coreModule": false,
           "followable": true,
@@ -5351,6 +5965,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -5366,8 +5981,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5385,6 +6002,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/queries.ts",
           "coreModule": false,
           "followable": true,
@@ -5402,6 +6020,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/validator.ts",
           "coreModule": false,
           "followable": true,
@@ -5429,6 +6048,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5446,6 +6066,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/validator.ts",
           "coreModule": false,
           "followable": true,
@@ -5473,6 +6094,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/utils/objectUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -5490,6 +6112,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -5507,6 +6130,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5524,6 +6148,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -5541,6 +6166,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/generation/boardGen.ts",
           "coreModule": false,
           "followable": true,
@@ -5558,6 +6184,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/geometry/hexUtils.ts",
           "coreModule": false,
           "followable": true,
@@ -5575,6 +6202,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/boardStats.ts",
           "coreModule": false,
           "followable": true,
@@ -5592,6 +6220,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/mechanics/resources.ts",
           "coreModule": false,
           "followable": true,
@@ -5609,6 +6238,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/validator.ts",
           "coreModule": false,
           "followable": true,
@@ -5636,6 +6266,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -5651,8 +6282,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5668,8 +6301,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/mechanics/trade.ts",
           "coreModule": false,
           "followable": true,
@@ -5687,6 +6322,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/validator.ts",
           "coreModule": false,
           "followable": true,
@@ -5714,6 +6350,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/constants.ts",
           "coreModule": false,
           "followable": true,
@@ -5729,8 +6366,10 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
-            "import"
+            "import",
+            "pre-compilation-only"
           ],
+          "preCompilationOnly": true,
           "resolved": "src/game/core/types.ts",
           "coreModule": false,
           "followable": true,
@@ -5748,6 +6387,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/validation.ts",
           "coreModule": false,
           "followable": true,
@@ -5765,6 +6405,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/queries.ts",
           "coreModule": false,
           "followable": true,
@@ -5782,6 +6423,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/rules/validator.ts",
           "coreModule": false,
           "followable": true,
@@ -5809,6 +6451,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/game/core/config.ts",
           "coreModule": false,
           "followable": true,
@@ -5825,13 +6468,6 @@
       "valid": true
     },
     {
-      "source": "src/game/core/utils/stringUtils.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
-    },
-    {
       "source": "src/main.tsx",
       "dependencies": [
         {
@@ -5843,6 +6479,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/App.tsx",
           "coreModule": false,
           "followable": true,
@@ -5860,6 +6497,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/styles/index.css",
           "coreModule": false,
           "followable": false,
@@ -5904,10 +6542,10 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 95,
-    "totalDependenciesCruised": 279,
+    "totalCruised": 99,
+    "totalDependenciesCruised": 292,
     "optionsUsed": {
-      "baseDir": "/app",
+      "baseDir": "/home/runner/work/catan-hex-mastery/catan-hex-mastery",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,
@@ -5941,7 +6579,19 @@
       "preserveSymlinks": false,
       "reporterOptions": {
         "dot": {
-          "collapsePattern": "node_modules/[^/]+"
+          "theme": {
+            "dependencies": [
+              {
+                "criteria": {
+                  "preCompilationOnly": true
+                },
+                "attributes": {
+                  "style": "dashed",
+                  "color": "#aaaaaa"
+                }
+              }
+            ]
+          }
         }
       },
       "rulesFile": "config/dependency-graph.cjs",
@@ -5949,11 +6599,147 @@
       "tsConfig": {
         "fileName": "tsconfig.app.json"
       },
-      "tsPreCompilationDeps": true,
+      "tsPreCompilationDeps": "specify",
       "args": "src"
     },
     "ruleSetUsed": {
-      "forbidden": []
+      "forbidden": [
+        {
+          "name": "core-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/core"
+          },
+          "to": {
+            "path": "^src/game/geometry|^src/game/mechanics|^src/game/generation|^src/game/rules|^src/game/analysis|^src/game/moves|^src/bots|^src/shared|^src/features"
+          },
+          "comment": "Core layer (Types/Constants) must be pure.",
+          "scope": "module"
+        },
+        {
+          "name": "geometry-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/geometry"
+          },
+          "to": {
+            "path": "^src/game/mechanics|^src/game/generation|^src/game/rules|^src/game/analysis|^src/game/moves|^src/bots|^src/shared|^src/features"
+          },
+          "comment": "Geometry layer must be pure math (only depend on Core).",
+          "scope": "module"
+        },
+        {
+          "name": "mechanics-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/mechanics"
+          },
+          "to": {
+            "path": "^src/game/generation|^src/game/rules|^src/game/analysis|^src/game/moves|^src/bots|^src/shared|^src/features"
+          },
+          "comment": "Mechanics layer must be pure and not depend on higher layers.",
+          "scope": "module"
+        },
+        {
+          "name": "generation-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/generation"
+          },
+          "to": {
+            "path": "^src/game/rules|^src/game/analysis|^src/game/moves|^src/bots"
+          },
+          "comment": "Generation layer cannot depend on Rules, Analysis, Moves, or Bots.",
+          "scope": "module"
+        },
+        {
+          "name": "rules-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/rules"
+          },
+          "to": {
+            "path": "^src/game/analysis|^src/game/moves|^src/bots"
+          },
+          "comment": "Rules layer (Validator/Enumerator) cannot depend on Analysis, Moves, or Bots.",
+          "scope": "module"
+        },
+        {
+          "name": "evaluation-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/analysis"
+          },
+          "to": {
+            "path": "^src/game/moves|^src/bots"
+          },
+          "comment": "Evaluation layer (Coach) evaluates state, not moves or bots.",
+          "scope": "module"
+        },
+        {
+          "name": "moves-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/moves"
+          },
+          "to": {
+            "path": "^src/bots"
+          },
+          "comment": "Moves are executed by game engine, should not depend on Bots.",
+          "scope": "module"
+        },
+        {
+          "name": "bypass-rule-facade",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/moves"
+          },
+          "to": {
+            "path": "^src/game/rules",
+            "pathNot": "^src/game/rules/validator.ts|^src/game/rules/queries.ts"
+          },
+          "comment": "Moves must access rules via the RuleEngine facade (validator.ts) or Query facade (queries.ts).",
+          "scope": "module"
+        },
+        {
+          "name": "logic-ui-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/game/core|^src/game/geometry|^src/game/mechanics|^src/game/generation|^src/game/rules|^src/game/analysis|^src/game/moves|^src/bots"
+          },
+          "to": {
+            "path": "^src/shared|^src/features"
+          },
+          "comment": "Game logic (Core, Rules, Moves) cannot depend on UI (Features, Shared).",
+          "scope": "module"
+        },
+        {
+          "name": "shared-layer-violation",
+          "severity": "error",
+          "from": {
+            "path": "^src/shared"
+          },
+          "to": {
+            "path": "^src/features|^src/game/geometry|^src/game/mechanics|^src/game/generation|^src/game/rules|^src/game/analysis|^src/game/moves|^src/bots"
+          },
+          "comment": "Shared UI cannot depend on Features or Game Logic (except Core Types/Config).",
+          "scope": "module"
+        },
+        {
+          "name": "feature-isolation",
+          "severity": "info",
+          "from": {
+            "path": "^src/features",
+            "pathNot": "^src/features/game"
+          },
+          "to": {
+            "path": "^src/features",
+            "pathNot": "^src/features/[^/]+"
+          },
+          "comment": "Features should be independent. Cross-feature imports are discouraged.",
+          "scope": "module"
+        }
+      ]
     }
   }
 }

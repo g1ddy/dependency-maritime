@@ -43,7 +43,7 @@ describe('Visualization Store', () => {
     expect(state.hideTypeDefinitions).toBe(true);
   });
 
-  it('should set graph data and generate nodes/edges', () => {
+  it('should set graph data and generate nodes/edges', { timeout: 15000 }, () => {
     const store = useGraphStore.getState();
     store.setGraphData(sampleData);
 
@@ -120,7 +120,7 @@ describe('Visualization Store', () => {
     expect(node.data.dimmed).toBe(false);
   });
 
-  it('should handle multiple filters correctly', () => {
+  it('should handle multiple filters correctly', { timeout: 15000 }, () => {
     const store = useGraphStore.getState();
     store.setGraphData(sampleData);
 

@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { ReactFlowProvider } from '@xyflow/react';
 import { DependencyGraph } from './DependencyGraph';
 import { describe, it, expect, vi } from 'vitest';
 
@@ -34,6 +35,14 @@ describe('DependencyGraph', () => {
 
     useGraphStoreMock.mockReturnValue(mockState);
     getStateMock.mockReturnValue({ rawGraphData: null });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(storeModule.useGraphStore).mockReturnValue(mockState as any);
+
+    const { container } = render(
+      <ReactFlowProvider>
+        <DependencyGraph />
+      </ReactFlowProvider>
+    );
 
     render(<DependencyGraph />);
 

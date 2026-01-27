@@ -44,6 +44,7 @@ interface GraphState {
   toggleTypeDefinitions: () => void;
   setFilter: (filter: ModuleCategory | 'all') => void;
   reset: () => void;
+  reparentNode: (nodeId: string, newParentId: string | undefined, newPosition: { x: number; y: number }) => void;
 
   // React Flow Handlers
   onNodesChange: OnNodesChange;
@@ -265,3 +266,40 @@ export const useGraphStore = create<GraphState>()(
     }
   )
 );
+      }),
+    });
+  },
+
+  reparentNode: (nodeId, newParentId, newPosition) => {
+    const { nodes } = get();
+    set({
+      nodes: nodes.map((n) => {
+        if (n.id === nodeId) {
+          return {
+            ...n,
+            parentId: newParentId,
+            position: newPosition,
+            extent: newParentId ? undefined : undefined,
+          };
+        }
+        return n;
+      }),
+    });
+  },
+
+  reset: () => {
+    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilters: [] });
+  },
+
+  onNodesChange: (changes: NodeChange[]) => {
+    set({
+      nodes: applyNodeChanges(changes, get().nodes),
+    });
+  },
+
+  onEdgesChange: (changes: EdgeChange[]) => {
+    set({
+      edges: applyEdgeChanges(changes, get().edges),
+    });
+  },
+}));
