@@ -58,7 +58,7 @@ export function DependencyGraph() {
         fitView
       >
         <Background />
-        <Controls />
+        <Controls position="bottom-right" />
         <MiniMap
           nodeColor={miniMapNodeColor}
           nodeStrokeColor="transparent"

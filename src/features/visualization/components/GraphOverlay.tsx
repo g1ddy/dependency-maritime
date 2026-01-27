@@ -1,6 +1,5 @@
 import { useMemo } from "react"
-import { Box, Hammer, Plus, Minus, Maximize, Globe, Wand2, Monitor, Cpu } from "lucide-react"
-import { useReactFlow } from "@xyflow/react"
+import { Box, Hammer, Globe, Wand2, Monitor, Cpu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -9,7 +8,6 @@ import { Label } from "@/components/ui/label"
 import { useGraphStore } from "../store"
 
 export function GraphOverlay() {
-  const { zoomIn, zoomOut, fitView } = useReactFlow();
   const { selectedNodeId, nodes, hideTypeDefinitions, toggleTypeDefinitions } = useGraphStore();
 
   const selectedNode = useMemo(
@@ -112,36 +110,6 @@ export function GraphOverlay() {
           <div className="w-96" /> /* Spacer to keep zoom controls aligned if needed, or just remove */
         )}
 
-        {/* Zoom Controls */}
-        <div className="flex flex-col gap-2 ml-auto">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="h-10 w-10 shadow-md border border-border/50"
-            data-testid="zoom-in-btn"
-            onClick={() => { void zoomIn(); }}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="secondary"
-            size="icon"
-            className="h-10 w-10 shadow-md border border-border/50"
-            data-testid="zoom-out-btn"
-            onClick={() => { void zoomOut(); }}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="secondary"
-            size="icon"
-            className="h-10 w-10 shadow-md border border-border/50"
-            data-testid="fit-view-btn"
-            onClick={() => { void fitView(); }}
-          >
-            <Maximize className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
     </div>
   )

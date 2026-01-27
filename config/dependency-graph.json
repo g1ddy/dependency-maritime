@@ -477,7 +477,8 @@
         }
       ],
       "dependents": [
-        "src/features/visualization/components/DependencyGraph.tsx"
+        "src/features/visualization/components/DependencyGraph.tsx",
+        "src/features/visualization/components/GraphOverlay.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -542,6 +543,23 @@
     {
       "source": "src/features/visualization/components/GraphOverlay.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/features/visualization/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "@/components/ui/button",
@@ -963,7 +981,7 @@
     "info": 1,
     "ignore": 0,
     "totalCruised": 26,
-    "totalDependenciesCruised": 35,
+    "totalDependenciesCruised": 36,
     "optionsUsed": {
       "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
       "combinedDependencies": false,
