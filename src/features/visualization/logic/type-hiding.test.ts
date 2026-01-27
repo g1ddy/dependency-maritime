@@ -60,7 +60,7 @@ describe('Type Definition Hiding Logic', () => {
       info: 0,
       totalCruised: 3,
       totalDependenciesCruised: 2,
-      optionsUsed: {} as any
+      optionsUsed: {}
     }
   };
 
