@@ -27,6 +27,17 @@ export function DependencyGraph() {
     setGraphData(parsedData);
   }, [setGraphData]);
 
+  // Define MiniMap node color logic
+  const miniMapNodeColor = (node: { data: { label?: unknown; external?: unknown } }) => {
+    const label = (node.data.label as string) || '';
+    const isExternal = !!node.data.external;
+
+    if (isExternal) return '#f59e0b'; // amber-500
+    if (label.endsWith('.tsx')) return '#60a5fa'; // blue-400
+    if (label.endsWith('.ts')) return '#4ade80'; // green-400
+    return '#94a3b8'; // slate-400
+  };
+
   return (
     <div className="absolute inset-0 w-full h-full">
       <ReactFlow
@@ -41,7 +52,12 @@ export function DependencyGraph() {
       >
         <Background />
         <Controls />
-        <MiniMap />
+        <MiniMap
+          nodeColor={miniMapNodeColor}
+          maskColor="rgb(9, 9, 11, 0.8)" // heavily darkened background
+          nodeStrokeColor="transparent"
+          nodeBorderRadius={2}
+        />
       </ReactFlow>
     </div>
   );
