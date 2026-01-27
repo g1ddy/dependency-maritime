@@ -141,7 +141,8 @@ export function transformToReactFlow(
   });
 
   // Add group nodes to the nodes list
-  nodes.push(...groupNodesMap.values());
+  // We place group nodes FIRST so they render BEHIND the file nodes
+  const finalNodes = [...groupNodesMap.values(), ...nodes];
 
   graph.forEachEdge((_edgeId, attributes, source, target) => {
     // 1. Filter out edges where source or target is hidden
@@ -169,5 +170,5 @@ export function transformToReactFlow(
     });
   });
 
-  return { nodes, edges };
+  return { nodes: finalNodes, edges };
 }
