@@ -40,6 +40,7 @@ describe('Visualization Store', () => {
     expect(state.edges).toEqual([]);
     expect(state.graph).toBeNull();
     expect(state.loading).toBe(false);
+    expect(state.hideTypeDefinitions).toBe(true);
   });
 
   it('should set graph data and generate nodes/edges', () => {

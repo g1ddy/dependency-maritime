@@ -50,7 +50,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   selectedNodeId: null,
   graph: null,
   loading: false,
-  hideTypeDefinitions: false,
+  hideTypeDefinitions: true,
   layoutDirection: 'TB',
 
   setGraphData: (data: ICruiseResult) => {
