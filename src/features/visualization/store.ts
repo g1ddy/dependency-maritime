@@ -109,7 +109,10 @@ export const useGraphStore = create<GraphState>((set, get) => ({
       const visited = new Set<string>([start]);
       let head = 0;
       while (head < queue.length) {
-        const curr = queue[head++]!;
+        // Safe access because we check head < queue.length
+        const curr = queue[head++];
+        if (!curr) continue;
+
         const neighbors = direction === 'in' ? graph.inNeighbors(curr) : graph.outNeighbors(curr);
         for (const neighbor of neighbors) {
           if (!visited.has(neighbor)) {
