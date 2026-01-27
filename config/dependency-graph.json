@@ -15,6 +15,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/layout/Header.tsx",
           "coreModule": false,
           "followable": true,
@@ -35,6 +36,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/visualization/components/DependencyGraph.tsx",
           "coreModule": false,
           "followable": true,
@@ -55,6 +57,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/visualization/components/GraphOverlay.tsx",
           "coreModule": false,
           "followable": true,
@@ -82,6 +85,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/vite-env.d.ts",
           "coreModule": false,
           "followable": true,
@@ -102,6 +106,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/mode-toggle.tsx",
           "coreModule": false,
           "followable": true,
@@ -122,6 +127,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/button.tsx",
           "coreModule": false,
           "followable": true,
@@ -142,6 +148,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/sheet.tsx",
           "coreModule": false,
           "followable": true,
@@ -181,6 +188,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/theme-provider.tsx",
           "coreModule": false,
           "followable": true,
@@ -201,6 +209,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/button.tsx",
           "coreModule": false,
           "followable": true,
@@ -221,6 +230,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/dropdown-menu.tsx",
           "coreModule": false,
           "followable": true,
@@ -261,6 +271,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -312,6 +323,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -342,6 +354,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -369,6 +382,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/visualization/store.ts",
           "coreModule": false,
           "followable": true,
@@ -386,6 +400,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/visualization/components/AppNode.tsx",
           "coreModule": false,
           "followable": true,
@@ -406,6 +421,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/schema/dependency-cruiser.ts",
           "coreModule": false,
           "followable": true,
@@ -434,6 +450,7 @@
             "type-only",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/schema/dependency-cruiser.ts",
           "coreModule": false,
           "followable": true,
@@ -469,6 +486,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/visualization/logic/layout.ts",
           "coreModule": false,
           "followable": true,
@@ -486,6 +504,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/visualization/logic/transformer.ts",
           "coreModule": false,
           "followable": true,
@@ -546,6 +565,7 @@
             "type-only",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/schema/dependency-cruiser.ts",
           "coreModule": false,
           "followable": true,
@@ -617,6 +637,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/features/visualization/store.ts",
           "coreModule": false,
           "followable": true,
@@ -637,6 +658,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/button.tsx",
           "coreModule": false,
           "followable": true,
@@ -657,6 +679,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/card.tsx",
           "coreModule": false,
           "followable": true,
@@ -677,6 +700,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/label.tsx",
           "coreModule": false,
           "followable": true,
@@ -697,6 +721,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/separator.tsx",
           "coreModule": false,
           "followable": true,
@@ -717,6 +742,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/ui/switch.tsx",
           "coreModule": false,
           "followable": true,
@@ -767,6 +793,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -797,6 +824,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -827,6 +855,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -857,6 +886,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -887,6 +917,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -915,6 +946,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -943,6 +975,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -968,6 +1001,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/App.tsx",
           "coreModule": false,
           "followable": true,
@@ -985,6 +1019,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/index.css",
           "coreModule": false,
           "followable": false,
@@ -1005,6 +1040,7 @@
             "local",
             "import"
           ],
+          "preCompilationOnly": false,
           "resolved": "src/components/theme-provider.tsx",
           "coreModule": false,
           "followable": true,
@@ -1068,7 +1104,7 @@
     "totalCruised": 27,
     "totalDependenciesCruised": 40,
     "optionsUsed": {
-      "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
+      "baseDir": "/app",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,
@@ -1116,7 +1152,7 @@
       "tsConfig": {
         "fileName": "./tsconfig.app.json"
       },
-      "tsPreCompilationDeps": true,
+      "tsPreCompilationDeps": "specify",
       "args": "src"
     },
     "ruleSetUsed": {

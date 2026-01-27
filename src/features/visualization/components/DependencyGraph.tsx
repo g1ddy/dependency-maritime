@@ -5,7 +5,7 @@ import { ReactFlow, Background, Controls, MiniMap } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { useGraphStore } from '../store';
-import sampleData from '../../../../sample-data/dependency-graph.json';
+import graphData from '../../../../sample-data/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 
@@ -29,8 +29,8 @@ export function DependencyGraph() {
   const nodeTypes = useMemo(() => ({ appNode: AppNode }), []);
 
   useEffect(() => {
-    // Load sample data on mount
-    const parsedData = CruiseResultSchema.parse(sampleData);
+    // Load graph data on mount
+    const parsedData = CruiseResultSchema.parse(graphData);
     setGraphData(parsedData);
   }, [setGraphData]);
 
