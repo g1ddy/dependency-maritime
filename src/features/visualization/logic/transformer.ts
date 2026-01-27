@@ -82,8 +82,8 @@ export function transformToReactFlow(
   graph.forEachEdge((_edgeId, attributes, source, target) => {
     if (
       options.hideTypeDefinitions &&
-      attributes.dependencyTypes &&
-      (attributes.dependencyTypes as string[]).includes('type-only')
+      Array.isArray(attributes.dependencyTypes) &&
+      attributes.dependencyTypes.includes('type-only')
     ) {
       return;
     }

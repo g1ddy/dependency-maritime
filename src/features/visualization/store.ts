@@ -74,7 +74,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   toggleTypeDefinitions: () => {
-    const { graph, hideTypeDefinitions, selectedNodeId } = get();
+    const { graph, hideTypeDefinitions, selectedNodeId, direction } = get();
     if (!graph) return;
 
     const newValue = !hideTypeDefinitions;
@@ -82,8 +82,8 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     // Re-transform with new filter
     const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: newValue });
 
-    // Re-layout (Default to TB for now as we don't store direction)
-    const layouted = applyDagreLayout(nodes, edges, { direction: 'TB' });
+    // Re-layout using the currently stored direction
+    const layouted = applyDagreLayout(nodes, edges, { direction });
 
     set({
       hideTypeDefinitions: newValue,
