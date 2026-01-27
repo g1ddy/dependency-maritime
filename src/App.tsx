@@ -21,8 +21,9 @@ function App() {
         const result = CruiseResultSchema.parse(json)
         setGraphData(result)
       } catch (error) {
+        // TODO: Integrate with a structured logging solution (e.g., Sentry)
         console.error("Failed to parse or validate file:", error)
-        // TODO: Implement a proper user notification (Toast)
+        // TODO: Implement a non-blocking notification system (e.g., Toast) to inform the user
       }
     }
     reader.readAsText(file)
@@ -33,7 +34,9 @@ function App() {
       const data = CruiseResultSchema.parse(sampleData)
       setGraphData(data)
     } catch (error) {
+      // TODO: Integrate with a structured logging solution
       console.error("Failed to load sample data:", error)
+      // TODO: Implement a non-blocking notification system
     }
   }
 
@@ -42,7 +45,9 @@ function App() {
       const data = CruiseResultSchema.parse(projectData)
       setGraphData(data)
     } catch (error) {
+      // TODO: Integrate with a structured logging solution
       console.error("Failed to load project data:", error)
+      // TODO: Implement a non-blocking notification system
     }
   }
 
