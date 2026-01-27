@@ -23,6 +23,8 @@ export const DependencySchema = z.object({
   dependencyTypes: z.array(z.string()).optional(),
   /** The module system used (e.g., "es6", "cjs") */
   moduleSystem: z.enum(['amd', 'cjs', 'es6', 'tsd']).optional(),
+  /** Whether the dependency exists only before compilation (e.g. type-only) */
+  preCompilationOnly: z.boolean().optional(),
   /** Validity of the dependency */
   valid: z.boolean().optional(),
   /** Cycle path if circular */

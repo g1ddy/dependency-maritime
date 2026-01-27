@@ -8,5 +8,6 @@ module.exports = {
     // Graph generation specific options
     includeOnly: '^src',
     exclude: '(\\.test\\.ts|\\.test\\.tsx|\\.spec\\.ts|testUtils\\.ts)$',
+    tsPreCompilationDeps: 'specify',
   },
 };
