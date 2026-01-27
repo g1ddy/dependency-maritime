@@ -195,9 +195,6 @@ export const useGraphStore = create<GraphState>((set, get) => ({
         const curr = queue[head++];
         if (!curr) continue;
 
-        // Safety check if we encounter a node not in graph during traversal
-        if (!graph.hasNode(curr)) continue;
-
         const neighbors = direction === 'in' ? graph.inNeighbors(curr) : graph.outNeighbors(curr);
         for (const neighbor of neighbors) {
           if (!visited.has(neighbor)) {
