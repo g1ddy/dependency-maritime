@@ -9,6 +9,13 @@ import sampleData from '../../../../sample-data/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 
+const MINI_MAP_NODE_COLORS = {
+  EXTERNAL: '#f59e0b', // amber-500
+  TSX: '#60a5fa', // blue-400
+  TS: '#4ade80', // green-400
+  DEFAULT: '#94a3b8', // slate-400
+} as const;
+
 export function DependencyGraph() {
   const {
     nodes,
@@ -32,10 +39,10 @@ export function DependencyGraph() {
     const label = (node.data.label as string) || '';
     const isExternal = !!node.data.external;
 
-    if (isExternal) return '#f59e0b'; // amber-500
-    if (label.endsWith('.tsx')) return '#60a5fa'; // blue-400
-    if (label.endsWith('.ts')) return '#4ade80'; // green-400
-    return '#94a3b8'; // slate-400
+    if (isExternal) return MINI_MAP_NODE_COLORS.EXTERNAL;
+    if (label.endsWith('.tsx')) return MINI_MAP_NODE_COLORS.TSX;
+    if (label.endsWith('.ts')) return MINI_MAP_NODE_COLORS.TS;
+    return MINI_MAP_NODE_COLORS.DEFAULT;
   };
 
   return (
@@ -54,7 +61,6 @@ export function DependencyGraph() {
         <Controls />
         <MiniMap
           nodeColor={miniMapNodeColor}
-          maskColor="rgb(9, 9, 11, 0.8)" // heavily darkened background
           nodeStrokeColor="transparent"
           nodeBorderRadius={2}
         />

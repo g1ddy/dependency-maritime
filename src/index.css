@@ -138,6 +138,6 @@
 }
 
 .react-flow__minimap .react-flow__minimap-mask {
-  fill: hsl(var(--muted)) !important;
-  opacity: 0.6;
+  fill: hsl(var(--background)) !important;
+  opacity: 0.8 !important;
 }
