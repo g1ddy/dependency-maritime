@@ -102,6 +102,9 @@ export function applyDagreLayout(
         if (parentPos) {
             x = x - parentPos.x;
             y = y - parentPos.y;
+        } else {
+            // Check if we are really missing the parent in the nodes list
+            console.warn(`Layout: Missing parent position for ${node.id} (parent: ${node.parentId}). Node might render displaced.`);
         }
     }
 

@@ -29,7 +29,7 @@ export function DependencyGraph() {
     reparentNode,
   } = useGraphStore();
 
-  const { getIntersectingNodes } = useReactFlow();
+  const { getIntersectingNodes, getInternalNode } = useReactFlow();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
@@ -56,7 +56,10 @@ export function DependencyGraph() {
         if (group.id !== node.parentId) {
           // Calculate relative position based on absolute positions
           const nodeAbs = customNode.positionAbsolute;
-          const groupAbs = group.positionAbsolute;
+
+          // Get the most up-to-date absolute position of the group
+          const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
+          const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
 
           if (nodeAbs && groupAbs) {
             const relativeX = nodeAbs.x - groupAbs.x;
@@ -77,7 +80,7 @@ export function DependencyGraph() {
         }
       }
     },
-    [getIntersectingNodes, reparentNode]
+    [getIntersectingNodes, reparentNode, getInternalNode]
   );
 
   // Define MiniMap node color logic
