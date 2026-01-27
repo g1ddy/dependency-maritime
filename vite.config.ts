@@ -10,7 +10,7 @@ interface PackageJson {
 }
 
 const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf-8")) as PackageJson
-const version = process.env.VITE_APP_VERSION || packageJson.version
+const version = process.env.VITE_APP_VERSION || packageJson.version || "DEV"
 
 export default defineConfig({
   base: "/dependency-maritime/",
