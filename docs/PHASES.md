@@ -40,6 +40,9 @@
     *   Validate the uploaded file against the Zod schema.
     *   Update the store with the new data to replace the sample data.
 
+9.  **Toolbar Actions (Drawer Menu)**
+    *   TODO: Implement functionality for Code, Download, and Settings buttons in the new Drawer menu.
+
 ## Phase 2: The "Inspector" (Metrics & Heatmaps)
 **Goal:** Visualize the "health" of the code.
 

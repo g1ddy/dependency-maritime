@@ -1,4 +1,4 @@
-import { Code, Download, Settings, Box, Layers, Hammer, Plus, Minus, Maximize, Globe, Wand2, Monitor, Cpu } from "lucide-react"
+import { Box, Layers, Hammer, Plus, Minus, Maximize, Globe, Wand2, Monitor, Cpu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -11,19 +11,6 @@ export function GraphOverlay() {
       {/* Top Bar */}
       <div className="flex justify-between items-start pointer-events-auto">
         <div className="flex flex-col gap-4">
-          {/* Tools */}
-          <Card className="flex items-center p-1 gap-1 w-fit bg-card/80 backdrop-blur border-border/50 shadow-sm">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-              <Code className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-              <Download className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </Card>
-
           {/* Filters */}
           <div className="flex gap-2">
             <Button variant="default" size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-md">
