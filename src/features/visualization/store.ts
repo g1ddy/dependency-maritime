@@ -32,7 +32,7 @@ interface GraphState {
   loading: boolean;
   hideTypeDefinitions: boolean;
   layoutDirection: 'TB' | 'LR';
-  activeFilter: ModuleCategory | 'all';
+  activeFilters: ModuleCategory[];
 
   // Actions
   setGraphData: (data: ICruiseResult) => void;
@@ -55,17 +55,17 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   loading: false,
   hideTypeDefinitions: true,
   layoutDirection: 'TB',
-  activeFilter: 'all',
+  activeFilters: [],
 
   setGraphData: (data: ICruiseResult) => {
-    const { hideTypeDefinitions, layoutDirection, activeFilter } = get();
+    const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
     set({ loading: true });
 
     // 1. Transform to Graphology
     const graph = createGraphFromCruiseResult(data);
 
     // 2. Transform to React Flow
-    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilter });
+    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters });
 
     // 3. Apply Initial Layout
     const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
@@ -80,7 +80,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   toggleTypeDefinitions: () => {
-    const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilter } = get();
+    const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilters } = get();
     if (!graph) return;
 
     const newValue = !hideTypeDefinitions;
@@ -88,7 +88,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     // Re-transform with new filter
     const { nodes, edges } = transformToReactFlow(graph, {
       hideTypeDefinitions: newValue,
-      activeFilter
+      activeFilters
     });
 
     // Re-layout using preserved direction
@@ -107,20 +107,32 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   setFilter: (filter: ModuleCategory | 'all') => {
-    const { graph, hideTypeDefinitions, layoutDirection } = get();
+    const { graph, hideTypeDefinitions, layoutDirection, activeFilters } = get();
     if (!graph) return;
+
+    let newFilters: ModuleCategory[];
+
+    if (filter === 'all') {
+      newFilters = [];
+    } else {
+      if (activeFilters.includes(filter)) {
+        newFilters = activeFilters.filter((f) => f !== filter);
+      } else {
+        newFilters = [...activeFilters, filter];
+      }
+    }
 
     // Re-transform with new filter
     const { nodes, edges } = transformToReactFlow(graph, {
       hideTypeDefinitions,
-      activeFilter: filter
+      activeFilters: newFilters
     });
 
     // Re-layout
     const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
 
     set({
-      activeFilter: filter,
+      activeFilters: newFilters,
       nodes: layouted.nodes,
       edges: layouted.edges,
       selectedNodeId: null // Reset selection as the node might be hidden
@@ -223,7 +235,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   reset: () => {
-    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilter: 'all' });
+    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilters: [] });
   },
 
   onNodesChange: (changes: NodeChange[]) => {
