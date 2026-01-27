@@ -7,15 +7,31 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useGraphStore } from "../store"
+import { cn } from "@/lib/utils"
 
 export function GraphOverlay() {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
-  const { selectedNodeId, nodes, hideTypeDefinitions, toggleTypeDefinitions } = useGraphStore();
+  const {
+    selectedNodeId,
+    nodes,
+    hideTypeDefinitions,
+    toggleTypeDefinitions,
+    activeFilter,
+    setFilter
+  } = useGraphStore();
 
   const selectedNode = useMemo(
     () => (selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null),
     [selectedNodeId, nodes]
   );
+
+  const getFilterButtonClass = (isActive: boolean) =>
+    cn(
+      "gap-2 shadow-md transition-colors",
+      isActive
+        ? "bg-blue-600 hover:bg-blue-700 text-white border-transparent"
+        : "bg-background/50 backdrop-blur border-border/50 hover:bg-background/80 text-foreground"
+    );
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col p-4">
@@ -24,16 +40,36 @@ export function GraphOverlay() {
         <div className="flex flex-col gap-4">
           {/* Filters */}
           <div className="flex gap-2">
-            <Button variant="default" size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-md">
+            <Button
+              variant={activeFilter === 'all' ? "default" : "outline"}
+              size="sm"
+              className={getFilterButtonClass(activeFilter === 'all')}
+              onClick={() => setFilter('all')}
+            >
               <Box className="h-3 w-3" /> All Modules
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-background/50 backdrop-blur border-border/50 hover:bg-background/80">
+            <Button
+              variant={activeFilter === 'core' ? "default" : "outline"}
+              size="sm"
+              className={getFilterButtonClass(activeFilter === 'core')}
+              onClick={() => setFilter('core')}
+            >
               <Cpu className="h-3 w-3" /> Core
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-background/50 backdrop-blur border-border/50 hover:bg-background/80">
+            <Button
+              variant={activeFilter === 'ui' ? "default" : "outline"}
+              size="sm"
+              className={getFilterButtonClass(activeFilter === 'ui')}
+              onClick={() => setFilter('ui')}
+            >
               <Monitor className="h-3 w-3" /> UI Kit
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-background/50 backdrop-blur border-border/50 hover:bg-background/80">
+            <Button
+              variant={activeFilter === 'util' ? "default" : "outline"}
+              size="sm"
+              className={getFilterButtonClass(activeFilter === 'util')}
+              onClick={() => setFilter('util')}
+            >
               <Hammer className="h-3 w-3" /> Util
             </Button>
           </div>

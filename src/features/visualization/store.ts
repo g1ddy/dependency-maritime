@@ -13,6 +13,7 @@ import Graph from 'graphology';
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
 import { applyDagreLayout } from './logic/layout';
+import { type ModuleCategory } from './logic/filters';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
@@ -31,12 +32,14 @@ interface GraphState {
   loading: boolean;
   hideTypeDefinitions: boolean;
   layoutDirection: 'TB' | 'LR';
+  activeFilter: ModuleCategory | 'all';
 
   // Actions
   setGraphData: (data: ICruiseResult) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
   selectNode: (nodeId: string | null) => void;
   toggleTypeDefinitions: () => void;
+  setFilter: (filter: ModuleCategory | 'all') => void;
   reset: () => void;
 
   // React Flow Handlers
@@ -52,16 +55,17 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   loading: false,
   hideTypeDefinitions: true,
   layoutDirection: 'TB',
+  activeFilter: 'all',
 
   setGraphData: (data: ICruiseResult) => {
-    const { hideTypeDefinitions, layoutDirection } = get();
+    const { hideTypeDefinitions, layoutDirection, activeFilter } = get();
     set({ loading: true });
 
     // 1. Transform to Graphology
     const graph = createGraphFromCruiseResult(data);
 
     // 2. Transform to React Flow
-    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions });
+    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilter });
 
     // 3. Apply Initial Layout
     const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
@@ -76,13 +80,16 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   toggleTypeDefinitions: () => {
-    const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection } = get();
+    const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilter } = get();
     if (!graph) return;
 
     const newValue = !hideTypeDefinitions;
 
     // Re-transform with new filter
-    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: newValue });
+    const { nodes, edges } = transformToReactFlow(graph, {
+      hideTypeDefinitions: newValue,
+      activeFilter
+    });
 
     // Re-layout using preserved direction
     const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
@@ -97,6 +104,30 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     if (selectedNodeId) {
       get().selectNode(selectedNodeId);
     }
+  },
+
+  setFilter: (filter: ModuleCategory | 'all') => {
+    const { graph, hideTypeDefinitions, layoutDirection } = get();
+    if (!graph) return;
+
+    // Re-transform with new filter
+    const { nodes, edges } = transformToReactFlow(graph, {
+      hideTypeDefinitions,
+      activeFilter: filter
+    });
+
+    // Re-layout
+    const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
+
+    set({
+      activeFilter: filter,
+      nodes: layouted.nodes,
+      edges: layouted.edges,
+      selectedNodeId: null // Reset selection as the node might be hidden
+    });
+
+    // Optional: try to preserve selection if visible?
+    // For now, simpler to reset.
   },
 
   layoutGraph: (direction = 'TB') => {
@@ -192,7 +223,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   reset: () => {
-    set({ nodes: [], edges: [], graph: null, selectedNodeId: null });
+    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilter: 'all' });
   },
 
   onNodesChange: (changes: NodeChange[]) => {

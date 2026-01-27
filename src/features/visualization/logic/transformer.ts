@@ -1,6 +1,7 @@
 import Graph from 'graphology';
 import { type Node, type Edge } from '@xyflow/react';
 import { type ICruiseResult, type IModule, type IDependency } from '../../../schema/dependency-cruiser';
+import { classifyNode, type ModuleCategory } from './filters';
 
 /**
  * Converts the dependency-cruiser output into a Graphology graph.
@@ -61,12 +62,28 @@ export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
  */
 export function transformToReactFlow(
   graph: Graph,
-  options: { hideTypeDefinitions?: boolean } = {}
+  options: {
+    hideTypeDefinitions?: boolean;
+    activeFilter?: ModuleCategory | 'all';
+  } = {}
 ): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
+  const visibleNodeIds = new Set<string>();
+
+  const activeFilter = options.activeFilter || 'all';
 
   graph.forEachNode((nodeId, attributes) => {
+    // Apply Category Filter
+    if (activeFilter !== 'all') {
+      const category = classifyNode(nodeId);
+      if (category !== activeFilter) {
+        return; // Skip this node
+      }
+    }
+
+    visibleNodeIds.add(nodeId);
+
     nodes.push({
       id: nodeId,
       // We will assume a default type for now, or 'default'
@@ -80,6 +97,12 @@ export function transformToReactFlow(
   });
 
   graph.forEachEdge((_edgeId, attributes, source, target) => {
+    // 1. Filter out edges where source or target is hidden
+    if (!visibleNodeIds.has(source) || !visibleNodeIds.has(target)) {
+      return;
+    }
+
+    // 2. Filter out type definitions if requested
     if (
       options.hideTypeDefinitions &&
       Array.isArray(attributes.dependencyTypes) &&
