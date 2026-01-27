@@ -9,6 +9,7 @@ import graphData from '../../../../sample-data/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
+import { type CustomNode } from '../types';
 
 const MINI_MAP_NODE_COLORS = {
   EXTERNAL: '#f59e0b', // amber-500
@@ -40,20 +41,22 @@ export function DependencyGraph() {
 
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
+      // Cast to CustomNode to safely access positionAbsolute
+      const customNode = node as CustomNode;
+
       // Find intersecting nodes that are groups
       const intersections = getIntersectingNodes(node).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
       );
-      const group = intersections[0];
+      const group = intersections[0] as CustomNode | undefined;
 
       // If dropped on a group
       if (group) {
         // Only update if parent is different
         if (group.id !== node.parentId) {
           // Calculate relative position based on absolute positions
-          // positionAbsolute is present at runtime but potentially missing in Node type definition
-          const nodeAbs = (node as Node & { positionAbsolute?: { x: number; y: number } }).positionAbsolute;
-          const groupAbs = (group as Node & { positionAbsolute?: { x: number; y: number } }).positionAbsolute;
+          const nodeAbs = customNode.positionAbsolute;
+          const groupAbs = group.positionAbsolute;
 
           if (nodeAbs && groupAbs) {
             const relativeX = nodeAbs.x - groupAbs.x;
@@ -64,7 +67,7 @@ export function DependencyGraph() {
       } else {
         // Dropped on canvas (no group)
         if (node.parentId) {
-          const nodeAbs = (node as Node & { positionAbsolute?: { x: number; y: number } }).positionAbsolute;
+          const nodeAbs = customNode.positionAbsolute;
           if (nodeAbs) {
             reparentNode(node.id, undefined, {
               x: nodeAbs.x,

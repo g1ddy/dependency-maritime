@@ -1,9 +1,13 @@
 import { memo } from 'react';
-import { type NodeProps } from '@xyflow/react';
+import { type NodeProps, type Node } from '@xyflow/react';
 import { Folder } from 'lucide-react';
+import { type GroupNodeData } from '../types';
 
-export const GroupNode = memo(({ data, selected }: NodeProps) => {
-  const label = (data.label as string) || 'unknown';
+// We extend NodeProps to override 'data' with our specific type
+type GroupNodeProps = NodeProps<Node<GroupNodeData>>;
+
+export const GroupNode = memo(({ data, selected }: GroupNodeProps) => {
+  const label = data.label || 'unknown';
 
   let borderClass = 'border-slate-700';
   if (selected) {
