@@ -5,7 +5,7 @@ import { ReactFlow, Background, Controls, MiniMap } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { useGraphStore } from '../store';
-import graphData from '../../../../sample-data/dependency-graph.json';
+import sampleData from '../../../../sample-data/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 
@@ -23,16 +23,25 @@ export function DependencyGraph() {
     onNodesChange,
     onEdgesChange,
     setGraphData,
+    rehydrateGraph,
     selectNode
   } = useGraphStore();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode }), []);
 
   useEffect(() => {
-    // Load graph data on mount
-    const parsedData = CruiseResultSchema.parse(graphData);
-    setGraphData(parsedData);
-  }, [setGraphData]);
+    // Attempt to hydrate from local storage
+    rehydrateGraph();
+
+    // Check if we have data after hydration attempt
+    const currentRawData = useGraphStore.getState().rawGraphData;
+
+    if (!currentRawData) {
+      // Fallback to sample data if no data is persisted
+      const parsedData = CruiseResultSchema.parse(sampleData);
+      setGraphData(parsedData);
+    }
+  }, [rehydrateGraph, setGraphData]);
 
   // Define MiniMap node color logic
   const miniMapNodeColor = (node: { data: { label?: unknown; external?: unknown } }) => {
