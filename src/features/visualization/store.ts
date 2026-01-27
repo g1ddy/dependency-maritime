@@ -183,6 +183,10 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
     // Helper for BFS
     const bfs = (start: string, direction: 'in' | 'out', result: Set<string>) => {
+      // If the node doesn't exist in the graph (e.g. it's a folder/group node),
+      // we can't traverse neighbors.
+      if (!graph.hasNode(start)) return;
+
       const queue = [start];
       const visited = new Set<string>([start]);
       let head = 0;
@@ -190,6 +194,9 @@ export const useGraphStore = create<GraphState>((set, get) => ({
         // Safe access because we check head < queue.length
         const curr = queue[head++];
         if (!curr) continue;
+
+        // Safety check if we encounter a node not in graph during traversal
+        if (!graph.hasNode(curr)) continue;
 
         const neighbors = direction === 'in' ? graph.inNeighbors(curr) : graph.outNeighbors(curr);
         for (const neighbor of neighbors) {
