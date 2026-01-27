@@ -1,9 +1,12 @@
 import { memo } from 'react';
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { AppWindow, FileCode, Package, File } from 'lucide-react';
+import { type AppNodeData } from '../types';
 
-export const AppNode = memo(({ data, selected }: NodeProps) => {
-  const label = (data.label as string) || 'unknown';
+type AppNodeProps = NodeProps<Node<AppNodeData>>;
+
+export const AppNode = memo(({ data, selected }: AppNodeProps) => {
+  const label = data.label || 'unknown';
   const isExternal = !!data.external;
 
   // Visual states from data

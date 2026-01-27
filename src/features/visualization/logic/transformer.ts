@@ -70,6 +70,7 @@ export function transformToReactFlow(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   const visibleNodeIds = new Set<string>();
+  const groupNodesMap = new Map<string, Node>();
 
   const activeFilters = options.activeFilters || [];
 
@@ -84,17 +85,63 @@ export function transformToReactFlow(
 
     visibleNodeIds.add(nodeId);
 
+    // Determine directory hierarchy
+    // Assuming nodeId is a file path like "src/features/visualization/logic/transformer.ts"
+    const parts = nodeId.split('/');
+    parts.pop(); // Remove filename
+
+    // Create/Find Group Nodes
+    let parentId: string | undefined = undefined;
+
+    if (parts.length > 0) {
+      const dirPath = parts.join('/');
+      parentId = dirPath;
+
+      // Ensure all ancestor groups exist
+      let currentPath = dirPath;
+      while (currentPath) {
+        if (!groupNodesMap.has(currentPath)) {
+          const groupParts = currentPath.split('/');
+          const label = groupParts[groupParts.length - 1];
+          // Parent of this group
+          groupParts.pop();
+          const groupParentId = groupParts.length > 0 ? groupParts.join('/') : undefined;
+
+          groupNodesMap.set(currentPath, {
+            id: currentPath,
+            type: 'groupNode',
+            position: { x: 0, y: 0 },
+            data: { label },
+            parentId: groupParentId,
+            style: { width: 100, height: 100 }, // Default size, Dagre will resize
+          });
+        } else {
+          // If we found the group, we assume its ancestors are also created
+          break;
+        }
+
+        // Move up one level
+        const lastSlash = currentPath.lastIndexOf('/');
+        if (lastSlash === -1) break;
+        currentPath = currentPath.substring(0, lastSlash);
+      }
+    }
+
     nodes.push({
       id: nodeId,
       // We will assume a default type for now, or 'default'
       type: 'appNode',
       position: { x: 0, y: 0 }, // Layout will fix this
+      parentId,
       data: {
         label: attributes.label,
         ...attributes
       },
     });
   });
+
+  // Add group nodes to the nodes list
+  nodes.push(...groupNodesMap.values());
 
   graph.forEachEdge((_edgeId, attributes, source, target) => {
     // 1. Filter out edges where source or target is hidden

@@ -59,34 +59,34 @@ Following the "AI to Rules" refactor and "Split Coach" initiative, here are the 
 ### 🏥 Repository Health Score: **99.0 / 100**
 
 *   **Formula**: 100 - Penalties for Files exceeding thresholds (LOC > 300, Complexity > 10, Fan-Out > 15).
-*   **Total Files Scanned**: 26
+*   **Total Files Scanned**: 28
 
 ### 🔥 Top 10 High-Complexity Files (Compound Score)
 _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/features/visualization/store.ts` | **57.4** | 241 | 6 | 4 | 0.67 |
-| `src/features/visualization/components/GraphOverlay.tsx` | **52.7** | 149 | 2 | 8 | 0.89 |
-| `src/features/visualization/logic/transformer.ts` | **42** | 127 | 6 | 2 | 0.67 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **38.1** | 71 | 5 | 3 | 0.75 |
+| `src/features/visualization/store.ts` | **60.4** | 271 | 6 | 4 | 0.67 |
+| `src/features/visualization/components/GraphOverlay.tsx` | **55.2** | 154 | 3 | 8 | 0.89 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **52.5** | 118 | 7 | 5 | 0.83 |
+| `src/features/visualization/logic/transformer.ts` | **50.7** | 174 | 8 | 2 | 0.67 |
+| `src/features/visualization/logic/layout.ts` | **38.9** | 129 | 13 | 0 | 0 |
 | `src/components/ui/dropdown-menu.tsx` | **36** | 200 | 2 | 1 | 0.5 |
-| `src/features/visualization/logic/layout.ts` | **35.3** | 93 | 13 | 0 | 0 |
+| `src/features/visualization/components/AppNode.tsx` | **33.4** | 54 | 8 | 1 | 0.5 |
 | `src/components/layout/Header.tsx` | **33** | 70 | 1 | 4 | 0.8 |
 | `src/components/ui/sheet.tsx` | **29.9** | 139 | 2 | 1 | 0.5 |
 | `src/main.tsx` | **29.9** | 19 | 1 | 3 | 1 |
-| `src/components/ui/tooltip.tsx` | **29.1** | 31 | 2 | 1 | 1 |
 
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
-| `src/features/visualization/logic/layout.ts` | **13** | 93 |
-| `src/features/visualization/components/AppNode.tsx` | **8** | 51 |
-| `src/features/visualization/store.ts` | **6** | 241 |
-| `src/features/visualization/logic/transformer.ts` | **6** | 127 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **5** | 71 |
+| `src/features/visualization/logic/layout.ts` | **13** | 129 |
+| `src/features/visualization/logic/transformer.ts` | **8** | 174 |
+| `src/features/visualization/components/AppNode.tsx` | **8** | 54 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **7** | 118 |
+| `src/features/visualization/store.ts` | **6** | 271 |
 | `src/components/theme-provider.tsx` | **4** | 77 |
 | `src/components/ui/separator.tsx` | **4** | 30 |
 | `src/components/ui/button.tsx` | **3** | 58 |
 | `src/features/visualization/logic/filters.ts` | **3** | 27 |
-| `src/components/ui/dropdown-menu.tsx` | **2** | 200 |
+| `src/features/visualization/components/GroupNode.tsx` | **3** | 33 |
