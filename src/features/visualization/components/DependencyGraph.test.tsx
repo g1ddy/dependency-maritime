@@ -1,13 +1,12 @@
 import { render } from '@testing-library/react';
 import { DependencyGraph } from './DependencyGraph';
 import { describe, it, expect, vi } from 'vitest';
-// import * as storeModule from '../store'; // Not needed if we control the mock via hoisted variables
 
 const { useGraphStoreMock, getStateMock } = vi.hoisted(() => {
   const getState = vi.fn();
   const useGraphStore = vi.fn();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (useGraphStore as any).getState = getState;
+  // Assigning getState to the mock function itself to simulate Zustand's api
+  Object.assign(useGraphStore, { getState });
   return { useGraphStoreMock: useGraphStore, getStateMock: getState };
 });
 
@@ -37,11 +36,6 @@ describe('DependencyGraph', () => {
     getStateMock.mockReturnValue({ rawGraphData: null });
 
     render(<DependencyGraph />);
-
-    // Check for the react-flow component (it renders a div with class react-flow)
-    // Note: Since we are mocking the store, ReactFlow should still render if it doesn't depend on store internals that we missed.
-    // However, ReactFlow might need a provider or valid nodes/edges.
-    // The previous test checked for `.react-flow`.
 
     // We expect the effect to run
     expect(rehydrateGraphMock).toHaveBeenCalled();

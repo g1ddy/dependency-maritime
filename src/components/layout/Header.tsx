@@ -20,56 +20,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { useGraphStore } from "../../features/visualization/store"
-import { CruiseResultSchema } from "../../schema/dependency-cruiser"
-import sampleData from "../../../sample-data/dependency-graph.json"
-import projectData from "../../../config/dependency-graph.json"
+interface HeaderProps {
+  onUpload: (file: File) => void;
+  onLoadSample: () => void;
+  onLoadProject: () => void;
+}
 
-export function Header() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+export function Header({ onUpload, onLoadSample, onLoadProject }: HeaderProps) {
   const appVersion = import.meta.env.VITE_APP_VERSION as string
-  const { setGraphData } = useGraphStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      try {
-        const json = JSON.parse(e.target?.result as string) as unknown
-        const result = CruiseResultSchema.parse(json)
-        setGraphData(result)
-      } catch (error) {
-        console.error("Failed to parse or validate file:", error)
-        alert("Invalid dependency-cruiser JSON file.")
-      }
-    }
-    reader.readAsText(file)
+    onUpload(file)
 
     // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
-  }
-
-  const loadSampleData = () => {
-    try {
-        const data = CruiseResultSchema.parse(sampleData)
-        setGraphData(data)
-    } catch (error) {
-        console.error("Failed to load sample data", error)
-    }
-  }
-
-  const loadProjectData = () => {
-      try {
-          const data = CruiseResultSchema.parse(projectData)
-          setGraphData(data)
-      } catch (error) {
-          console.error("Failed to load project data", error)
-      }
   }
 
   return (
@@ -132,10 +102,10 @@ export function Header() {
               <Upload className="mr-2 h-4 w-4" /> Upload JSON...
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={loadSampleData}>
+            <DropdownMenuItem onClick={onLoadSample}>
               <LayoutTemplate className="mr-2 h-4 w-4" /> Load Sample Data
             </DropdownMenuItem>
-             <DropdownMenuItem onClick={loadProjectData}>
+             <DropdownMenuItem onClick={onLoadProject}>
               <FileJson className="mr-2 h-4 w-4" /> Load Project Graph
             </DropdownMenuItem>
           </DropdownMenuContent>
