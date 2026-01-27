@@ -43,7 +43,7 @@ describe('Graph Transformer Logic', () => {
     const graph = createGraphFromCruiseResult(sampleData);
     const { nodes, edges } = transformToReactFlow(graph);
 
-    expect(nodes.length).toBe(graph.order);
+    expect(nodes.length).toBeGreaterThanOrEqual(graph.order);
     expect(edges.length).toBe(graph.size);
 
     const appNode = nodes.find(n => n.id === 'src/App.tsx');

@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { ReactFlowProvider } from '@xyflow/react';
 import { DependencyGraph } from './DependencyGraph';
 import { describe, it, expect, vi } from 'vitest';
 import * as storeModule from '../store';
@@ -23,7 +24,11 @@ describe('DependencyGraph', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(storeModule.useGraphStore).mockReturnValue(mockState as any);
 
-    const { container } = render(<DependencyGraph />);
+    const { container } = render(
+      <ReactFlowProvider>
+        <DependencyGraph />
+      </ReactFlowProvider>
+    );
 
     // Check for the react-flow class or attribute
     const reactFlowContainer = container.querySelector('.react-flow');

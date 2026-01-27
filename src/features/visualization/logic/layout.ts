@@ -49,7 +49,8 @@ export function applyDagreLayout(
     direction = 'TB',
   } = options;
 
-  const dagreGraph = new dagre.graphlib.Graph();
+  // Enable compound graph support
+  const dagreGraph = new dagre.graphlib.Graph({ compound: true });
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
   const isHorizontal = direction === 'LR';
@@ -58,7 +59,12 @@ export function applyDagreLayout(
   // 1. Add nodes to Dagre
   nodes.forEach((node) => {
     const { width, height } = getNodeDimensions(node, options);
+    // For cluster nodes (groups), dimensions set here act as minimum dimensions
     dagreGraph.setNode(node.id, { width, height });
+
+    if (node.parentId) {
+      dagreGraph.setParent(node.id, node.parentId);
+    }
   });
 
   // 2. Add edges to Dagre
@@ -70,21 +76,51 @@ export function applyDagreLayout(
   dagre.layout(dagreGraph);
 
   // 4. Update Node Positions
-  // Dagre returns the center point (x, y). React Flow expects top-left (x, y).
+  // Capture all absolute top-left positions first
+  const absolutePositions = new Map<string, { x: number; y: number }>();
+
+  nodes.forEach((node) => {
+      const nodeWithPosition = dagreGraph.node(node.id);
+      // Dagre returns center coordinates, convert to top-left
+      const x = nodeWithPosition.x - nodeWithPosition.width / 2;
+      const y = nodeWithPosition.y - nodeWithPosition.height / 2;
+      absolutePositions.set(node.id, { x, y });
+  });
+
   const layoutedNodes = nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
 
     // Use the dimensions Dagre used for the calculation to ensure correct centering
     const { width, height } = nodeWithPosition;
 
+    let x = nodeWithPosition.x - width / 2;
+    let y = nodeWithPosition.y - height / 2;
+
+    // Convert to relative position if parent exists
+    if (node.parentId) {
+        const parentPos = absolutePositions.get(node.parentId);
+        if (parentPos) {
+            x = x - parentPos.x;
+            y = y - parentPos.y;
+        }
+    }
+
+    // Update style/dimensions for group nodes so they render correctly sized
+    const newStyle = { ...node.style };
+    if (node.type === 'groupNode') {
+        newStyle.width = width;
+        newStyle.height = height;
+    }
+
     return {
       ...node,
       targetPosition: isHorizontal ? Position.Left : Position.Top,
       sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
       position: {
-        x: nodeWithPosition.x - width / 2,
-        y: nodeWithPosition.y - height / 2,
+        x,
+        y,
       },
+      style: newStyle,
     };
   });
 
