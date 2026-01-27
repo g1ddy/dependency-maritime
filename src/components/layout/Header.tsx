@@ -32,18 +32,20 @@ export function Header() {
               </SheetDescription>
             </SheetHeader>
             <div className="flex gap-4 mt-4">
-              <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto p-2">
-                <Code className="h-6 w-6" />
-                <span className="text-xs">Code</span>
-              </Button>
-              <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto p-2">
-                <Download className="h-6 w-6" />
-                <span className="text-xs">Export</span>
-              </Button>
-              <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto p-2">
-                <Settings className="h-6 w-6" />
-                <span className="text-xs">Settings</span>
-              </Button>
+              {[
+                { icon: Code, label: "Code" },
+                { icon: Download, label: "Export" },
+                { icon: Settings, label: "Settings" },
+              ].map(({ icon: Icon, label }) => (
+                <Button
+                  key={label}
+                  variant="ghost"
+                  className="flex flex-col items-center gap-1 h-auto p-2"
+                >
+                  <Icon className="h-6 w-6" />
+                  <span className="text-xs">{label}</span>
+                </Button>
+              ))}
             </div>
           </SheetContent>
         </Sheet>
