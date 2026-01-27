@@ -224,7 +224,7 @@
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="714.3,-118.9 718.46,-114.09 712.21,-115.25 714.3,-118.9"/>
 </g>
 <!-- src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/button.tsx -->
-<g id="edge24" class="edge">
+<g id="edge25" class="edge">
 <title>src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/button.tsx</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M342.31,-88C344.28,-139.38 356.56,-395.1 408,-450 414.3,-456.72 423.09,-460.64 432.03,-462.88"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="431.6,-464.93 437.91,-464.11 432.47,-460.82 431.6,-464.93"/>
@@ -239,7 +239,7 @@
 </g>
 </g>
 <!-- src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/card.tsx -->
-<g id="edge25" class="edge">
+<g id="edge26" class="edge">
 <title>src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/card.tsx</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M341.75,-88.18C341.37,-121.87 344.78,-239.81 408,-300 415.73,-307.35 426.45,-311.28 436.76,-313.32"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="436.49,-315.4 442.75,-314.32 437.18,-311.26 436.49,-315.4"/>
@@ -254,7 +254,7 @@
 </g>
 </g>
 <!-- src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/label.tsx -->
-<g id="edge26" class="edge">
+<g id="edge27" class="edge">
 <title>src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/label.tsx</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M342.25,-88.22C343.6,-119 352.28,-219.16 408,-270 415.88,-277.19 426.64,-281.07 436.93,-283.13"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="436.65,-285.21 442.91,-284.14 437.35,-281.07 436.65,-285.21"/>
@@ -269,7 +269,7 @@
 </g>
 </g>
 <!-- src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/separator.tsx -->
-<g id="edge27" class="edge">
+<g id="edge28" class="edge">
 <title>src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/separator.tsx</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M342.87,-88.01C347.23,-131.57 368.17,-319.75 408,-360 413.09,-365.15 419.65,-368.63 426.57,-370.97"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="426.09,-373.02 432.44,-372.68 427.26,-368.99 426.09,-373.02"/>
@@ -284,10 +284,16 @@
 </g>
 </g>
 <!-- src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/switch.tsx -->
-<g id="edge28" class="edge">
+<g id="edge29" class="edge">
 <title>src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/components/ui/switch.tsx</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M342.93,-88.32C346.19,-116 359.72,-198.38 408,-240 414.91,-245.96 423.82,-249.63 432.69,-251.86"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="432.49,-253.96 438.8,-253.19 433.38,-249.86 432.49,-253.96"/>
+</g>
+<!-- src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/features/visualization/store.ts -->
+<g id="edge24" class="edge">
+<title>src/features/visualization/components/GraphOverlay.tsx&#45;&gt;src/features/visualization/store.ts</title>
+<path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M355.06,-88.09C367.97,-96.68 388.55,-109.37 408,-117 417.13,-120.58 427.4,-123.38 436.87,-125.5"/>
+<polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="436.66,-127.6 442.97,-126.79 437.53,-123.49 436.66,-127.6"/>
 </g>
 <!-- src/components/mode&#45;toggle.tsx&#45;&gt;src/components/ui/button.tsx -->
 <g id="edge9" class="edge">
@@ -422,7 +428,7 @@
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="590.47,-345.26 593.62,-350.79 594.6,-344.5 590.47,-345.26"/>
 </g>
 <!-- src/features/visualization/store.ts&#45;&gt;src/schema/dependency&#45;cruiser.ts -->
-<g id="edge30" class="edge">
+<g id="edge31" class="edge">
 <title>src/features/visualization/store.ts&#45;&gt;src/schema/dependency&#45;cruiser.ts</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M497.16,-132.6C511.82,-132.01 529.26,-128.54 540,-117 558.93,-96.66 527.13,-73.35 548,-55 585.38,-22.13 612.43,-40.35 660,-55 683.12,-62.12 705.48,-79.27 719.35,-91.49"/>
 <polygon fill="none" stroke="#000000" stroke-opacity="0.200000" points="718.2,-93.28 724.06,-95.74 721.01,-90.16 718.2,-93.28"/>
@@ -437,7 +443,7 @@
 </g>
 </g>
 <!-- src/features/visualization/store.ts&#45;&gt;src/features/visualization/logic/layout.ts -->
-<g id="edge31" class="edge">
+<g id="edge32" class="edge">
 <title>src/features/visualization/store.ts&#45;&gt;src/features/visualization/logic/layout.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M497.18,-131.9C511.48,-131.01 528.55,-127.48 540,-117 549.23,-108.55 539.24,-98.94 548,-90 551.87,-86.05 556.79,-83.13 561.97,-80.98"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="562.72,-82.95 567.66,-78.94 561.3,-78.99 562.72,-82.95"/>
@@ -452,13 +458,13 @@
 </g>
 </g>
 <!-- src/features/visualization/store.ts&#45;&gt;src/features/visualization/logic/transformer.ts -->
-<g id="edge32" class="edge">
+<g id="edge33" class="edge">
 <title>src/features/visualization/store.ts&#45;&gt;src/features/visualization/logic/transformer.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M497.23,-125.77C510.12,-123.18 525.89,-119.97 540,-117 543.23,-116.32 546.56,-115.61 549.91,-114.89"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="550.53,-116.91 555.96,-113.59 549.65,-112.8 550.53,-116.91"/>
 </g>
 <!-- src/features/visualization/logic/transformer.ts&#45;&gt;src/schema/dependency&#45;cruiser.ts -->
-<g id="edge29" class="edge">
+<g id="edge30" class="edge">
 <title>src/features/visualization/logic/transformer.ts&#45;&gt;src/schema/dependency&#45;cruiser.ts</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M636.12,-105C646.55,-105 658.11,-105 669.5,-105"/>
 <polygon fill="none" stroke="#000000" stroke-opacity="0.200000" points="669.81,-107.1 675.81,-105 669.81,-102.9 669.81,-107.1"/>
@@ -482,19 +488,19 @@
 </g>
 </g>
 <!-- src/main.tsx&#45;&gt;src/App.tsx -->
-<g id="edge33" class="edge">
+<g id="edge34" class="edge">
 <title>src/main.tsx&#45;&gt;src/App.tsx</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M54.68,-543.85C65.34,-507.39 104.87,-372.28 118.13,-326.94"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="120.15,-327.51 119.82,-321.16 116.12,-326.33 120.15,-327.51"/>
 </g>
 <!-- src/main.tsx&#45;&gt;src/components/theme&#45;provider.tsx -->
-<g id="edge35" class="edge">
+<g id="edge36" class="edge">
 <title>src/main.tsx&#45;&gt;src/components/theme&#45;provider.tsx</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M74.69,-562.07C112.12,-576.5 189.53,-604.07 258,-614 320.46,-623.05 341.52,-637.72 400,-614 426.13,-603.4 447.82,-577.62 459.55,-561.31"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="461.42,-562.29 463.14,-556.17 457.98,-559.89 461.42,-562.29"/>
 </g>
 <!-- src/main.tsx&#45;&gt;src/index.css -->
-<g id="edge34" class="edge">
+<g id="edge35" class="edge">
 <title>src/main.tsx&#45;&gt;src/index.css</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M79.15,-561.39C81.69,-562.96 84.04,-564.81 86,-567 94.62,-576.65 86.24,-584.64 94,-595 95.38,-596.84 97.01,-598.54 98.77,-600.1"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="97.67,-601.9 103.7,-603.9 100.23,-598.57 97.67,-601.9"/>

@@ -107,6 +107,7 @@
   border-radius: var(--radius) !important;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
   overflow: hidden;
+  bottom: 180px !important; /* Stack above MiniMap */
 }
 
 .react-flow__controls-button {
@@ -115,6 +116,8 @@
   border-radius: 0 !important;
   color: hsl(var(--foreground)) !important;
   fill: hsl(var(--foreground)) !important;
+  width: 40px !important;
+  height: 40px !important;
 }
 
 .react-flow__controls-button:hover {
@@ -127,6 +130,8 @@
 
 .react-flow__controls-button svg {
   fill: hsl(var(--foreground)) !important;
+  width: 20px !important;
+  height: 20px !important;
 }
 
 /* React Flow MiniMap Override */

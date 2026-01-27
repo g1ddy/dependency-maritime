@@ -66,27 +66,27 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/features/visualization/components/GraphOverlay.tsx` | **40.4** | 117 | 1 | 5 | 0.83 |
+| `src/features/visualization/store.ts` | **51** | 210 | 6 | 3 | 0.6 |
+| `src/features/visualization/components/GraphOverlay.tsx` | **44.8** | 117 | 2 | 6 | 0.86 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **38.1** | 71 | 5 | 3 | 0.75 |
 | `src/components/ui/dropdown-menu.tsx` | **36** | 200 | 2 | 1 | 0.5 |
 | `src/features/visualization/logic/layout.ts` | **35.3** | 93 | 13 | 0 | 0 |
-| `src/components/layout/Header.tsx` | **35** | 70 | 2 | 4 | 0.8 |
-| `src/features/visualization/store.ts` | **33.9** | 89 | 2 | 3 | 0.75 |
+| `src/components/layout/Header.tsx` | **33** | 70 | 1 | 4 | 0.8 |
+| `src/features/visualization/logic/transformer.ts` | **30.4** | 104 | 4 | 1 | 0.5 |
 | `src/components/ui/sheet.tsx` | **29.9** | 139 | 2 | 1 | 0.5 |
 | `src/main.tsx` | **29.9** | 19 | 1 | 3 | 1 |
 | `src/components/ui/tooltip.tsx` | **29.1** | 31 | 2 | 1 | 1 |
-| `src/components/ui/badge.tsx` | **27.7** | 37 | 1 | 1 | 1 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **27.6** | 46 | 1 | 3 | 0.75 |
 
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
 | `src/features/visualization/logic/layout.ts` | **13** | 93 |
-| `src/features/visualization/components/AppNode.tsx` | **6** | 36 |
+| `src/features/visualization/components/AppNode.tsx` | **8** | 51 |
+| `src/features/visualization/store.ts` | **6** | 210 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **5** | 71 |
 | `src/components/theme-provider.tsx` | **4** | 77 |
+| `src/features/visualization/logic/transformer.ts` | **4** | 104 |
 | `src/components/ui/separator.tsx` | **4** | 30 |
 | `src/components/ui/button.tsx` | **3** | 58 |
-| `src/features/visualization/logic/transformer.ts` | **3** | 93 |
-| `src/components/layout/Header.tsx` | **2** | 70 |
 | `src/components/ui/dropdown-menu.tsx` | **2** | 200 |
 | `src/components/ui/sheet.tsx` | **2** | 139 |
-| `src/features/visualization/store.ts` | **2** | 89 |
