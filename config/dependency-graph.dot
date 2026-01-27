@@ -11,6 +11,7 @@ strict digraph "dependency-cruiser output"{
     "src/components/layout/Header.tsx" -> "src/vite-env.d.ts"
     "src/components/layout/Header.tsx" -> "src/components/mode-toggle.tsx"
     "src/components/layout/Header.tsx" -> "src/components/ui/button.tsx"
+    "src/components/layout/Header.tsx" -> "src/components/ui/sheet.tsx"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/mode-toggle.tsx" [label=<mode-toggle.tsx> tooltip="mode-toggle.tsx" URL="src/components/mode-toggle.tsx" fillcolor="#bbfeff"] } }
     "src/components/mode-toggle.tsx" -> "src/components/theme-provider.tsx"
     "src/components/mode-toggle.tsx" -> "src/components/ui/button.tsx"
