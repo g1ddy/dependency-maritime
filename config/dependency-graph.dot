@@ -43,6 +43,7 @@ strict digraph "dependency-cruiser output"{
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/components/AppNode.tsx"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/schema/dependency-cruiser.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/GraphOverlay.tsx" [label=<GraphOverlay.tsx> tooltip="GraphOverlay.tsx" URL="src/features/visualization/components/GraphOverlay.tsx" fillcolor="#bbfeff"] } } } }
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/features/visualization/store.ts"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/button.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/card.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/label.tsx"
