@@ -6,6 +6,8 @@ export const FILTER_ALIASES: Record<Exclude<ModuleCategory, 'other'>, string[]> 
   ui: ['/ui/', '/features/', '/components/', '/pages/', '/layouts/', '/views/']
 };
 
+const PRIORITY_ORDER: Exclude<ModuleCategory, 'other'>[] = ['core', 'util', 'ui'];
+
 /**
  * Classifies a module path into a category based on predefined aliases.
  * Priority: Core > Util > UI > Other.
@@ -14,19 +16,10 @@ export function classifyNode(path: string): ModuleCategory {
   // Normalize path separators just in case
   const normalizedPath = path.replace(/\\/g, '/');
 
-  // Check Core
-  if (FILTER_ALIASES.core.some(alias => normalizedPath.includes(alias))) {
-    return 'core';
-  }
-
-  // Check Util
-  if (FILTER_ALIASES.util.some(alias => normalizedPath.includes(alias))) {
-    return 'util';
-  }
-
-  // Check UI
-  if (FILTER_ALIASES.ui.some(alias => normalizedPath.includes(alias))) {
-    return 'ui';
+  for (const category of PRIORITY_ORDER) {
+    if (FILTER_ALIASES[category].some(alias => normalizedPath.includes(alias))) {
+      return category;
+    }
   }
 
   return 'other';

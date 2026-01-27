@@ -8,6 +8,20 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useGraphStore } from "../store"
 import { cn } from "@/lib/utils"
+import { type ModuleCategory } from "../logic/filters"
+
+type FilterConfig = {
+  key: ModuleCategory | 'all';
+  label: string;
+  icon: React.ElementType;
+};
+
+const FILTERS: FilterConfig[] = [
+  { key: 'all', label: 'All Modules', icon: Box },
+  { key: 'core', label: 'Core', icon: Cpu },
+  { key: 'ui', label: 'UI Kit', icon: Monitor },
+  { key: 'util', label: 'Util', icon: Hammer },
+];
 
 export function GraphOverlay() {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
@@ -40,38 +54,20 @@ export function GraphOverlay() {
         <div className="flex flex-col gap-4">
           {/* Filters */}
           <div className="flex gap-2">
-            <Button
-              variant={activeFilter === 'all' ? "default" : "outline"}
-              size="sm"
-              className={getFilterButtonClass(activeFilter === 'all')}
-              onClick={() => setFilter('all')}
-            >
-              <Box className="h-3 w-3" /> All Modules
-            </Button>
-            <Button
-              variant={activeFilter === 'core' ? "default" : "outline"}
-              size="sm"
-              className={getFilterButtonClass(activeFilter === 'core')}
-              onClick={() => setFilter('core')}
-            >
-              <Cpu className="h-3 w-3" /> Core
-            </Button>
-            <Button
-              variant={activeFilter === 'ui' ? "default" : "outline"}
-              size="sm"
-              className={getFilterButtonClass(activeFilter === 'ui')}
-              onClick={() => setFilter('ui')}
-            >
-              <Monitor className="h-3 w-3" /> UI Kit
-            </Button>
-            <Button
-              variant={activeFilter === 'util' ? "default" : "outline"}
-              size="sm"
-              className={getFilterButtonClass(activeFilter === 'util')}
-              onClick={() => setFilter('util')}
-            >
-              <Hammer className="h-3 w-3" /> Util
-            </Button>
+            {FILTERS.map((filter) => {
+              const Icon = filter.icon;
+              return (
+                <Button
+                  key={filter.key}
+                  variant={activeFilter === filter.key ? "default" : "outline"}
+                  size="sm"
+                  className={getFilterButtonClass(activeFilter === filter.key)}
+                  onClick={() => setFilter(filter.key)}
+                >
+                  <Icon className="h-3 w-3" /> {filter.label}
+                </Button>
+              );
+            })}
           </div>
 
           {/* Secondary Filters */}
