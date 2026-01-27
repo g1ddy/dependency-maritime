@@ -44,11 +44,6 @@ export function Header() {
       const json = JSON.parse(text)
       const result = CruiseResultSchema.parse(json)
       setGraphData(result)
-
-      // Reset input value to allow re-uploading the same file if needed
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
     } catch (error) {
       console.error("Upload error:", error)
       let title = "Error"
@@ -59,10 +54,7 @@ export function Header() {
         description = "The file content is not valid JSON. Please check the file and try again."
       } else if (error instanceof ZodError) {
         title = "Validation Error"
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-        const issues = (error as any).issues || (error as any).errors || []
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        const details = (issues as any[]).map((e: any) => `${e.path?.join('.')}: ${e.message}`).join(", ")
+        const details = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(", ")
         description = "The JSON structure does not match the expected schema. " + (details || error.message)
       } else if (error instanceof Error) {
         description = error.message
@@ -70,8 +62,8 @@ export function Header() {
 
       setErrorDetails({ title, description })
       setErrorDialogOpen(true)
-
-      // Also reset input on error
+    } finally {
+      // Reset input value to allow re-uploading the same file if needed
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
