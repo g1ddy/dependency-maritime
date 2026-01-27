@@ -87,7 +87,7 @@ describe('Type Definition Hiding Logic', () => {
 
   it('removes type-only edges (including pre-compilation-only) when hideTypeDefinitions is true', () => {
     const graph = createGraphFromCruiseResult(mockData);
-    const { edges } = transformToReactFlow(graph, { hideTypeDefinitions: true });
+    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: true });
 
     // Verify Edges
     // Should contain A->B (normal)
@@ -96,15 +96,30 @@ describe('Type Definition Hiding Logic', () => {
     expect(edges.length).toBe(1);
     expect(edges[0].source).toBe('src/A.ts');
     expect(edges[0].target).toBe('src/B.ts');
+
+    // Verify Nodes
+    // All nodes (A, B, C, D) should still exist
+    expect(nodes.length).toBe(4);
+    const nodeIds = nodes.map(n => n.id).sort();
+    expect(nodeIds).toEqual(['src/A.ts', 'src/B.ts', 'src/C.ts', 'src/D.ts']);
+
+    // C and D should be isolated (no edges connected to them in the React Flow edges list)
+    const edgesConnectedToTypeNodes = edges.filter(
+      e => ['src/C.ts', 'src/D.ts'].includes(e.source) || ['src/C.ts', 'src/D.ts'].includes(e.target)
+    );
+    expect(edgesConnectedToTypeNodes.length).toBe(0);
   });
 
   it('keeps type-only edges when hideTypeDefinitions is false', () => {
     const graph = createGraphFromCruiseResult(mockData);
-    const { edges } = transformToReactFlow(graph, { hideTypeDefinitions: false });
+    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: false });
 
     // Verify Edges
     expect(edges.length).toBe(3);
     const targets = edges.map(e => e.target).sort();
     expect(targets).toEqual(['src/B.ts', 'src/C.ts', 'src/D.ts']);
+
+    // Verify Nodes
+    expect(nodes.length).toBe(4);
   });
 });
