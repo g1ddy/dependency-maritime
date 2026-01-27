@@ -42,7 +42,10 @@ export function GraphOverlay() {
         </div>
 
         {/* Action Button */}
-        <Button className="bg-blue-600 hover:bg-blue-700 gap-2 pointer-events-auto shadow-lg shadow-blue-900/20 text-white">
+        <Button
+          className="bg-blue-600 hover:bg-blue-700 gap-2 pointer-events-auto shadow-lg shadow-blue-900/20 text-white"
+          data-testid="refactor-graph-btn"
+        >
           <Wand2 className="h-4 w-4" /> Refactor Graph
         </Button>
       </div>
@@ -95,7 +98,7 @@ export function GraphOverlay() {
            <div className="bg-muted/50 p-3 rounded-md mt-1 border border-border/50">
               <div className="flex justify-between items-center mb-1">
                  <span className="text-xs font-semibold">Isolate Module</span>
-                 <Switch id="isolate-module" />
+                 <Switch id="isolate-module" data-testid="isolate-module-toggle" />
               </div>
               <p className="text-[10px] text-muted-foreground">Hide all unconnected nodes</p>
            </div>
@@ -103,13 +106,28 @@ export function GraphOverlay() {
 
         {/* Zoom Controls */}
         <div className="flex flex-col gap-2">
-          <Button variant="secondary" size="icon" className="h-10 w-10 shadow-md border border-border/50">
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-10 w-10 shadow-md border border-border/50"
+            data-testid="zoom-in-btn"
+          >
             <Plus className="h-4 w-4" />
           </Button>
-          <Button variant="secondary" size="icon" className="h-10 w-10 shadow-md border border-border/50">
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-10 w-10 shadow-md border border-border/50"
+            data-testid="zoom-out-btn"
+          >
             <Minus className="h-4 w-4" />
           </Button>
-          <Button variant="secondary" size="icon" className="h-10 w-10 shadow-md border border-border/50">
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-10 w-10 shadow-md border border-border/50"
+            data-testid="fit-view-btn"
+          >
             <Maximize className="h-4 w-4" />
           </Button>
         </div>

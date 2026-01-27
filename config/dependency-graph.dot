@@ -8,6 +8,7 @@ strict digraph "dependency-cruiser output"{
     "src/App.tsx" -> "src/features/visualization/components/DependencyGraph.tsx"
     "src/App.tsx" -> "src/features/visualization/components/GraphOverlay.tsx"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/Header.tsx" [label=<Header.tsx> tooltip="Header.tsx" URL="src/components/layout/Header.tsx" fillcolor="#bbfeff"] } } }
+    "src/components/layout/Header.tsx" -> "src/vite-env.d.ts"
     "src/components/layout/Header.tsx" -> "src/components/mode-toggle.tsx"
     "src/components/layout/Header.tsx" -> "src/components/ui/button.tsx"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/mode-toggle.tsx" [label=<mode-toggle.tsx> tooltip="mode-toggle.tsx" URL="src/components/mode-toggle.tsx" fillcolor="#bbfeff"] } }
@@ -59,5 +60,5 @@ strict digraph "dependency-cruiser output"{
     "src/main.tsx" -> "src/components/theme-provider.tsx"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/dependency-cruiser.ts" [label=<dependency-cruiser.ts> tooltip="dependency-cruiser.ts" URL="src/schema/dependency-cruiser.ts" fillcolor="#ddfeff"] } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/test" {label="test" "src/test/setup.ts" [label=<setup.ts> tooltip="no-orphans" URL="src/test/setup.ts" fillcolor="#ccffcc" fontcolor="blue" color="blue"] } }
-    subgraph "cluster_src" {label="src" "src/vite-env.d.ts" [label=<vite-env.d.ts> tooltip="vite-env.d.ts" URL="src/vite-env.d.ts" fillcolor="#ccffcc"] }
+    subgraph "cluster_src" {label="src" "src/vite-env.d.ts" [label=<vite-env.d.ts> tooltip="vite-env.d.ts" URL="src/vite-env.d.ts" fillcolor="#ddfeff"] }
 }
