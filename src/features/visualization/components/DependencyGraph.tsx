@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ReactFlow, Background, Controls, MiniMap } from '@xyflow/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - CSS import might not be recognized by tsc but works in Vite
@@ -7,6 +7,7 @@ import '@xyflow/react/dist/style.css';
 import { useGraphStore } from '../store';
 import sampleData from '../../../../sample-data/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
+import { AppNode } from './AppNode';
 
 export function DependencyGraph() {
   const {
@@ -16,6 +17,8 @@ export function DependencyGraph() {
     onEdgesChange,
     setGraphData
   } = useGraphStore();
+
+  const nodeTypes = useMemo(() => ({ appNode: AppNode }), []);
 
   useEffect(() => {
     // Load sample data on mount
@@ -30,6 +33,7 @@ export function DependencyGraph() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
         fitView
       >
         <Background />
