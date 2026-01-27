@@ -10,7 +10,7 @@ import { useGraphStore } from "../store"
 
 export function GraphOverlay() {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
-  const { selectedNodeId, nodes } = useGraphStore();
+  const { selectedNodeId, nodes, hideTypeDefinitions, toggleTypeDefinitions } = useGraphStore();
 
   const selectedNode = useMemo(
     () => (selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null),
@@ -36,6 +36,16 @@ export function GraphOverlay() {
             <Button variant="outline" size="sm" className="gap-2 bg-background/50 backdrop-blur border-border/50 hover:bg-background/80">
               <Hammer className="h-3 w-3" /> Util
             </Button>
+          </div>
+
+          {/* Secondary Filters */}
+          <div className="flex items-center space-x-2 bg-background/50 backdrop-blur p-2 rounded-md border border-border/50 w-fit pointer-events-auto">
+             <Switch
+                id="hide-type-defs"
+                checked={hideTypeDefinitions}
+                onCheckedChange={toggleTypeDefinitions}
+             />
+             <Label htmlFor="hide-type-defs" className="text-sm cursor-pointer">Hide Type Definitions</Label>
           </div>
         </div>
 
