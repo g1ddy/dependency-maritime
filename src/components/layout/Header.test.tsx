@@ -1,15 +1,9 @@
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { Header } from './Header';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import * as storeModule from '../../features/visualization/store';
-
-// Mock the store
-vi.mock('../../features/visualization/store', () => ({
-  useGraphStore: vi.fn(),
-}));
 
 describe('Header', () => {
-  const setGraphDataMock = vi.fn();
+  const onDataLoadedMock = vi.fn();
 
   afterEach(() => {
     cleanup();
@@ -17,17 +11,10 @@ describe('Header', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(storeModule.useGraphStore).mockImplementation((selector: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      return selector({
-        setGraphData: setGraphDataMock,
-      });
-    });
   });
 
   it('renders without crashing', () => {
-    render(<Header />);
+    render(<Header onDataLoaded={onDataLoadedMock} />);
     expect(screen.getByTestId('app-title')).toBeDefined();
   });
 
@@ -48,7 +35,7 @@ describe('Header', () => {
       value: async () => Promise.resolve(JSON.stringify(validData)),
     });
 
-    render(<Header />);
+    render(<Header onDataLoaded={onDataLoadedMock} />);
 
     // We assume the input will have this test-id
     const input = screen.getByTestId('file-input');
@@ -56,7 +43,7 @@ describe('Header', () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(setGraphDataMock).toHaveBeenCalled();
+      expect(onDataLoadedMock).toHaveBeenCalledWith(validData);
     });
   });
 
@@ -67,7 +54,7 @@ describe('Header', () => {
       value: async () => Promise.resolve(invalidJson),
     });
 
-    render(<Header />);
+    render(<Header onDataLoaded={onDataLoadedMock} />);
     const input = screen.getByTestId('file-input');
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -78,7 +65,7 @@ describe('Header', () => {
       // We check for some error text
       expect(screen.getByText(/Invalid JSON/i)).toBeTruthy();
     });
-    expect(setGraphDataMock).not.toHaveBeenCalled();
+    expect(onDataLoadedMock).not.toHaveBeenCalled();
   });
 
   it('shows error dialog for schema validation failure', async () => {
@@ -89,7 +76,7 @@ describe('Header', () => {
       value: async () => Promise.resolve(JSON.stringify(invalidSchema)),
     });
 
-    render(<Header />);
+    render(<Header onDataLoaded={onDataLoadedMock} />);
     const input = screen.getByTestId('file-input');
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -98,6 +85,6 @@ describe('Header', () => {
       expect(screen.getByRole('dialog')).toBeTruthy();
       expect(screen.getByText(/Validation Error/i)).toBeTruthy();
     });
-    expect(setGraphDataMock).not.toHaveBeenCalled();
+    expect(onDataLoadedMock).not.toHaveBeenCalled();
   });
 });

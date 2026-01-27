@@ -18,13 +18,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useRef, useState } from "react"
-import { useGraphStore } from "@/features/visualization/store"
-import { CruiseResultSchema } from "@/schema/dependency-cruiser"
+import { type ICruiseResult, CruiseResultSchema } from "@/schema/dependency-cruiser"
 import { ZodError } from "zod"
 
-export function Header() {
+interface HeaderProps {
+  onDataLoaded?: (data: ICruiseResult) => void;
+}
+
+export function Header({ onDataLoaded }: HeaderProps) {
   const appVersion = import.meta.env.VITE_APP_VERSION as string
-  const setGraphData = useGraphStore((state) => state.setGraphData)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [errorDialogOpen, setErrorDialogOpen] = useState(false)
@@ -43,7 +45,7 @@ export function Header() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const json = JSON.parse(text)
       const result = CruiseResultSchema.parse(json)
-      setGraphData(result)
+      onDataLoaded?.(result)
     } catch (error) {
       console.error("Upload error:", error)
       let title = "Error"
