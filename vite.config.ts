@@ -10,12 +10,13 @@ interface PackageJson {
 }
 
 const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf-8")) as PackageJson
+const version = process.env.VITE_APP_VERSION || packageJson.version
 
 export default defineConfig({
   base: "/dependency-maritime/",
   plugins: [react(), tailwindcss()],
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(version),
   },
   resolve: {
     alias: {
