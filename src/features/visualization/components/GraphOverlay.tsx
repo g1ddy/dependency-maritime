@@ -6,14 +6,44 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useGraphStore } from "../store"
+import { cn } from "@/lib/utils"
+import { type ModuleCategory } from "../logic/filters"
+
+type FilterConfig = {
+  key: ModuleCategory | 'all';
+  label: string;
+  icon: React.ElementType;
+};
+
+const FILTERS: FilterConfig[] = [
+  { key: 'all', label: 'All Modules', icon: Box },
+  { key: 'core', label: 'Core', icon: Cpu },
+  { key: 'ui', label: 'UI Kit', icon: Monitor },
+  { key: 'util', label: 'Util', icon: Hammer },
+];
 
 export function GraphOverlay() {
-  const { selectedNodeId, nodes, hideTypeDefinitions, toggleTypeDefinitions } = useGraphStore();
+  const {
+    selectedNodeId,
+    nodes,
+    hideTypeDefinitions,
+    toggleTypeDefinitions,
+    activeFilter,
+    setFilter
+  } = useGraphStore();
 
   const selectedNode = useMemo(
     () => (selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null),
     [selectedNodeId, nodes]
   );
+
+  const getFilterButtonClass = (isActive: boolean) =>
+    cn(
+      "gap-2 shadow-md transition-colors",
+      isActive
+        ? "bg-blue-600 hover:bg-blue-700 text-white border-transparent"
+        : "bg-background/50 backdrop-blur border-border/50 hover:bg-background/80 text-foreground"
+    );
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col p-4">
@@ -22,18 +52,20 @@ export function GraphOverlay() {
         <div className="flex flex-col gap-4">
           {/* Filters */}
           <div className="flex gap-2">
-            <Button variant="default" size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-md">
-              <Box className="h-3 w-3" /> All Modules
-            </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-background/50 backdrop-blur border-border/50 hover:bg-background/80">
-              <Cpu className="h-3 w-3" /> Core
-            </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-background/50 backdrop-blur border-border/50 hover:bg-background/80">
-              <Monitor className="h-3 w-3" /> UI Kit
-            </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-background/50 backdrop-blur border-border/50 hover:bg-background/80">
-              <Hammer className="h-3 w-3" /> Util
-            </Button>
+            {FILTERS.map((filter) => {
+              const Icon = filter.icon;
+              return (
+                <Button
+                  key={filter.key}
+                  variant={activeFilter === filter.key ? "default" : "outline"}
+                  size="sm"
+                  className={getFilterButtonClass(activeFilter === filter.key)}
+                  onClick={() => setFilter(filter.key)}
+                >
+                  <Icon className="h-3 w-3" /> {filter.label}
+                </Button>
+              );
+            })}
           </div>
 
           {/* Secondary Filters */}

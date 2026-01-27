@@ -43,17 +43,22 @@ strict digraph "dependency-cruiser output"{
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/components/AppNode.tsx"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/schema/dependency-cruiser.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/GraphOverlay.tsx" [label=<GraphOverlay.tsx> tooltip="GraphOverlay.tsx" URL="src/features/visualization/components/GraphOverlay.tsx" fillcolor="#bbfeff"] } } } }
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/features/visualization/logic/filters.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/features/visualization/store.ts"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/button.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/card.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/label.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/separator.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/switch.tsx"
+    "src/features/visualization/components/GraphOverlay.tsx" -> "src/lib/utils.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/filters.ts" [label=<filters.ts> tooltip="filters.ts" URL="src/features/visualization/logic/filters.ts" fillcolor="#ddfeff"] } } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout.ts" [label=<layout.ts> tooltip="layout.ts" URL="src/features/visualization/logic/layout.ts" fillcolor="#ddfeff"] } } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/transformer.ts" [label=<transformer.ts> tooltip="transformer.ts" URL="src/features/visualization/logic/transformer.ts" fillcolor="#ddfeff"] } } } }
     "src/features/visualization/logic/transformer.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/features/visualization/logic/transformer.ts" -> "src/features/visualization/logic/filters.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" "src/features/visualization/store.ts" [label=<store.ts> tooltip="store.ts" URL="src/features/visualization/store.ts" fillcolor="#ddfeff"] } } }
     "src/features/visualization/store.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/features/visualization/store.ts" -> "src/features/visualization/logic/filters.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/store.ts" -> "src/features/visualization/logic/layout.ts"
     "src/features/visualization/store.ts" -> "src/features/visualization/logic/transformer.ts"
     subgraph "cluster_src" {label="src" "src/index.css" [label=<index.css> tooltip="index.css" URL="src/index.css" ] }
