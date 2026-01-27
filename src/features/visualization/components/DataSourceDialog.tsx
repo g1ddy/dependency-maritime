@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Upload, FileJson, Database } from 'lucide-react';
@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 // Import data sources
 import sampleData from '../../../../sample-data/dependency-graph.json';
-// @ts-ignore - Importing outside src is managed by Vite but might be flagged by TS
+// @ts-expect-error - Importing outside src is managed by Vite but might be flagged by TS
 import projectData from '../../../../config/dependency-graph.json';
 
 interface DataSourceDialogProps {
@@ -22,6 +22,14 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<{ title: string; description: string } | null>(null);
 
+  useEffect(() => {
+    if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(null);
+      setDragActive(false);
+    }
+  }, [open]);
+
   const loadData = (data: unknown, sourceName: string) => {
     try {
       const result = CruiseResultSchema.parse(data);
@@ -30,10 +38,18 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       setError(null);
     } catch (err) {
       console.error(`Error loading ${sourceName}:`, err);
-      setError({
-        title: 'Invalid Data',
-        description: `Failed to load ${sourceName}. The data does not match the expected schema.`
-      });
+      if (err instanceof ZodError) {
+        const details = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(", ");
+        setError({
+          title: 'Validation Error',
+          description: `The ${sourceName} data is invalid: ${details}`
+        });
+      } else {
+        setError({
+          title: 'Invalid Data',
+          description: `Failed to load ${sourceName}. The data does not match the expected schema.`
+        });
+      }
     }
   };
 
