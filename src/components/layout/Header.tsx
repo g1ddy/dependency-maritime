@@ -10,10 +10,67 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { useRef, useState } from "react"
+import { type ICruiseResult, CruiseResultSchema } from "@/schema/dependency-cruiser"
+import { ZodError } from "zod"
 
-export function Header() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+interface HeaderProps {
+  onDataLoaded?: (data: ICruiseResult) => void;
+}
+
+export function Header({ onDataLoaded }: HeaderProps) {
   const appVersion = import.meta.env.VITE_APP_VERSION as string
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false)
+  const [errorDetails, setErrorDetails] = useState({ title: "", description: "" })
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const json = JSON.parse(text)
+      const result = CruiseResultSchema.parse(json)
+      onDataLoaded?.(result)
+    } catch (error) {
+      console.error("Upload error:", error)
+      let title = "Error"
+      let description = "An unexpected error occurred."
+
+      if (error instanceof SyntaxError) {
+        title = "Invalid JSON"
+        description = "The file content is not valid JSON. Please check the file and try again."
+      } else if (error instanceof ZodError) {
+        title = "Validation Error"
+        const details = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(", ")
+        description = "The JSON structure does not match the expected schema. " + (details || error.message)
+      } else if (error instanceof Error) {
+        description = error.message
+      }
+
+      setErrorDetails({ title, description })
+      setErrorDialogOpen(true)
+    } finally {
+      // Reset input value to allow re-uploading the same file if needed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+    }
+  }
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 z-50 relative">
@@ -60,10 +117,29 @@ export function Header() {
       </div>
       <div className="flex items-center gap-2">
         <ModeToggle />
-        <Button variant="ghost" size="icon">
+        <input
+          type="file"
+          accept=".json"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={(e) => { void handleFileChange(e) }}
+          data-testid="file-input"
+        />
+        <Button variant="ghost" size="icon" onClick={handleUploadClick} aria-label="Upload JSON">
           <Upload className="h-5 w-5" />
         </Button>
       </div>
+
+      <Dialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{errorDetails.title}</DialogTitle>
+            <DialogDescription className="max-h-[60vh] overflow-y-auto whitespace-pre-wrap break-words">
+              {errorDetails.description}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </header>
   )
 }
