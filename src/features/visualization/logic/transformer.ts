@@ -64,20 +64,20 @@ export function transformToReactFlow(
   graph: Graph,
   options: {
     hideTypeDefinitions?: boolean;
-    activeFilter?: ModuleCategory | 'all';
+    activeFilters?: ModuleCategory[];
   } = {}
 ): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   const visibleNodeIds = new Set<string>();
 
-  const activeFilter = options.activeFilter || 'all';
+  const activeFilters = options.activeFilters || [];
 
   graph.forEachNode((nodeId, attributes) => {
     // Apply Category Filter
-    if (activeFilter !== 'all') {
+    if (activeFilters.length > 0) {
       const category = classifyNode(nodeId);
-      if (category !== activeFilter) {
+      if (!activeFilters.includes(category)) {
         return; // Skip this node
       }
     }

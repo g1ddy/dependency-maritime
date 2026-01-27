@@ -119,4 +119,30 @@ describe('Visualization Store', () => {
     expect(node.data.highlighted).toBe(false);
     expect(node.data.dimmed).toBe(false);
   });
+
+  it('should handle multiple filters correctly', () => {
+    const store = useGraphStore.getState();
+    store.setGraphData(sampleData);
+
+    // Initial state: empty filters (show all)
+    expect(useGraphStore.getState().activeFilters).toEqual([]);
+
+    // Select 'core'
+    store.setFilter('core');
+    expect(useGraphStore.getState().activeFilters).toEqual(['core']);
+
+    // Select 'ui' (should add to list)
+    store.setFilter('ui');
+    expect(useGraphStore.getState().activeFilters).toContain('core');
+    expect(useGraphStore.getState().activeFilters).toContain('ui');
+    expect(useGraphStore.getState().activeFilters).toHaveLength(2);
+
+    // Toggle 'core' off
+    store.setFilter('core');
+    expect(useGraphStore.getState().activeFilters).toEqual(['ui']);
+
+    // Select 'all' (should clear list)
+    store.setFilter('all');
+    expect(useGraphStore.getState().activeFilters).toEqual([]);
+  });
 });

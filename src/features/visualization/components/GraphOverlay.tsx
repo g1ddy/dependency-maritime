@@ -28,7 +28,7 @@ export function GraphOverlay() {
     nodes,
     hideTypeDefinitions,
     toggleTypeDefinitions,
-    activeFilter,
+    activeFilters,
     setFilter
   } = useGraphStore();
 
@@ -54,12 +54,17 @@ export function GraphOverlay() {
           <div className="flex gap-2">
             {FILTERS.map((filter) => {
               const Icon = filter.icon;
+              const isActive =
+                filter.key === 'all'
+                  ? activeFilters.length === 0
+                  : activeFilters.includes(filter.key);
+
               return (
                 <Button
                   key={filter.key}
-                  variant={activeFilter === filter.key ? "default" : "outline"}
+                  variant={isActive ? "default" : "outline"}
                   size="sm"
-                  className={getFilterButtonClass(activeFilter === filter.key)}
+                  className={getFilterButtonClass(isActive)}
                   onClick={() => setFilter(filter.key)}
                 >
                   <Icon className="h-3 w-3" /> {filter.label}
