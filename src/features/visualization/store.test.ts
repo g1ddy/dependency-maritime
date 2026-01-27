@@ -59,9 +59,12 @@ describe('Visualization Store', () => {
   it('should reset state', () => {
     const store = useGraphStore.getState();
     store.setGraphData(sampleData);
-    expect(useGraphStore.getState().nodes.length).toBeGreaterThan(0);
 
-    store.reset();
+    // Get fresh state
+    const state = useGraphStore.getState();
+    expect(state.nodes.length).toBeGreaterThan(0);
+
+    state.reset();
     expect(useGraphStore.getState().nodes).toEqual([]);
     expect(useGraphStore.getState().graph).toBeNull();
   });
@@ -70,12 +73,17 @@ describe('Visualization Store', () => {
     const store = useGraphStore.getState();
     store.setGraphData(sampleData);
 
-    // Find a known node or just the first one
-    const rootNode = store.nodes.find(n => n.id === 'src/App.tsx');
-    // If App.tsx is not in sample data, use first available
-    const targetNode = rootNode || store.nodes[0];
+    // Get fresh state after update
+    const state = useGraphStore.getState();
 
-    if (!targetNode) return; // Should not happen with valid data
+    // Find a known node or just the first one
+    const rootNode = state.nodes.find(n => n.id === 'src/App.tsx');
+    // If App.tsx is not in sample data, use first available
+    const targetNode = rootNode || state.nodes[0];
+
+    // Explicit assertion for test validity
+    expect(targetNode).toBeDefined();
+    if (!targetNode) return;
 
     store.selectNode(targetNode.id);
 
@@ -90,9 +98,15 @@ describe('Visualization Store', () => {
   it('should deselect node', () => {
     const store = useGraphStore.getState();
     store.setGraphData(sampleData);
-    if (store.nodes.length === 0) return;
 
-    const rootNode = store.nodes[0];
+    // Get fresh state after update
+    const state = useGraphStore.getState();
+
+    // Explicit assertion for test validity
+    expect(state.nodes.length).toBeGreaterThan(0);
+    if (state.nodes.length === 0) return;
+
+    const rootNode = state.nodes[0];
     store.selectNode(rootNode.id);
 
     expect(useGraphStore.getState().selectedNodeId).toBe(rootNode.id);

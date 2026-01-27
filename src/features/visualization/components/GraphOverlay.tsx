@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Box, Hammer, Plus, Minus, Maximize, Globe, Wand2, Monitor, Cpu } from "lucide-react"
 import { useReactFlow } from "@xyflow/react"
 import { Button } from "@/components/ui/button"
@@ -11,7 +12,10 @@ export function GraphOverlay() {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const { selectedNodeId, nodes } = useGraphStore();
 
-  const selectedNode = selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null;
+  const selectedNode = useMemo(
+    () => (selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null),
+    [selectedNodeId, nodes]
+  );
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col p-4">
@@ -105,7 +109,7 @@ export function GraphOverlay() {
             size="icon"
             className="h-10 w-10 shadow-md border border-border/50"
             data-testid="zoom-in-btn"
-            onClick={() => zoomIn()}
+            onClick={() => { void zoomIn(); }}
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -114,7 +118,7 @@ export function GraphOverlay() {
             size="icon"
             className="h-10 w-10 shadow-md border border-border/50"
             data-testid="zoom-out-btn"
-            onClick={() => zoomOut()}
+            onClick={() => { void zoomOut(); }}
           >
             <Minus className="h-4 w-4" />
           </Button>
@@ -123,7 +127,7 @@ export function GraphOverlay() {
             size="icon"
             className="h-10 w-10 shadow-md border border-border/50"
             data-testid="fit-view-btn"
-            onClick={() => fitView()}
+            onClick={() => { void fitView(); }}
           >
             <Maximize className="h-4 w-4" />
           </Button>

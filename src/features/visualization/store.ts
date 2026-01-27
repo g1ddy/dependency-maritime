@@ -14,6 +14,9 @@ import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
 import { applyDagreLayout } from './logic/layout';
 
+const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
+const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
+
 interface GraphState {
   // React Flow State
   nodes: Node[];
@@ -104,24 +107,16 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     const bfs = (start: string, direction: 'in' | 'out', result: Set<string>) => {
       const queue = [start];
       const visited = new Set<string>([start]);
-      while (queue.length > 0) {
-        const curr = queue.shift()!;
-        if (direction === 'in') {
-          graph.forEachInNeighbor(curr, (neighbor) => {
-            if (!visited.has(neighbor)) {
-              visited.add(neighbor);
-              result.add(neighbor);
-              queue.push(neighbor);
-            }
-          });
-        } else {
-          graph.forEachOutNeighbor(curr, (neighbor) => {
-            if (!visited.has(neighbor)) {
-              visited.add(neighbor);
-              result.add(neighbor);
-              queue.push(neighbor);
-            }
-          });
+      let head = 0;
+      while (head < queue.length) {
+        const curr = queue[head++]!;
+        const neighbors = direction === 'in' ? graph.inNeighbors(curr) : graph.outNeighbors(curr);
+        for (const neighbor of neighbors) {
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            result.add(neighbor);
+            queue.push(neighbor);
+          }
         }
       }
     };
@@ -152,9 +147,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
         return {
           ...e,
           animated: isHighlighted,
-          style: isHighlighted
-            ? { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 } // Highlighted (blue-400)
-            : { stroke: '#334155', strokeWidth: 1, opacity: 0.2 }, // Dimmed (slate-700)
+          style: isHighlighted ? HIGHLIGHTED_EDGE_STYLE : DIMMED_EDGE_STYLE,
           zIndex: isHighlighted ? 10 : 0,
         };
       }),
