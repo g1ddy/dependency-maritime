@@ -29,11 +29,14 @@ interface GraphState {
 
   // Metadata
   loading: boolean;
+  hideTypeDefinitions: boolean;
+  layoutDirection: 'TB' | 'LR';
 
   // Actions
   setGraphData: (data: ICruiseResult) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
   selectNode: (nodeId: string | null) => void;
+  toggleTypeDefinitions: () => void;
   reset: () => void;
 
   // React Flow Handlers
@@ -47,18 +50,21 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   selectedNodeId: null,
   graph: null,
   loading: false,
+  hideTypeDefinitions: false,
+  layoutDirection: 'TB',
 
   setGraphData: (data: ICruiseResult) => {
+    const { hideTypeDefinitions, layoutDirection } = get();
     set({ loading: true });
 
     // 1. Transform to Graphology
     const graph = createGraphFromCruiseResult(data);
 
     // 2. Transform to React Flow
-    const { nodes, edges } = transformToReactFlow(graph);
+    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions });
 
-    // 3. Apply Initial Layout (Default TB)
-    const layouted = applyDagreLayout(nodes, edges, { direction: 'TB' });
+    // 3. Apply Initial Layout
+    const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
 
     set({
       graph,
@@ -69,12 +75,40 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     });
   },
 
+  toggleTypeDefinitions: () => {
+    const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection } = get();
+    if (!graph) return;
+
+    const newValue = !hideTypeDefinitions;
+
+    // Re-transform with new filter
+    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: newValue });
+
+    // Re-layout using preserved direction
+    const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
+
+    set({
+      hideTypeDefinitions: newValue,
+      nodes: layouted.nodes,
+      edges: layouted.edges,
+    });
+
+    // Re-apply selection highlighting if a node was selected
+    if (selectedNodeId) {
+      get().selectNode(selectedNodeId);
+    }
+  },
+
   layoutGraph: (direction = 'TB') => {
     const { nodes, edges } = get();
     // Re-run layout on existing nodes/edges
     // This allows us to use existing 'measured' dimensions if they exist
     const layouted = applyDagreLayout(nodes, edges, { direction });
-    set({ nodes: layouted.nodes, edges: layouted.edges });
+    set({
+      nodes: layouted.nodes,
+      edges: layouted.edges,
+      layoutDirection: direction
+    });
   },
 
   selectNode: (nodeId: string | null) => {

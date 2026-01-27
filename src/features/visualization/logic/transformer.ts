@@ -59,7 +59,10 @@ export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
  * This function returns nodes with default (0,0) positions.
  * Layouting should be applied after this step.
  */
-export function transformToReactFlow(graph: Graph): { nodes: Node[]; edges: Edge[] } {
+export function transformToReactFlow(
+  graph: Graph,
+  options: { hideTypeDefinitions?: boolean } = {}
+): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
@@ -77,6 +80,14 @@ export function transformToReactFlow(graph: Graph): { nodes: Node[]; edges: Edge
   });
 
   graph.forEachEdge((_edgeId, attributes, source, target) => {
+    if (
+      options.hideTypeDefinitions &&
+      Array.isArray(attributes.dependencyTypes) &&
+      attributes.dependencyTypes.includes('type-only')
+    ) {
+      return;
+    }
+
     edges.push({
       id: `e-${source}-${target}`, // Stable edge ID
       source,
