@@ -18,8 +18,7 @@ describe('Visualization Store', () => {
     // Load sample data
     const sampleDataPath = path.resolve(__dirname, '../../../sample-data/dependency-graph.json');
     if (!fs.existsSync(sampleDataPath)) {
-         // Fallback if sample data missing in test env (shouldn't happen in this repo)
-         // We construct a minimal valid object to satisfy TS, though tests depending on real data might fail if this branch is hit
+         // Fallback if sample data missing in test env
          sampleData = { modules: [], summary: {
              violations: [],
              error: 0,
@@ -52,9 +51,7 @@ describe('Visualization Store', () => {
     expect(newState.edges.length).toBeGreaterThan(0);
     expect(newState.graph).not.toBeNull();
 
-    // Check if layout was applied (positions shouldn't be all 0,0)
-    // Note: Layout depends on Dagre. The root node usually has some position.
-    // In Dagre, top-left might be shifted.
+    // Check if layout was applied
     const nonZeroPos = newState.nodes.some(n => n.position.x !== 0 || n.position.y !== 0);
     expect(nonZeroPos).toBe(true);
   });
@@ -62,10 +59,63 @@ describe('Visualization Store', () => {
   it('should reset state', () => {
     const store = useGraphStore.getState();
     store.setGraphData(sampleData);
-    expect(useGraphStore.getState().nodes.length).toBeGreaterThan(0);
 
-    store.reset();
+    // Get fresh state
+    const state = useGraphStore.getState();
+    expect(state.nodes.length).toBeGreaterThan(0);
+
+    state.reset();
     expect(useGraphStore.getState().nodes).toEqual([]);
     expect(useGraphStore.getState().graph).toBeNull();
+  });
+
+  it('should select a node and highlight related nodes', () => {
+    const store = useGraphStore.getState();
+    store.setGraphData(sampleData);
+
+    // Get fresh state after update
+    const state = useGraphStore.getState();
+
+    // Find a known node or just the first one
+    const rootNode = state.nodes.find(n => n.id === 'src/App.tsx');
+    // If App.tsx is not in sample data, use first available
+    const targetNode = rootNode || state.nodes[0];
+
+    // Explicit assertion for test validity
+    expect(targetNode).toBeDefined();
+    if (!targetNode) return;
+
+    store.selectNode(targetNode.id);
+
+    const newState = useGraphStore.getState();
+    expect(newState.selectedNodeId).toBe(targetNode.id);
+
+    const selectedNode = newState.nodes.find(n => n.id === targetNode.id);
+    expect(selectedNode?.data.highlighted).toBe(true);
+    expect(selectedNode?.data.dimmed).toBe(false);
+  });
+
+  it('should deselect node', () => {
+    const store = useGraphStore.getState();
+    store.setGraphData(sampleData);
+
+    // Get fresh state after update
+    const state = useGraphStore.getState();
+
+    // Explicit assertion for test validity
+    expect(state.nodes.length).toBeGreaterThan(0);
+    if (state.nodes.length === 0) return;
+
+    const rootNode = state.nodes[0];
+    store.selectNode(rootNode.id);
+
+    expect(useGraphStore.getState().selectedNodeId).toBe(rootNode.id);
+
+    store.selectNode(null);
+    expect(useGraphStore.getState().selectedNodeId).toBeNull();
+
+    const node = useGraphStore.getState().nodes[0];
+    expect(node.data.highlighted).toBe(false);
+    expect(node.data.dimmed).toBe(false);
   });
 });
