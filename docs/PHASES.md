@@ -39,6 +39,9 @@
     *   Implement a UI mechanism (Button or Dropzone) to accept a user-provided `json` file.
     *   Validate the uploaded file against the Zod schema.
     *   Update the store with the new data to replace the sample data.
+    *   **Deferred:**
+        *   Structured logging (e.g., Sentry) for parse errors (currently using `console.error` in `App.tsx`).
+        *   Non-blocking notifications (e.g., Toasts) for user feedback (currently missing).
 
 9.  **Toolbar Actions (Drawer Menu)**
     *   TODO: Implement functionality for Code, Download, and Settings buttons in the new Drawer menu.
