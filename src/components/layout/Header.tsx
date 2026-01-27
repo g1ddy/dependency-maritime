@@ -23,7 +23,6 @@ import { CruiseResultSchema } from "@/schema/dependency-cruiser"
 import { ZodError } from "zod"
 
 export function Header() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const appVersion = import.meta.env.VITE_APP_VERSION as string
   const setGraphData = useGraphStore((state) => state.setGraphData)
 
@@ -60,10 +59,10 @@ export function Header() {
         description = "The file content is not valid JSON. Please check the file and try again."
       } else if (error instanceof ZodError) {
         title = "Validation Error"
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
         const issues = (error as any).issues || (error as any).errors || []
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        const details = issues.map((e: any) => `${e.path?.join('.')}: ${e.message}`).join(", ")
+        const details = (issues as any[]).map((e: any) => `${e.path?.join('.')}: ${e.message}`).join(", ")
         description = "The JSON structure does not match the expected schema. " + (details || error.message)
       } else if (error instanceof Error) {
         description = error.message

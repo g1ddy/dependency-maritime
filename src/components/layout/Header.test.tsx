@@ -19,6 +19,7 @@ describe('Header', () => {
     vi.clearAllMocks();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(storeModule.useGraphStore).mockImplementation((selector: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       return selector({
         setGraphData: setGraphDataMock,
       });
@@ -44,7 +45,7 @@ describe('Header', () => {
     };
     const file = new File([JSON.stringify(validData)], 'graph.json', { type: 'application/json' });
     Object.defineProperty(file, 'text', {
-      value: async () => JSON.stringify(validData),
+      value: async () => Promise.resolve(JSON.stringify(validData)),
     });
 
     render(<Header />);
@@ -63,7 +64,7 @@ describe('Header', () => {
     const invalidJson = "{ invalid: json }";
     const file = new File([invalidJson], 'graph.json', { type: 'application/json' });
     Object.defineProperty(file, 'text', {
-      value: async () => invalidJson,
+      value: async () => Promise.resolve(invalidJson),
     });
 
     render(<Header />);
@@ -85,7 +86,7 @@ describe('Header', () => {
     const invalidSchema = {};
     const file = new File([JSON.stringify(invalidSchema)], 'graph.json', { type: 'application/json' });
     Object.defineProperty(file, 'text', {
-      value: async () => JSON.stringify(invalidSchema),
+      value: async () => Promise.resolve(JSON.stringify(invalidSchema)),
     });
 
     render(<Header />);
