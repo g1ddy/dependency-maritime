@@ -393,25 +393,6 @@
         },
         {
           "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "./AppNode",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -421,24 +402,6 @@
           ],
           "preCompilationOnly": false,
           "resolved": "src/features/visualization/components/AppNode.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./GroupNode",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/components/GroupNode.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -506,7 +469,6 @@
             "type-only",
             "import"
           ],
-          "preCompilationOnly": false,
           "resolved": "src/features/visualization/logic/filters.ts",
           "coreModule": false,
           "followable": true,
@@ -621,7 +583,6 @@
             "local",
             "import"
           ],
-          "preCompilationOnly": false,
           "resolved": "src/features/visualization/logic/filters.ts",
           "coreModule": false,
           "followable": true,
@@ -638,68 +599,8 @@
       "valid": true
     },
     {
-      "source": "src/features/visualization/types.ts",
-      "dependencies": [],
-      "dependents": [
-        "src/features/visualization/components/DependencyGraph.tsx",
-        "src/features/visualization/components/AppNode.tsx",
-        "src/features/visualization/components/GroupNode.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
       "source": "src/features/visualization/components/AppNode.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/features/visualization/components/DependencyGraph.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/GroupNode.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
+      "dependencies": [],
       "dependents": [
         "src/features/visualization/components/DependencyGraph.tsx"
       ],
@@ -719,7 +620,6 @@
             "type-only",
             "import"
           ],
-          "preCompilationOnly": false,
           "resolved": "src/features/visualization/logic/filters.ts",
           "coreModule": false,
           "followable": true,
@@ -863,7 +763,6 @@
             "local",
             "import"
           ],
-          "preCompilationOnly": false,
           "resolved": "src/lib/utils.ts",
           "coreModule": false,
           "followable": true,
@@ -1202,10 +1101,10 @@
     "warn": 0,
     "info": 1,
     "ignore": 0,
-    "totalCruised": 29,
-    "totalDependenciesCruised": 44,
+    "totalCruised": 27,
+    "totalDependenciesCruised": 40,
     "optionsUsed": {
-      "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
+      "baseDir": "/app",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,
