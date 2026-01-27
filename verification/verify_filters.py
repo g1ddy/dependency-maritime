@@ -17,15 +17,18 @@ def verify_filters(page):
     ui_btn = page.get_by_role("button", name="UI Kit")
     ui_btn.click()
 
-    # Wait a bit for layout
-    page.wait_for_timeout(1000)
+    # Wait for known 'core' and 'ui' nodes to be visible to confirm filtering.
+    expect(page.get_by_text("dependency-cruiser.ts")).to_be_visible()
+    expect(page.get_by_text("GraphOverlay.tsx")).to_be_visible()
 
     # Take screenshot of multiple selection
     page.screenshot(path="verification/multiple_filters.png")
 
     # Reset
     all_btn.click()
-    page.wait_for_timeout(500)
+    # Wait for a node that is not 'core' or 'ui' (e.g., 'other') to reappear,
+    # confirming the filter has been reset.
+    expect(page.get_by_text("App.tsx")).to_be_visible()
     page.screenshot(path="verification/reset_filters.png")
 
 if __name__ == "__main__":
