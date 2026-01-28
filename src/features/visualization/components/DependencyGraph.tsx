@@ -64,7 +64,7 @@ export function DependencyGraph() {
       // We use 'any' casting here because getInternalNode returns a type that ESLint finds ambiguous
       // or 'error-typed' in this context, but we know it has positionAbsolute at runtime.
       const internalNode = getInternalNode(node.id) as { positionAbsolute?: { x: number; y: number } } | undefined;
-      const nodeAbs = internalNode?.positionAbsolute || (node as { positionAbsolute?: { x: number; y: number } }).positionAbsolute;
+      const nodeAbs = internalNode?.positionAbsolute || node.positionAbsolute;
 
       // If dropped on a group
       if (group) {
