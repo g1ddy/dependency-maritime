@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 
 // Import data sources
 import sampleData from '../../../../sample-data/dependency-graph.json';
-// @ts-expect-error - Importing outside src is managed by Vite but might be flagged by TS
 import projectData from '../../../../config/dependency-graph.json';
 
 interface DataSourceDialogProps {

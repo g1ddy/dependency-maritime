@@ -16,6 +16,7 @@ This repository contains the "Dependency Maritime" project.
 
 *   **TypeScript:**
     *   Use `@ts-expect-error` instead of `@ts-ignore` when valid.
+    *   **Do not blindly replace `@ts-ignore` with `@ts-expect-error` without verifying that an error actually exists.** If no error exists, remove the directive entirely.
     *   Ensure all new tests are written in TypeScript (e.g., in `e2e/`).
 *   **Linting:** Always run `npm run lint` to ensure code quality before submitting.
 
