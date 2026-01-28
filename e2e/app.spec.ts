@@ -16,14 +16,15 @@ test('App elements are visible', async ({ page }) => {
     // We use Port.tsx as it is known to be visible in the viewport across devices (verified in node_visibility.spec.ts)
     const node = page.locator('.react-flow__node-appNode:has-text("Port.tsx")');
     await expect(node).toBeVisible();
-    await node.click({ force: true });
+    await node.scrollIntoViewIfNeeded();
+    await node.click();
 
     await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
   });
 
   await test.step('Verify Zoom controls', async () => {
-    await expect(page.locator('.react-flow__controls-zoomin')).toBeVisible();
-    await expect(page.locator('.react-flow__controls-zoomout')).toBeVisible();
-    await expect(page.locator('.react-flow__controls-fitview')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'zoom in' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'zoom out' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'fit view' })).toBeVisible();
   });
 });
