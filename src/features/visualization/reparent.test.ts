@@ -3,13 +3,13 @@ import { useGraphStore } from './store';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { CruiseResultSchema } from '../../schema/dependency-cruiser';
+import { CruiseResultSchema, type ICruiseResult } from '../../schema/dependency-cruiser';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe('Reparenting Logic', () => {
-  let sampleData: any;
+  let sampleData: ICruiseResult;
 
   beforeEach(() => {
     useGraphStore.getState().reset();

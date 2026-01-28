@@ -29,7 +29,7 @@ export function DependencyGraph() {
     reparentNode,
   } = useGraphStore();
 
-  const { getIntersectingNodes, getInternalNode, screenToFlowPosition } = useReactFlow();
+  const { getIntersectingNodes, getInternalNode } = useReactFlow();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
@@ -50,16 +50,18 @@ export function DependencyGraph() {
       // Get the accurate position of the node (after drag)
       // We rely on getInternalNode to ensure we have the latest positionAbsolute
       // falling back to the passed node's positionAbsolute
-      const internalNode = getInternalNode(node.id);
-      const nodeAbs = internalNode?.positionAbsolute || node.positionAbsolute;
+      // We use 'any' casting here because getInternalNode returns a type that ESLint finds ambiguous
+      // or 'error-typed' in this context, but we know it has positionAbsolute at runtime.
+      const internalNode = getInternalNode(node.id) as { positionAbsolute?: { x: number; y: number } } | undefined;
+      const nodeAbs = internalNode?.positionAbsolute || (node as { positionAbsolute?: { x: number; y: number } }).positionAbsolute;
 
       // If dropped on a group
       if (group) {
         // Only update if parent is different
         if (group.id !== node.parentId) {
           // Get the most up-to-date absolute position of the group
-          const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
-          const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
+          const internalGroup = getInternalNode(group.id) as { positionAbsolute?: { x: number; y: number } } | undefined;
+          const groupAbs = internalGroup?.positionAbsolute || (group as unknown as { positionAbsolute?: { x: number; y: number } }).positionAbsolute;
 
           if (nodeAbs && groupAbs) {
             const relativeX = nodeAbs.x - groupAbs.x;
@@ -79,7 +81,7 @@ export function DependencyGraph() {
         }
       }
     },
-    [getIntersectingNodes, reparentNode, getInternalNode, screenToFlowPosition]
+    [getIntersectingNodes, reparentNode, getInternalNode]
   );
 
   // Define MiniMap node color logic
