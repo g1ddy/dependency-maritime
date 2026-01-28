@@ -29,6 +29,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "src/vite-env.d.ts"],
+  "include": ["src", "src/vite-env.d.ts", "config/**/*.json"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test/"]
 }
