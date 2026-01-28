@@ -25,8 +25,11 @@ describe('Reparenting Logic', () => {
     let state = useGraphStore.getState();
     // Find 'src/App.tsx' node. The ID is a GUID, so search by label or fullPath.
     const node = state.nodes.find(n => n.data.fullPath === 'src/App.tsx');
-    expect(node).toBeDefined();
-    if (!node) return;
+
+    // Fail test immediately if node is missing, avoids silent pass if expectations were removed
+    if (!node) {
+        throw new Error('Test node src/App.tsx not found in sample data');
+    }
 
     // Check initial state
     // 'src/App.tsx' should have a parent 'src' (if 'src' group exists)
@@ -39,12 +42,55 @@ describe('Reparenting Logic', () => {
 
     state = useGraphStore.getState();
     const updatedNode = state.nodes.find(n => n.id === node.id);
-    expect(updatedNode).toBeDefined();
+
+    if (!updatedNode) {
+        throw new Error('Updated node not found');
+    }
 
     // Verify parentId is undefined
-    expect(updatedNode?.parentId).toBeUndefined();
+    expect(updatedNode.parentId).toBeUndefined();
 
     // Verify fullPath is updated to just 'App.tsx' (since it's at root now)
-    expect(updatedNode?.data.fullPath).toBe('App.tsx');
+    expect(updatedNode.data.fullPath).toBe('App.tsx');
+
+    // Verify extent behavior (undefined for root)
+    expect(updatedNode.extent).toBeUndefined();
+  });
+
+  it('should update fullPath when moving node into a group', () => {
+    const store = useGraphStore.getState();
+    store.setGraphData(sampleData);
+
+    let state = useGraphStore.getState();
+    const node = state.nodes.find(n => n.data.fullPath === 'src/App.tsx');
+
+    if (!node) {
+        throw new Error('Test node src/App.tsx not found');
+    }
+
+    // Move to 'src/pages' group (assuming it exists in sample data or we create it logic wise)
+    // In sample data: src/pages/GamePage.tsx exists, so src/pages group should exist.
+    const newParentId = 'src/pages';
+
+    store.reparentNode(node.id, newParentId, { x: 50, y: 50 });
+
+    state = useGraphStore.getState();
+    const updatedNode = state.nodes.find(n => n.id === node.id);
+
+    if (!updatedNode) {
+        throw new Error('Updated node not found');
+    }
+
+    // Verify parentId
+    expect(updatedNode.parentId).toBe(newParentId);
+
+    // Verify fullPath is updated
+    expect(updatedNode.data.fullPath).toBe('src/pages/App.tsx');
+
+    // Verify extent behavior (currently undefined in implementation, but reviewer suggested checking it)
+    // The current implementation in store.ts sets extent: undefined for newParentId too?
+    // Let's check the code: extent: newParentId ? undefined : undefined
+    // So it is always undefined.
+    expect(updatedNode.extent).toBeUndefined();
   });
 });
