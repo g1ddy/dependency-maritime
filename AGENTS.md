@@ -21,11 +21,11 @@ This repository contains the "Dependency Maritime" project.
 
 ## Pre-Submit Checks
 
-Before submitting any changes:
-1.  Run `npm run lint` and fix any errors.
-2.  Run `npm test` for unit tests.
-3.  Run `npm run test:e2e` for integration/E2E tests.
-4.  Verify that your changes do not break the build (`npm run build`).
+Before submitting any changes, run these checks in order to ensure you are testing the latest compiled code:
+1.  **Build:** Run `npm run build` to verify the application compiles correctly.
+2.  **Lint:** Run `npm run lint` and fix any errors.
+3.  **Unit Tests:** Run `npm test`.
+4.  **E2E Tests:** Run `npm run test:e2e`.
 
 ## Documentation
 
