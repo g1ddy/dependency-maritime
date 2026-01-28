@@ -5,7 +5,10 @@ import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } fro
 import '@xyflow/react/dist/style.css';
 
 import { useGraphStore } from '../store';
-import graphData from '../../../../sample-data/dependency-graph.json';
+// Switch to project data as requested
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Config file is outside src
+import graphData from '../../../../config/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
