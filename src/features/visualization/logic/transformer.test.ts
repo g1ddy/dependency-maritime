@@ -35,8 +35,9 @@ describe('Graph Transformer Logic', () => {
     expect(graph.size).toBeGreaterThan(0);
 
     // Verify a specific node exists (e.g., src/App.tsx from known sample data)
-    const appNode = graph.hasNode('src/App.tsx');
-    expect(appNode).toBe(true);
+    // We now look for a node with the correct fullPath attribute, as IDs are GUIDs
+    const appNodeId = graph.findNode((_node, attributes) => attributes.fullPath === 'src/App.tsx');
+    expect(appNodeId).toBeDefined();
   });
 
   it('should transform Graphology graph to React Flow primitives', () => {
@@ -46,7 +47,7 @@ describe('Graph Transformer Logic', () => {
     expect(nodes.length).toBeGreaterThanOrEqual(graph.order);
     expect(edges.length).toBe(graph.size);
 
-    const appNode = nodes.find(n => n.id === 'src/App.tsx');
+    const appNode = nodes.find(n => n.data.fullPath === 'src/App.tsx');
     expect(appNode).toBeDefined();
     expect(appNode?.position).toEqual({ x: 0, y: 0 }); // Default position before layout
   });
