@@ -47,12 +47,11 @@ export function DependencyGraph() {
       );
       const group = intersections[0] as CustomNode | undefined;
 
-      // Calculate the absolute position from the mouse event to ensure accuracy
-      // This avoids potential staleness in the node's positionAbsolute
-      const nodeAbs = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
+      // Get the accurate position of the node (after drag)
+      // We rely on getInternalNode to ensure we have the latest positionAbsolute
+      // falling back to the passed node's positionAbsolute
+      const internalNode = getInternalNode(node.id);
+      const nodeAbs = internalNode?.positionAbsolute || node.positionAbsolute;
 
       // If dropped on a group
       if (group) {
