@@ -9,7 +9,7 @@ import graphData from '../../../../sample-data/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
-import { type CustomNode } from '../types';
+import { type CustomNode, type AppNodeData } from '../types';
 
 const MINI_MAP_NODE_COLORS = {
   EXTERNAL: '#f59e0b', // amber-500
@@ -19,8 +19,8 @@ const MINI_MAP_NODE_COLORS = {
 } as const;
 
 // Define MiniMap node color logic outside component to prevent re-renders
-const miniMapNodeColor = (node: { data: { label?: unknown; external?: unknown } }) => {
-  const label = (node.data.label as string) || '';
+const miniMapNodeColor = (node: Node<AppNodeData>) => {
+  const label = node.data.label || '';
   const isExternal = !!node.data.external;
 
   if (isExternal) return MINI_MAP_NODE_COLORS.EXTERNAL;
