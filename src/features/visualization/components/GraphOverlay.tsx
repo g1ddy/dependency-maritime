@@ -109,8 +109,8 @@ export function GraphOverlay() {
                 <h3 className="font-semibold text-sm truncate" title={selectedNode.data.label as string}>
                   {selectedNode.data.label as string}
                 </h3>
-                <p className="text-xs text-muted-foreground truncate" title={selectedNode.id}>
-                  {selectedNode.id}
+                <p className="text-xs text-muted-foreground truncate" title={selectedNode.data.fullPath as string}>
+                  {selectedNode.data.fullPath as string}
                 </p>
               </div>
               <div className="ml-auto text-right whitespace-nowrap">

@@ -89,26 +89,32 @@ describe('Type Definition Hiding Logic', () => {
     const graph = createGraphFromCruiseResult(mockData);
     const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: true });
 
+    // Lookup node IDs
+    const idA = nodes.find(n => n.data.fullPath === 'src/A.ts')?.id;
+    const idB = nodes.find(n => n.data.fullPath === 'src/B.ts')?.id;
+    const idC = nodes.find(n => n.data.fullPath === 'src/C.ts')?.id;
+    const idD = nodes.find(n => n.data.fullPath === 'src/D.ts')?.id;
+
+    expect(idA).toBeDefined();
+    expect(idB).toBeDefined();
+    expect(idC).toBeDefined();
+    expect(idD).toBeDefined();
+
     // Verify Edges
     // Should contain A->B (normal)
     // Should NOT contain A->C (type-only)
     // Should NOT contain A->D (pre-compilation-only with type-only tag)
     expect(edges.length).toBe(1);
-    expect(edges[0].source).toBe('src/A.ts');
-    expect(edges[0].target).toBe('src/B.ts');
+    expect(edges[0].source).toBe(idA);
+    expect(edges[0].target).toBe(idB);
 
     // Verify Nodes
     // All nodes (A, B, C, D) should still exist
     expect(nodes.length).toBeGreaterThanOrEqual(4);
-    const nodeIds = nodes.map(n => n.id).sort();
-    expect(nodeIds).toContain('src/A.ts');
-    expect(nodeIds).toContain('src/B.ts');
-    expect(nodeIds).toContain('src/C.ts');
-    expect(nodeIds).toContain('src/D.ts');
 
     // C and D should be isolated (no edges connected to them in the React Flow edges list)
     const edgesConnectedToTypeNodes = edges.filter(
-      e => ['src/C.ts', 'src/D.ts'].includes(e.source) || ['src/C.ts', 'src/D.ts'].includes(e.target)
+      e => [idC, idD].includes(e.source) || [idC, idD].includes(e.target)
     );
     expect(edgesConnectedToTypeNodes.length).toBe(0);
   });
@@ -117,10 +123,24 @@ describe('Type Definition Hiding Logic', () => {
     const graph = createGraphFromCruiseResult(mockData);
     const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: false });
 
+    // Lookup node IDs
+    const idA = nodes.find(n => n.data.fullPath === 'src/A.ts')?.id;
+    const idB = nodes.find(n => n.data.fullPath === 'src/B.ts')?.id;
+    const idC = nodes.find(n => n.data.fullPath === 'src/C.ts')?.id;
+    const idD = nodes.find(n => n.data.fullPath === 'src/D.ts')?.id;
+
+    expect(idA).toBeDefined();
+    expect(idB).toBeDefined();
+    expect(idC).toBeDefined();
+    expect(idD).toBeDefined();
+
     // Verify Edges
     expect(edges.length).toBe(3);
     const targets = edges.map(e => e.target).sort();
-    expect(targets).toEqual(['src/B.ts', 'src/C.ts', 'src/D.ts']);
+
+    // We expect targets to be B, C, D IDs
+    const expectedTargets = [idB, idC, idD].sort();
+    expect(targets).toEqual(expectedTargets);
 
     // Verify Nodes
     expect(nodes.length).toBeGreaterThanOrEqual(4);

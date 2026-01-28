@@ -3,20 +3,35 @@ import { type Node, type Edge } from '@xyflow/react';
 import { type ICruiseResult, type IModule, type IDependency } from '../../../schema/dependency-cruiser';
 import { classifyNode, type ModuleCategory } from './filters';
 
+// Simple UUID generator for browser/node compatibility
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 /**
  * Converts the dependency-cruiser output into a Graphology graph.
  * This acts as the "Headless" logic layer.
  */
 export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
   const graph = new Graph({ type: 'directed', allowSelfLoops: true, multi: false });
+  const pathMap = new Map<string, string>(); // Maps original file path -> Node GUID
 
   // 1. Add all nodes
   data.modules.forEach((mod: IModule) => {
-    // We use the source path as the unique ID
-    if (!graph.hasNode(mod.source)) {
-      graph.addNode(mod.source, {
+    // We use a GUID as the unique ID for file nodes
+    if (!pathMap.has(mod.source)) {
+      const guid = generateUUID();
+      pathMap.set(mod.source, guid);
+
+      graph.addNode(guid, {
         label: mod.source.split('/').pop(), // Simple filename as label
-        fullPath: mod.source,
+        fullPath: mod.source, // Store the original path
         ...mod
       });
     }
@@ -25,27 +40,25 @@ export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
   // 2. Add all edges
   data.modules.forEach((mod: IModule) => {
     mod.dependencies.forEach((dep: IDependency) => {
-      // Ensure the target node exists (sometimes dep-cruiser reports resolved paths that aren't in the modules list?)
-      // If it's an external module or core module, it might not be in 'modules' depending on config.
-      // For now, we only add edges if both nodes exist to avoid errors.
-      // Alternatively, we could add missing nodes as "external" nodes.
+      // Ensure the target node exists
+      const sourceId = pathMap.get(mod.source);
+      let targetId = pathMap.get(dep.resolved);
 
-      const targetId = dep.resolved;
+      if (!targetId) {
+        // If target is external or missing from 'modules', create it
+        targetId = generateUUID();
+        pathMap.set(dep.resolved, targetId);
 
-      if (!graph.hasNode(targetId)) {
-        // Option: Auto-create external nodes?
-        // Let's create them but mark them as external/unresolved
         graph.addNode(targetId, {
-           label: targetId.split('/').pop(),
-           fullPath: targetId,
+           label: dep.resolved.split('/').pop(),
+           fullPath: dep.resolved,
            external: true,
            coreModule: dep.coreModule
         });
       }
 
-      // Avoid duplicate edges if they already exist
-      if (!graph.hasEdge(mod.source, targetId)) {
-        graph.addEdge(mod.source, targetId, {
+      if (sourceId && targetId && !graph.hasEdge(sourceId, targetId)) {
+        graph.addEdge(sourceId, targetId, {
             ...dep
         });
       }
@@ -75,9 +88,13 @@ export function transformToReactFlow(
   const activeFilters = options.activeFilters || [];
 
   graph.forEachNode((nodeId, attributes) => {
+    // attributes.fullPath should be something like "src/features/visualization/logic/transformer.ts"
+    const fullPath = (attributes.fullPath as string) || '';
+
     // Apply Category Filter
     if (activeFilters.length > 0) {
-      const category = classifyNode(nodeId);
+      // classifyNode expects the original file path to determine category
+      const category = classifyNode(fullPath);
       if (!activeFilters.includes(category)) {
         return; // Skip this node
       }
@@ -85,9 +102,8 @@ export function transformToReactFlow(
 
     visibleNodeIds.add(nodeId);
 
-    // Determine directory hierarchy
-    // Assuming nodeId is a file path like "src/features/visualization/logic/transformer.ts"
-    const parts = nodeId.split('/');
+    // Determine directory hierarchy using the fullPath attribute
+    const parts = fullPath.split('/');
     parts.pop(); // Remove filename
 
     // Create/Find Group Nodes
@@ -128,13 +144,13 @@ export function transformToReactFlow(
     }
 
     nodes.push({
-      id: nodeId,
-      // We will assume a default type for now, or 'default'
+      id: nodeId, // This is now a GUID
       type: 'appNode',
       position: { x: 0, y: 0 }, // Layout will fix this
-      parentId,
+      parentId, // This refers to the Group Node ID (path)
       data: {
         label: attributes.label,
+        fullPath: attributes.fullPath, // Pass this along
         ...attributes
       },
     });
@@ -142,7 +158,6 @@ export function transformToReactFlow(
 
   // Add group nodes to the nodes list
   // We place group nodes FIRST so they render BEHIND the file nodes
-  // React Flow requires parents to appear before their children in the array for relative positioning to work correctly.
   const groupNodes = Array.from(groupNodesMap.values()).sort((a, b) => {
     // Sort by path depth (number of slashes) ascending, so 'src' comes before 'src/features'
     return a.id.split('/').length - b.id.split('/').length;
@@ -166,10 +181,9 @@ export function transformToReactFlow(
     }
 
     edges.push({
-      id: `e-${source}-${target}`, // Stable edge ID
+      id: `e-${source}-${target}`, // Stable edge ID based on GUIDs
       source,
       target,
-      // type: 'smoothstep', // Default edge type
       data: {
         ...attributes
       }

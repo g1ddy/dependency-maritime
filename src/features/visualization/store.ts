@@ -244,11 +244,20 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     set({
       nodes: nodes.map((n) => {
         if (n.id === nodeId) {
+          // Calculate new fullPath
+          const label = (n.data.label as string) || '';
+          // newParentId is the folder path (e.g. 'src/features') or undefined (root)
+          const newFullPath = newParentId ? `${newParentId}/${label}` : label;
+
           return {
             ...n,
             parentId: newParentId,
             position: newPosition,
             extent: newParentId ? undefined : undefined,
+            data: {
+              ...n.data,
+              fullPath: newFullPath,
+            },
           };
         }
         return n;
