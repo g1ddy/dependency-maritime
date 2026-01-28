@@ -9,7 +9,7 @@ import graphData from '../../../../sample-data/dependency-graph.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
-import { type CustomNode } from '../types';
+import { type CustomNode, type AppNodeData } from '../types';
 
 const MINI_MAP_NODE_COLORS = {
   EXTERNAL: '#f59e0b', // amber-500
@@ -17,6 +17,17 @@ const MINI_MAP_NODE_COLORS = {
   TS: '#4ade80', // green-400
   DEFAULT: '#94a3b8', // slate-400
 } as const;
+
+// Define MiniMap node color logic outside component to prevent re-renders
+const miniMapNodeColor = (node: Node<AppNodeData>) => {
+  const label = node.data.label || '';
+  const isExternal = !!node.data.external;
+
+  if (isExternal) return MINI_MAP_NODE_COLORS.EXTERNAL;
+  if (label.endsWith('.tsx')) return MINI_MAP_NODE_COLORS.TSX;
+  if (label.endsWith('.ts')) return MINI_MAP_NODE_COLORS.TS;
+  return MINI_MAP_NODE_COLORS.DEFAULT;
+};
 
 export function DependencyGraph() {
   const {
@@ -83,16 +94,16 @@ export function DependencyGraph() {
     [getIntersectingNodes, reparentNode, getInternalNode, screenToFlowPosition]
   );
 
-  // Define MiniMap node color logic
-  const miniMapNodeColor = (node: { data: { label?: unknown; external?: unknown } }) => {
-    const label = (node.data.label as string) || '';
-    const isExternal = !!node.data.external;
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      selectNode(node.id);
+    },
+    [selectNode]
+  );
 
-    if (isExternal) return MINI_MAP_NODE_COLORS.EXTERNAL;
-    if (label.endsWith('.tsx')) return MINI_MAP_NODE_COLORS.TSX;
-    if (label.endsWith('.ts')) return MINI_MAP_NODE_COLORS.TS;
-    return MINI_MAP_NODE_COLORS.DEFAULT;
-  };
+  const onPaneClick = useCallback(() => {
+    selectNode(null);
+  }, [selectNode]);
 
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -101,8 +112,8 @@ export function DependencyGraph() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onNodeClick={(_, node) => selectNode(node.id)}
-        onPaneClick={() => selectNode(null)}
+        onNodeClick={onNodeClick}
+        onPaneClick={onPaneClick}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         fitView
