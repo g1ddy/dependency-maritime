@@ -12,6 +12,22 @@ This repository contains the "Dependency Maritime" project.
 3.  **Project Phases:** Respect the phased approach outlined in `docs/PHASES.md`. Do not implement features from future phases unless explicitly requested.
 4.  **Test-First:** Follow the "Test-First" development strategy. Write tests for complex logic before implementing the solution.
 
+## Coding Standards
+
+*   **TypeScript:**
+    *   Use `@ts-expect-error` instead of `@ts-ignore` when valid.
+    *   **Do not blindly replace `@ts-ignore` with `@ts-expect-error` without verifying that an error actually exists.** If no error exists, remove the directive entirely.
+    *   Ensure all new tests are written in TypeScript (e.g., in `e2e/`).
+*   **Linting:** Always run `npm run lint` to ensure code quality before submitting.
+
+## Pre-Submit Checks
+
+Before submitting any changes, run these checks in order to ensure you are testing the latest compiled code:
+1.  **Build:** Run `npm run build` to verify the application compiles correctly.
+2.  **Lint:** Run `npm run lint` and fix any errors.
+3.  **Unit Tests:** Run `npm test`.
+4.  **E2E Tests:** Run `npm run test:e2e`.
+
 ## Documentation
 
 *   Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
