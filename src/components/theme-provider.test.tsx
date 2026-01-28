@@ -1,12 +1,7 @@
 import { render } from '@testing-library/react'
-import { ThemeProvider, useTheme } from './theme-provider'
+import { ThemeProvider } from './theme-provider'
+import { useTheme, ThemeProviderState } from './theme-context'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-
-// Define the shape of the context value to avoid 'any'
-type ThemeProviderState = {
-  theme: "dark" | "light" | "system"
-  setTheme: (theme: "dark" | "light" | "system") => void
-}
 
 describe('ThemeProvider', () => {
   beforeEach(() => {
