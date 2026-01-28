@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react'
 import { ThemeProvider } from './theme-provider'
-import { useTheme, ThemeProviderState } from './theme-context'
+import { useTheme, type ThemeProviderState } from './theme-context'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 describe('ThemeProvider', () => {
