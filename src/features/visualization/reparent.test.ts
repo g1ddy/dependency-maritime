@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { useGraphStore } from './store';
 import fs from 'fs';
 import path from 'path';
@@ -7,14 +7,6 @@ import { CruiseResultSchema, type ICruiseResult } from '../../schema/dependency-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Mock layout logic to speed up tests
-vi.mock('./logic/layout', () => ({
-  applyDagreLayout: (nodes: any[], edges: any[]) => ({
-    nodes: nodes.map(n => ({ ...n, position: { x: 0, y: 0 } })),
-    edges
-  })
-}));
 
 describe('Reparenting Logic', () => {
   let sampleData: ICruiseResult;

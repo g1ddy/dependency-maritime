@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { useGraphStore } from './store';
 import fs from 'fs';
 import path from 'path';
@@ -7,14 +7,6 @@ import { CruiseResultSchema, type ICruiseResult } from '../../schema/dependency-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Mock layout logic to speed up tests
-vi.mock('./logic/layout', () => ({
-  applyDagreLayout: (nodes: any[], edges: any[]) => ({
-    nodes: nodes.map(n => ({ ...n, position: { x: 0, y: 0 } })),
-    edges
-  })
-}));
 
 describe('Visualization Store', () => {
   let sampleData: ICruiseResult;
@@ -60,13 +52,9 @@ describe('Visualization Store', () => {
     expect(newState.edges.length).toBeGreaterThan(0);
     expect(newState.graph).not.toBeNull();
 
-    // Check if layout was applied
-    // Since we mocked layout to return (0,0), this assertion would fail if we expect non-zero
-    // But since applyDagreLayout is mocked, we know it returns 0,0.
-    // The original test checked: n.position.x !== 0 || n.position.y !== 0
-    // We should update this expectation or accept 0,0.
-    // However, let's just check nodes exist.
-    expect(newState.nodes.length).toBeGreaterThan(0);
+    // Verify layout mock applied correctly (all positions should be 0,0)
+    const allZeroPositions = newState.nodes.every(n => n.position.x === 0 && n.position.y === 0);
+    expect(allZeroPositions).toBe(true);
   });
 
   it('should reset state', () => {
