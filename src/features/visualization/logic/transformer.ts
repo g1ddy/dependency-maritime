@@ -142,7 +142,13 @@ export function transformToReactFlow(
 
   // Add group nodes to the nodes list
   // We place group nodes FIRST so they render BEHIND the file nodes
-  const finalNodes = [...groupNodesMap.values(), ...nodes];
+  // React Flow requires parents to appear before their children in the array for relative positioning to work correctly.
+  const groupNodes = Array.from(groupNodesMap.values()).sort((a, b) => {
+    // Sort by path depth (number of slashes) ascending, so 'src' comes before 'src/features'
+    return a.id.split('/').length - b.id.split('/').length;
+  });
+
+  const finalNodes = [...groupNodes, ...nodes];
 
   graph.forEachEdge((_edgeId, attributes, source, target) => {
     // 1. Filter out edges where source or target is hidden
