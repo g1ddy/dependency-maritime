@@ -9,7 +9,7 @@ function generateUUID(): string {
     return crypto.randomUUID();
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
 }
@@ -88,10 +88,12 @@ export function transformToReactFlow(
   const activeFilters = options.activeFilters || [];
 
   graph.forEachNode((nodeId, attributes) => {
+    // attributes.fullPath should be something like "src/features/visualization/logic/transformer.ts"
+    const fullPath = (attributes.fullPath as string) || '';
+
     // Apply Category Filter
     if (activeFilters.length > 0) {
       // classifyNode expects the original file path to determine category
-      const fullPath = attributes.fullPath as string;
       const category = classifyNode(fullPath);
       if (!activeFilters.includes(category)) {
         return; // Skip this node
@@ -101,8 +103,6 @@ export function transformToReactFlow(
     visibleNodeIds.add(nodeId);
 
     // Determine directory hierarchy using the fullPath attribute
-    // attributes.fullPath should be something like "src/features/visualization/logic/transformer.ts"
-    const fullPath = (attributes.fullPath as string) || '';
     const parts = fullPath.split('/');
     parts.pop(); // Remove filename
 
