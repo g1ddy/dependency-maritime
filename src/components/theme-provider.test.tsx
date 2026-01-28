@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react'
 import { ThemeProvider, useTheme } from './theme-provider'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import React from 'react'
 
 // Define the shape of the context value to avoid 'any'
 type ThemeProviderState = {
