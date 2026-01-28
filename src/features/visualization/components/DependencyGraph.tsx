@@ -72,7 +72,7 @@ export function DependencyGraph() {
         if (group.id !== node.parentId) {
           // Get the most up-to-date absolute position of the group
           const internalGroup = getInternalNode(group.id) as { positionAbsolute?: { x: number; y: number } } | undefined;
-          const groupAbs = internalGroup?.positionAbsolute || (group as unknown as { positionAbsolute?: { x: number; y: number } }).positionAbsolute;
+          const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
 
           if (nodeAbs && groupAbs) {
             const relativeX = nodeAbs.x - groupAbs.x;
