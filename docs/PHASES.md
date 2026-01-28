@@ -3,39 +3,39 @@
 ## Phase 1: The "Chartroom" (MVP)
 **Goal:** Load JSON and render a static graph that isn't a mess.
 
-1.  **Schema Definition**
+1.  **Schema Definition** [x]
     *   Create Zod schemas mirroring the dependency-cruiser output type (focusing on `modules`, `source`, `dependencies`, and `resolved`).
     *   Export TypeScript types inferred from the schema to ensure type safety across the app.
 
-2.  **State Management (Zustand)**
+2.  **State Management (Zustand)** [x]
     *   Set up the Zustand store to hold the raw graph data, the Graphology instance, and React Flow nodes/edges.
     *   Implement actions to load data and reset the state.
 
-3.  **Graph Logic Core (Headless)**
+3.  **Graph Logic Core (Headless)** [x]
     *   Implement the transformation logic: `JSON -> Graphology Graph`.
     *   Iterate through modules to create nodes and dependencies to create edges.
     *   Ensure node IDs are unique (using file paths).
 
-4.  **Layout Implementation**
+4.  **Layout Implementation** [x]
     *   Implement `dagre` (via `@reactflow/dagre` or direct) to calculate node positions.
     *   Arrange nodes hierarchically (Top-Down or Left-Right) so standard dependency trees look logical.
     *   Transform the Graphology graph into React Flow primitives: create fully formed React Flow Nodes (merging data + layout positions) and Edges.
 
-5.  **React Flow Integration**
+5.  **React Flow Integration** [x]
     *   Create the main Visualization component using React Flow.
     *   Render the nodes and edges from the store.
     *   Use the existing `CanvasPlaceholder` for empty states.
 
-6.  **Load Sample Data**
+6.  **Load Sample Data** [x]
     *   Import `sample-data/dependency-graph.json` directly.
     *   Initialize the store with this data on application startup for immediate feedback.
 
-7.  **Basic Interaction (Highlighting)**
+7.  **Basic Interaction (Highlighting)** [x]
     *   Implement click handlers on nodes.
     *   Use Graphology traversal (neighbors, predecessors, successors) to identify connected nodes.
     *   Visually highlight the selected node and its direct ancestors (upstream) and descendants (downstream), dimming others.
 
-8.  **File Upload (Late Phase 1)**
+8.  **File Upload (Late Phase 1)** [x]
     *   Implement a UI mechanism (Button or Dropzone) to accept a user-provided `json` file.
     *   Validate the uploaded file against the Zod schema.
     *   Update the store with the new data to replace the sample data.
