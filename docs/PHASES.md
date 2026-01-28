@@ -57,8 +57,8 @@
 ## Phase 3: The "Simulator" (Refactoring Playground)
 **Goal:** The killer feature—drag and drop architecture.
 
-*   **Group/Cluster Support:** Implement React Flow SubFlow to render Folders as containers.
-*   **Drag Logic:** Allow dragging a FileNode from one FolderNode to another.
+*   **Group/Cluster Support:** (Implemented) React Flow SubFlow renders Folders as container nodes (GroupNodes) with dashed borders and folder icons.
+*   **Drag Logic:** (Implemented) Nodes can be dragged between Groups or to the Root. Logic updates the `fullPath` and `parentId` in the store, maintaining graph consistency.
 *   **Virtual Recalculation:** When a drop happens:
     *   Intercept the event.
     *   Update the in-memory graph edges.
