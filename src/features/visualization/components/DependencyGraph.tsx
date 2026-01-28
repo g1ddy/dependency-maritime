@@ -40,7 +40,7 @@ export function DependencyGraph() {
   }, [setGraphData]);
 
   const onNodeDragStop = useCallback(
-    (event: React.MouseEvent, node: Node) => {
+    (_: React.MouseEvent, node: Node) => {
       // Find intersecting nodes that are groups
       const intersections = getIntersectingNodes(node).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
