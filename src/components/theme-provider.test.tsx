@@ -10,6 +10,7 @@ type ThemeProviderState = {
 
 describe('ThemeProvider', () => {
   beforeEach(() => {
+    // Mock matchMedia
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: vi.fn().mockImplementation((query: string) => ({
@@ -22,6 +23,17 @@ describe('ThemeProvider', () => {
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
       })),
+    });
+
+    // Mock localStorage
+    const localStorageMock = {
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+    };
+    Object.defineProperty(window, 'localStorage', {
+      value: localStorageMock,
     });
   })
 
