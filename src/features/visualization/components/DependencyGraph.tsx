@@ -29,7 +29,7 @@ export function DependencyGraph() {
     reparentNode,
   } = useGraphStore();
 
-  const { getIntersectingNodes, getInternalNode } = useReactFlow();
+  const { getIntersectingNodes, getInternalNode, screenToFlowPosition } = useReactFlow();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
@@ -40,23 +40,24 @@ export function DependencyGraph() {
   }, [setGraphData]);
 
   const onNodeDragStop = useCallback(
-    (_: React.MouseEvent, node: Node) => {
-      // Cast to CustomNode to safely access positionAbsolute
-      const customNode = node as CustomNode;
-
+    (event: React.MouseEvent, node: Node) => {
       // Find intersecting nodes that are groups
       const intersections = getIntersectingNodes(node).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
       );
       const group = intersections[0] as CustomNode | undefined;
 
+      // Calculate the absolute position from the mouse event to ensure accuracy
+      // This avoids potential staleness in the node's positionAbsolute
+      const nodeAbs = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
       // If dropped on a group
       if (group) {
         // Only update if parent is different
         if (group.id !== node.parentId) {
-          // Calculate relative position based on absolute positions
-          const nodeAbs = customNode.positionAbsolute;
-
           // Get the most up-to-date absolute position of the group
           const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
           const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
@@ -70,7 +71,6 @@ export function DependencyGraph() {
       } else {
         // Dropped on canvas (no group)
         if (node.parentId) {
-          const nodeAbs = customNode.positionAbsolute;
           if (nodeAbs) {
             reparentNode(node.id, undefined, {
               x: nodeAbs.x,
@@ -80,7 +80,7 @@ export function DependencyGraph() {
         }
       }
     },
-    [getIntersectingNodes, reparentNode, getInternalNode]
+    [getIntersectingNodes, reparentNode, getInternalNode, screenToFlowPosition]
   );
 
   // Define MiniMap node color logic
