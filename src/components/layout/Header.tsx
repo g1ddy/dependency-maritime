@@ -1,4 +1,3 @@
-import "../../vite-env.d.ts"
 import { Menu, Upload, Code, Download, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
