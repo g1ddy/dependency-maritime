@@ -102,13 +102,10 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     set({ isCalculatingMetrics: true });
 
     try {
-      // Run the heavy calculation (simulated or real)
       calculateGraphMetrics(graph);
 
       // Abort if a newer calculation has started while we were awaiting
       if (get().metricsVersion !== targetVersion) return;
-
-      console.log("Metrics calculation complete");
 
       // Sync results back to React Flow nodes
       // We iterate over the existing RF nodes (getting the latest state)
