@@ -51,7 +51,7 @@
 
 2.  **Inspector Panel (UI)**
     *   Implement a "Node Details" Sidebar/Sheet (replacing simple highlighting).
-    *   When a node is selected, show its full path, file type, and computed metrics (Instability Score, Centrality).
+    *   When a node is selected, show its full path, file type, and computed metrics (Instability Score, Centrality, Cyclomatic Complexity).
     *   Display interactive lists of **Dependencies** (outgoing) and **Dependents** (incoming) that allow navigation to those nodes.
 
 3.  **Heatmap Visualization (View Modes)**
