@@ -57,6 +57,14 @@ vi.mock('../../../../config/dependency-graph.json', () => ({
   default: mockProjectData
 }));
 
+// Mock dynamic import of complexity metrics
+// Since the component uses `await import(...)`, we can't easily spy on it without intercepting the module loading.
+// However, since it's an external file, we can trust that in the test environment (where it likely doesn't exist or we don't mock it),
+// it throws or returns undefined.
+// But `DataSourceDialog.tsx` has a try/catch.
+// For the test "loads project data", we should expect `undefined` as the second argument unless we can mock the dynamic import successfully.
+// To keep it simple and robust, we'll verify it's called with *some* second argument (likely undefined here).
+
 describe('DataSourceDialog', () => {
   const mockOnOpenChange = vi.fn();
   const mockOnDataLoaded = vi.fn();
@@ -98,11 +106,12 @@ describe('DataSourceDialog', () => {
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /Sample Data/i }));
 
-    expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData);
+    // Expect undefined for the second argument (complexity metrics)
+    expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData, undefined);
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('loads project data when clicked', () => {
+  it('loads project data when clicked', async () => {
     render(
       <DataSourceDialog
         open={true}
@@ -114,7 +123,10 @@ describe('DataSourceDialog', () => {
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /Project Graph/i }));
 
-    expect(mockOnDataLoaded).toHaveBeenCalledWith(mockProjectData);
+    // Wait for the async operation
+    await waitFor(() => {
+        expect(mockOnDataLoaded).toHaveBeenCalledWith(mockProjectData, expect.anything());
+    });
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 });
@@ -131,10 +143,6 @@ describe('DataSourceDialog File Interactions', () => {
       cleanup();
       document.body.innerHTML = '';
     });
-
-    // Note: Direct file input simulation using fireEvent.change is flaky in JSDOM/React19 environment.
-    // We rely on drag-and-drop tests to verify the file handling logic (parsing, validation, errors),
-    // as it uses the same handleFile function internally.
 
     it('handles drag and drop of valid JSON', async () => {
         render(
@@ -162,7 +170,9 @@ describe('DataSourceDialog File Interactions', () => {
         });
 
         await waitFor(() => {
-             expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData);
+             // Expect mockSampleData AND explicitly undefined as second arg, or expect.anything() if we don't care.
+             // Given the implementation passes undefined for upload, we expect undefined.
+             expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData, undefined);
         });
         expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
