@@ -54,7 +54,7 @@
     *   Implement a "Node Details" Sidebar/Sheet (replacing simple highlighting).
     *   When a node is selected, show its full path, file type, and computed metrics (Instability Score, Centrality, Cyclomatic Complexity).
     *   Display interactive lists of **Dependencies** (outgoing) and **Dependents** (incoming) that allow navigation to those nodes.
-    *   **Deep Analysis Tools:** Include "Shortest Path" (select two nodes to see the chain) and "Impact Analysis" (visualize what % of the system is affected by this node).
+    *   **Deep Analysis Tools:** Include "Shortest Path" (select two nodes to see the chain) and "Impact Analysis" (visualize what percentage of the system's nodes are affected by this node).
 
 3.  **Heatmap Visualization (View Modes)**
     *   Implement "Settings" controls to switch between Graph View Modes.
@@ -81,7 +81,7 @@
     *   Intercept the event.
     *   Update the in-memory graph edges.
     *   **Cycle Detection:** Check for Circular Dependency creation (using Graphology's `findCycles`).
-    *   **Rule Validation:** Verify architectural rules (e.g., "UI should not import Core").
+    *   **Rule Validation:** Verify architectural rules from a configuration file (e.g., "UI should not import Core").
     *   If a violation occurs, flash the edge RED and warn the user.
 
 ## Phase 4: The "Cohesion" Assistant (AI/Algo Suggestions)
