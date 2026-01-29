@@ -13,7 +13,14 @@ test.describe('Graph Interaction', () => {
     // Wait for at least one node to render
     await page.waitForSelector('.react-flow__node');
     // Wait for layout to settle (roughly)
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
+
+    // Fit view to ensure nodes are within viewport for consistent coordinates
+    const fitViewBtn = page.getByRole('button', { name: 'fit view' });
+    await expect(fitViewBtn).toBeVisible();
+    await fitViewBtn.click();
+
+    await page.waitForTimeout(1000); // Allow transition
   });
 
   test('nodes should be visually contained in their parent groups initially', async ({ page }) => {

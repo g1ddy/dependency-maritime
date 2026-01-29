@@ -146,18 +146,18 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
               <p className="text-sm font-medium">Click to upload or drag and drop</p>
               <p className="text-xs text-muted-foreground mt-1">JSON files only</p>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files?.[0]) void handleFile(e.target.files[0]);
-                // Reset value to allow re-selection
-                e.target.value = '';
-              }}
-            />
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.[0]) void handleFile(e.target.files[0]);
+              // Reset value to allow re-selection
+              e.target.value = '';
+            }}
+          />
 
           {error && (
              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md border border-destructive/20 max-h-40 overflow-auto">
