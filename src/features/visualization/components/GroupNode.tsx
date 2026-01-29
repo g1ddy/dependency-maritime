@@ -16,6 +16,7 @@ export const GroupNode = memo(({ data, selected }: GroupNodeProps) => {
 
   return (
     <div
+      data-testid={`node-${label}`}
       className={`
         h-full w-full
         border-2 border-dashed bg-slate-900/20 rounded-xl
