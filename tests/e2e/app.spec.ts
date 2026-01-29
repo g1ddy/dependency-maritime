@@ -13,10 +13,13 @@ test('App elements are visible', async ({ page }) => {
     await expect(page.getByTestId('refactor-graph-btn')).toBeVisible();
 
     // Select a node to make the isolate module toggle visible
-    // We use Port.tsx as it is known to be visible in the viewport across devices (verified in node_visibility.spec.ts)
-    const node = page.locator('.react-flow__node-appNode:has-text("Port.tsx")');
+    // We use main.tsx as it is known to be visible in the viewport across devices (verified in node_visibility.spec.ts)
+    const node = page.getByTestId('node-main.tsx');
+
+    // Fit view to ensure the node is in the viewport, especially on mobile
+    await page.getByRole('button', { name: 'fit view' }).click();
+
     await expect(node).toBeVisible();
-    await node.scrollIntoViewIfNeeded();
     await node.click();
 
     await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();

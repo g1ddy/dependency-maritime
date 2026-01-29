@@ -52,8 +52,6 @@ export function DependencyGraph() {
 
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      type Position = { x: number; y: number };
-
       // Find intersecting nodes that are groups
       const intersections = getIntersectingNodes(node).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
@@ -63,9 +61,10 @@ export function DependencyGraph() {
       // Get the accurate position of the node (after drag)
       // We rely on getInternalNode to ensure we have the latest positionAbsolute
       // falling back to the passed node's positionAbsolute
-      // We use 'any' casting here because getInternalNode returns a type that ESLint finds ambiguous
-      // or 'error-typed' in this context, but we know it has positionAbsolute at runtime.
-      const internalNode = getInternalNode(node.id) as { positionAbsolute?: Position } | undefined;
+      // Use standard Node type but cast to CustomNode for legacy property access if needed,
+      // though internal nodes usually have positionAbsolute.
+      // We cast to CustomNode to satisfy TypeScript if the basic Node type is missing it in this version.
+      const internalNode = getInternalNode(node.id) as CustomNode | undefined;
       const nodeAbs = internalNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
 
       // If dropped on a group
@@ -73,7 +72,7 @@ export function DependencyGraph() {
         // Only update if parent is different
         if (group.id !== node.parentId) {
           // Get the most up-to-date absolute position of the group
-          const internalGroup = getInternalNode(group.id) as { positionAbsolute?: Position } | undefined;
+          const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
           const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
 
           if (nodeAbs && groupAbs) {
