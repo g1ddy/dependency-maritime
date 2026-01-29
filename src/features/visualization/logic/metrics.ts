@@ -1,31 +1,45 @@
 import Graph from 'graphology';
-import { type AppNodeData } from '../types';
+import pagerank from 'graphology-metrics/centrality/pagerank';
 
 /**
- * Calculates graph metrics for Phase 2.
- * Currently simulates a heavy calculation and assigns a random debug color.
+ * Calculates graph metrics for Phase 2: The Inspector.
+ * - Instability: Ce / (Ca + Ce)
+ * - Centrality: PageRank
  */
-export async function calculateGraphMetrics(graph: Graph): Promise<void> {
-  // Simulate heavy computation time
-  await new Promise((resolve) => setTimeout(resolve, 800));
+export function calculateGraphMetrics(graph: Graph): void {
+  // 1. Centrality (PageRank)
+  // We run this first as it calculates for the whole graph
+  const centralities = pagerank(graph);
 
-  graph.forEachNode((nodeId, attributes) => {
-    // 1. Generate Random Debug Color
-    const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+  // 2. Iterate nodes to calculate Instability and assign all metrics
+  graph.forEachNode((nodeId) => {
+    // Fan-Out (Efferent Coupling - Ce): Dependencies (outgoing edges)
+    const fanOut = graph.outDegree(nodeId);
 
-    // 2. Assign to Node Attributes (Mutates the Graphology instance directly)
-    graph.setNodeAttribute(nodeId, 'debugColor', randomColor);
+    // Fan-In (Afferent Coupling - Ca): Dependents (incoming edges)
+    const fanIn = graph.inDegree(nodeId);
 
-    // 3. Placeholder for future metrics
-    // Cast attributes to AppNodeData to avoid unsafe any access, assuming attributes match our schema
-    const data = attributes as Partial<AppNodeData>;
-    const existingMetrics = data.metrics || {};
+    // Instability Calculation
+    // I = Ce / (Ca + Ce)
+    // Range: [0, 1]. 0 = Stable (many incoming), 1 = Unstable (many outgoing)
+    let instability = 0;
+    const totalCoupling = fanIn + fanOut;
 
-    graph.setNodeAttribute(nodeId, 'metrics', {
-      ...existingMetrics,
-      instability: Math.random(), // Placeholder
-      centrality: 0,
-      cyclomaticComplexity: 0
+    if (totalCoupling > 0) {
+      instability = fanOut / totalCoupling;
+    }
+
+    // Prepare Metrics Object
+    const metrics = {
+      instability: Math.round(instability * 100) / 100,
+      centrality: Math.round((centralities[nodeId] || 0) * 10000) / 10000,
+      cyclomaticComplexity: 0 // Not available in current schema, placeholder.
+    };
+
+    // Update Graph Attributes
+    // We preserve existing data and merge metrics
+    graph.mergeNodeAttributes(nodeId, {
+      metrics,
     });
   });
 }

@@ -40,7 +40,7 @@ interface GraphState {
 
   // Actions
   setGraphData: (data: ICruiseResult) => void;
-  calculateMetrics: (version?: number) => Promise<void>;
+  calculateMetrics: (version?: number) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
   selectNode: (nodeId: string | null) => void;
   toggleTypeDefinitions: () => void;
@@ -88,10 +88,10 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     });
 
     // 4. Trigger Async Metrics Calculation
-    void get().calculateMetrics(newVersion);
+    get().calculateMetrics(newVersion);
   },
 
-  calculateMetrics: async (version?: number) => {
+  calculateMetrics: (version?: number) => {
     const targetVersion = version ?? get().metricsVersion;
     const { graph } = get();
     if (!graph) return;
@@ -103,7 +103,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
     try {
       // Run the heavy calculation (simulated or real)
-      await calculateGraphMetrics(graph);
+      calculateGraphMetrics(graph);
 
       // Abort if a newer calculation has started while we were awaiting
       if (get().metricsVersion !== targetVersion) return;
