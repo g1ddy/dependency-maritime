@@ -307,15 +307,25 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   reparentNode: (nodeId, newParentId, newPosition) => {
-    const { nodes } = get();
+    const { nodes, graph } = get();
+
+    // Calculate new fullPath logic outside map to reuse for graph update
+    // We need to find the node first to get its label
+    const targetNode = nodes.find(n => n.id === nodeId);
+    if (!targetNode) return;
+
+    const label = (targetNode.data.label as string) || '';
+    const newFullPath = newParentId ? `${newParentId}/${label}` : label;
+
+    // 1. Update Graphology Instance (Source of Truth)
+    if (graph && graph.hasNode(nodeId)) {
+      graph.setNodeAttribute(nodeId, 'fullPath', newFullPath);
+    }
+
+    // 2. Update React Flow State (Visual)
     set({
       nodes: nodes.map((n) => {
         if (n.id === nodeId) {
-          // Calculate new fullPath
-          const label = (n.data.label as string) || '';
-          // newParentId is the folder path (e.g. 'src/features') or undefined (root)
-          const newFullPath = newParentId ? `${newParentId}/${label}` : label;
-
           return {
             ...n,
             parentId: newParentId,
