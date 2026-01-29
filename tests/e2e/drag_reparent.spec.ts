@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Graph Interaction', () => {
+  const APP_TSX_TEST_ID = 'node-App.tsx';
+  const SRC_GROUP_TEST_ID = 'node-src';
+  const FEATURES_GROUP_TEST_ID = 'node-features';
+
   test.beforeEach(async ({ page }) => {
     // Navigate to the app
     await page.goto('http://localhost:5173/dependency-maritime/');
@@ -18,9 +22,9 @@ test.describe('Graph Interaction', () => {
     // Or 'src/features/visualization/components/AppNode.tsx'. Parent 'components'.
 
     // Let's find "App.tsx" node.
-    const childNode = page.getByTestId('node-App.tsx');
+    const childNode = page.getByTestId(APP_TSX_TEST_ID);
     // Its parent should be "src".
-    const groupNode = page.getByTestId('node-src');
+    const groupNode = page.getByTestId(SRC_GROUP_TEST_ID);
 
     await expect(childNode).toBeVisible();
     await expect(groupNode).toBeVisible();
@@ -44,10 +48,10 @@ test.describe('Graph Interaction', () => {
 
   test('dragging a node into a group should reparent and contain it', async ({ page }) => {
     // Find a node: "App.tsx".
-    const targetNode = page.getByTestId('node-App.tsx');
+    const targetNode = page.getByTestId(APP_TSX_TEST_ID);
 
     // Find a group: "features".
-    const targetGroup = page.getByTestId('node-features');
+    const targetGroup = page.getByTestId(FEATURES_GROUP_TEST_ID);
 
     await expect(targetNode).toBeVisible();
     await expect(targetGroup).toBeVisible();
