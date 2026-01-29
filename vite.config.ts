@@ -28,5 +28,20 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/utils/setup.ts", "./tests/utils/setup-layout-mock.ts"],
     exclude: ["tests/e2e/**", "node_modules/**"],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      exclude: [
+        'src/components/ui/**',
+        'src/vite-env.d.ts',
+        'config/**',
+        'sample-data/**',
+        'scripts/**',
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        'tests/**',
+      ],
+      reporter: ['text', 'json', 'html'],
+    },
   },
 })
