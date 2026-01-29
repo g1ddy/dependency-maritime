@@ -1,4 +1,5 @@
 import Graph from 'graphology';
+import { type AppNodeData } from '../types';
 
 /**
  * Calculates graph metrics for Phase 2.
@@ -16,7 +17,10 @@ export async function calculateGraphMetrics(graph: Graph): Promise<void> {
     graph.setNodeAttribute(nodeId, 'debugColor', randomColor);
 
     // 3. Placeholder for future metrics
-    const existingMetrics = attributes.metrics || {};
+    // Cast attributes to AppNodeData to avoid unsafe any access, assuming attributes match our schema
+    const data = attributes as Partial<AppNodeData>;
+    const existingMetrics = data.metrics || {};
+
     graph.setNodeAttribute(nodeId, 'metrics', {
       ...existingMetrics,
       instability: Math.random(), // Placeholder

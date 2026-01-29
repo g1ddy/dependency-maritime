@@ -106,7 +106,8 @@ export const useGraphStore = create<GraphState>((set, get) => ({
       const currentNodes = get().nodes;
       const updatedNodes = currentNodes.map((node) => {
         if (graph.hasNode(node.id)) {
-          const attributes = graph.getNodeAttributes(node.id);
+          // Cast attributes to AppNodeData partial since Graphology returns Record<string, any>
+          const attributes = graph.getNodeAttributes(node.id) as Partial<AppNodeData>;
           return {
             ...node,
             data: {
