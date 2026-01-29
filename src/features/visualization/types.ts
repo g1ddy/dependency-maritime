@@ -5,6 +5,16 @@ export interface AppNodeData extends Record<string, unknown> {
   external?: boolean;
   highlighted?: boolean;
   dimmed?: boolean;
+
+  // Phase 2: Metrics
+  metrics?: {
+    instability?: number;
+    centrality?: number;
+    cyclomaticComplexity?: number;
+  };
+
+  // Debug visualization for async processing
+  debugColor?: string;
 }
 
 export interface GroupNodeData extends Record<string, unknown> {
