@@ -130,7 +130,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
       set({ nodes: updatedNodes });
 
-    } catch (error) {
+    } catch {
       // Error is caught but not logged to keep the production console clean
     } finally {
       // Only reset loading state if this is still the current calculation
