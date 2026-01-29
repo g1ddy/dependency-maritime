@@ -1,19 +1,18 @@
 import Graph from 'graphology';
 import pagerank from 'graphology-metrics/centrality/pagerank';
-import { type AppNodeData } from '../types';
 
 /**
  * Calculates graph metrics for Phase 2: The Inspector.
  * - Instability: Ce / (Ca + Ce)
  * - Centrality: PageRank
  */
-export async function calculateGraphMetrics(graph: Graph): Promise<void> {
+export function calculateGraphMetrics(graph: Graph): void {
   // 1. Centrality (PageRank)
   // We run this first as it calculates for the whole graph
   const centralities = pagerank(graph);
 
   // 2. Iterate nodes to calculate Instability and assign all metrics
-  graph.forEachNode((nodeId, attributes) => {
+  graph.forEachNode((nodeId) => {
     // Fan-Out (Efferent Coupling - Ce): Dependencies (outgoing edges)
     const fanOut = graph.outDegree(nodeId);
 
@@ -39,11 +38,8 @@ export async function calculateGraphMetrics(graph: Graph): Promise<void> {
 
     // Update Graph Attributes
     // We preserve existing data and merge metrics
-    const existingData = attributes as Partial<AppNodeData>;
-
     graph.mergeNodeAttributes(nodeId, {
       metrics,
-      // We remove the debugColor simulation from the stub
     });
   });
 }

@@ -4,7 +4,7 @@ import { calculateGraphMetrics } from './metrics';
 import { type AppNodeData } from '../types';
 
 describe('calculateGraphMetrics', () => {
-  it('calculates instability and centrality correctly for a simple chain', async () => {
+  it('calculates instability and centrality correctly for a simple chain', () => {
     const graph = new Graph();
 
     // Create nodes
@@ -16,7 +16,7 @@ describe('calculateGraphMetrics', () => {
     graph.addEdge('A', 'B');
     graph.addEdge('B', 'C');
 
-    await calculateGraphMetrics(graph);
+    calculateGraphMetrics(graph);
 
     const dataA = graph.getNodeAttributes('A') as AppNodeData;
     const dataB = graph.getNodeAttributes('B') as AppNodeData;
@@ -41,11 +41,11 @@ describe('calculateGraphMetrics', () => {
     expect(dataA.metrics?.cyclomaticComplexity).toBe(0);
   });
 
-  it('handles orphan nodes (division by zero protection)', async () => {
+  it('handles orphan nodes (division by zero protection)', () => {
     const graph = new Graph();
     graph.addNode('Orphan');
 
-    await calculateGraphMetrics(graph);
+    calculateGraphMetrics(graph);
 
     const data = graph.getNodeAttributes('Orphan') as AppNodeData;
 
