@@ -102,13 +102,10 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     set({ isCalculatingMetrics: true });
 
     try {
-      // Run the heavy calculation (simulated or real)
       calculateGraphMetrics(graph);
 
       // Abort if a newer calculation has started while we were awaiting
       if (get().metricsVersion !== targetVersion) return;
-
-      console.log("Metrics calculation complete");
 
       // Sync results back to React Flow nodes
       // We iterate over the existing RF nodes (getting the latest state)
@@ -134,7 +131,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
       set({ nodes: updatedNodes });
 
     } catch (error) {
-      console.error("Failed to calculate metrics:", error);
+      // Error is caught but not logged to keep the production console clean
     } finally {
       // Only reset loading state if this is still the current calculation
       if (get().metricsVersion === targetVersion) {
