@@ -6,6 +6,7 @@ const { execSync } = require('child_process');
 const SRC_DIR = 'src';
 const DOCS_FILE = 'docs/COMPLEXITY.md';
 const DEP_GRAPH_JSON = 'config/dependency-graph.json';
+const METRICS_JSON_FILE = 'config/complexity-metrics.json';
 
 // Thresholds for "Repo Health" Penalties
 const THRESHOLDS = {
@@ -179,25 +180,24 @@ ${sortedByComplexity.map(f => `| \`${f.file}\` | **${f.complexity}** | ${f.loc} 
     fs.writeFileSync(DOCS_FILE, newContent);
 
     // 7. Export Metrics to JSON
-    console.log('   - Exporting metrics to config/complexity-metrics.json...');
-    const metricsMap = {};
-    fileMetrics.forEach(f => {
-        metricsMap[f.file] = {
+    console.log(`   - Exporting metrics to ${METRICS_JSON_FILE}...`);
+
+    const metricsMap = fileMetrics.reduce((acc, f) => {
+        acc[f.file] = {
             complexity: f.complexity,
             loc: f.loc,
             instability: f.instability,
             fanIn: f.fanIn,
             fanOut: f.fanOut
         };
-    });
+        return acc;
+    }, {});
 
     // Ensure config directory exists
-    const configDir = path.dirname('config/complexity-metrics.json');
-    if (!fs.existsSync(configDir)) {
-        fs.mkdirSync(configDir, { recursive: true });
-    }
+    const configDir = path.dirname(METRICS_JSON_FILE);
+    fs.mkdirSync(configDir, { recursive: true });
 
-    fs.writeFileSync('config/complexity-metrics.json', JSON.stringify(metricsMap, null, 2));
+    fs.writeFileSync(METRICS_JSON_FILE, JSON.stringify(metricsMap, null, 2));
 
     console.log('✅ Complexity Report Updated and Metrics Exported!');
 }
