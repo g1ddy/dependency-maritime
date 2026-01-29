@@ -59,7 +59,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const json = JSON.parse(text);
       const result = CruiseResultSchema.parse(json);
-      onDataLoaded(result);
+      onDataLoaded(result, undefined);
       onOpenChange(false);
       setError(null);
     } catch (err) {
