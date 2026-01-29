@@ -52,178 +52,165 @@ describe('Visualization Store', () => {
     expect(state.hideTypeDefinitions).toBe(true);
   });
 
-  it('should set graph data and generate nodes/edges', () => {
-    const store = useGraphStore.getState();
-    store.setGraphData(mockData);
+  describe('Populated Graph', () => {
+    beforeEach(() => {
+      useGraphStore.getState().setGraphData(mockData);
+    });
 
-    const newState = useGraphStore.getState();
-    expect(newState.nodes.length).toBeGreaterThan(0);
-    expect(newState.edges.length).toBeGreaterThan(0);
-    expect(newState.graph).not.toBeNull();
-  });
+    it('should have nodes and edges', () => {
+      const newState = useGraphStore.getState();
+      expect(newState.nodes.length).toBeGreaterThan(0);
+      expect(newState.edges.length).toBeGreaterThan(0);
+      expect(newState.graph).not.toBeNull();
+    });
 
-  it('should select a node and highlight related nodes (BFS Coverage)', () => {
-    const store = useGraphStore.getState();
-    store.setGraphData(mockData);
+    it('should select a node and highlight related nodes (BFS Coverage)', () => {
+      const store = useGraphStore.getState();
+      let state = useGraphStore.getState();
+      // Select 'src/B.ts' which is in the middle: A -> B -> C
+      const nodeB = state.nodes.find(n => n.data.fullPath === 'src/B.ts');
+      if (!nodeB) throw new Error('Node B not found');
 
-    let state = useGraphStore.getState();
-    // Select 'src/B.ts' which is in the middle: A -> B -> C
-    const nodeB = state.nodes.find(n => n.data.fullPath === 'src/B.ts');
-    if (!nodeB) throw new Error('Node B not found');
+      store.selectNode(nodeB.id);
 
-    store.selectNode(nodeB.id);
+      state = useGraphStore.getState();
+      const nodeA = state.nodes.find(n => n.data.fullPath === 'src/A.ts');
+      const nodeC = state.nodes.find(n => n.data.fullPath === 'src/C.ts');
+      const nodeD = state.nodes.find(n => n.data.fullPath === 'src/D.ts');
 
-    state = useGraphStore.getState();
-    const nodeA = state.nodes.find(n => n.data.fullPath === 'src/A.ts');
-    const nodeC = state.nodes.find(n => n.data.fullPath === 'src/C.ts');
-    const nodeD = state.nodes.find(n => n.data.fullPath === 'src/D.ts');
+      // B should be selected
+      expect(state.selectedNodeId).toBe(nodeB.id);
 
-    // B should be selected
-    expect(state.selectedNodeId).toBe(nodeB.id);
+      // A (ancestor) and C (descendant) should be highlighted
+      expect(nodeA?.data.highlighted).toBe(true);
+      expect(nodeC?.data.highlighted).toBe(true);
 
-    // A (ancestor) and C (descendant) should be highlighted
-    expect(nodeA?.data.highlighted).toBe(true);
-    expect(nodeC?.data.highlighted).toBe(true);
+      // D (isolated) should NOT be highlighted, but dimmed
+      expect(nodeD?.data.highlighted).toBe(false);
+      expect(nodeD?.data.dimmed).toBe(true);
+    });
 
-    // D (isolated) should NOT be highlighted, but dimmed
-    expect(nodeD?.data.highlighted).toBe(false);
-    expect(nodeD?.data.dimmed).toBe(true);
-  });
+    it('should handle complex filter combinations', () => {
+      const store = useGraphStore.getState();
 
-  it('should handle complex filter combinations', () => {
-    const store = useGraphStore.getState();
-    store.setGraphData(mockData);
+      // Initial: []
+      expect(useGraphStore.getState().activeFilters).toEqual([]);
 
-    // Initial: []
-    expect(useGraphStore.getState().activeFilters).toEqual([]);
+      // Add 'core'
+      store.setFilter('core');
+      expect(useGraphStore.getState().activeFilters).toEqual(['core']);
 
-    // Add 'core'
-    store.setFilter('core');
-    expect(useGraphStore.getState().activeFilters).toEqual(['core']);
+      // Add 'ui' -> ['core', 'ui']
+      store.setFilter('ui');
+      expect(useGraphStore.getState().activeFilters).toEqual(['core', 'ui']);
 
-    // Add 'ui' -> ['core', 'ui']
-    store.setFilter('ui');
-    expect(useGraphStore.getState().activeFilters).toEqual(['core', 'ui']);
+      // Remove 'core' -> ['ui']
+      store.setFilter('core');
+      expect(useGraphStore.getState().activeFilters).toEqual(['ui']);
 
-    // Remove 'core' -> ['ui']
-    store.setFilter('core');
-    expect(useGraphStore.getState().activeFilters).toEqual(['ui']);
+      // Reset to all
+      store.setFilter('all');
+      expect(useGraphStore.getState().activeFilters).toEqual([]);
+    });
 
-    // Reset to all
-    store.setFilter('all');
-    expect(useGraphStore.getState().activeFilters).toEqual([]);
-  });
+    it('should handle async metrics calculation race conditions', async () => {
+      vi.useFakeTimers();
+      const store = useGraphStore.getState();
 
-  it('should handle async metrics calculation race conditions', async () => {
-    vi.useFakeTimers();
-    const store = useGraphStore.getState();
+      // 1. Initial Load happened in beforeEach.
+      // We capture the version from that load.
+      const version1 = useGraphStore.getState().metricsVersion;
 
-    // 1. Initial Load
-    store.setGraphData(mockData);
-    const version1 = useGraphStore.getState().metricsVersion;
+      // 2. Trigger another load immediately to simulate race
+      store.setGraphData(mockData);
+      const version2 = useGraphStore.getState().metricsVersion;
 
-    // 2. Trigger another load immediately to simulate race
-    store.setGraphData(mockData);
-    const version2 = useGraphStore.getState().metricsVersion;
+      expect(version2).toBeGreaterThan(version1);
 
-    expect(version2).toBeGreaterThan(version1);
+      // 3. Manually call calculateMetrics with an OLD version to see if it aborts.
+      store.calculateMetrics(version1);
 
-    // 3. Manually call calculateMetrics with an OLD version to see if it aborts.
-    store.calculateMetrics(version1);
+      await vi.runAllTimersAsync();
 
-    await vi.runAllTimersAsync();
+      // setGraphData in beforeEach -> calculateMetrics (v1) -> calculateGraphMetrics (call 1)
+      // setGraphData in test -> calculateMetrics (v2) -> calculateGraphMetrics (call 2)
+      // manual calculateMetrics(v1) -> aborted
 
-    // In current implementation:
-    // setGraphData -> calls calculateMetrics(newVersion) -> calls calculateGraphMetrics
-    // calculateMetrics -> checks version -> calls calculateGraphMetrics -> checks version -> updates store
+      // Total calls should be 2.
+      expect(calculateGraphMetrics).toHaveBeenCalledTimes(2);
+    });
 
-    // Since setGraphData calls it immediately, it will be called twice total for the two setGraphData calls.
-    // The manual call `store.calculateMetrics(version1)`:
-    // current version is version2. target is version1.
-    // `if (get().metricsVersion !== targetVersion) return;` at start of function.
-    // So calculateGraphMetrics should NOT be called for the manual invocation.
+    it('should handle React Flow node/edge changes', () => {
+      const store = useGraphStore.getState();
 
-    // Total calls should be 2 (from the two setGraphData calls).
-    expect(calculateGraphMetrics).toHaveBeenCalledTimes(2);
-  });
+      const node = useGraphStore.getState().nodes[0];
+      const change: NodeChange = {
+          id: node.id,
+          type: 'position',
+          position: { x: 999, y: 999 }
+      };
 
-  it('should handle React Flow node/edge changes', () => {
-    const store = useGraphStore.getState();
-    store.setGraphData(mockData);
+      store.onNodesChange([change]);
 
-    const node = useGraphStore.getState().nodes[0];
-    const change: NodeChange = {
-        id: node.id,
-        type: 'position',
-        position: { x: 999, y: 999 }
-    };
+      const updatedNode = useGraphStore.getState().nodes.find(n => n.id === node.id);
+      expect(updatedNode?.position.x).toBe(999);
 
-    store.onNodesChange([change]);
+      // Edge change (selection)
+      const edge = useGraphStore.getState().edges[0];
+      const edgeChange: EdgeChange = {
+          id: edge.id,
+          type: 'select',
+          selected: true
+      };
 
-    const updatedNode = useGraphStore.getState().nodes.find(n => n.id === node.id);
-    expect(updatedNode?.position.x).toBe(999);
+      store.onEdgesChange([edgeChange]);
+      const updatedEdge = useGraphStore.getState().edges.find(e => e.id === edge.id);
+      expect(updatedEdge?.selected).toBe(true);
+    });
 
-    // Edge change (selection)
-    const edge = useGraphStore.getState().edges[0];
-    // Create a valid EdgeChange object for selection
-    // Note: The type definition might require specific fields
-    // Assuming 'select' type change
-    const edgeChange: EdgeChange = {
-        id: edge.id,
-        type: 'select',
-        selected: true
-    };
+    it('should deselect node', () => {
+      const store = useGraphStore.getState();
 
-    store.onEdgesChange([edgeChange]);
-    const updatedEdge = useGraphStore.getState().edges.find(e => e.id === edge.id);
-    expect(updatedEdge?.selected).toBe(true);
-  });
+      const node = useGraphStore.getState().nodes[0];
+      store.selectNode(node.id);
+      expect(useGraphStore.getState().selectedNodeId).toBe(node.id);
 
-  it('should deselect node', () => {
-    const store = useGraphStore.getState();
-    store.setGraphData(mockData);
+      store.selectNode(null);
+      expect(useGraphStore.getState().selectedNodeId).toBeNull();
 
-    const node = useGraphStore.getState().nodes[0];
-    store.selectNode(node.id);
-    expect(useGraphStore.getState().selectedNodeId).toBe(node.id);
+      // Check reset visual state
+      const resetNode = useGraphStore.getState().nodes[0];
+      expect(resetNode.data.highlighted).toBe(false);
+      expect(resetNode.data.dimmed).toBe(false);
+    });
 
-    store.selectNode(null);
-    expect(useGraphStore.getState().selectedNodeId).toBeNull();
+    it('should layout graph', () => {
+      const store = useGraphStore.getState();
 
-    // Check reset visual state
-    const resetNode = useGraphStore.getState().nodes[0];
-    expect(resetNode.data.highlighted).toBe(false);
-    expect(resetNode.data.dimmed).toBe(false);
-  });
+      // Initial direction is TB
+      expect(useGraphStore.getState().layoutDirection).toBe('TB');
 
-  it('should layout graph', () => {
-    const store = useGraphStore.getState();
-    store.setGraphData(mockData);
+      // Change to LR
+      store.layoutGraph('LR');
+      expect(useGraphStore.getState().layoutDirection).toBe('LR');
 
-    // Initial direction is TB
-    expect(useGraphStore.getState().layoutDirection).toBe('TB');
+      // Verify nodes still exist (layout updates positions but shouldn't lose nodes)
+      expect(useGraphStore.getState().nodes.length).toBeGreaterThan(0);
+    });
 
-    // Change to LR
-    store.layoutGraph('LR');
-    expect(useGraphStore.getState().layoutDirection).toBe('LR');
+    it('should toggle type definitions', () => {
+      const store = useGraphStore.getState();
 
-    // Verify nodes still exist (layout updates positions but shouldn't lose nodes)
-    expect(useGraphStore.getState().nodes.length).toBeGreaterThan(0);
-  });
+      // Initial state: hideTypeDefinitions = true
+      expect(useGraphStore.getState().hideTypeDefinitions).toBe(true);
 
-  it('should toggle type definitions', () => {
-    const store = useGraphStore.getState();
-    store.setGraphData(mockData);
+      // Toggle OFF (show types)
+      store.toggleTypeDefinitions();
+      expect(useGraphStore.getState().hideTypeDefinitions).toBe(false);
 
-    // Initial state: hideTypeDefinitions = true
-    expect(useGraphStore.getState().hideTypeDefinitions).toBe(true);
-
-    // Toggle OFF (show types)
-    store.toggleTypeDefinitions();
-    expect(useGraphStore.getState().hideTypeDefinitions).toBe(false);
-
-    // Toggle ON (hide types)
-    store.toggleTypeDefinitions();
-    expect(useGraphStore.getState().hideTypeDefinitions).toBe(true);
+      // Toggle ON (hide types)
+      store.toggleTypeDefinitions();
+      expect(useGraphStore.getState().hideTypeDefinitions).toBe(true);
+    });
   });
 });
