@@ -34,12 +34,8 @@ export default defineConfig({
       exclude: [
         'src/components/ui/**',
         'src/vite-env.d.ts',
-        'config/**',
-        'sample-data/**',
-        'scripts/**',
         '**/*.test.ts',
         '**/*.test.tsx',
-        'tests/**',
       ],
       reporter: ['text', 'json', 'html'],
     },
