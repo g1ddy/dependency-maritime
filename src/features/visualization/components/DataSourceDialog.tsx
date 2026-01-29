@@ -129,9 +129,10 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
             </Button>
           </div>
 
-          <div
+          <button
+            type="button"
             className={cn(
-              "border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors",
+              "w-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               dragActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
             )}
             onDragEnter={onDrag}
@@ -156,7 +157,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
                 e.target.value = '';
               }}
             />
-          </div>
+          </button>
 
           {error && (
              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md border border-destructive/20 max-h-40 overflow-auto">
