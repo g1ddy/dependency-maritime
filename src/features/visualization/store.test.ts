@@ -124,8 +124,6 @@ describe('Visualization Store', () => {
     // We can verify that `calculateMetrics` respects the version check.
     // We'll manually call calculateMetrics with an OLD version to see if it aborts.
 
-    const initialCalculating = useGraphStore.getState().isCalculatingMetrics;
-
     // Call with old version
     store.calculateMetrics(version1);
     // It should bail out early or at least not set state if check works.
