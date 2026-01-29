@@ -19,6 +19,7 @@ This repository contains the "Dependency Maritime" project.
     *   **Do not blindly replace `@ts-ignore` with `@ts-expect-error` without verifying that an error actually exists.** If no error exists, remove the directive entirely.
     *   Ensure all new tests are written in TypeScript (e.g., in `e2e/`).
 *   **Linting:** Always run `npm run lint` to ensure code quality before submitting.
+*   **DRY Principles:** Always avoid duplication and follow DRY principles. In tests, this means properly using setup helpers to encapsulate common logic.
 
 ## Pre-Submit Checks
 
