@@ -30,3 +30,13 @@
 
 **Decision:** Component Scaffolding.
 *   **Strategy:** Build Shadcn/UI components and Custom React Flow nodes in isolation.
+
+## Package Management
+
+**Decision:** Plan to migrate to `pnpm`.
+*   **Current State:** The project currently uses `npm` (with `package-lock.json`).
+*   **Rationale for Switch:**
+    *   **Strictness:** `pnpm` prevents access to phantom dependencies (packages not explicitly declared in `package.json`), ensuring more reliable builds.
+    *   **Efficiency:** Uses a content-addressable store to save disk space and reduce install times.
+    *   **Monorepo Support:** Better native support for workspaces, aligning with the potential future migration to a monorepo structure.
+*   **Status:** Future Consideration. The team should plan a migration task to delete `package-lock.json`, install `pnpm`, and update CI workflows.
