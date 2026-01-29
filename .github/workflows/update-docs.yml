@@ -1,0 +1,50 @@
+name: Update Documentation Assets
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - '!docs/images/**'
+      - '!docs/COMPLEXITY.md'
+      - 'README.md'
+      - 'package.json'
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Generate Screenshots
+        # We use the dedicated config which handles the server (port 4174) and test discovery
+        run: |
+          npm run test:screenshots
+        env:
+          CI: true
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs(assets): update screenshots [skip ci]"
+          file_pattern: 'docs/images/*.png'

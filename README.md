@@ -1,37 +1,101 @@
 # Dependency Maritime ⚓️
 
-Chart, navigate, and refactor your application's architecture. An interactive visualizer for dependency-cruiser that helps you enforce clear boundaries and navigate complex dependency graphs.
+![License](https://img.shields.io/badge/license-MIT-blue)
+![React](https://img.shields.io/badge/react-19.2.3-blue)
+![Vite](https://img.shields.io/badge/vite-7.3.1-purple)
+![TypeScript](https://img.shields.io/badge/typescript-5.9.3-blue)
+![Status](https://img.shields.io/badge/status-Phase%201%20Complete-green)
 
-## 🏗 High-Level Architecture
+**Chart, navigate, and refactor your application's architecture.**
 
-The application follows a "Headless Logic, Interactive UI" pattern. The heavy lifting of graph theory happens in a framework-agnostic logic layer (Graphology), which feeds a React-based renderer (React Flow).
+Dependency Maritime is an interactive visualization tool for [dependency-cruiser](https://github.com/sverweij/dependency-cruiser). It transforms complex dependency graphs into navigable, interactive maps, helping you enforce boundaries, identify tangles, and plan refactoring efforts.
 
-For full details, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
+## 📸 Visuals
 
-## 🚀 Project Phases
+### Interactive Dashboard
+Visualize your project's structure with an interactive graph. Zoom, pan, and filter to understand relationships.
+![Dashboard View](docs/images/screenshot-dashboard.png)
 
-The development is divided into 4 key phases:
+### Node Inspector
+Select any file to view detailed metrics, including incoming and outgoing dependencies.
+![Node Inspector](docs/images/screenshot-inspector.png)
 
-1.  **Phase 1: The "Chartroom" (MVP)** - Basic visualization and layout.
-2.  **Phase 2: The "Inspector"** - Metrics and health heatmaps.
-3.  **Phase 3: The "Simulator"** - Refactoring playground with drag-and-drop.
-4.  **Phase 4: The "Cohesion" Assistant** - AI/Algo based suggestions.
+### Bring Your Own Data
+Easily upload your own `dependency-cruiser` JSON output to visualize your codebase.
+![Upload Data](docs/images/screenshot-upload.png)
 
-See [docs/PHASES.md](./docs/PHASES.md) for the roadmap.
+## ✨ Features
 
-## 📚 Documentation
+*   **Interactive Visualization:** Zoom, pan, and drag nodes to explore your architecture.
+*   **Deep Inspection:** Click any node to see its full path, metrics, and direct neighbors.
+*   **Dependency Filtering:** Toggle between "Product" and "Test" code (planned) or specific folders.
+*   **Isolate Modules:** Focus on specific sub-graphs to declutter the view.
+*   **Metrics (Phase 2):** Analyze instability, centrality, and complexity metrics.
+*   **100% Client-Side:** Your code structure is analyzed locally; no data leaves your machine.
 
+## 🛠 Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/dependency-maritime.git
+    cd dependency-maritime
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+
+## 🚀 Usage
+
+### 1. Generating a Dependency Graph
+To visualize your own project, you need to generate a JSON report using `dependency-cruiser`.
+
+Run the following command in the root of the project you want to analyze:
+
+```bash
+npx dependency-cruiser src \
+  --include-only "^src" \
+  --output-type json \
+  > dependency-graph.json
+```
+
+*Adjust the `src` and `--include-only` patterns to match your project structure.*
+
+### 2. Loading Data
+1.  Open **Dependency Maritime** in your browser (default: `http://localhost:5173`).
+2.  Click the **Upload** icon (cloud/arrow) in the header.
+3.  Drag and drop your `dependency-graph.json` file or click to select it.
+4.  The graph will automatically render your data.
+
+## 🏗 Architecture & Phases
+
+The project is being built in 4 phases:
+1.  **Phase 1: The "Chartroom" (MVP)** - Core visualization (Complete).
+2.  **Phase 2: The "Inspector"** - Metrics and health heatmaps (In Progress).
+3.  **Phase 3: The "Simulator"** - Refactoring playground.
+4.  **Phase 4: The "Cohesion" Assistant** - AI-assisted suggestions.
+
+For more details, check out the documentation:
 *   [Architecture](./docs/ARCHITECTURE.md)
 *   [Phases & Roadmap](./docs/PHASES.md)
 *   [Design Decisions](./docs/DESIGN_DECISIONS.md)
-*   [Agent Context](./.jules/context.md)
 
-## 🛠 Getting Started (Planned)
+## 🤝 Contributing
 
-> **Note:** The project is currently in the planning/initialization phase. Code generation has not started yet.
+This project uses **npm** for package management. Please ensure you lock files are updated accordingly.
 
-1.  Initialize the repo: `npm create vite@latest dependency-maritime -- --template react-ts`
-2.  Install dependencies: `npm install reactflow graphology zod zustand dagre`
-3.  Initialize Shadcn/UI: Follow the [official installation guide](https://ui.shadcn.com/docs/installation/vite).
-4.  Generate sample data: `npx dependency-cruiser src --output-type json > maritime-sample.json`
-5.  Run the application: `npm run dev`
+1.  Fork the repo.
+2.  Create a feature branch.
+3.  Commit your changes.
+4.  Push to the branch.
+5.  Create a Pull Request.
+
+## 📝 License
+
+Distributed under the MIT License.
