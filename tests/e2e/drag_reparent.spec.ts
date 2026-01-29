@@ -56,6 +56,13 @@ test.describe('Graph Interaction', () => {
     await expect(targetNode).toBeVisible();
     await expect(targetGroup).toBeVisible();
 
+    // Center the graph to ensure consistent coordinates
+    const fitViewButton = page.getByRole('button', { name: 'fit view' });
+    if (await fitViewButton.isVisible()) {
+      await fitViewButton.click();
+      await page.waitForTimeout(500); // Wait for animation
+    }
+
     const startBox = await targetNode.boundingBox();
     const groupDestBox = await targetGroup.boundingBox();
 
@@ -63,19 +70,12 @@ test.describe('Graph Interaction', () => {
     expect(groupDestBox).not.toBeNull();
 
     if (startBox && groupDestBox) {
-        // Calculate a safe drop position that is inside the group AND inside the viewport
-        const viewportSize = page.viewportSize();
-        if (!viewportSize) throw new Error('No viewport size');
+        // Calculate a safe drop position that is inside the group
+        // We target the center of the group to be safe
+        const dropX = groupDestBox.x + groupDestBox.width / 2;
+        const dropY = groupDestBox.y + groupDestBox.height / 2;
 
-        const safeX = Math.max(0, groupDestBox.x) + 50; // 50px inside left edge (or screen left)
-        const safeY = Math.max(0, groupDestBox.y) + 50; // 50px inside top edge (or screen top)
-
-        // Ensure we are not outside the group (e.g. if group is smaller than 50px? Unlikely for "features")
-        // But let's clamp just in case.
-        const dropX = Math.min(safeX, groupDestBox.x + groupDestBox.width - 20);
-        const dropY = Math.min(safeY, groupDestBox.y + groupDestBox.height - 20);
-
-        console.log(`Dragging to safe coordinates: ${dropX}, ${dropY}`);
+        console.log(`Dragging from (${startBox.x}, ${startBox.y}) to (${dropX}, ${dropY})`);
 
         // Perform Drag
         await page.mouse.move(startBox.x + startBox.width / 2, startBox.y + startBox.height / 2);
