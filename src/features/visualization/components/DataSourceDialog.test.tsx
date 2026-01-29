@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
 import { DataSourceDialog } from './DataSourceDialog';
-import { ICruiseResult } from '@/schema/dependency-cruiser';
+import type { ICruiseResult } from '@/schema/dependency-cruiser';
 
 // Polyfill Blob.prototype.text for jsdom
 if (!Blob.prototype.text) {
