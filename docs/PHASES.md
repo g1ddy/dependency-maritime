@@ -40,19 +40,30 @@
     *   Validate the uploaded file against the Zod schema.
     *   Update the store with the new data to replace the sample data.
 
-9.  **Toolbar Actions (Drawer Menu)**
-    *   TODO: Implement functionality for Code, Download, and Settings buttons in the new Drawer menu.
-
 ## Phase 2: The "Inspector" (Metrics & Heatmaps)
 **Goal:** Visualize the "health" of the code.
 
-*   **Metric Calculation:** Use Graphology to compute metrics that DepCruiser might miss, or visualize the ones it provides:
-    *   **Instability (I):** Color nodes Green (I=0, Stable) to Red (I=1, Volatile).
-    *   **PageRank/Centrality:** Size nodes based on how critical they are to the system.
-*   **Sidebar Details:** Click a node to open a Shadcn sheet showing:
-    *   Cyclomatic Complexity.
-    *   List of dependents (Who breaks if I change this?).
-    *   List of dependencies (What breaks me?).
+1.  **Metric Calculation (Headless)**
+    *   Implement calculation logic for software metrics using Graphology.
+    *   **Instability:** Calculate $I = Ce / (Ca + Ce)$ for each node.
+    *   **Centrality:** Compute PageRank or Betweenness centrality to identify critical nodes.
+    *   Store these computed metrics as attributes on the Graphology nodes.
+
+2.  **Inspector Panel (UI)**
+    *   Implement a "Node Details" Sidebar/Sheet (replacing simple highlighting).
+    *   When a node is selected, show its full path, file type, and computed metrics (Instability Score, Centrality, Cyclomatic Complexity).
+    *   Display interactive lists of **Dependencies** (outgoing) and **Dependents** (incoming) that allow navigation to those nodes.
+
+3.  **Heatmap Visualization (View Modes)**
+    *   Implement "Settings" controls to switch between Graph View Modes.
+    *   **Normal Mode:** Standard file-type coloring.
+    *   **Instability Heatmap:** Color nodes from Green (Stable, $I=0$) to Red (Volatile, $I=1$).
+    *   **Importance View:** Size nodes based on Centrality/PageRank (larger = more critical).
+
+4.  **Export & Reporting**
+    *   Implement "Export" functionality (Download button).
+    *   Allow exporting the current graph visualization as an Image (PNG/SVG) for documentation.
+    *   (Optional) Export a "Health Report" summarizing the most unstable or central modules.
 
 ## Phase 3: The "Simulator" (Refactoring Playground)
 **Goal:** The killer feature—drag and drop architecture.
@@ -70,4 +81,7 @@
 
 *   **Community Detection:** Run the Louvain or Leiden algorithm on the graph.
 *   **Suggestion Engine:** Identify nodes that are physically in Folder A but mathematically belong to the cluster of Folder B.
-*   **"Apply" Button:** (Optional) Generate a shell script or list of commands to actually move the files on disk.
+*   **"Code" / "Apply" Action:**
+    *   Implement the functionality for the **Code** button.
+    *   Generate a shell script (`mv source dest`) or Refactoring Plan based on the user's drag-and-drop actions in Phase 3.
+    *   Allow the user to copy or download this script to apply changes to their actual codebase.
