@@ -18,9 +18,9 @@ test.describe('Graph Interaction', () => {
     // Or 'src/features/visualization/components/AppNode.tsx'. Parent 'components'.
 
     // Let's find "App.tsx" node.
-    const childNode = page.locator('.react-flow__node-appNode').filter({ hasText: 'App.tsx' }).first();
+    const childNode = page.getByTestId('node-App.tsx');
     // Its parent should be "src".
-    const groupNode = page.locator('.react-flow__node-groupNode').filter({ hasText: 'src' }).first();
+    const groupNode = page.getByTestId('node-src');
 
     await expect(childNode).toBeVisible();
     await expect(groupNode).toBeVisible();
@@ -44,10 +44,10 @@ test.describe('Graph Interaction', () => {
 
   test('dragging a node into a group should reparent and contain it', async ({ page }) => {
     // Find a node: "App.tsx".
-    const targetNode = page.locator('.react-flow__node-appNode').filter({ hasText: 'App.tsx' }).first();
+    const targetNode = page.getByTestId('node-App.tsx');
 
     // Find a group: "features".
-    const targetGroup = page.locator('.react-flow__node-groupNode').filter({ hasText: 'features' }).first();
+    const targetGroup = page.getByTestId('node-features');
 
     await expect(targetNode).toBeVisible();
     await expect(targetGroup).toBeVisible();

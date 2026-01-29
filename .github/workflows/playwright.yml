@@ -1,7 +1,7 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
     paths:
       - 'src/**'
       - 'tests/**'
@@ -16,7 +16,7 @@ on:
       - 'tailwind.config.js'
       - '.github/workflows/playwright.yml'
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
     paths:
       - 'src/**'
       - 'tests/**'
