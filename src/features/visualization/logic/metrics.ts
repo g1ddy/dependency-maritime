@@ -31,8 +31,8 @@ export function calculateGraphMetrics(graph: Graph): void {
 
     // Prepare Metrics Object
     const metrics = {
-      instability: Number(instability.toFixed(2)),
-      centrality: Number((centralities[nodeId] || 0).toFixed(4)),
+      instability: Math.round(instability * 100) / 100,
+      centrality: Math.round((centralities[nodeId] || 0) * 10000) / 10000,
       cyclomaticComplexity: 0 // Not available in current schema, placeholder.
     };
 
