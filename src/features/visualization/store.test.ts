@@ -1,7 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useGraphStore } from './store';
+import { calculateGraphMetrics } from './logic/metrics'; // Direct import of the function to mock
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { type NodeChange, type EdgeChange } from '@xyflow/react';
+
+// Mock the metrics logic to allow spying while keeping implementation
+vi.mock('./logic/metrics', async () => {
+  const actual = await vi.importActual<typeof import('./logic/metrics')>('./logic/metrics');
+  return {
+    ...actual,
+    calculateGraphMetrics: vi.fn(actual.calculateGraphMetrics),
+  };
+});
 
 // Inline mock data
 const mockData: ICruiseResult = {
@@ -30,6 +40,7 @@ describe('Visualization Store', () => {
   beforeEach(() => {
     useGraphStore.getState().reset();
     vi.useRealTimers();
+    vi.clearAllMocks(); // Clear call counts
   });
 
   it('should initialize with empty state', () => {
@@ -37,6 +48,8 @@ describe('Visualization Store', () => {
     expect(state.nodes).toEqual([]);
     expect(state.edges).toEqual([]);
     expect(state.graph).toBeNull();
+    expect(state.loading).toBe(false);
+    expect(state.hideTypeDefinitions).toBe(true);
   });
 
   it('should set graph data and generate nodes/edges', () => {
@@ -115,22 +128,23 @@ describe('Visualization Store', () => {
 
     expect(version2).toBeGreaterThan(version1);
 
-    // 3. Fast-forward time to let async promises settle
-    // Note: Since `calculateGraphMetrics` is synchronous in our mock/logic,
-    // strictly speaking this test verifies logic flow.
-    // If it were truly async (e.g. worker), this proves we use the latest version.
-    // The store logic checks `get().metricsVersion !== targetVersion`.
-
-    // We can verify that `calculateMetrics` respects the version check.
-    // We'll manually call calculateMetrics with an OLD version to see if it aborts.
-
-    // Call with old version
+    // 3. Manually call calculateMetrics with an OLD version to see if it aborts.
     store.calculateMetrics(version1);
-    // It should bail out early or at least not set state if check works.
-    // Since we can't spy on internal implementation easily, we observe side effects.
-    // Ideally we'd mock `calculateGraphMetrics` to return a specific value and verify it wasn't applied.
 
     await vi.runAllTimersAsync();
+
+    // In current implementation:
+    // setGraphData -> calls calculateMetrics(newVersion) -> calls calculateGraphMetrics
+    // calculateMetrics -> checks version -> calls calculateGraphMetrics -> checks version -> updates store
+
+    // Since setGraphData calls it immediately, it will be called twice total for the two setGraphData calls.
+    // The manual call `store.calculateMetrics(version1)`:
+    // current version is version2. target is version1.
+    // `if (get().metricsVersion !== targetVersion) return;` at start of function.
+    // So calculateGraphMetrics should NOT be called for the manual invocation.
+
+    // Total calls should be 2 (from the two setGraphData calls).
+    expect(calculateGraphMetrics).toHaveBeenCalledTimes(2);
   });
 
   it('should handle React Flow node/edge changes', () => {

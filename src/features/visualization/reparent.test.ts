@@ -35,11 +35,11 @@ const mockData: ICruiseResult = {
 describe('Reparenting Logic', () => {
   beforeEach(() => {
     useGraphStore.getState().reset();
+    useGraphStore.getState().setGraphData(mockData);
   });
 
   it('should update fullPath correctly when moving node to a new folder', () => {
     const store = useGraphStore.getState();
-    store.setGraphData(mockData);
 
     let state = useGraphStore.getState();
     const node = state.nodes.find(n => n.data.fullPath === 'src/App.tsx');
@@ -68,7 +68,6 @@ describe('Reparenting Logic', () => {
 
   it('should update fullPath correctly when moving node to root', () => {
     const store = useGraphStore.getState();
-    store.setGraphData(mockData);
 
     let state = useGraphStore.getState();
     const node = state.nodes.find(n => n.data.fullPath === 'src/components/Button.tsx');
@@ -88,7 +87,6 @@ describe('Reparenting Logic', () => {
 
   it('should update fullPath correctly when moving node to a nested folder', () => {
     const store = useGraphStore.getState();
-    store.setGraphData(mockData);
 
     let state = useGraphStore.getState();
     const node = state.nodes.find(n => n.data.fullPath === 'src/App.tsx');
