@@ -2,6 +2,7 @@ import { type Node } from '@xyflow/react';
 
 export interface AppNodeData extends Record<string, unknown> {
   label: string;
+  fullPath?: string;
   external?: boolean;
   highlighted?: boolean;
   dimmed?: boolean;
