@@ -130,8 +130,8 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
       set({ nodes: updatedNodes });
 
-    } catch {
-      // Error is caught but not logged to keep the production console clean
+    } catch (error) {
+      console.error("Failed to calculate metrics:", error);
     } finally {
       // Only reset loading state if this is still the current calculation
       if (get().metricsVersion === targetVersion) {
