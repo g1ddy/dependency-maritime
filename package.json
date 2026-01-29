@@ -32,6 +32,7 @@
     "clsx": "^2.1.1",
     "dagre": "^0.8.5",
     "graphology": "^0.26.0",
+    "graphology-metrics": "^2.4.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

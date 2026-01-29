@@ -12,6 +12,7 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
   // Visual states from data
   const isHighlighted = !!data.highlighted;
   const isDimmed = !!data.dimmed;
+  const debugColor = data.debugColor;
 
   // Determine icon based on file extension or type
   let Icon = File;
@@ -33,6 +34,10 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
     borderClass = 'border-blue-400/80 ring-1 ring-blue-400/50';
   }
 
+  // If debugColor is present (after async processing), we override the border color
+  // to prove the update happened.
+  const debugStyle = debugColor ? { borderColor: debugColor } : {};
+
   return (
     <div
       data-testid={`node-${label}`}
@@ -42,6 +47,7 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
         ${opacityClass}
         ${borderClass}
       `}
+      style={debugStyle}
     >
       <Handle type="target" position={Position.Top} className="!bg-blue-500/50 !w-2 !h-2" />
 

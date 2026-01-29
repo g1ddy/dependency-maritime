@@ -14,6 +14,8 @@ import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
 import { applyDagreLayout } from './logic/layout';
 import { type ModuleCategory } from './logic/filters';
+import { calculateGraphMetrics } from './logic/metrics';
+import { type AppNodeData } from './types';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
@@ -30,12 +32,14 @@ interface GraphState {
 
   // Metadata
   loading: boolean;
+  isCalculatingMetrics: boolean;
   hideTypeDefinitions: boolean;
   layoutDirection: 'TB' | 'LR';
   activeFilters: ModuleCategory[];
 
   // Actions
   setGraphData: (data: ICruiseResult) => void;
+  calculateMetrics: () => Promise<void>;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
   selectNode: (nodeId: string | null) => void;
   toggleTypeDefinitions: () => void;
@@ -54,6 +58,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   selectedNodeId: null,
   graph: null,
   loading: false,
+  isCalculatingMetrics: false,
   hideTypeDefinitions: true,
   layoutDirection: 'TB',
   activeFilters: [],
@@ -78,6 +83,50 @@ export const useGraphStore = create<GraphState>((set, get) => ({
       selectedNodeId: null, // Reset selection on new data
       loading: false
     });
+
+    // 4. Trigger Async Metrics Calculation
+    void get().calculateMetrics();
+  },
+
+  calculateMetrics: async () => {
+    const { graph } = get();
+    if (!graph) return;
+
+    set({ isCalculatingMetrics: true });
+    // console.log("Starting metrics calculation..."); // Optional log
+
+    try {
+      // Run the heavy calculation (simulated or real)
+      await calculateGraphMetrics(graph);
+      console.log("Metrics calculation complete");
+
+      // Sync results back to React Flow nodes
+      // We iterate over the existing RF nodes (getting the latest state)
+      // and update their data from the potentially mutated Graphology graph attributes.
+      const currentNodes = get().nodes;
+      const updatedNodes = currentNodes.map((node) => {
+        if (graph.hasNode(node.id)) {
+          const attributes = graph.getNodeAttributes(node.id);
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              // Update specific fields we expect to change
+              metrics: attributes.metrics,
+              debugColor: attributes.debugColor
+            } as AppNodeData
+          };
+        }
+        return node;
+      });
+
+      set({ nodes: updatedNodes });
+
+    } catch (error) {
+      console.error("Failed to calculate metrics:", error);
+    } finally {
+      set({ isCalculatingMetrics: false });
+    }
   },
 
   toggleTypeDefinitions: () => {
