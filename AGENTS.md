@@ -22,6 +22,7 @@ This repository contains the "Dependency Maritime" project.
     *   **Do not use `page.waitForTimeout()`**. It is an anti-pattern and leads to flaky tests.
     *   Instead, disable animations in the application during tests (e.g., using `VITE_DISABLE_ANIMATIONS` environment variable) and use reliable wait conditions like `page.waitForSelector()`, `expect().toBeVisible()`, or `page.waitForFunction()`.
 *   **Linting:** Always run `npm run lint` to ensure code quality before submitting.
+*   **DRY Principles:** Always avoid duplication and follow DRY principles. In tests, this means properly using setup helpers to encapsulate common logic.
 
 ## Pre-Submit Checks
 
