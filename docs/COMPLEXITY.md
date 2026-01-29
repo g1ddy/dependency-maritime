@@ -66,11 +66,11 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/features/visualization/store.ts` | **74** | 347 | 7 | 6 | 0.67 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **62.1** | 134 | 11 | 5 | 0.83 |
+| `src/features/visualization/store.ts` | **73.7** | 344 | 7 | 6 | 0.67 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **62.2** | 135 | 11 | 5 | 0.83 |
 | `src/features/visualization/components/GraphOverlay.tsx` | **55.2** | 154 | 3 | 8 | 0.89 |
 | `src/features/visualization/logic/transformer.ts` | **54.8** | 195 | 9 | 2 | 0.67 |
-| `src/features/visualization/components/DataSourceDialog.tsx` | **51.2** | 172 | 5 | 4 | 0.8 |
+| `src/features/visualization/components/DataSourceDialog.tsx` | **51.3** | 173 | 5 | 4 | 0.8 |
 | `src/features/visualization/logic/layout.ts` | **39.2** | 132 | 13 | 0 | 0 |
 | `src/features/visualization/components/AppNode.tsx` | **36.1** | 61 | 9 | 1 | 0.5 |
 | `src/components/ui/dropdown-menu.tsx` | **36** | 200 | 2 | 1 | 0.5 |
@@ -81,11 +81,11 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
 | `src/features/visualization/logic/layout.ts` | **13** | 132 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **11** | 134 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **11** | 135 |
 | `src/features/visualization/logic/transformer.ts` | **9** | 195 |
 | `src/features/visualization/components/AppNode.tsx` | **9** | 61 |
-| `src/features/visualization/store.ts` | **7** | 347 |
-| `src/features/visualization/components/DataSourceDialog.tsx` | **5** | 172 |
+| `src/features/visualization/store.ts` | **7** | 344 |
+| `src/features/visualization/components/DataSourceDialog.tsx` | **5** | 173 |
 | `src/components/ui/separator.tsx` | **4** | 30 |
 | `src/components/theme-provider.tsx` | **4** | 63 |
 | `src/components/ui/button.tsx` | **3** | 59 |

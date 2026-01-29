@@ -161,7 +161,7 @@ ${sortedByScore.map(f => `| \`${f.file}\` | **${f.score}** | ${f.loc} | ${f.comp
 ${sortedByComplexity.map(f => `| \`${f.file}\` | **${f.complexity}** | ${f.loc} |`).join('\n')}
 `;
 
-    // 6. Update File
+    // 6. Update File (Docs)
     console.log('   - Updating docs/COMPLEXITY.md...');
     let currentContent = fs.readFileSync(DOCS_FILE, 'utf8');
 
@@ -178,7 +178,28 @@ ${sortedByComplexity.map(f => `| \`${f.file}\` | **${f.complexity}** | ${f.loc} 
     const newContent = currentContent.trim() + '\n\n' + report;
     fs.writeFileSync(DOCS_FILE, newContent);
 
-    console.log('✅ Complexity Report Updated!');
+    // 7. Export Metrics to JSON
+    console.log('   - Exporting metrics to config/complexity-metrics.json...');
+    const metricsMap = {};
+    fileMetrics.forEach(f => {
+        metricsMap[f.file] = {
+            complexity: f.complexity,
+            loc: f.loc,
+            instability: f.instability,
+            fanIn: f.fanIn,
+            fanOut: f.fanOut
+        };
+    });
+
+    // Ensure config directory exists
+    const configDir = path.dirname('config/complexity-metrics.json');
+    if (!fs.existsSync(configDir)) {
+        fs.mkdirSync(configDir, { recursive: true });
+    }
+
+    fs.writeFileSync('config/complexity-metrics.json', JSON.stringify(metricsMap, null, 2));
+
+    console.log('✅ Complexity Report Updated and Metrics Exported!');
 }
 
 main();
