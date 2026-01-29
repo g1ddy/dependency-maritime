@@ -63,8 +63,6 @@ describe('DataSourceDialog', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    cleanup();
-    document.body.innerHTML = '';
   });
 
   afterEach(() => {
@@ -127,8 +125,6 @@ describe('DataSourceDialog File Interactions', () => {
 
     beforeEach(() => {
       vi.clearAllMocks();
-      cleanup();
-      document.body.innerHTML = '';
     });
 
     afterEach(() => {
@@ -155,17 +151,15 @@ describe('DataSourceDialog File Interactions', () => {
 
         const file = new File([JSON.stringify(mockSampleData)], 'graph.json', { type: 'application/json' });
 
-        if (dropZone) {
-            fireEvent.dragEnter(dropZone);
-            expect(dropZone.className).toContain('border-primary');
+        fireEvent.dragEnter(dropZone!);
+        expect(dropZone!.className).toContain('border-primary');
 
-            fireEvent.drop(dropZone, {
-                dataTransfer: {
-                    files: [file],
-                    types: ['Files']
-                }
-            });
-        }
+        fireEvent.drop(dropZone!, {
+            dataTransfer: {
+                files: [file],
+                types: ['Files']
+            }
+        });
 
         await waitFor(() => {
              expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData);
@@ -184,16 +178,15 @@ describe('DataSourceDialog File Interactions', () => {
 
         const dialog = screen.getByRole('dialog');
         const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
+        expect(dropZone).not.toBeNull();
         const file = new File(['{ invalid json: '], 'invalid.json', { type: 'application/json' });
 
-        if (dropZone) {
-            fireEvent.drop(dropZone, {
-                dataTransfer: {
-                    files: [file],
-                    types: ['Files']
-                }
-            });
-        }
+        fireEvent.drop(dropZone!, {
+            dataTransfer: {
+                files: [file],
+                types: ['Files']
+            }
+        });
 
         const errorElement = await within(dialog).findByText('Invalid JSON');
         expect(errorElement).toBeTruthy();
@@ -211,19 +204,18 @@ describe('DataSourceDialog File Interactions', () => {
 
         const dialog = screen.getByRole('dialog');
         const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
+        expect(dropZone).not.toBeNull();
 
         // Missing 'modules' array
         const invalidData = { foo: 'bar' };
         const file = new File([JSON.stringify(invalidData)], 'schema-error.json', { type: 'application/json' });
 
-        if (dropZone) {
-            fireEvent.drop(dropZone, {
-                dataTransfer: {
-                    files: [file],
-                    types: ['Files']
-                }
-            });
-        }
+        fireEvent.drop(dropZone!, {
+            dataTransfer: {
+                files: [file],
+                types: ['Files']
+            }
+        });
 
         const errorElement = await within(dialog).findByText('Validation Error');
         expect(errorElement).toBeTruthy();
