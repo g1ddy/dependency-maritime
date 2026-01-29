@@ -18,6 +18,9 @@ This repository contains the "Dependency Maritime" project.
     *   Use `@ts-expect-error` instead of `@ts-ignore` when valid.
     *   **Do not blindly replace `@ts-ignore` with `@ts-expect-error` without verifying that an error actually exists.** If no error exists, remove the directive entirely.
     *   Ensure all new tests are written in TypeScript (e.g., in `e2e/`).
+*   **E2E Testing:**
+    *   **Do not use `page.waitForTimeout()`**. It is an anti-pattern and leads to flaky tests.
+    *   Instead, disable animations in the application during tests (e.g., using `VITE_DISABLE_ANIMATIONS` environment variable) and use reliable wait conditions like `page.waitForSelector()`, `expect().toBeVisible()`, or `page.waitForFunction()`.
 *   **Linting:** Always run `npm run lint` to ensure code quality before submitting.
 *   **DRY Principles:** Always avoid duplication and follow DRY principles. In tests, this means properly using setup helpers to encapsulate common logic.
 

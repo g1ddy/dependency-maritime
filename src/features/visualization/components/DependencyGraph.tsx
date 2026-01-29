@@ -30,6 +30,7 @@ const miniMapNodeColor = (node: Node<AppNodeData>) => {
 };
 
 export function DependencyGraph() {
+  const disableAnimations = import.meta.env.VITE_DISABLE_ANIMATIONS === 'true';
   const {
     nodes,
     edges,
@@ -123,6 +124,7 @@ export function DependencyGraph() {
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={disableAnimations ? { duration: 0 } : undefined}
         minZoom={0.1}
       >
         <Background />
