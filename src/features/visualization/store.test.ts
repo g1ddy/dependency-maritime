@@ -15,8 +15,8 @@ const mockData: ICruiseResult = {
     optionsUsed: {}
   },
   modules: [
-    { source: 'src/A.ts', dependencies: [{ resolved: 'src/B.ts', module: 'src/B.ts', dependencyTypes: ['local'] }], dependents: [] },
-    { source: 'src/B.ts', dependencies: [{ resolved: 'src/C.ts', module: 'src/C.ts', dependencyTypes: ['local'] }], dependents: ['src/A.ts'] },
+    { source: 'src/A.ts', dependencies: [{ resolved: 'src/B.ts', module: 'src/B.ts', dependencyTypes: ['local'], coreModule: false, followable: true, couldNotResolve: false }], dependents: [] },
+    { source: 'src/B.ts', dependencies: [{ resolved: 'src/C.ts', module: 'src/C.ts', dependencyTypes: ['local'], coreModule: false, followable: true, couldNotResolve: false }], dependents: ['src/A.ts'] },
     { source: 'src/C.ts', dependencies: [], dependents: ['src/B.ts'] },
     // Isolated node
     { source: 'src/D.ts', dependencies: [], dependents: [] },
