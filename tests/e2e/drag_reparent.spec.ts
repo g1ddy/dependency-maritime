@@ -60,7 +60,7 @@ test.describe('Graph Interaction', () => {
     const fitViewButton = page.getByRole('button', { name: 'fit view' });
     if (await fitViewButton.isVisible()) {
       await fitViewButton.click();
-      await page.waitForTimeout(500); // Wait for animation
+      await page.locator('.react-flow__renderer').waitFor({ state: 'stable' });
     }
 
     const startBox = await targetNode.boundingBox();
