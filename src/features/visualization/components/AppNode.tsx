@@ -35,6 +35,7 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
 
   return (
     <div
+      data-testid={`node-${label}`}
       className={`
         border bg-blue-950/30 backdrop-blur px-4 py-2 rounded-lg flex items-center gap-2 shadow-[0_0_30px_-5px_rgba(37,99,235,0.3)]
         transition-all duration-200
