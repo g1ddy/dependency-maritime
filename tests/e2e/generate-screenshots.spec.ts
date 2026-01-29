@@ -21,9 +21,9 @@ test.describe('Documentation Screenshots', () => {
     // We try to find main.tsx or fallback to the first available node
     const mainNode = page.locator('[data-testid="node-main.tsx"]');
     if (await mainNode.count() > 0) {
-        await mainNode.click({ force: true });
+        await mainNode.click();
     } else {
-        await page.locator('[data-testid^="node-"]').first().click({ force: true });
+        await page.locator('[data-testid^="node-"]').first().click();
     }
 
     // Wait for inspector to appear

@@ -13,7 +13,7 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: BASE_URL,
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     viewport: { width: 1280, height: 720 },
   },
   projects: [
