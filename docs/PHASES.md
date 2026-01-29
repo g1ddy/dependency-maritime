@@ -41,18 +41,20 @@
     *   Update the store with the new data to replace the sample data.
 
 ## Phase 2: The "Inspector" (Metrics & Heatmaps)
-**Goal:** Visualize the "health" of the code.
+**Goal:** Visualize the "health" of the code and handle scale.
 
 1.  **Metric Calculation (Headless)**
     *   Implement calculation logic for software metrics using Graphology.
     *   **Instability:** Calculate $I = Ce / (Ca + Ce)$ for each node.
     *   **Centrality:** Compute PageRank or Betweenness centrality to identify critical nodes.
     *   Store these computed metrics as attributes on the Graphology nodes.
+    *   **Folder-Level Metrics:** Aggregate metrics (Instability, Size) to the Group/Folder level to visualize architectural "Hotspots" at a macro level.
 
 2.  **Inspector Panel (UI)**
     *   Implement a "Node Details" Sidebar/Sheet (replacing simple highlighting).
     *   When a node is selected, show its full path, file type, and computed metrics (Instability Score, Centrality, Cyclomatic Complexity).
     *   Display interactive lists of **Dependencies** (outgoing) and **Dependents** (incoming) that allow navigation to those nodes.
+    *   **Deep Analysis Tools:** Include "Shortest Path" (select two nodes to see the chain) and "Impact Analysis" (visualize what percentage of the system's nodes are affected by this node).
 
 3.  **Heatmap Visualization (View Modes)**
     *   Implement "Settings" controls to switch between Graph View Modes.
@@ -60,7 +62,12 @@
     *   **Instability Heatmap:** Color nodes from Green (Stable, $I=0$) to Red (Volatile, $I=1$).
     *   **Importance View:** Size nodes based on Centrality/PageRank (larger = more critical).
 
-4.  **Export & Reporting**
+4.  **Advanced Layout & Scaling (Fixing "Awkward Graphs")**
+    *   **Problem:** Large graphs using `dagre` become overly tall or wide, making navigation difficult.
+    *   **Solution:** Integrate **ELK (Eclipse Layout Kernel)** or **Force-Directed Layouts** (d3-force/react-force-graph behavior).
+    *   **Interactive Layouts:** Allow users to toggle between "Hierarchical" (Dagre - good for small flows) and "Force/Compact" (ELK/Force - good for large architectural clusters).
+
+5.  **Export & Reporting**
     *   Implement "Export" functionality (Download button).
     *   Allow exporting the current graph visualization as an Image (PNG/SVG) for documentation.
     *   (Optional) Export a "Health Report" summarizing the most unstable or central modules.
@@ -70,16 +77,17 @@
 
 *   **Group/Cluster Support:** (Implemented) React Flow SubFlow renders Folders as container nodes (GroupNodes) with dashed borders and folder icons.
 *   **Drag Logic:** (Implemented) Nodes can be dragged between Groups or to the Root. Logic updates the `fullPath` and `parentId` in the store, maintaining graph consistency.
-*   **Virtual Recalculation:** When a drop happens:
+*   **Real-time Architecture Validation:** When a drop happens:
     *   Intercept the event.
     *   Update the in-memory graph edges.
-    *   Check for Circular Dependency creation (using Graphology's `findCycles`).
-    *   If a cycle is created, flash the edge RED and warn the user.
+    *   **Cycle Detection:** Check for Circular Dependency creation (using Graphology's `findCycles`).
+    *   **Rule Validation:** Verify architectural rules from a configuration file (e.g., "UI should not import Core").
+    *   If a violation occurs, flash the edge RED and warn the user.
 
 ## Phase 4: The "Cohesion" Assistant (AI/Algo Suggestions)
 **Goal:** Suggest improvements.
 
-*   **Community Detection:** Run the Louvain or Leiden algorithm on the graph.
+*   **Community Detection:** Run the Louvain or Leiden algorithm on the graph to automatically identify clusters.
 *   **Suggestion Engine:** Identify nodes that are physically in Folder A but mathematically belong to the cluster of Folder B.
 *   **"Code" / "Apply" Action:**
     *   Implement the functionality for the **Code** button.
