@@ -119,6 +119,7 @@ export function DependencyGraph() {
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         fitView
+        minZoom={0.1}
       >
         <Background />
         <Controls position="bottom-right" />
