@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { applyDagreLayout } from './layout';
 import { type Node, type Edge, Position } from '@xyflow/react';
-import dagre from 'dagre';
 
 // Unmock the module under test because it is globally mocked in setup-layout-mock.ts
 vi.unmock('./layout');
