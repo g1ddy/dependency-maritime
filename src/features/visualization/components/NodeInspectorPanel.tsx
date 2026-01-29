@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from "react";
 import { X, ArrowRight, ArrowLeft, Activity, Info, Box } from "lucide-react";
 import { useGraphStore } from "../store";
 import { Button } from "@/components/ui/button";
@@ -16,14 +17,10 @@ export function NodeInspectorPanel() {
     selectNode
   } = useGraphStore();
 
-  if (!isInspectorOpen) return null;
-
-  // Find the selected node data.
-  // If no node is selected, we show a placeholder.
-  const selectedNode = selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null;
+  const nodesById = useMemo(() => new Map(nodes.map(node => [node.id, node])), [nodes]);
 
   // Helper to get neighbors
-  const getNeighbors = (direction: 'in' | 'out') => {
+  const getNeighbors = useCallback((direction: 'in' | 'out') => {
     if (!graph || !selectedNodeId) return [];
 
     // Safety check if node exists in graph (might be filtered out or group node handling)
@@ -32,18 +29,23 @@ export function NodeInspectorPanel() {
     const neighbors = direction === 'in' ? graph.inNeighbors(selectedNodeId) : graph.outNeighbors(selectedNodeId);
     return neighbors.map(id => {
        // Try to find in rendered nodes first to get current state if needed, or fallback to graph attributes
-       const node = nodes.find(n => n.id === id);
+       const node = nodesById.get(id);
        // graph.getNodeAttribute returns any, so we cast or assume string
        const graphLabel = graph.getNodeAttribute(id, 'label') as string;
        const label = (node?.data?.label as string) || graphLabel || id;
        return { id, label };
     });
-  };
+  }, [graph, selectedNodeId, nodesById]);
 
-  const dependencies = getNeighbors('out');
-  const dependents = getNeighbors('in');
+  const dependencies = useMemo(() => getNeighbors('out'), [getNeighbors]);
+  const dependents = useMemo(() => getNeighbors('in'), [getNeighbors]);
 
+  // Find the selected node data.
+  // If no node is selected, we show a placeholder.
+  const selectedNode = selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null;
   const metrics = selectedNode ? (selectedNode.data as AppNodeData).metrics : undefined;
+
+  if (!isInspectorOpen) return null;
 
   return (
     <div className={cn(
