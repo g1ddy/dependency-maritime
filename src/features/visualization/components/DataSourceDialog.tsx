@@ -5,6 +5,7 @@ import { Upload, FileJson, Database } from 'lucide-react';
 import { CruiseResultSchema, type ICruiseResult } from '@/schema/dependency-cruiser';
 import { ZodError } from 'zod';
 import { cn } from '@/lib/utils';
+import { type ComplexityMetricsMap } from '../types';
 
 // Import data sources
 import sampleData from '../../../../sample-data/dependency-graph.json';
@@ -13,7 +14,7 @@ import projectData from '../../../../config/dependency-graph.json';
 interface DataSourceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDataLoaded: (data: ICruiseResult, complexityMetrics?: Record<string, any>) => void;
+  onDataLoaded: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
 }
 
 export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourceDialogProps) {
@@ -29,7 +30,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     }
   }, [open]);
 
-  const loadData = (data: unknown, sourceName: string, complexityMetrics?: Record<string, any>) => {
+  const loadData = (data: unknown, sourceName: string, complexityMetrics?: ComplexityMetricsMap) => {
     try {
       const result = CruiseResultSchema.parse(data);
       onDataLoaded(result, complexityMetrics);
@@ -122,19 +123,20 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
             <Button
               variant="outline"
               className="h-24 flex flex-col gap-2 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-950/30 transition-colors"
-              onClick={async () => {
-                let metrics;
-                try {
-                  // Dynamically import to prevent build failure if missing
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                  const module = await import('../../../../config/complexity-metrics.json');
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  metrics = module.default;
-                } catch {
-                  console.warn("Complexity metrics not found, skipping.");
-                }
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                loadData(projectData, "Project Graph", metrics);
+              onClick={() => {
+                void (async () => {
+                  let metrics: ComplexityMetricsMap | undefined;
+                  try {
+                    // Dynamically import to prevent build failure if missing
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                    const module = await import('../../../../config/complexity-metrics.json');
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                    metrics = module.default as ComplexityMetricsMap;
+                  } catch {
+                    console.warn("Complexity metrics not found, skipping.");
+                  }
+                  loadData(projectData, "Project Graph", metrics);
+                })();
               }}
             >
               <FileJson className="h-8 w-8 text-green-500" />

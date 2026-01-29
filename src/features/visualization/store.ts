@@ -15,7 +15,7 @@ import { createGraphFromCruiseResult, transformToReactFlow } from './logic/trans
 import { applyDagreLayout } from './logic/layout';
 import { type ModuleCategory } from './logic/filters';
 import { calculateGraphMetrics } from './logic/metrics';
-import { type AppNodeData } from './types';
+import { type AppNodeData, type ComplexityMetricsMap } from './types';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
@@ -38,11 +38,11 @@ interface GraphState {
   layoutDirection: 'TB' | 'LR';
   activeFilters: ModuleCategory[];
   isInspectorOpen: boolean;
-  rawComplexityMetrics: Record<string, any> | null;
+  rawComplexityMetrics: ComplexityMetricsMap | null;
 
   // Actions
   setInspectorOpen: (isOpen: boolean) => void;
-  setGraphData: (data: ICruiseResult, complexityMetrics?: Record<string, any>) => void;
+  setGraphData: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
   calculateMetrics: (version?: number) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
   selectNode: (nodeId: string | null) => void;
@@ -74,7 +74,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     set({ isInspectorOpen: isOpen });
   },
 
-  setGraphData: (data: ICruiseResult, complexityMetrics?: Record<string, any>) => {
+  setGraphData: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => {
     const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
     set((state) => ({
       loading: true,
