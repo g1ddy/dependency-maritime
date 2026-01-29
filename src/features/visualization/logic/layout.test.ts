@@ -152,17 +152,20 @@ describe('applyDagreLayout', () => {
 
     expect(mocks.setParent).toHaveBeenCalledWith(childId, parentId);
 
-    const parentNode = layoutedNodes.find(n => n.id === parentId)!;
-    const childNode = layoutedNodes.find(n => n.id === childId)!;
+    const parentNode = layoutedNodes.find(n => n.id === parentId);
+    const childNode = layoutedNodes.find(n => n.id === childId);
+
+    expect(parentNode).toBeDefined();
+    expect(childNode).toBeDefined();
 
     // Check Parent Position (Absolute)
     // Center (200, 200) - Half (200, 200) = (0, 0)
-    expect(parentNode.position).toEqual({ x: 0, y: 0 });
+    expect(parentNode!.position).toEqual({ x: 0, y: 0 });
 
     // Check Child Position (Relative to Parent)
     // Child Absolute: Center (100, 100) - Half (50, 25) = (50, 75)
     // Relative = Child Absolute (50, 75) - Parent Absolute (0, 0) = (50, 75)
-    expect(childNode.position).toEqual({ x: 50, y: 75 });
+    expect(childNode!.position).toEqual({ x: 50, y: 75 });
   });
 
   it('should update group node style dimensions', () => {
