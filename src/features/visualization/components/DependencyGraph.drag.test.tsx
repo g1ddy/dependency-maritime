@@ -76,8 +76,20 @@ const createMockGraphState = (overrides: Partial<ReturnType<typeof storeModule.u
 };
 
 describe('DependencyGraph Drag Logic', () => {
-  const srcGroup = { id: 'src', type: 'groupNode', positionAbsolute: { x: 0, y: 0 } };
-  const featuresGroup = { id: 'src/features', type: 'groupNode', positionAbsolute: { x: 10, y: 10 } };
+  const srcGroup = {
+    id: 'src',
+    type: 'groupNode',
+    position: { x: 0, y: 0 },
+    positionAbsolute: { x: 0, y: 0 },
+    data: {},
+  } as Node;
+  const featuresGroup = {
+    id: 'src/features',
+    type: 'groupNode',
+    position: { x: 10, y: 10 },
+    positionAbsolute: { x: 10, y: 10 },
+    data: {},
+  } as Node;
 
   beforeEach(() => {
     capturedReactFlowProps = {};
