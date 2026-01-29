@@ -56,6 +56,10 @@ export function DependencyGraph() {
       const intersections = getIntersectingNodes(node).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
       );
+
+      // Sort intersections to find the most specific group (deepest path/longest ID)
+      intersections.sort((a, b) => b.id.length - a.id.length);
+
       const group = intersections[0] as CustomNode | undefined;
 
       // Get the accurate position of the node (after drag)
