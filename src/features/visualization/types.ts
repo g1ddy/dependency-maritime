@@ -12,6 +12,7 @@ export interface AppNodeData extends Record<string, unknown> {
     instability?: number;
     centrality?: number;
     cyclomaticComplexity?: number;
+    loc?: number;
   };
 
   // Debug visualization for async processing

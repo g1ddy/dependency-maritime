@@ -99,8 +99,13 @@ export function NodeInspectorPanel() {
                  />
                  <MetricCard
                     label="Complexity"
-                    value="N/A"
+                    value={metrics?.cyclomaticComplexity ?? "N/A"}
                     description="Cyclomatic"
+                 />
+                 <MetricCard
+                    label="LOC"
+                    value={metrics?.loc ?? "N/A"}
+                    description="Lines of Code"
                  />
               </div>
             </div>

@@ -37,8 +37,23 @@ describe('calculateGraphMetrics', () => {
     expect(dataC.metrics?.centrality).toBeGreaterThan(dataB.metrics?.centrality || 0);
     expect(dataB.metrics?.centrality).toBeGreaterThan(dataA.metrics?.centrality || 0);
 
-    // Check Cyclomatic Complexity (Placeholder)
-    expect(dataA.metrics?.cyclomaticComplexity).toBe(0);
+    // Check Cyclomatic Complexity (Default is now undefined)
+    expect(dataA.metrics?.cyclomaticComplexity).toBeUndefined();
+  });
+
+  it('calculates complexity when provided', () => {
+    const graph = new Graph();
+    graph.addNode('A', { label: 'Node A' });
+
+    const complexityData = {
+      'A': { complexity: 5, loc: 20 }
+    };
+
+    calculateGraphMetrics(graph, complexityData);
+
+    const dataA = graph.getNodeAttributes('A') as AppNodeData;
+    expect(dataA.metrics?.cyclomaticComplexity).toBe(5);
+    expect(dataA.metrics?.loc).toBe(20);
   });
 
   it('handles orphan nodes (division by zero protection)', () => {

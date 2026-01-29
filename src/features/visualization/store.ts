@@ -38,10 +38,11 @@ interface GraphState {
   layoutDirection: 'TB' | 'LR';
   activeFilters: ModuleCategory[];
   isInspectorOpen: boolean;
+  rawComplexityMetrics: Record<string, any> | null;
 
   // Actions
   setInspectorOpen: (isOpen: boolean) => void;
-  setGraphData: (data: ICruiseResult) => void;
+  setGraphData: (data: ICruiseResult, complexityMetrics?: Record<string, any>) => void;
   calculateMetrics: (version?: number) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
   selectNode: (nodeId: string | null) => void;
@@ -67,14 +68,19 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   layoutDirection: 'TB',
   activeFilters: [],
   isInspectorOpen: false,
+  rawComplexityMetrics: null,
 
   setInspectorOpen: (isOpen: boolean) => {
     set({ isInspectorOpen: isOpen });
   },
 
-  setGraphData: (data: ICruiseResult) => {
+  setGraphData: (data: ICruiseResult, complexityMetrics?: Record<string, any>) => {
     const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
-    set((state) => ({ loading: true, metricsVersion: state.metricsVersion + 1 }));
+    set((state) => ({
+      loading: true,
+      metricsVersion: state.metricsVersion + 1,
+      rawComplexityMetrics: complexityMetrics || null
+    }));
     const newVersion = get().metricsVersion;
 
     // 1. Transform to Graphology
@@ -100,7 +106,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
   calculateMetrics: (version?: number) => {
     const targetVersion = version ?? get().metricsVersion;
-    const { graph } = get();
+    const { graph, rawComplexityMetrics } = get();
     if (!graph) return;
 
     // Early exit if a newer calculation has already started
@@ -109,7 +115,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     set({ isCalculatingMetrics: true });
 
     try {
-      calculateGraphMetrics(graph);
+      calculateGraphMetrics(graph, rawComplexityMetrics);
 
       // Abort if a newer calculation has started while we were awaiting
       if (get().metricsVersion !== targetVersion) return;
@@ -343,7 +349,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   reset: () => {
-    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilters: [], isInspectorOpen: false });
+    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null });
   },
 
   onNodesChange: (changes: NodeChange[]) => {
