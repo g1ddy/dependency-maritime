@@ -46,6 +46,35 @@ vi.mock('../store', () => ({
   useGraphStore: vi.fn(),
 }));
 
+// Helper factory for creating a type-safe mock state
+const createMockGraphState = (overrides: Partial<ReturnType<typeof storeModule.useGraphStore.getState>> = {}) => {
+  return {
+    nodes: [],
+    edges: [],
+    selectedNodeId: null,
+    graph: null,
+    loading: false,
+    isCalculatingMetrics: false,
+    metricsVersion: 0,
+    hideTypeDefinitions: true,
+    layoutDirection: 'TB',
+    activeFilters: [],
+    isInspectorOpen: false,
+    setInspectorOpen: vi.fn(),
+    setGraphData: vi.fn(),
+    calculateMetrics: vi.fn(),
+    layoutGraph: vi.fn(),
+    selectNode: vi.fn(),
+    toggleTypeDefinitions: vi.fn(),
+    setFilter: vi.fn(),
+    reset: vi.fn(),
+    reparentNode: vi.fn(),
+    onNodesChange: vi.fn(),
+    onEdgesChange: vi.fn(),
+    ...overrides,
+  };
+};
+
 describe('DependencyGraph Drag Logic', () => {
   beforeEach(() => {
     capturedReactFlowProps = {};
@@ -56,17 +85,11 @@ describe('DependencyGraph Drag Logic', () => {
 
   it('reparents correctly even when the current parent group appears first in intersections', () => {
     const reparentNodeMock = vi.fn();
-    const setGraphDataMock = vi.fn();
 
-    const mockState = {
-      nodes: [],
-      edges: [],
-      onNodesChange: vi.fn(),
-      onEdgesChange: vi.fn(),
-      setGraphData: setGraphDataMock,
+    // Use factory to create type-safe mock state
+    const mockState = createMockGraphState({
       reparentNode: reparentNodeMock,
-      selectNode: vi.fn(),
-    };
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(storeModule.useGraphStore).mockReturnValue(mockState as any);
@@ -115,17 +138,10 @@ describe('DependencyGraph Drag Logic', () => {
 
   it('reparents correctly if the desired group appears first', () => {
     const reparentNodeMock = vi.fn();
-    const setGraphDataMock = vi.fn();
 
-    const mockState = {
-      nodes: [],
-      edges: [],
-      onNodesChange: vi.fn(),
-      onEdgesChange: vi.fn(),
-      setGraphData: setGraphDataMock,
+    const mockState = createMockGraphState({
       reparentNode: reparentNodeMock,
-      selectNode: vi.fn(),
-    };
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(storeModule.useGraphStore).mockReturnValue(mockState as any);
