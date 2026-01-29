@@ -2,6 +2,7 @@ import { ReactFlowProvider } from "@xyflow/react"
 import { Header } from "@/components/layout/Header"
 import { DependencyGraph } from "@/features/visualization/components/DependencyGraph"
 import { GraphOverlay } from "@/features/visualization/components/GraphOverlay"
+import { NodeInspectorPanel } from "@/features/visualization/components/NodeInspectorPanel"
 import { useGraphStore } from "@/features/visualization/store"
 import { DataSourceDialog } from "@/features/visualization/components/DataSourceDialog"
 import { useState } from "react"
@@ -17,6 +18,7 @@ function App() {
         <ReactFlowProvider>
           <DependencyGraph />
           <GraphOverlay />
+          <NodeInspectorPanel />
         </ReactFlowProvider>
       </div>
       <DataSourceDialog

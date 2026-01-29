@@ -37,8 +37,10 @@ interface GraphState {
   hideTypeDefinitions: boolean;
   layoutDirection: 'TB' | 'LR';
   activeFilters: ModuleCategory[];
+  isInspectorOpen: boolean;
 
   // Actions
+  setInspectorOpen: (isOpen: boolean) => void;
   setGraphData: (data: ICruiseResult) => void;
   calculateMetrics: (version?: number) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
@@ -64,6 +66,11 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   hideTypeDefinitions: true,
   layoutDirection: 'TB',
   activeFilters: [],
+  isInspectorOpen: false,
+
+  setInspectorOpen: (isOpen: boolean) => {
+    set({ isInspectorOpen: isOpen });
+  },
 
   setGraphData: (data: ICruiseResult) => {
     const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
@@ -326,7 +333,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   reset: () => {
-    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilters: [] });
+    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilters: [], isInspectorOpen: false });
   },
 
   onNodesChange: (changes: NodeChange[]) => {

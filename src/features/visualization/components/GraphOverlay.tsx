@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Box, Hammer, Globe, Wand2, Monitor, Cpu } from "lucide-react"
+import { Box, Hammer, Globe, Wand2, Monitor, Cpu, PanelRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -29,7 +29,9 @@ export function GraphOverlay() {
     hideTypeDefinitions,
     toggleTypeDefinitions,
     activeFilters,
-    setFilter
+    setFilter,
+    isInspectorOpen,
+    setInspectorOpen
   } = useGraphStore();
 
   const selectedNode = useMemo(
@@ -84,13 +86,22 @@ export function GraphOverlay() {
           </div>
         </div>
 
-        {/* Action Button */}
-        <Button
-          className="bg-blue-600 hover:bg-blue-700 gap-2 pointer-events-auto shadow-lg shadow-blue-900/20 text-white"
-          data-testid="refactor-graph-btn"
-        >
-          <Wand2 className="h-4 w-4" /> Refactor Graph
-        </Button>
+        {/* Action Buttons */}
+        <div className="flex gap-2 pointer-events-auto">
+          <Button
+            variant="outline"
+            className={cn("gap-2 shadow-lg bg-background/50 backdrop-blur border-border/50 hover:bg-background/80", isInspectorOpen && "bg-accent text-accent-foreground")}
+            onClick={() => setInspectorOpen(!isInspectorOpen)}
+          >
+            <PanelRight className="h-4 w-4" /> Inspector
+          </Button>
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 gap-2 shadow-lg shadow-blue-900/20 text-white"
+            data-testid="refactor-graph-btn"
+          >
+            <Wand2 className="h-4 w-4" /> Refactor Graph
+          </Button>
+        </div>
       </div>
 
       {/* Spacer */}
