@@ -142,10 +142,10 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
             onClick={() => fileInputRef.current?.click()}
           >
             <Upload className="h-8 w-8 text-muted-foreground" />
-            <div className="text-center">
-              <p className="text-sm font-medium">Click to upload or drag and drop</p>
-              <p className="text-xs text-muted-foreground mt-1">JSON files only</p>
-            </div>
+            <span className="text-center flex flex-col items-center">
+              <span className="text-sm font-medium block">Click to upload or drag and drop</span>
+              <span className="text-xs text-muted-foreground mt-1 block">JSON files only</span>
+            </span>
           </button>
           <input
             ref={fileInputRef}
