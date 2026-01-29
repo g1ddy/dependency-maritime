@@ -3,10 +3,18 @@ import { DependencyGraph } from './DependencyGraph';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as storeModule from '../store';
 import React from 'react';
+import { type Node } from '@xyflow/react';
+
+// Define a minimal interface for the props we are capturing
+interface ReactFlowMockProps {
+  onNodeDragStop?: (event: React.MouseEvent, node: Node) => void;
+  children?: React.ReactNode;
+  // Allow other props
+  [key: string]: unknown;
+}
 
 // We need to capture the props passed to ReactFlow
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let capturedReactFlowProps: any = {};
+let capturedReactFlowProps: ReactFlowMockProps = {};
 const mockGetIntersectingNodes = vi.fn();
 const mockGetInternalNode = vi.fn();
 
@@ -17,7 +25,9 @@ vi.mock('@xyflow/react', async (importOriginal) => {
     ...actual,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ReactFlow: (props: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       capturedReactFlowProps = props;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       return <div className="react-flow-mock">{props.children}</div>;
     },
     useReactFlow: () => ({
@@ -74,7 +84,6 @@ describe('DependencyGraph Drag Logic', () => {
     mockGetIntersectingNodes.mockReturnValue([srcGroup, featuresGroup]);
 
     // Mock getInternalNode to return positions
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockGetInternalNode.mockImplementation((id: string) => {
         if (id === 'src') return srcGroup;
         if (id === 'src/features') return featuresGroup;
@@ -88,13 +97,13 @@ describe('DependencyGraph Drag Logic', () => {
         position: { x: 50, y: 50 },
         positionAbsolute: { x: 50, y: 50 },
         data: { label: 'App.tsx' }
-    };
+    } as Node;
 
     // Invoke the handler
     // We expect onNodeDragStop to be passed to ReactFlow
     expect(capturedReactFlowProps.onNodeDragStop).toBeDefined();
 
-    capturedReactFlowProps.onNodeDragStop(
+    capturedReactFlowProps.onNodeDragStop!(
         {} as React.MouseEvent,
         draggedNode
     );
@@ -129,7 +138,6 @@ describe('DependencyGraph Drag Logic', () => {
     // Setup intersections: 'src/features' comes FIRST (good order)
     mockGetIntersectingNodes.mockReturnValue([featuresGroup, srcGroup]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mockGetInternalNode.mockImplementation((id: string) => {
         if (id === 'src') return srcGroup;
         if (id === 'src/features') return featuresGroup;
@@ -143,9 +151,9 @@ describe('DependencyGraph Drag Logic', () => {
         position: { x: 50, y: 50 },
         positionAbsolute: { x: 50, y: 50 },
         data: { label: 'App.tsx' }
-    };
+    } as Node;
 
-    capturedReactFlowProps.onNodeDragStop({} as React.MouseEvent, draggedNode);
+    capturedReactFlowProps.onNodeDragStop!({} as React.MouseEvent, draggedNode);
 
     // It should pick 'src/features'
     expect(reparentNodeMock).toHaveBeenCalledWith('node-1', 'src/features', expect.any(Object));
