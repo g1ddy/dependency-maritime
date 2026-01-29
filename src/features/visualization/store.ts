@@ -66,9 +66,9 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   activeFilters: [],
 
   setGraphData: (data: ICruiseResult) => {
-    const { hideTypeDefinitions, layoutDirection, activeFilters, metricsVersion } = get();
-    const newVersion = metricsVersion + 1;
-    set({ loading: true, metricsVersion: newVersion });
+    const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
+    set((state) => ({ loading: true, metricsVersion: state.metricsVersion + 1 }));
+    const newVersion = get().metricsVersion;
 
     // 1. Transform to Graphology
     const graph = createGraphFromCruiseResult(data);
