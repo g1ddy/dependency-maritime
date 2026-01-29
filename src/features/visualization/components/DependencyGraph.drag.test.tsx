@@ -76,6 +76,21 @@ const createMockGraphState = (overrides: Partial<ReturnType<typeof storeModule.u
 };
 
 describe('DependencyGraph Drag Logic', () => {
+  const srcGroup = {
+    id: 'src',
+    type: 'groupNode',
+    position: { x: 0, y: 0 },
+    positionAbsolute: { x: 0, y: 0 },
+    data: {},
+  } as Node;
+  const featuresGroup = {
+    id: 'src/features',
+    type: 'groupNode',
+    position: { x: 10, y: 10 },
+    positionAbsolute: { x: 10, y: 10 },
+    data: {},
+  } as Node;
+
   beforeEach(() => {
     capturedReactFlowProps = {};
     mockGetIntersectingNodes.mockReset();
@@ -83,10 +98,9 @@ describe('DependencyGraph Drag Logic', () => {
     vi.clearAllMocks();
   });
 
-  it('reparents correctly even when the current parent group appears first in intersections', () => {
+  const setupDragTest = (intersections: Node[]) => {
     const reparentNodeMock = vi.fn();
 
-    // Use factory to create type-safe mock state
     const mockState = createMockGraphState({
       reparentNode: reparentNodeMock,
     });
@@ -96,78 +110,42 @@ describe('DependencyGraph Drag Logic', () => {
 
     render(<DependencyGraph />);
 
-    // Define groups
-    const srcGroup = { id: 'src', type: 'groupNode', positionAbsolute: { x: 0, y: 0 } };
-    const featuresGroup = { id: 'src/features', type: 'groupNode', positionAbsolute: { x: 10, y: 10 } };
+    mockGetIntersectingNodes.mockReturnValue(intersections);
 
-    // Setup intersections: 'src' comes FIRST (bad order for previous logic)
-    // We are simulating dropping a node that is currently in 'src' onto 'src/features'.
-    // Since 'src/features' is inside 'src', we intersect both.
-    // The fix should sort these so 'src/features' (longer id) is picked.
-    mockGetIntersectingNodes.mockReturnValue([srcGroup, featuresGroup]);
-
-    // Mock getInternalNode to return positions
     mockGetInternalNode.mockImplementation((id: string) => {
-        if (id === 'src') return srcGroup;
-        if (id === 'src/features') return featuresGroup;
-        return null;
+      if (id === 'src') return srcGroup;
+      if (id === 'src/features') return featuresGroup;
+      return null;
     });
 
     const draggedNode = {
-        id: 'node-1',
-        type: 'appNode',
-        parentId: 'src', // Currently in 'src'
-        position: { x: 50, y: 50 },
-        positionAbsolute: { x: 50, y: 50 },
-        data: { label: 'App.tsx' }
+      id: 'node-1',
+      type: 'appNode',
+      parentId: 'src',
+      position: { x: 50, y: 50 },
+      positionAbsolute: { x: 50, y: 50 },
+      data: { label: 'App.tsx' },
     } as Node;
 
-    // Invoke the handler
-    // We expect onNodeDragStop to be passed to ReactFlow
-    expect(capturedReactFlowProps.onNodeDragStop).toBeDefined();
+    return { reparentNodeMock, draggedNode };
+  };
 
+  it('reparents correctly even when the current parent group appears first in intersections', () => {
+    const { reparentNodeMock, draggedNode } = setupDragTest([srcGroup, featuresGroup]);
+
+    // Invoke the handler
+    expect(capturedReactFlowProps.onNodeDragStop).toBeDefined();
     capturedReactFlowProps.onNodeDragStop!(
         {} as React.MouseEvent,
         draggedNode
     );
 
-    // Assert:
-    // With fixed logic, it picks 'src/features' because it has longer ID.
+    // Assert: picking 'src/features' because it has longer ID.
     expect(reparentNodeMock).toHaveBeenCalledWith('node-1', 'src/features', expect.any(Object));
   });
 
   it('reparents correctly if the desired group appears first', () => {
-    const reparentNodeMock = vi.fn();
-
-    const mockState = createMockGraphState({
-      reparentNode: reparentNodeMock,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(storeModule.useGraphStore).mockReturnValue(mockState as any);
-
-    render(<DependencyGraph />);
-
-    const srcGroup = { id: 'src', type: 'groupNode', positionAbsolute: { x: 0, y: 0 } };
-    const featuresGroup = { id: 'src/features', type: 'groupNode', positionAbsolute: { x: 10, y: 10 } };
-
-    // Setup intersections: 'src/features' comes FIRST (good order)
-    mockGetIntersectingNodes.mockReturnValue([featuresGroup, srcGroup]);
-
-    mockGetInternalNode.mockImplementation((id: string) => {
-        if (id === 'src') return srcGroup;
-        if (id === 'src/features') return featuresGroup;
-        return null;
-    });
-
-    const draggedNode = {
-        id: 'node-1',
-        type: 'appNode',
-        parentId: 'src',
-        position: { x: 50, y: 50 },
-        positionAbsolute: { x: 50, y: 50 },
-        data: { label: 'App.tsx' }
-    } as Node;
+    const { reparentNodeMock, draggedNode } = setupDragTest([featuresGroup, srcGroup]);
 
     capturedReactFlowProps.onNodeDragStop!({} as React.MouseEvent, draggedNode);
 
