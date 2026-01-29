@@ -33,13 +33,14 @@ interface GraphState {
   // Metadata
   loading: boolean;
   isCalculatingMetrics: boolean;
+  metricsVersion: number;
   hideTypeDefinitions: boolean;
   layoutDirection: 'TB' | 'LR';
   activeFilters: ModuleCategory[];
 
   // Actions
   setGraphData: (data: ICruiseResult) => void;
-  calculateMetrics: () => Promise<void>;
+  calculateMetrics: (version?: number) => Promise<void>;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
   selectNode: (nodeId: string | null) => void;
   toggleTypeDefinitions: () => void;
@@ -59,13 +60,15 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   graph: null,
   loading: false,
   isCalculatingMetrics: false,
+  metricsVersion: 0,
   hideTypeDefinitions: true,
   layoutDirection: 'TB',
   activeFilters: [],
 
   setGraphData: (data: ICruiseResult) => {
-    const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
-    set({ loading: true });
+    const { hideTypeDefinitions, layoutDirection, activeFilters, metricsVersion } = get();
+    const newVersion = metricsVersion + 1;
+    set({ loading: true, metricsVersion: newVersion });
 
     // 1. Transform to Graphology
     const graph = createGraphFromCruiseResult(data);
@@ -85,19 +88,26 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     });
 
     // 4. Trigger Async Metrics Calculation
-    void get().calculateMetrics();
+    void get().calculateMetrics(newVersion);
   },
 
-  calculateMetrics: async () => {
+  calculateMetrics: async (version?: number) => {
+    const targetVersion = version ?? get().metricsVersion;
     const { graph } = get();
     if (!graph) return;
 
+    // Early exit if a newer calculation has already started
+    if (get().metricsVersion !== targetVersion) return;
+
     set({ isCalculatingMetrics: true });
-    // console.log("Starting metrics calculation..."); // Optional log
 
     try {
       // Run the heavy calculation (simulated or real)
       await calculateGraphMetrics(graph);
+
+      // Abort if a newer calculation has started while we were awaiting
+      if (get().metricsVersion !== targetVersion) return;
+
       console.log("Metrics calculation complete");
 
       // Sync results back to React Flow nodes
@@ -126,7 +136,10 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     } catch (error) {
       console.error("Failed to calculate metrics:", error);
     } finally {
-      set({ isCalculatingMetrics: false });
+      // Only reset loading state if this is still the current calculation
+      if (get().metricsVersion === targetVersion) {
+        set({ isCalculatingMetrics: false });
+      }
     }
   },
 
