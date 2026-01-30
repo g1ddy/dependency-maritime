@@ -81,6 +81,8 @@ describe('DependencyGraph Drag Logic', () => {
     type: 'groupNode',
     position: { x: 0, y: 0 },
     positionAbsolute: { x: 0, y: 0 },
+    width: 200,
+    height: 200,
     data: {},
   } as Node;
   const featuresGroup = {
@@ -88,6 +90,8 @@ describe('DependencyGraph Drag Logic', () => {
     type: 'groupNode',
     position: { x: 10, y: 10 },
     positionAbsolute: { x: 10, y: 10 },
+    width: 150,
+    height: 150,
     data: {},
   } as Node;
 
@@ -124,8 +128,18 @@ describe('DependencyGraph Drag Logic', () => {
       parentId: 'src',
       position: { x: 50, y: 50 },
       positionAbsolute: { x: 50, y: 50 },
+      width: 50,
+      height: 20,
       data: { label: 'App.tsx' },
     } as Node;
+
+    // Update mock to return dragged node too
+    mockGetInternalNode.mockImplementation((id: string) => {
+        if (id === 'src') return srcGroup;
+        if (id === 'src/features') return featuresGroup;
+        if (id === 'node-1') return draggedNode;
+        return null;
+    });
 
     return { reparentNodeMock, draggedNode };
   };
@@ -151,5 +165,32 @@ describe('DependencyGraph Drag Logic', () => {
 
     // It should pick 'src/features'
     expect(reparentNodeMock).toHaveBeenCalledWith('node-1', 'src/features', expect.any(Object));
+  });
+
+  it('reparents to root (undefined) when dragged outside of all groups', () => {
+    const { reparentNodeMock, draggedNode } = setupDragTest([srcGroup]); // Originally intersecting src
+
+    // Move node far away
+    const movedNode = {
+      ...draggedNode,
+      positionAbsolute: { x: 500, y: 500 },
+    };
+
+    // Update mock to return new position for the dragged node
+    mockGetInternalNode.mockImplementation((id: string) => {
+        if (id === 'src') return srcGroup;
+        if (id === 'src/features') return featuresGroup;
+        if (id === 'node-1') return movedNode;
+        return null;
+    });
+
+    // Simulate React Flow still reporting intersection (React Flow might be loose or slow to update)
+    // BUT our geometry check should reject it.
+    mockGetIntersectingNodes.mockReturnValue([srcGroup]);
+
+    capturedReactFlowProps.onNodeDragStop!({} as React.MouseEvent, movedNode);
+
+    // Expect reparent to undefined
+    expect(reparentNodeMock).toHaveBeenCalledWith('node-1', undefined, expect.any(Object));
   });
 });

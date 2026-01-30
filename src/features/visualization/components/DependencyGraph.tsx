@@ -10,6 +10,7 @@ import { CruiseResultSchema } from '@/schema/dependency-cruiser';
 import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
 import { type CustomNode, type AppNodeData } from '../types';
+import { isNodeCenterInside } from '../logic/geometry';
 
 const MINI_MAP_NODE_COLORS = {
   EXTERNAL: '#f59e0b', // amber-500
@@ -53,48 +54,58 @@ export function DependencyGraph() {
 
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
+      // Get the accurate position of the node (after drag)
+      const internalNode = getInternalNode(node.id);
+
+      // If we can't find the internal node, we can't reliably calculate geometry
+      if (!internalNode) return;
+
+      const nodeAbs = internalNode.positionAbsolute;
+      if (!nodeAbs) return;
+
       // Find intersecting nodes that are groups
       const intersections = getIntersectingNodes(node).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
       );
 
+      // Filter intersections based on geometry (Center Inside)
+      // We need to fetch the internal node for each group to get its dimensions/positionAbsolute
+      const validGroups = intersections.filter((group) => {
+        const internalGroup = getInternalNode(group.id);
+        if (!internalGroup) return false;
+        return isNodeCenterInside(internalNode, internalGroup);
+      });
+
       // Sort intersections to find the most specific group (deepest path/longest ID)
-      intersections.sort((a, b) => b.id.length - a.id.length);
+      validGroups.sort((a, b) => b.id.length - a.id.length);
 
-      const group = intersections[0] as CustomNode | undefined;
+      const targetGroup = validGroups[0] as CustomNode | undefined;
 
-      // Get the accurate position of the node (after drag)
-      // We rely on getInternalNode to ensure we have the latest positionAbsolute
-      // falling back to the passed node's positionAbsolute
-      // Use standard Node type but cast to CustomNode for legacy property access if needed,
-      // though internal nodes usually have positionAbsolute.
-      // We cast to CustomNode to satisfy TypeScript if the basic Node type is missing it in this version.
-      const internalNode = getInternalNode(node.id) as CustomNode | undefined;
-      const nodeAbs = internalNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
-
-      // If dropped on a group
-      if (group) {
+      // If dropped on a valid group
+      if (targetGroup) {
         // Only update if parent is different
-        if (group.id !== node.parentId) {
-          // Get the most up-to-date absolute position of the group
-          const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
-          const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
+        // We trigger this even if it's the SAME parent to correct the relative position
+        // if the store logic requires it, but usually we care about reparenting.
+        // However, if we drag inside the same parent, React Flow handles position updates.
+        // We only need to call reparentNode if the parent CHANGED.
+        if (targetGroup.id !== node.parentId) {
+          const internalGroup = getInternalNode(targetGroup.id) as CustomNode | undefined;
+          const groupAbs = internalGroup?.positionAbsolute || targetGroup.positionAbsolute;
 
-          if (nodeAbs && groupAbs) {
+          if (groupAbs) {
             const relativeX = nodeAbs.x - groupAbs.x;
             const relativeY = nodeAbs.y - groupAbs.y;
-            reparentNode(node.id, group.id, { x: relativeX, y: relativeY });
+            reparentNode(node.id, targetGroup.id, { x: relativeX, y: relativeY });
           }
         }
       } else {
-        // Dropped on canvas (no group)
+        // Dropped on canvas (no valid group found)
+        // If the node currently has a parent, it means we dragged it OUT.
         if (node.parentId) {
-          if (nodeAbs) {
-            reparentNode(node.id, undefined, {
-              x: nodeAbs.x,
-              y: nodeAbs.y,
-            });
-          }
+          reparentNode(node.id, undefined, {
+            x: nodeAbs.x,
+            y: nodeAbs.y,
+          });
         }
       }
     },
