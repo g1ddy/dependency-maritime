@@ -30,7 +30,8 @@ Easily upload your own `dependency-cruiser` JSON output to visualize your codeba
 *   **Deep Inspection:** Click any node to see its full path, metrics, and direct neighbors.
 *   **Dependency Filtering:** Toggle between "Product" and "Test" code (planned) or specific folders.
 *   **Isolate Modules:** Focus on specific sub-graphs to declutter the view.
-*   **Metrics (Phase 2):** Analyze instability, centrality, and now **Cyclomatic Complexity & Lines of Code (LOC)**.
+*   **Metrics (Phase 2):** Analyze instability, centrality, and **Cyclomatic Complexity & Lines of Code (LOC)**.
+*   **Compound Health Score:** Automatically assesses node health (Healthy, Warning, Unhealthy) based on a compound formula combining LOC, Complexity, Fan-Out, and Instability.
 *   **100% Client-Side:** Your code structure is analyzed locally; no data leaves your machine.
 
 ## 🛠 Installation
@@ -78,6 +79,19 @@ To view Cyclomatic Complexity and LOC in the Node Inspector, generate a metrics 
 ```
 
 Place this file at `config/complexity-metrics.json` to have it automatically loaded when selecting "Project Graph".
+
+#### Compound Score & Health Status
+The application calculates a **Compound Complexity Score** for each node to determine its health status:
+
+**Formula:**
+`Score = (LOC / 10) + (Complexity * 2) + (FanOut * 2) + (Instability * 20)`
+
+**Health Thresholds:**
+*   🟢 **Healthy:** Score < 20
+*   🟡 **Warning:** Score between 20 and 50
+*   🔴 **Unhealthy:** Score > 50
+
+Nodes will visually reflect their status with colored borders and backgrounds.
 
 ### 2. Loading Data
 1.  Open **Dependency Maritime** in your browser (default: `http://localhost:5173`).
