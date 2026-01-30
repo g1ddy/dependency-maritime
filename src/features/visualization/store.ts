@@ -14,7 +14,7 @@ import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
 import { applyDagreLayout } from './logic/layout';
 import { type ModuleCategory } from './logic/filters';
-import { calculateGraphMetrics } from './logic/metrics';
+import { calculateGraphMetrics, getHealthStatus } from './logic/metrics';
 import { type AppNodeData, type GroupNodeData, type ComplexityMetricsMap } from './types';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
@@ -153,12 +153,9 @@ export const useGraphStore = create<GraphState>((set, get) => ({
           const metrics = folderMetrics[node.id];
 
           // Determine health status based on compound score
-          let healthStatus: 'healthy' | 'warning' | 'unhealthy' = 'healthy';
-          if (metrics?.compoundScore && metrics.compoundScore > 50) {
-            healthStatus = 'unhealthy';
-          } else if (metrics?.compoundScore && metrics.compoundScore >= 20) {
-            healthStatus = 'warning';
-          }
+          const healthStatus = metrics?.compoundScore !== undefined
+            ? getHealthStatus(metrics.compoundScore)
+            : 'healthy';
 
           return {
             ...node,

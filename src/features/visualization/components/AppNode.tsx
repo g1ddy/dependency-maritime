@@ -90,7 +90,11 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
   }
 
   // Calculate dynamic styles for Heatmap Modes
-  const dynamicStyle: React.CSSProperties = { ...debugColor ? { borderColor: debugColor } : {} };
+  const dynamicStyle: React.CSSProperties = {
+    ...(debugColor ? { borderColor: debugColor } : {}),
+    // Ensure consistent transition for smooth mode switching to prevent glitches
+    transition: 'all 0.3s ease'
+  };
 
   if (viewMode === 'instability') {
     // 0 (Stable) -> Green (120), 1 (Unstable) -> Red (0)
@@ -98,19 +102,8 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
     const color = `hsl(${hue}, 70%, 40%)`;
     const bgColor = `hsla(${hue}, 70%, 10%, 0.3)`;
 
-    // Override border and background
-    // We keep selection borders if selected (handled by CSS specificity/inline logic? Inline wins)
-    // If selected, we might want to keep the "Ring" but change the inner border.
-    // However, borderClass sets the border color.
-    // If we set inline borderColor, it overrides the class.
-
     dynamicStyle.borderColor = color;
     dynamicStyle.backgroundColor = bgColor;
-    // Add a transition for smooth mode switching
-    dynamicStyle.transition = 'all 0.3s ease';
-
-    // If selected, maybe add a box shadow manually? Or trust the ring class from Tailwind?
-    // Tailwind ring classes usually work independently of border-color.
   } else if (viewMode === 'centrality') {
     // Scale based on centrality.
     // Base 1.0. Max 1.5. Min 0.8.
@@ -119,8 +112,6 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
 
     dynamicStyle.transform = `scale(${scale})`;
     dynamicStyle.transformOrigin = 'center';
-    dynamicStyle.transition = 'transform 0.3s ease';
-    // Keep default colors
   }
 
   return (

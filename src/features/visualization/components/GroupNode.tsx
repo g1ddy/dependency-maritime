@@ -33,7 +33,6 @@ export const GroupNode = memo(({ data, selected }: GroupNodeProps) => {
         backgroundColor: bgColor,
         borderStyle: 'solid', // Make solid for heatmap visibility
         borderWidth: selected ? 3 : 2,
-        transition: 'all 0.3s ease'
       };
   }
 

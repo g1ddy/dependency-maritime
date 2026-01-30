@@ -2,6 +2,18 @@ import Graph from 'graphology';
 import pagerank from 'graphology-metrics/centrality/pagerank';
 import { type ComplexityMetricsMap, type GroupNodeData } from '../types';
 
+export const HEALTHY_THRESHOLD = 20;
+export const UNHEALTHY_THRESHOLD = 50;
+
+export function getHealthStatus(score: number): 'healthy' | 'warning' | 'unhealthy' {
+  if (score > UNHEALTHY_THRESHOLD) {
+    return 'unhealthy';
+  } else if (score >= HEALTHY_THRESHOLD) {
+    return 'warning';
+  }
+  return 'healthy';
+}
+
 interface FolderAggregation {
   count: number;
   totalInstability: number;
@@ -80,12 +92,7 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
     const compoundScore = Math.round(rawScore * 10) / 10;
 
     // Health Status
-    let healthStatus: 'healthy' | 'warning' | 'unhealthy' = 'healthy';
-    if (compoundScore > 50) {
-      healthStatus = 'unhealthy';
-    } else if (compoundScore >= 20) {
-      healthStatus = 'warning';
-    }
+    const healthStatus = getHealthStatus(compoundScore);
 
     const centrality = centralities[nodeId] || 0;
 
