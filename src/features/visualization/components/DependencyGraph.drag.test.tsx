@@ -152,4 +152,16 @@ describe('DependencyGraph Drag Logic', () => {
     // It should pick 'src/features'
     expect(reparentNodeMock).toHaveBeenCalledWith('node-1', 'src/features', expect.any(Object));
   });
+
+  it('unparents (moves to root) when dropped on canvas (no intersections)', () => {
+    // Setup with empty intersections
+    const { reparentNodeMock, draggedNode } = setupDragTest([]);
+
+    // The dragged node has parentId='src' and positionAbsolute={ x: 50, y: 50 }
+    // We expect it to be reparented to undefined with position { x: 50, y: 50 }
+
+    capturedReactFlowProps.onNodeDragStop!({} as React.MouseEvent, draggedNode);
+
+    expect(reparentNodeMock).toHaveBeenCalledWith('node-1', undefined, { x: 50, y: 50 });
+  });
 });
