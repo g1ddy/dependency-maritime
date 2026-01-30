@@ -53,8 +53,16 @@ export function DependencyGraph() {
 
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      // Find intersecting nodes that are groups
-      const intersections = getIntersectingNodes(node).filter(
+      // Get the accurate position of the node (after drag)
+      // We rely on getInternalNode to ensure we have the latest positionAbsolute
+      const internalNode = getInternalNode(node.id) as CustomNode | undefined;
+      const targetNode = (internalNode || node);
+      const nodeAbs = internalNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
+
+      if (!nodeAbs) return;
+
+      // Find intersecting nodes that are groups using the updated node
+      const intersections = getIntersectingNodes(targetNode).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
       );
 
@@ -62,25 +70,17 @@ export function DependencyGraph() {
       intersections.sort((a, b) => b.id.length - a.id.length);
 
       const group = intersections[0] as CustomNode | undefined;
-
-      // Get the accurate position of the node (after drag)
-      // We rely on getInternalNode to ensure we have the latest positionAbsolute
-      // falling back to the passed node's positionAbsolute
-      // Use standard Node type but cast to CustomNode for legacy property access if needed,
-      // though internal nodes usually have positionAbsolute.
-      // We cast to CustomNode to satisfy TypeScript if the basic Node type is missing it in this version.
-      const internalNode = getInternalNode(node.id) as CustomNode | undefined;
-      const nodeAbs = internalNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
+      const currentParentId = targetNode.parentId || node.parentId;
 
       // If dropped on a group
       if (group) {
         // Only update if parent is different
-        if (group.id !== node.parentId) {
+        if (group.id !== currentParentId) {
           // Get the most up-to-date absolute position of the group
           const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
           const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
 
-          if (nodeAbs && groupAbs) {
+          if (groupAbs) {
             const relativeX = nodeAbs.x - groupAbs.x;
             const relativeY = nodeAbs.y - groupAbs.y;
             reparentNode(node.id, group.id, { x: relativeX, y: relativeY });
@@ -88,13 +88,11 @@ export function DependencyGraph() {
         }
       } else {
         // Dropped on canvas (no group)
-        if (node.parentId) {
-          if (nodeAbs) {
-            reparentNode(node.id, undefined, {
-              x: nodeAbs.x,
-              y: nodeAbs.y,
-            });
-          }
+        if (currentParentId) {
+          reparentNode(node.id, undefined, {
+            x: nodeAbs.x,
+            y: nodeAbs.y,
+          });
         }
       }
     },
