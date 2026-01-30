@@ -13,7 +13,10 @@ export interface AppNodeData extends Record<string, unknown> {
     centrality?: number;
     cyclomaticComplexity?: number;
     loc?: number;
+    compoundScore?: number;
   };
+
+  healthStatus?: 'healthy' | 'warning' | 'unhealthy';
 
   // Debug visualization for async processing
   debugColor?: string;

@@ -39,6 +39,26 @@ export function GraphOverlay() {
     [selectedNodeId, nodes]
   );
 
+  const { scoreDisplay, statusConfig } = useMemo(() => {
+    if (!selectedNode) return { scoreDisplay: 'N/A', statusConfig: { label: 'Unknown', color: 'text-muted-foreground', dot: 'bg-muted-foreground' } };
+
+    const score = selectedNode.data.metrics?.compoundScore;
+    const status = selectedNode.data.healthStatus;
+
+    let config;
+    switch (status) {
+      case 'healthy': config = { label: 'Healthy', color: 'text-green-500', dot: 'bg-green-500' }; break;
+      case 'warning': config = { label: 'Warning', color: 'text-yellow-500', dot: 'bg-yellow-500' }; break;
+      case 'unhealthy': config = { label: 'Unhealthy', color: 'text-red-500', dot: 'bg-red-500' }; break;
+      default: config = { label: 'Unknown', color: 'text-muted-foreground', dot: 'bg-muted-foreground' };
+    }
+
+    return {
+      scoreDisplay: score !== undefined ? score.toFixed(1) : 'N/A',
+      statusConfig: config
+    };
+  }, [selectedNode]);
+
   const getFilterButtonClass = (isActive: boolean) =>
     cn(
       "gap-2 shadow-md transition-colors",
@@ -125,9 +145,9 @@ export function GraphOverlay() {
                 </p>
               </div>
               <div className="ml-auto text-right whitespace-nowrap">
-                <div className="text-sm font-bold">N/A LOC</div>
-                <div className="text-xs text-green-500 flex items-center gap-1 justify-end">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Healthy
+                <div className="text-sm font-bold" title="Compound Complexity Score">{scoreDisplay} Score</div>
+                <div className={`text-xs ${statusConfig.color} flex items-center gap-1 justify-end`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${statusConfig.dot}`} /> {statusConfig.label}
                 </div>
               </div>
             </div>
