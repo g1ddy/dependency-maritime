@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { useGraphStore } from "../store"
 import { cn } from "@/lib/utils"
 import { type ModuleCategory } from "../logic/filters"
+import { type AppNodeData } from "../types"
 
 type FilterConfig = {
   key: ModuleCategory | 'all';
@@ -42,8 +43,9 @@ export function GraphOverlay() {
   const { scoreDisplay, statusConfig } = useMemo(() => {
     if (!selectedNode) return { scoreDisplay: 'N/A', statusConfig: { label: 'Unknown', color: 'text-muted-foreground', dot: 'bg-muted-foreground' } };
 
-    const score = selectedNode.data.metrics?.compoundScore;
-    const status = selectedNode.data.healthStatus;
+    const data = selectedNode.data as AppNodeData;
+    const score = data.metrics?.compoundScore;
+    const status = data.healthStatus;
 
     let config;
     switch (status) {
