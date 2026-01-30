@@ -23,6 +23,14 @@ const FILTERS: FilterConfig[] = [
   { key: 'util', label: 'Util', icon: Hammer },
 ];
 
+// Status configuration map for GraphOverlay
+const STATUS_CONFIG = {
+  healthy: { label: 'Healthy', color: 'text-green-500', dot: 'bg-green-500' },
+  warning: { label: 'Warning', color: 'text-yellow-500', dot: 'bg-yellow-500' },
+  unhealthy: { label: 'Unhealthy', color: 'text-red-500', dot: 'bg-red-500' },
+  default: { label: 'Unknown', color: 'text-muted-foreground', dot: 'bg-muted-foreground' }
+};
+
 export function GraphOverlay() {
   const {
     selectedNodeId,
@@ -41,19 +49,12 @@ export function GraphOverlay() {
   );
 
   const { scoreDisplay, statusConfig } = useMemo(() => {
-    if (!selectedNode) return { scoreDisplay: 'N/A', statusConfig: { label: 'Unknown', color: 'text-muted-foreground', dot: 'bg-muted-foreground' } };
+    if (!selectedNode) return { scoreDisplay: 'N/A', statusConfig: STATUS_CONFIG.default };
 
     const data = selectedNode.data as AppNodeData;
     const score = data.metrics?.compoundScore;
-    const status = data.healthStatus;
-
-    let config;
-    switch (status) {
-      case 'healthy': config = { label: 'Healthy', color: 'text-green-500', dot: 'bg-green-500' }; break;
-      case 'warning': config = { label: 'Warning', color: 'text-yellow-500', dot: 'bg-yellow-500' }; break;
-      case 'unhealthy': config = { label: 'Unhealthy', color: 'text-red-500', dot: 'bg-red-500' }; break;
-      default: config = { label: 'Unknown', color: 'text-muted-foreground', dot: 'bg-muted-foreground' };
-    }
+    const status = data.healthStatus || 'default';
+    const config = STATUS_CONFIG[status] || STATUS_CONFIG.default;
 
     return {
       scoreDisplay: score !== undefined ? score.toFixed(1) : 'N/A',
