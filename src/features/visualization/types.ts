@@ -12,6 +12,7 @@ export interface AppNodeData extends Record<string, unknown> {
     instability?: number;
     centrality?: number;
     cyclomaticComplexity?: number;
+    loc?: number;
   };
 
   // Debug visualization for async processing
@@ -29,3 +30,13 @@ export type CustomNode = Node & {
   positionAbsolute?: { x: number; y: number };
   data: AppNodeData | GroupNodeData;
 };
+
+export interface ComplexityMetric {
+  complexity: number;
+  loc: number;
+  instability?: number;
+  fanIn?: number;
+  fanOut?: number;
+}
+
+export type ComplexityMetricsMap = Record<string, ComplexityMetric>;

@@ -1,12 +1,14 @@
 import Graph from 'graphology';
 import pagerank from 'graphology-metrics/centrality/pagerank';
+import { type ComplexityMetricsMap } from '../types';
 
 /**
  * Calculates graph metrics for Phase 2: The Inspector.
  * - Instability: Ce / (Ca + Ce)
  * - Centrality: PageRank
+ * - Complexity: Cyclomatic Complexity & LOC (from external source)
  */
-export function calculateGraphMetrics(graph: Graph): void {
+export function calculateGraphMetrics(graph: Graph, complexityMetrics?: ComplexityMetricsMap | null): void {
   // 1. Centrality (PageRank)
   // We run this first as it calculates for the whole graph
   const centralities = pagerank(graph);
@@ -29,11 +31,22 @@ export function calculateGraphMetrics(graph: Graph): void {
       instability = fanOut / totalCoupling;
     }
 
+    // Retrieve Complexity Data if available
+    // The nodeId (file path) should match the keys in complexityMetrics
+    let cyclomaticComplexity: number | undefined;
+    let loc: number | undefined;
+
+    if (complexityMetrics && complexityMetrics[nodeId]) {
+      cyclomaticComplexity = complexityMetrics[nodeId].complexity || 0;
+      loc = complexityMetrics[nodeId].loc || 0;
+    }
+
     // Prepare Metrics Object
     const metrics = {
       instability: Math.round(instability * 100) / 100,
       centrality: Math.round((centralities[nodeId] || 0) * 10000) / 10000,
-      cyclomaticComplexity: 0 // Not available in current schema, placeholder.
+      cyclomaticComplexity,
+      loc
     };
 
     // Update Graph Attributes

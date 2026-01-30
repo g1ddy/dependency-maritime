@@ -30,7 +30,7 @@ Easily upload your own `dependency-cruiser` JSON output to visualize your codeba
 *   **Deep Inspection:** Click any node to see its full path, metrics, and direct neighbors.
 *   **Dependency Filtering:** Toggle between "Product" and "Test" code (planned) or specific folders.
 *   **Isolate Modules:** Focus on specific sub-graphs to declutter the view.
-*   **Metrics (Phase 2):** Analyze instability, centrality, and complexity metrics.
+*   **Metrics (Phase 2):** Analyze instability, centrality, and now **Cyclomatic Complexity & Lines of Code (LOC)**.
 *   **100% Client-Side:** Your code structure is analyzed locally; no data leaves your machine.
 
 ## 🛠 Installation
@@ -66,6 +66,18 @@ npx dependency-cruiser src \
 ```
 
 *Adjust the `src` and `--include-only` patterns to match your project structure.*
+
+#### Integrating Complexity Metrics (Optional)
+To view Cyclomatic Complexity and LOC in the Node Inspector, generate a metrics file using the provided script (if available in your project) or construct a JSON map matching the schema:
+
+```json
+{
+  "src/App.tsx": { "complexity": 5, "loc": 120 },
+  "src/utils.ts": { "complexity": 2, "loc": 45 }
+}
+```
+
+Place this file at `config/complexity-metrics.json` to have it automatically loaded when selecting "Project Graph".
 
 ### 2. Loading Data
 1.  Open **Dependency Maritime** in your browser (default: `http://localhost:5173`).
