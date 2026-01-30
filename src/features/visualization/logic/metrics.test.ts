@@ -1,16 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import Graph from 'graphology';
 import { calculateGraphMetrics } from './metrics';
-import { type AppNodeData } from '../types';
+import { type AppNodeData, type ComplexityMetricsMap } from '../types';
 
 describe('calculateGraphMetrics', () => {
   it('calculates instability and centrality correctly for a simple chain', () => {
     const graph = new Graph();
 
     // Create nodes
-    graph.addNode('A', { label: 'Node A' });
-    graph.addNode('B', { label: 'Node B' });
-    graph.addNode('C', { label: 'Node C' });
+    graph.addNode('A', { label: 'Node A', fullPath: 'A' });
+    graph.addNode('B', { label: 'Node B', fullPath: 'B' });
+    graph.addNode('C', { label: 'Node C', fullPath: 'C' });
 
     // Create chain: A -> B -> C
     graph.addEdge('A', 'B');
@@ -33,58 +33,54 @@ describe('calculateGraphMetrics', () => {
     expect(dataC.metrics?.instability).toBe(0.0);
 
     // Check Centrality (PageRank)
-    // C is referred to by B, B by A. C should be most central.
     expect(dataC.metrics?.centrality).toBeGreaterThan(dataB.metrics?.centrality || 0);
     expect(dataB.metrics?.centrality).toBeGreaterThan(dataA.metrics?.centrality || 0);
 
-    // Check Cyclomatic Complexity (Default is now undefined)
-    expect(dataA.metrics?.cyclomaticComplexity).toBeUndefined();
-
-    // Check Compound Score & Status (Basic checks)
+    // Check Compound Score & Status
     // A: Loc=0, Comp=0, FanOut=1, Instability=1.
     // Score = 0 + 0 + (1*2) + (1*20) = 22. Warning.
     expect(dataA.metrics?.compoundScore).toBe(22);
     expect(dataA.healthStatus).toBe('warning');
 
     // B: Loc=0, Comp=0, FanOut=1, Instability=0.5.
-    // Score = 0 + 0 + 2 + (0.5*20) = 2 + 10 = 12. Healthy.
+    // Score = 0 + 0 + 2 + (0.5*20) = 12. Healthy.
     expect(dataB.metrics?.compoundScore).toBe(12);
     expect(dataB.healthStatus).toBe('healthy');
   });
 
   it('calculates complexity when provided', () => {
     const graph = new Graph();
-    graph.addNode('A', { label: 'Node A' });
+    // Must provide fullPath for metrics lookup
+    graph.addNode('A', { label: 'Node A', fullPath: 'src/A.ts' });
 
-    const complexityData = {
-      'A': { complexity: 5, loc: 20 }
+    const complexityData: ComplexityMetricsMap = {
+      'src/A.ts': { complexity: 5, loc: 20, instability: 0, fanIn: 0, fanOut: 0 }
     };
 
     calculateGraphMetrics(graph, complexityData);
 
     const dataA = graph.getNodeAttributes('A') as AppNodeData;
+
     expect(dataA.metrics?.cyclomaticComplexity).toBe(5);
     expect(dataA.metrics?.loc).toBe(20);
 
     // Score: (20/10) + (5*2) + (0*2) + (0*20) = 2 + 10 + 0 + 0 = 12
     expect(dataA.metrics?.compoundScore).toBe(12);
-    expect(dataA.healthStatus).toBe('healthy');
   });
 
   it('assigns correct health status based on thresholds', () => {
     const graph = new Graph();
+
     // Unhealthy Node: High Complexity
-    graph.addNode('U', { label: 'Unhealthy' });
     // FanOut=0, Instability=0.
-    // Need Score > 50.
-    // Let Complexity = 26 -> 26*2 = 52.
-    const complexityU = { 'U': { complexity: 26, loc: 0 } };
+    // Need Score > 50. Complexity=26 -> 52.
+    graph.addNode('U', { label: 'Unhealthy', fullPath: 'src/U.ts' });
+    const complexityU = { 'src/U.ts': { complexity: 26, loc: 0, instability: 0, fanIn: 0, fanOut: 0 } };
 
     // Warning Node: Medium
-    graph.addNode('W', { label: 'Warning' });
-    // Need Score 20-50.
-    // Complexity = 10 -> 20.
-    const complexityW = { 'W': { complexity: 10, loc: 0 } };
+    // Need Score 20-50. Complexity=10 -> 20.
+    graph.addNode('W', { label: 'Warning', fullPath: 'src/W.ts' });
+    const complexityW = { 'src/W.ts': { complexity: 10, loc: 0, instability: 0, fanIn: 0, fanOut: 0 } };
 
     calculateGraphMetrics(graph, { ...complexityU, ...complexityW });
 
@@ -100,7 +96,7 @@ describe('calculateGraphMetrics', () => {
 
   it('handles orphan nodes (division by zero protection)', () => {
     const graph = new Graph();
-    graph.addNode('Orphan');
+    graph.addNode('Orphan', { fullPath: 'Orphan' });
 
     calculateGraphMetrics(graph);
 

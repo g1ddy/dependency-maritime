@@ -15,10 +15,12 @@ import { createGraphFromCruiseResult, transformToReactFlow } from './logic/trans
 import { applyDagreLayout } from './logic/layout';
 import { type ModuleCategory } from './logic/filters';
 import { calculateGraphMetrics } from './logic/metrics';
-import { type AppNodeData, type ComplexityMetricsMap } from './types';
+import { type AppNodeData, type GroupNodeData, type ComplexityMetricsMap } from './types';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
+
+export type ViewMode = 'standard' | 'instability' | 'centrality';
 
 interface GraphState {
   // React Flow State
@@ -39,6 +41,7 @@ interface GraphState {
   activeFilters: ModuleCategory[];
   isInspectorOpen: boolean;
   rawComplexityMetrics: ComplexityMetricsMap | null;
+  viewMode: ViewMode;
 
   // Actions
   setInspectorOpen: (isOpen: boolean) => void;
@@ -48,6 +51,7 @@ interface GraphState {
   selectNode: (nodeId: string | null) => void;
   toggleTypeDefinitions: () => void;
   setFilter: (filter: ModuleCategory | 'all') => void;
+  setViewMode: (mode: ViewMode) => void;
   reset: () => void;
   reparentNode: (nodeId: string, newParentId: string | undefined, newPosition: { x: number; y: number }) => void;
 
@@ -69,9 +73,14 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   activeFilters: [],
   isInspectorOpen: false,
   rawComplexityMetrics: null,
+  viewMode: 'standard',
 
   setInspectorOpen: (isOpen: boolean) => {
     set({ isInspectorOpen: isOpen });
+  },
+
+  setViewMode: (mode: ViewMode) => {
+    set({ viewMode: mode });
   },
 
   setGraphData: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => {
@@ -115,7 +124,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     set({ isCalculatingMetrics: true });
 
     try {
-      calculateGraphMetrics(graph, rawComplexityMetrics);
+      const folderMetrics = calculateGraphMetrics(graph, rawComplexityMetrics);
 
       // Abort if a newer calculation has started while we were awaiting
       if (get().metricsVersion !== targetVersion) return;
@@ -126,6 +135,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
       const currentNodes = get().nodes;
       const updatedNodes = currentNodes.map((node) => {
         if (graph.hasNode(node.id)) {
+          // This is a file node
           // Cast attributes to AppNodeData partial since Graphology returns Record<string, any>
           const attributes = graph.getNodeAttributes(node.id) as Partial<AppNodeData>;
           return {
@@ -137,6 +147,26 @@ export const useGraphStore = create<GraphState>((set, get) => ({
               healthStatus: attributes.healthStatus,
               debugColor: attributes.debugColor
             } as AppNodeData
+          };
+        } else if (node.type === 'groupNode' && folderMetrics[node.id]) {
+          // This is a group node with calculated metrics
+          const metrics = folderMetrics[node.id];
+
+          // Determine health status based on compound score
+          let healthStatus: 'healthy' | 'warning' | 'unhealthy' = 'healthy';
+          if (metrics.compoundScore && metrics.compoundScore > 50) {
+            healthStatus = 'unhealthy';
+          } else if (metrics.compoundScore && metrics.compoundScore >= 20) {
+            healthStatus = 'warning';
+          }
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              metrics,
+              healthStatus
+            } as GroupNodeData
           };
         }
         return node;

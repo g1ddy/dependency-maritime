@@ -24,6 +24,17 @@ export interface AppNodeData extends Record<string, unknown> {
 
 export interface GroupNodeData extends Record<string, unknown> {
   label: string;
+
+  // Phase 2: Aggregated Metrics
+  metrics?: {
+    instability?: number;
+    centrality?: number;
+    cyclomaticComplexity?: number; // Sum
+    loc?: number; // Sum
+    compoundScore?: number; // Average
+  };
+
+  healthStatus?: 'healthy' | 'warning' | 'unhealthy';
 }
 
 // React Flow's Node type might not expose positionAbsolute in all versions or it might be optional.

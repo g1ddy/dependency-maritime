@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { AppWindow, FileCode, Package, File } from 'lucide-react';
 import { type AppNodeData } from '../types';
+import { useGraphStore } from '../store';
 
 type AppNodeProps = NodeProps<Node<AppNodeData>>;
 
@@ -50,6 +51,8 @@ const STATUS_STYLES = {
 };
 
 export const AppNode = memo(({ data, selected }: AppNodeProps) => {
+  const viewMode = useGraphStore((s) => s.viewMode);
+
   const label = data.label || 'unknown';
   const isExternal = !!data.external;
 
@@ -58,6 +61,10 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
   const isDimmed = !!data.dimmed;
   const debugColor = data.debugColor;
   const healthStatus = data.healthStatus || 'default';
+
+  // Metrics
+  const instability = data.metrics?.instability ?? 0;
+  const centrality = data.metrics?.centrality ?? 0;
 
   // Determine icon based on file extension or type
   let Icon = File;
@@ -71,19 +78,50 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
 
   const styles = STATUS_STYLES[healthStatus] || STATUS_STYLES.default;
 
-  // Determine styles
+  // Determine base classes
   const opacityClass = isDimmed ? 'opacity-20 grayscale' : 'opacity-100';
-
   let borderClass = styles.border;
+
+  // Selection overrides
   if (selected) {
     borderClass = styles.selected;
   } else if (isHighlighted) {
     borderClass = styles.highlighted;
   }
 
-  // If debugColor is present (after async processing), we override the border color
-  // to prove the update happened.
-  const debugStyle = debugColor ? { borderColor: debugColor } : {};
+  // Calculate dynamic styles for Heatmap Modes
+  let dynamicStyle: React.CSSProperties = { ...debugColor ? { borderColor: debugColor } : {} };
+
+  if (viewMode === 'instability') {
+    // 0 (Stable) -> Green (120), 1 (Unstable) -> Red (0)
+    const hue = Math.max(0, Math.min(120, (1 - instability) * 120));
+    const color = `hsl(${hue}, 70%, 40%)`;
+    const bgColor = `hsla(${hue}, 70%, 10%, 0.3)`;
+
+    // Override border and background
+    // We keep selection borders if selected (handled by CSS specificity/inline logic? Inline wins)
+    // If selected, we might want to keep the "Ring" but change the inner border.
+    // However, borderClass sets the border color.
+    // If we set inline borderColor, it overrides the class.
+
+    dynamicStyle.borderColor = color;
+    dynamicStyle.backgroundColor = bgColor;
+    // Add a transition for smooth mode switching
+    dynamicStyle.transition = 'all 0.3s ease';
+
+    // If selected, maybe add a box shadow manually? Or trust the ring class from Tailwind?
+    // Tailwind ring classes usually work independently of border-color.
+  } else if (viewMode === 'centrality') {
+    // Scale based on centrality.
+    // Base 1.0. Max 1.5. Min 0.8.
+    // Assuming centrality range [0, 0.05] effectively.
+    const scale = Math.min(1.8, Math.max(0.7, 1 + (centrality * 20)));
+
+    dynamicStyle.transform = `scale(${scale})`;
+    dynamicStyle.transformOrigin = 'center';
+    dynamicStyle.transition = 'transform 0.3s ease';
+    // Keep default colors
+  }
 
   return (
     <div
@@ -91,12 +129,12 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
       className={`
         border backdrop-blur px-4 py-2 rounded-lg flex items-center gap-2
         transition-all duration-200
-        ${styles.bg}
-        ${styles.shadow}
+        ${viewMode === 'standard' ? styles.bg : ''}
+        ${viewMode === 'standard' ? styles.shadow : ''}
         ${opacityClass}
         ${borderClass}
       `}
-      style={debugStyle}
+      style={dynamicStyle}
     >
       <Handle type="target" position={Position.Top} className={`${styles.handle} !w-2 !h-2`} />
 
