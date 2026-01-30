@@ -41,18 +41,36 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
       loc = complexityMetrics[nodeId].loc || 0;
     }
 
+    // Compound Score Calculation
+    // (LOC / 10) + (Complexity * 2) + (FanOut * 2) + (Instability * 20)
+    const effectiveLoc = loc || 0;
+    const effectiveComplexity = cyclomaticComplexity || 0;
+
+    const rawScore = (effectiveLoc / 10) + (effectiveComplexity * 2) + (fanOut * 2) + (instability * 20);
+    const compoundScore = Math.round(rawScore * 10) / 10;
+
+    // Health Status
+    let healthStatus: 'healthy' | 'warning' | 'unhealthy' = 'healthy';
+    if (compoundScore > 50) {
+      healthStatus = 'unhealthy';
+    } else if (compoundScore >= 20) {
+      healthStatus = 'warning';
+    }
+
     // Prepare Metrics Object
     const metrics = {
       instability: Math.round(instability * 100) / 100,
       centrality: Math.round((centralities[nodeId] || 0) * 10000) / 10000,
       cyclomaticComplexity,
-      loc
+      loc,
+      compoundScore
     };
 
     // Update Graph Attributes
     // We preserve existing data and merge metrics
     graph.mergeNodeAttributes(nodeId, {
       metrics,
+      healthStatus
     });
   });
 }

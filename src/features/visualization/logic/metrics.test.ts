@@ -39,6 +39,17 @@ describe('calculateGraphMetrics', () => {
 
     // Check Cyclomatic Complexity (Default is now undefined)
     expect(dataA.metrics?.cyclomaticComplexity).toBeUndefined();
+
+    // Check Compound Score & Status (Basic checks)
+    // A: Loc=0, Comp=0, FanOut=1, Instability=1.
+    // Score = 0 + 0 + (1*2) + (1*20) = 22. Warning.
+    expect(dataA.metrics?.compoundScore).toBe(22);
+    expect(dataA.healthStatus).toBe('warning');
+
+    // B: Loc=0, Comp=0, FanOut=1, Instability=0.5.
+    // Score = 0 + 0 + 2 + (0.5*20) = 2 + 10 = 12. Healthy.
+    expect(dataB.metrics?.compoundScore).toBe(12);
+    expect(dataB.healthStatus).toBe('healthy');
   });
 
   it('calculates complexity when provided', () => {
@@ -54,6 +65,37 @@ describe('calculateGraphMetrics', () => {
     const dataA = graph.getNodeAttributes('A') as AppNodeData;
     expect(dataA.metrics?.cyclomaticComplexity).toBe(5);
     expect(dataA.metrics?.loc).toBe(20);
+
+    // Score: (20/10) + (5*2) + (0*2) + (0*20) = 2 + 10 + 0 + 0 = 12
+    expect(dataA.metrics?.compoundScore).toBe(12);
+    expect(dataA.healthStatus).toBe('healthy');
+  });
+
+  it('assigns correct health status based on thresholds', () => {
+    const graph = new Graph();
+    // Unhealthy Node: High Complexity
+    graph.addNode('U', { label: 'Unhealthy' });
+    // FanOut=0, Instability=0.
+    // Need Score > 50.
+    // Let Complexity = 26 -> 26*2 = 52.
+    const complexityU = { 'U': { complexity: 26, loc: 0 } };
+
+    // Warning Node: Medium
+    graph.addNode('W', { label: 'Warning' });
+    // Need Score 20-50.
+    // Complexity = 10 -> 20.
+    const complexityW = { 'W': { complexity: 10, loc: 0 } };
+
+    calculateGraphMetrics(graph, { ...complexityU, ...complexityW });
+
+    const dataU = graph.getNodeAttributes('U') as AppNodeData;
+    expect(dataU.metrics?.compoundScore).toBeGreaterThan(50);
+    expect(dataU.healthStatus).toBe('unhealthy');
+
+    const dataW = graph.getNodeAttributes('W') as AppNodeData;
+    expect(dataW.metrics?.compoundScore).toBeGreaterThanOrEqual(20);
+    expect(dataW.metrics?.compoundScore).toBeLessThanOrEqual(50);
+    expect(dataW.healthStatus).toBe('warning');
   });
 
   it('handles orphan nodes (division by zero protection)', () => {

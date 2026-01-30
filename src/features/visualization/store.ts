@@ -134,6 +134,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
               ...node.data,
               // Update specific fields we expect to change
               metrics: attributes.metrics,
+              healthStatus: attributes.healthStatus,
               debugColor: attributes.debugColor
             } as AppNodeData
           };
