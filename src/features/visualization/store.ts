@@ -154,9 +154,9 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
           // Determine health status based on compound score
           let healthStatus: 'healthy' | 'warning' | 'unhealthy' = 'healthy';
-          if (metrics.compoundScore && metrics.compoundScore > 50) {
+          if (metrics?.compoundScore && metrics.compoundScore > 50) {
             healthStatus = 'unhealthy';
-          } else if (metrics.compoundScore && metrics.compoundScore >= 20) {
+          } else if (metrics?.compoundScore && metrics.compoundScore >= 20) {
             healthStatus = 'warning';
           }
 
