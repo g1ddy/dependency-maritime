@@ -8,7 +8,6 @@ test.describe('Documentation Screenshots', () => {
     await page.waitForSelector('[data-testid^="node-"]', { timeout: 10000 });
     // Ensure we are fit to view
     await page.getByRole('button', { name: 'fit view' }).click();
-    await page.waitForTimeout(1000); // Allow animation to settle
   });
 
   test('dashboard view', async ({ page }) => {
@@ -28,7 +27,6 @@ test.describe('Documentation Screenshots', () => {
 
     // Wait for inspector to appear
     await expect(page.getByText('Metrics')).toBeVisible();
-    await page.waitForTimeout(500); // Allow panel animation
 
     await page.screenshot({ path: 'docs/images/screenshot-inspector.png', fullPage: true });
   });
@@ -39,7 +37,6 @@ test.describe('Documentation Screenshots', () => {
 
     // Wait for dialog
     await expect(page.getByText('Select Data Source')).toBeVisible();
-    await page.waitForTimeout(500);
 
     // Capture specifically the dialog area if possible, or the whole page with overlay
     // For docs, whole page with modal overlay is usually fine, or we can clip it.
