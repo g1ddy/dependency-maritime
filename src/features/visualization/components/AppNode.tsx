@@ -90,7 +90,7 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
   }
 
   // Calculate dynamic styles for Heatmap Modes
-  let dynamicStyle: React.CSSProperties = { ...debugColor ? { borderColor: debugColor } : {} };
+  const dynamicStyle: React.CSSProperties = { ...debugColor ? { borderColor: debugColor } : {} };
 
   if (viewMode === 'instability') {
     // 0 (Stable) -> Green (120), 1 (Unstable) -> Red (0)
