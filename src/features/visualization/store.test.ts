@@ -244,7 +244,7 @@ describe('Visualization Store', () => {
       expect(updatedNode?.parentId).toBe('src/features');
 
       // Verify Graphology update
-      const graphFullPath = state.graph?.getNodeAttribute(node.id, 'fullPath');
+      const graphFullPath = state.graph?.getNodeAttribute(node.id, 'fullPath') as string;
       expect(graphFullPath).toBe('src/features/A.ts');
     });
 
