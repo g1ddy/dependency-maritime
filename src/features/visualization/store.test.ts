@@ -213,4 +213,62 @@ describe('Visualization Store', () => {
       expect(useGraphStore.getState().hideTypeDefinitions).toBe(true);
     });
   });
+
+  describe('Simulation Mode', () => {
+    beforeEach(() => {
+      useGraphStore.getState().setGraphData(mockData);
+    });
+
+    it('should initialize simulation state correctly', () => {
+      const state = useGraphStore.getState();
+      expect(state.originalGraph).not.toBeNull();
+      expect(state.graph).not.toBeNull();
+      // They should be different instances (deep copy)
+      expect(state.originalGraph).not.toBe(state.graph);
+      expect(state.hasUnsavedChanges).toBe(false);
+    });
+
+    it('should track unsaved changes on reparent', () => {
+      const store = useGraphStore.getState();
+      const node = store.nodes.find(n => n.data.fullPath === 'src/A.ts');
+      if (!node) throw new Error('Node A not found');
+
+      // Move A.ts to src/features
+      store.reparentNode(node.id, 'src/features', { x: 100, y: 100 });
+
+      const state = useGraphStore.getState();
+      expect(state.hasUnsavedChanges).toBe(true);
+
+      const updatedNode = state.nodes.find(n => n.id === node.id);
+      expect(updatedNode?.data.fullPath).toBe('src/features/A.ts');
+      expect(updatedNode?.parentId).toBe('src/features');
+
+      // Verify Graphology update
+      const graphFullPath = state.graph?.getNodeAttribute(node.id, 'fullPath');
+      expect(graphFullPath).toBe('src/features/A.ts');
+    });
+
+    it('should reset simulation', () => {
+      const store = useGraphStore.getState();
+      const node = store.nodes.find(n => n.data.fullPath === 'src/A.ts');
+      if (!node) throw new Error('Node A not found');
+
+      // Make a change
+      store.reparentNode(node.id, 'src/features', { x: 100, y: 100 });
+      expect(useGraphStore.getState().hasUnsavedChanges).toBe(true);
+
+      // Reset
+      store.resetSimulation();
+
+      const state = useGraphStore.getState();
+      expect(state.hasUnsavedChanges).toBe(false);
+
+      const resetNode = state.nodes.find(n => n.id === node.id);
+      // Should revert to original path
+      expect(resetNode?.data.fullPath).toBe('src/A.ts');
+      // ParentId is derived from path in transformToReactFlow.
+      // src/A.ts -> parent is 'src'.
+      expect(resetNode?.parentId).toBe('src');
+    });
+  });
 });

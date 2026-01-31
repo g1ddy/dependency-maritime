@@ -31,8 +31,10 @@ interface GraphState {
   // Graphology Instance (Headless Graph)
   // We mark it as potentially undefined until loaded
   graph: Graph | null;
+  originalGraph: Graph | null;
 
   // Metadata
+  hasUnsavedChanges: boolean;
   loading: boolean;
   isCalculatingMetrics: boolean;
   metricsVersion: number;
@@ -53,6 +55,7 @@ interface GraphState {
   setFilter: (filter: ModuleCategory | 'all') => void;
   setViewMode: (mode: ViewMode) => void;
   reset: () => void;
+  resetSimulation: () => void;
   reparentNode: (nodeId: string, newParentId: string | undefined, newPosition: { x: number; y: number }) => void;
 
   // React Flow Handlers
@@ -65,6 +68,8 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   edges: [],
   selectedNodeId: null,
   graph: null,
+  originalGraph: null,
+  hasUnsavedChanges: false,
   loading: false,
   isCalculatingMetrics: false,
   metricsVersion: 0,
@@ -94,6 +99,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
     // 1. Transform to Graphology
     const graph = createGraphFromCruiseResult(data);
+    const originalGraph = graph.copy();
 
     // 2. Transform to React Flow
     const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters });
@@ -103,10 +109,12 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
     set({
       graph,
+      originalGraph,
       nodes: layouted.nodes,
       edges: layouted.edges,
       selectedNodeId: null, // Reset selection on new data
-      loading: false
+      loading: false,
+      hasUnsavedChanges: false
     });
 
     // 4. Trigger Async Metrics Calculation
@@ -351,7 +359,9 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     if (!targetNode) return;
 
     const label = (targetNode.data.label as string) || '';
-    const newFullPath = newParentId ? `${newParentId}/${label}` : label;
+    // Ensure we don't double-slash if newParentId ends with /
+    const cleanParentId = newParentId?.replace(/\/$/, '');
+    const newFullPath = cleanParentId ? `${cleanParentId}/${label}` : label;
 
     // 1. Update Graphology Instance (Source of Truth)
     if (graph && graph.hasNode(nodeId)) {
@@ -360,6 +370,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
     // 2. Update React Flow State (Visual)
     set({
+      hasUnsavedChanges: true,
       nodes: nodes.map((n) => {
         if (n.id === nodeId) {
           return {
@@ -379,7 +390,32 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   reset: () => {
-    set({ nodes: [], edges: [], graph: null, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null });
+    set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null });
+  },
+
+  resetSimulation: () => {
+    const { originalGraph, hideTypeDefinitions, layoutDirection, activeFilters, metricsVersion } = get();
+    if (!originalGraph) return;
+
+    // Clone original to be the new working graph
+    const graph = originalGraph.copy();
+
+    // Re-transform
+    const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters });
+
+    // Re-layout
+    const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
+
+    set({
+      graph,
+      nodes: layouted.nodes,
+      edges: layouted.edges,
+      selectedNodeId: null,
+      hasUnsavedChanges: false,
+    });
+
+    // Trigger metric sync to ensure nodes get their data
+    get().calculateMetrics(metricsVersion);
   },
 
   onNodesChange: (changes: NodeChange[]) => {
