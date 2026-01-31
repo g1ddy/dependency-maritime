@@ -3,6 +3,7 @@ import { type NodeProps, type Node } from '@xyflow/react';
 import { Folder } from 'lucide-react';
 import { type GroupNodeData } from '../types';
 import { useGraphStore } from '../store';
+import { STATUS_STYLES } from './styles';
 
 // We extend NodeProps to override 'data' with our specific type
 type GroupNodeProps = NodeProps<Node<GroupNodeData>>;
@@ -10,11 +11,14 @@ type GroupNodeProps = NodeProps<Node<GroupNodeData>>;
 export const GroupNode = memo(({ data, selected }: GroupNodeProps) => {
   const viewMode = useGraphStore((s) => s.viewMode);
   const label = data.label || 'unknown';
+  const healthStatus = data.healthStatus || 'default';
 
-  // Default Style
-  let borderClass = 'border-slate-700';
+  const styles = STATUS_STYLES[healthStatus] || STATUS_STYLES.default;
+
+  // Visual Styling
+  let borderClass = styles.border;
   if (selected) {
-    borderClass = 'border-blue-400 ring-2 ring-blue-400';
+    borderClass = styles.selected;
   }
 
   // Heatmap Logic
@@ -41,15 +45,16 @@ export const GroupNode = memo(({ data, selected }: GroupNodeProps) => {
       data-testid={`node-${label}`}
       className={`
         h-full w-full
-        border-2 border-dashed bg-slate-900/20 rounded-xl
+        border-2 border-dashed rounded-xl
         transition-all duration-200
+        ${viewMode === 'standard' ? styles.bg : ''}
         ${borderClass}
       `}
       style={dynamicStyle}
     >
       <div className="bg-slate-800/50 p-2 rounded-t-[10px] flex items-center gap-2 border-b border-slate-700/50">
-        <Folder className="h-4 w-4 text-slate-400" />
-        <span className="text-slate-300 font-mono text-sm font-semibold">{label}</span>
+        <Folder className={`h-4 w-4 ${styles.icon}`} />
+        <span className={`${styles.text} font-mono text-sm font-semibold`}>{label}</span>
         {viewMode === 'instability' && data.metrics && (
            <span className="ml-auto text-xs font-mono opacity-70" style={{ color: dynamicStyle.borderColor }}>
              I: {instability.toFixed(2)}
