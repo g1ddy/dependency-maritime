@@ -17,6 +17,8 @@ interface DataSourceDialogProps {
   onDataLoaded: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
 }
 
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
 export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourceDialogProps) {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,6 +55,14 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
   };
 
   const handleFile = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      setError({
+        title: "File Too Large",
+        description: `The file exceeds the maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)}MB.`
+      });
+      return;
+    }
+
     try {
       const text = await file.text();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
