@@ -231,4 +231,34 @@ describe('DataSourceDialog File Interactions', () => {
         expect(errorElement).toBeTruthy();
         expect(mockOnDataLoaded).not.toHaveBeenCalled();
     });
+
+    it('displays error when file is too large', async () => {
+        render(
+          <DataSourceDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            onDataLoaded={mockOnDataLoaded}
+          />
+        );
+
+        const dialog = screen.getByRole('dialog');
+        const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
+        expect(dropZone).not.toBeNull();
+
+        // Create a fake file with size > 50MB
+        // We don't need actual content, just the size property mocked
+        const file = new File([''], 'huge.json', { type: 'application/json' });
+        Object.defineProperty(file, 'size', { value: 50 * 1024 * 1024 + 1 });
+
+        fireEvent.drop(dropZone!, {
+            dataTransfer: {
+                files: [file],
+                types: ['Files']
+            }
+        });
+
+        const errorElement = await within(dialog).findByText('File Too Large');
+        expect(errorElement).toBeTruthy();
+        expect(mockOnDataLoaded).not.toHaveBeenCalled();
+    });
 });
