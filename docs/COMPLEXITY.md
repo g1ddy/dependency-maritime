@@ -71,7 +71,7 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 | `src/features/visualization/components/GraphOverlay.tsx` | **74.9** | 227 | 7 | 10 | 0.91 |
 | `src/features/visualization/components/AppNode.tsx` | **68.6** | 96 | 19 | 3 | 0.75 |
 | `src/features/visualization/components/DependencyGraph.tsx` | **67.4** | 143 | 12 | 6 | 0.86 |
-| `src/features/visualization/components/DataSourceDialog.tsx` | **55.7** | 190 | 5 | 5 | 0.83 |
+| `src/features/visualization/components/DataSourceDialog.tsx` | **58.7** | 200 | 6 | 5 | 0.83 |
 | `src/features/visualization/logic/transformer.ts` | **54.8** | 195 | 9 | 2 | 0.67 |
 | `src/features/visualization/components/GroupNode.tsx` | **54.2** | 72 | 13 | 3 | 0.75 |
 | `src/features/visualization/logic/metrics.ts` | **53.7** | 157 | 13 | 1 | 0.5 |
@@ -89,4 +89,4 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 | `src/features/visualization/logic/transformer.ts` | **9** | 195 |
 | `src/features/visualization/store.ts` | **7** | 395 |
 | `src/features/visualization/components/GraphOverlay.tsx` | **7** | 227 |
-| `src/features/visualization/components/DataSourceDialog.tsx` | **5** | 190 |
+| `src/features/visualization/components/DataSourceDialog.tsx` | **6** | 200 |
