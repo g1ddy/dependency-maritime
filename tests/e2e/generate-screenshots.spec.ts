@@ -8,6 +8,8 @@ test.describe('Documentation Screenshots', () => {
     await page.waitForSelector('[data-testid^="node-"]', { timeout: 10000 });
     // Ensure we are fit to view
     await page.getByRole('button', { name: 'fit view' }).click();
+    // Allow animations to settle
+    await page.waitForTimeout(1000);
   });
 
   test('dashboard view', async ({ page }) => {
@@ -20,13 +22,16 @@ test.describe('Documentation Screenshots', () => {
     // We try to find main.tsx or fallback to the first available node
     const mainNode = page.locator('[data-testid="node-main.tsx"]');
     if (await mainNode.count() > 0) {
-        await mainNode.click();
+        await mainNode.click({ force: true });
     } else {
-        await page.locator('[data-testid^="node-"]').first().click();
+        await page.locator('[data-testid^="node-"]').first().click({ force: true });
     }
 
-    // Wait for inspector to appear
-    await expect(page.getByText('Metrics')).toBeVisible();
+    // Wait for inspector to appear by checking for the Panel Title
+    await expect(page.getByText('Node Inspector')).toBeVisible();
+
+    // Then verify content is loaded
+    await expect(page.locator('h4', { hasText: 'Metrics' })).toBeVisible();
 
     await page.screenshot({ path: 'docs/images/screenshot-inspector.png', fullPage: true });
   });

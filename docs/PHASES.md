@@ -73,23 +73,55 @@
     *   (Optional) Export a "Health Report" summarizing the most unstable or central modules.
 
 ## Phase 3: The "Simulator" (Refactoring Playground)
-**Goal:** The killer feature—drag and drop architecture.
+**Goal:** The killer feature—drag and drop architecture validation and planning.
 
-*   **Group/Cluster Support:** (Implemented) React Flow SubFlow renders Folders as container nodes (GroupNodes) with dashed borders and folder icons.
-*   **Drag Logic:** (Implemented) Nodes can be dragged between Groups or to the Root. Logic updates the `fullPath` and `parentId` in the store, maintaining graph consistency.
-*   **Real-time Architecture Validation:** When a drop happens:
-    *   Intercept the event.
-    *   Update the in-memory graph edges.
-    *   **Cycle Detection:** Check for Circular Dependency creation (using Graphology's `findCycles`).
-    *   **Rule Validation:** Verify architectural rules from a configuration file (e.g., "UI should not import Core").
-    *   If a violation occurs, flash the edge RED and warn the user.
+1.  **Graph Consistency & Simulation State**
+    *   Implement a "Simulation Mode" in the store that tracks the *original* graph state versus the *simulated* (draft) state.
+    *   Refine drag-and-drop logic to ensure that moving a node updates both the React Flow visualization and the underlying Graphology data structure (parent/child relationships) accurately.
+    *   Ensure that when a node is dragged into a new folder, its `fullPath` property is updated in the simulation state to reflect the move.
+
+2.  **Cycle & Rule Validation**
+    *   **Trigger:** Execute validation checks on the `onDrop` event (finalizing a move) to ensure performance.
+    *   **Cycle Detection:** Use Graphology's `findCycles` to detect if the new parent/child relationship creates a circular dependency.
+    *   **Rule Engine:** Implement a flexible architectural rule validator.
+        *   Rules can be defined in a simple config (e.g., "modules in `/ui` cannot import `/core`").
+        *   Validator checks if the move violates these layering or boundary rules.
+    *   **Visual Feedback:** If a violation occurs, *do not block the move*. Instead, visually flag the error (e.g., render the edge or node border in Red) to alert the user while allowing them to explore the "bad" state.
+
+3.  **Refactoring Manifest (Instruction Generator)**
+    *   Create a system that tracks the delta between the `originalPath` and `currentPath` for every node in the graph.
+    *   Render a live "Refactoring Manifest" side-panel.
+    *   **Output Format:** Display human-readable instructions for developers or AI assistants.
+        *   *Example:* "Move `src/auth/login.ts` to `src/features/authentication/`"
+        *   *Example:* "Move `src/utils/date.ts` to `src/shared/utils/`"
+
+4.  **Metric Impact Analysis**
+    *   Recalculate key metrics (Instability, Coupling) immediately after a node is moved.
+    *   Display the *delta* in the UI to show the impact of the refactor (e.g., "Instability: 0.8 -> 0.6 (Improved)").
+
+5.  **History Management**
+    *   Implement an Undo/Redo stack for the simulation session.
+    *   Allow users to step back through their drag-and-drop actions if they make a mistake or want to compare states.
 
 ## Phase 4: The "Cohesion" Assistant (AI/Algo Suggestions)
-**Goal:** Suggest improvements.
+**Goal:** Algorithmic analysis to suggest architectural improvements.
 
-*   **Community Detection:** Run the Louvain or Leiden algorithm on the graph to automatically identify clusters.
-*   **Suggestion Engine:** Identify nodes that are physically in Folder A but mathematically belong to the cluster of Folder B.
-*   **"Code" / "Apply" Action:**
-    *   Implement the functionality for the **Code** button.
-    *   Generate a shell script (`mv source dest`) or Refactoring Plan based on the user's drag-and-drop actions in Phase 3.
-    *   Allow the user to copy or download this script to apply changes to their actual codebase.
+1.  **Algorithmic Community Detection**
+    *   Integrate Graphology's community detection algorithms (e.g., **Louvain** or **Leiden**) to identify "logical clusters" based purely on coupling and cohesion, ignoring the actual folder structure.
+    *   Store these "suggested communities" as attributes on the nodes.
+
+2.  **Drift Visualization**
+    *   Visualize the discrepancy between the *physical* folder structure and the *logical* communities found by the algorithms.
+    *   Highlight nodes that are "Drifting" (e.g., physically in `Folder A` but mathematically tightly coupled to `Community B`).
+
+3.  **Auto-Generated Refactoring Plans**
+    *   Build a "Suggestion Engine" that translates algorithmic findings into concrete actions.
+    *   **Logic:** If Node X is in Folder A but belongs to Community B (and the cohesion gain exceeds a threshold), suggest moving Node X to Folder B.
+    *   **Consistency:** Ensure these suggestions generate the *same* instruction format as Phase 3's manual manifest (e.g., "Algorithm suggests moving `helper.ts` to `/src/shared`").
+
+4.  **Actionable Export**
+    *   Implement an "Export Plan" feature for both Manual (Phase 3) and Auto (Phase 4) instructions.
+    *   **Formats:**
+        *   **Shell Script:** Generate a `.sh` or `.ps1` script containing `mv` or `git mv` commands.
+        *   **Markdown Checklist:** A copy-pasteable list for PR descriptions or AI prompts.
+    *   Allow the user to download or copy this plan to apply the architectural changes to their codebase.
