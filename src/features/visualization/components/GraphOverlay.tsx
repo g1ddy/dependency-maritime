@@ -1,11 +1,18 @@
 import { useMemo } from "react"
-import { Box, Hammer, Globe, Wand2, Monitor, Cpu, PanelRight } from "lucide-react"
+import { Box, Hammer, Globe, Wand2, Monitor, Cpu, PanelRight, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { useGraphStore } from "../store"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useGraphStore, type ViewMode } from "../store"
 import { cn } from "@/lib/utils"
 import { type ModuleCategory } from "../logic/filters"
 import { type AppNodeData } from "../types"
@@ -31,6 +38,12 @@ const STATUS_CONFIG = {
   default: { label: 'Unknown', color: 'text-muted-foreground', dot: 'bg-muted-foreground' }
 };
 
+const VIEW_MODE_LABELS: Record<ViewMode, string> = {
+  standard: 'Standard',
+  instability: 'Instability Heatmap',
+  centrality: 'Centrality Scale'
+};
+
 export function GraphOverlay() {
   const {
     selectedNodeId,
@@ -40,7 +53,9 @@ export function GraphOverlay() {
     activeFilters,
     setFilter,
     isInspectorOpen,
-    setInspectorOpen
+    setInspectorOpen,
+    viewMode,
+    setViewMode
   } = useGraphStore();
 
   const selectedNode = useMemo(
@@ -51,7 +66,8 @@ export function GraphOverlay() {
   const { scoreDisplay, statusConfig } = useMemo(() => {
     if (!selectedNode) return { scoreDisplay: 'N/A', statusConfig: STATUS_CONFIG.default };
 
-    const data = selectedNode.data as AppNodeData;
+    // Check if it's a file node or group node
+    const data = selectedNode.data as AppNodeData; // Works for GroupNodeData too as it has similar fields
     const score = data.metrics?.compoundScore;
     const status = data.healthStatus || 'default';
     const config = STATUS_CONFIG[status] || STATUS_CONFIG.default;
@@ -99,13 +115,33 @@ export function GraphOverlay() {
           </div>
 
           {/* Secondary Filters */}
-          <div className="flex items-center space-x-2 bg-background/50 backdrop-blur p-2 rounded-md border border-border/50 w-fit pointer-events-auto">
-             <Switch
-                id="hide-type-defs"
-                checked={hideTypeDefinitions}
-                onCheckedChange={toggleTypeDefinitions}
-             />
-             <Label htmlFor="hide-type-defs" className="text-sm cursor-pointer">Hide Type Definitions</Label>
+          <div className="flex items-center gap-2">
+              {/* Type Defs Toggle */}
+              <div className="flex items-center space-x-2 bg-background/50 backdrop-blur p-2 rounded-md border border-border/50 w-fit pointer-events-auto">
+                 <Switch
+                    id="hide-type-defs"
+                    checked={hideTypeDefinitions}
+                    onCheckedChange={toggleTypeDefinitions}
+                 />
+                 <Label htmlFor="hide-type-defs" className="text-sm cursor-pointer">Hide Type Definitions</Label>
+              </div>
+
+              {/* View Mode Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                   <Button variant="outline" size="sm" className="bg-background/50 backdrop-blur border-border/50 gap-2">
+                      <Eye className="h-4 w-4" />
+                      View: {VIEW_MODE_LABELS[viewMode]}
+                   </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                   <DropdownMenuRadioGroup value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+                      <DropdownMenuRadioItem value="standard">Standard</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="instability">Instability Heatmap</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="centrality">Centrality Scale</DropdownMenuRadioItem>
+                   </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
           </div>
         </div>
 
@@ -143,8 +179,8 @@ export function GraphOverlay() {
                 <h3 className="font-semibold text-sm truncate" title={selectedNode.data.label as string}>
                   {selectedNode.data.label as string}
                 </h3>
-                <p className="text-xs text-muted-foreground truncate" title={selectedNode.data.fullPath as string}>
-                  {selectedNode.data.fullPath as string}
+                <p className="text-xs text-muted-foreground truncate" title={(selectedNode.data.fullPath || selectedNode.id) as string}>
+                  {(selectedNode.data.fullPath || selectedNode.id) as string}
                 </p>
               </div>
               <div className="ml-auto text-right whitespace-nowrap">

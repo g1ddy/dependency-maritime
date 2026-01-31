@@ -24,7 +24,6 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
 
   useEffect(() => {
     if (open) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(null);
       setDragActive(false);
     }
@@ -128,7 +127,6 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
                   let metrics: ComplexityMetricsMap | undefined;
                   try {
                     // Dynamically import to prevent build failure if missing
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     metrics = (await import('../../../../config/complexity-metrics.json')).default as ComplexityMetricsMap;
                   } catch {
                     console.warn("Complexity metrics not found, skipping.");

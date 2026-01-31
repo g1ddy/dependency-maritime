@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { type AppNodeData } from "../types";
+import { type AppNodeData, type GroupNodeData } from "../types";
 
 export function NodeInspectorPanel() {
   const {
@@ -23,14 +23,55 @@ export function NodeInspectorPanel() {
   const getNeighbors = useCallback((direction: 'in' | 'out') => {
     if (!graph || !selectedNodeId) return [];
 
-    // Safety check if node exists in graph (might be filtered out or group node handling)
+    const selectedNode = nodesById.get(selectedNodeId);
+
+    // If Group Node: Aggregate dependencies from all descendants
+    if (selectedNode?.type === 'groupNode') {
+       const descendants: string[] = [];
+       // Find all file descendants
+       graph.forEachNode((nodeId) => {
+          if (nodeId.startsWith(selectedNodeId + '/')) {
+             descendants.push(nodeId);
+          }
+       });
+
+       const uniqueNeighbors = new Set<string>();
+
+       descendants.forEach(childId => {
+          const neighbors = direction === 'in' ? graph.inNeighbors(childId) : graph.outNeighbors(childId);
+          neighbors.forEach(nId => {
+             // Skip if neighbor is internal to the group
+             if (nId.startsWith(selectedNodeId + '/')) return;
+
+             // Find parent folder of the neighbor to aggregate
+             const parts = nId.split('/');
+             parts.pop();
+             const parentPath = parts.join('/');
+
+             // If parent path is valid and not the selected node itself (circular case?), add it
+             // Also ensure we don't just add empty string for external deps
+             if (parentPath && parentPath !== selectedNodeId && nodesById.has(parentPath)) {
+                 uniqueNeighbors.add(parentPath);
+             } else {
+                 // Fallback to file/package ID
+                 uniqueNeighbors.add(nId);
+             }
+          });
+       });
+
+       return Array.from(uniqueNeighbors).map(id => {
+          const node = nodesById.get(id);
+          const label = (node?.data?.label as string) || id;
+          return { id, label };
+       });
+    }
+
+    // Standard File Node Logic
     if (!graph.hasNode(selectedNodeId)) return [];
 
     const neighbors = direction === 'in' ? graph.inNeighbors(selectedNodeId) : graph.outNeighbors(selectedNodeId);
     return neighbors.map(id => {
-       // Try to find in rendered nodes first to get current state if needed, or fallback to graph attributes
        const node = nodesById.get(id);
-       // graph.getNodeAttribute returns any, so we cast or assume string
        const graphLabel = graph.getNodeAttribute(id, 'label') as string;
        const label = (node?.data?.label as string) || graphLabel || id;
        return { id, label };
@@ -41,9 +82,10 @@ export function NodeInspectorPanel() {
   const dependents = useMemo(() => getNeighbors('in'), [getNeighbors]);
 
   // Find the selected node data.
-  // If no node is selected, we show a placeholder.
   const selectedNode = selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null;
-  const metrics = selectedNode ? (selectedNode.data as AppNodeData).metrics : undefined;
+  const metrics = selectedNode ? (selectedNode.data as AppNodeData | GroupNodeData).metrics : undefined;
+  const label = selectedNode ? (selectedNode.data.label as string) : '';
+  const fullPath = selectedNode ? ((selectedNode.data as AppNodeData).fullPath || selectedNode.id) : '';
 
   if (!isInspectorOpen) return null;
 
@@ -70,11 +112,12 @@ export function NodeInspectorPanel() {
             <div>
                <div className="flex items-start justify-between">
                   <h3 className="text-lg font-bold break-words leading-tight">
-                    {(selectedNode.data as AppNodeData).label}
+                    {label}
                   </h3>
+                  {selectedNode.type === 'groupNode' && <Badge variant="outline">Folder</Badge>}
                </div>
                <p className="text-xs text-muted-foreground mt-1 break-all font-mono bg-muted p-1 rounded">
-                 {(selectedNode.data as AppNodeData).fullPath || selectedNode.id}
+                 {fullPath}
                </p>
             </div>
 
@@ -100,12 +143,12 @@ export function NodeInspectorPanel() {
                  <MetricCard
                     label="Complexity"
                     value={metrics?.cyclomaticComplexity ?? "N/A"}
-                    description="Cyclomatic"
+                    description={selectedNode.type === 'groupNode' ? "Total Cyclomatic" : "Cyclomatic"}
                  />
                  <MetricCard
                     label="LOC"
                     value={metrics?.loc ?? "N/A"}
-                    description="Lines of Code"
+                    description={selectedNode.type === 'groupNode' ? "Total LOC" : "Lines of Code"}
                  />
               </div>
             </div>
