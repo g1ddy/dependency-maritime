@@ -15,7 +15,7 @@ import {
 import { useGraphStore, type ViewMode } from "../store"
 import { cn } from "@/lib/utils"
 import { type ModuleCategory } from "../logic/filters"
-import { type AppNodeData } from "../types"
+import { type AppNodeData, type GroupNodeData } from "../types"
 
 type FilterConfig = {
   key: ModuleCategory | 'all';
@@ -185,6 +185,9 @@ export function GraphOverlay() {
               </div>
               <div className="ml-auto text-right whitespace-nowrap">
                 <div className="text-sm font-bold" title="Compound Complexity Score">{scoreDisplay} Score</div>
+                <div className="text-xs text-muted-foreground mb-1">
+                  {((selectedNode.data as AppNodeData | GroupNodeData).metrics?.loc ?? "N/A")} LOC
+                </div>
                 <div className={`text-xs ${statusConfig.color} flex items-center gap-1 justify-end`}>
                   <span className={`h-1.5 w-1.5 rounded-full ${statusConfig.dot}`} /> {statusConfig.label}
                 </div>

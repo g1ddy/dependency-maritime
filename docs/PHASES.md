@@ -43,7 +43,7 @@
 ## Phase 2: The "Inspector" (Metrics & Heatmaps)
 **Goal:** Visualize the "health" of the code and handle scale.
 
-1.  **Metric Calculation (Headless)**
+1.  **Metric Calculation (Headless)** [x]
     *   Implement calculation logic for software metrics using Graphology.
     *   **Instability:** Calculate $I = Ce / (Ca + Ce)$ for each node.
     *   **Centrality:** Compute PageRank or Betweenness centrality to identify critical nodes.
