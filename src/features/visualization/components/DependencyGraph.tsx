@@ -8,9 +8,10 @@ import { useGraphStore } from '../store';
 import graphData from '../../../../config/dependency-graph.json';
 import complexityMetrics from '../../../../config/complexity-metrics.json';
 import { CruiseResultSchema } from '@/schema/dependency-cruiser';
+import { ComplexityMetricsMapSchema } from '@/schema/complexity-metrics';
 import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
-import { type CustomNode, type AppNodeData, type ComplexityMetricsMap } from '../types';
+import { type CustomNode, type AppNodeData } from '../types';
 
 const MINI_MAP_NODE_COLORS = {
   EXTERNAL: '#f59e0b', // amber-500
@@ -49,9 +50,9 @@ export function DependencyGraph() {
   useEffect(() => {
     // Load graph data on mount
     const parsedData = CruiseResultSchema.parse(graphData);
-    // Explicitly cast complexityMetrics to the expected type since JSON imports
-    // can be inferred loosely by TypeScript
-    setGraphData(parsedData, complexityMetrics as unknown as ComplexityMetricsMap);
+    // Validate metrics data at runtime for robustness
+    const parsedMetrics = ComplexityMetricsMapSchema.parse(complexityMetrics);
+    setGraphData(parsedData, parsedMetrics);
   }, [setGraphData]);
 
   const onNodeDragStop = useCallback(

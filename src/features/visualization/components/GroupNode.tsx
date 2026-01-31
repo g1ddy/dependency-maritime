@@ -40,6 +40,11 @@ export const GroupNode = memo(({ data, selected }: GroupNodeProps) => {
       };
   }
 
+  // Determine background class
+  // We use styles.bg for 'standard' mode, and a default fallback for others (like 'centrality')
+  // unless overridden by inline styles (like in 'instability' mode).
+  const bgClass = viewMode === 'standard' ? styles.bg : 'bg-slate-900/20';
+
   return (
     <div
       data-testid={`node-${label}`}
@@ -47,7 +52,7 @@ export const GroupNode = memo(({ data, selected }: GroupNodeProps) => {
         h-full w-full
         border-2 border-dashed rounded-xl
         transition-all duration-200
-        ${viewMode === 'standard' ? styles.bg : ''}
+        ${bgClass}
         ${borderClass}
       `}
       style={dynamicStyle}
