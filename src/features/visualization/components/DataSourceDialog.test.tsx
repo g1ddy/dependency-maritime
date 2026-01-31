@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
-import { DataSourceDialog } from './DataSourceDialog';
+import { DataSourceDialog, MAX_FILE_SIZE } from './DataSourceDialog';
 import type { ICruiseResult } from '@/schema/dependency-cruiser';
 
 // Polyfill Blob.prototype.text for jsdom
@@ -248,7 +248,7 @@ describe('DataSourceDialog File Interactions', () => {
         // Create a fake file with size > 50MB
         // We don't need actual content, just the size property mocked
         const file = new File([''], 'huge.json', { type: 'application/json' });
-        Object.defineProperty(file, 'size', { value: 50 * 1024 * 1024 + 1 });
+        Object.defineProperty(file, 'size', { value: MAX_FILE_SIZE + 1 });
 
         fireEvent.drop(dropZone!, {
             dataTransfer: {

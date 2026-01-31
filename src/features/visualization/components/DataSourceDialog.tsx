@@ -17,7 +17,7 @@ interface DataSourceDialogProps {
   onDataLoaded: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
 }
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourceDialogProps) {
   const [dragActive, setDragActive] = useState(false);
@@ -58,7 +58,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     if (file.size > MAX_FILE_SIZE) {
       setError({
         title: "File Too Large",
-        description: `The file exceeds the maximum allowed size of 50MB.`
+        description: `The file exceeds the maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)}MB.`
       });
       return;
     }
