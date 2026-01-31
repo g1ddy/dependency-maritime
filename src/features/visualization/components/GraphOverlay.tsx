@@ -185,6 +185,9 @@ export function GraphOverlay() {
               </div>
               <div className="ml-auto text-right whitespace-nowrap">
                 <div className="text-sm font-bold" title="Compound Complexity Score">{scoreDisplay} Score</div>
+                <div className="text-xs text-muted-foreground mb-1">
+                  {(selectedNode.data as AppNodeData).metrics?.loc ?? "N/A"} LOC
+                </div>
                 <div className={`text-xs ${statusConfig.color} flex items-center gap-1 justify-end`}>
                   <span className={`h-1.5 w-1.5 rounded-full ${statusConfig.dot}`} /> {statusConfig.label}
                 </div>
