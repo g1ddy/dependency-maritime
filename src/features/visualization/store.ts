@@ -264,6 +264,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
       // Reset visual state
       set({
         selectedNodeId: null,
+        isInspectorOpen: false,
         nodes: nodes.map((n) => ({
           ...n,
           data: { ...n.data, highlighted: false, dimmed: false },
@@ -314,6 +315,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
     set({
       selectedNodeId: nodeId,
+      isInspectorOpen: true,
       nodes: nodes.map((n) => {
         const isHighlighted = relevantNodes.has(n.id);
         return {
