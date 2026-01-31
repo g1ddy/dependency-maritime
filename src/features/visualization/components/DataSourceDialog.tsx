@@ -129,8 +129,11 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
                     // Dynamically import to prevent build failure if missing
                     const mod = await import('../../../../config/complexity-metrics.json');
                     // Handle both default export (traditional JSON module) and direct export
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    metrics = (mod.default || mod) as ComplexityMetricsMap;
+                    if (mod && typeof mod === 'object' && 'default' in mod) {
+                        metrics = mod.default as ComplexityMetricsMap;
+                    } else {
+                        metrics = mod as unknown as ComplexityMetricsMap;
+                    }
                   } catch (e) {
                     console.warn("Complexity metrics not found or invalid, skipping.", e);
                   }
