@@ -55,7 +55,9 @@ export function GraphOverlay() {
     isInspectorOpen,
     setInspectorOpen,
     viewMode,
-    setViewMode
+    setViewMode,
+    hasUnsavedChanges,
+    resetSimulation
   } = useGraphStore();
 
   const selectedNode = useMemo(
@@ -147,6 +149,15 @@ export function GraphOverlay() {
 
         {/* Action Buttons */}
         <div className="flex gap-2 pointer-events-auto">
+          {hasUnsavedChanges && (
+            <Button
+              variant="outline"
+              className="gap-2 shadow-lg bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 hover:text-amber-800"
+              onClick={resetSimulation}
+            >
+              Reset Simulation
+            </Button>
+          )}
           <Button
             variant="outline"
             className={cn("gap-2 shadow-lg bg-background/50 backdrop-blur border-border/50 hover:bg-background/80", isInspectorOpen && "bg-accent text-accent-foreground")}
