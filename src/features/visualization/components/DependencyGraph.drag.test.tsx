@@ -17,6 +17,7 @@ interface ReactFlowMockProps {
 let capturedReactFlowProps: ReactFlowMockProps = {};
 const mockGetIntersectingNodes = vi.fn();
 const mockGetInternalNode = vi.fn();
+const mockGetNode = vi.fn();
 
 // Mock @xyflow/react
 vi.mock('@xyflow/react', async (importOriginal) => {
@@ -33,6 +34,7 @@ vi.mock('@xyflow/react', async (importOriginal) => {
     useReactFlow: () => ({
       getIntersectingNodes: mockGetIntersectingNodes,
       getInternalNode: mockGetInternalNode,
+      getNode: mockGetNode,
     }),
     ReactFlowProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     Background: () => <div>Background</div>,
@@ -95,6 +97,7 @@ describe('DependencyGraph Drag Logic', () => {
     capturedReactFlowProps = {};
     mockGetIntersectingNodes.mockReset();
     mockGetInternalNode.mockReset();
+    mockGetNode.mockReset();
     vi.clearAllMocks();
   });
 
@@ -113,6 +116,13 @@ describe('DependencyGraph Drag Logic', () => {
     mockGetIntersectingNodes.mockReturnValue(intersections);
 
     mockGetInternalNode.mockImplementation((id: string) => {
+      if (id === 'src') return srcGroup;
+      if (id === 'src/features') return featuresGroup;
+      return null;
+    });
+
+    // Fallback to internal node logic for get node
+    mockGetNode.mockImplementation((id: string) => {
       if (id === 'src') return srcGroup;
       if (id === 'src/features') return featuresGroup;
       return null;
