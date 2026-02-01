@@ -75,9 +75,14 @@ export function DependencyGraph() {
       // Fallback: Calculate positionAbsolute if missing
       if (!finalAbs && targetNode.position) {
         if (targetNode.parentId) {
-          const parent = getInternalNode(targetNode.parentId) || getNode(targetNode.parentId);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const parentAbs = parent?.positionAbsolute || parent?.position;
+          // getInternalNode returns InternalNode<T> which has positionAbsolute
+          // getNode returns Node<T> which does NOT guaranteed have positionAbsolute in the type definition used by build
+          // We cast both to unknown then CustomNode (or a shape with positionAbsolute) to be safe
+          const parentInternal = getInternalNode(targetNode.parentId);
+          const parentPublic = getNode(targetNode.parentId);
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+          const parentAbs = (parentInternal as any)?.positionAbsolute || (parentPublic as any)?.positionAbsolute || parentPublic?.position;
 
           // Use safe casting to check for existence of x and y
           // We cast because parentAbs types might be vague in some versions of XYFlow
