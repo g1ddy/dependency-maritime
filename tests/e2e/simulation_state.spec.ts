@@ -5,8 +5,8 @@ test.describe('Simulation State', () => {
   const FEATURES_GROUP_TEST_ID = 'node-features';
 
   test.beforeEach(async ({ page }) => {
-    // Navigate to the app
-    await page.goto('http://localhost:5173/dependency-maritime/');
+    // Navigate to the app with animations disabled
+    await page.goto('http://localhost:5173/dependency-maritime/?disableAnimations=true');
     // Wait for canvas to be present
     await page.waitForSelector('.react-flow__renderer');
     // Wait for at least one node to render
@@ -16,8 +16,6 @@ test.describe('Simulation State', () => {
     const fitViewBtn = page.getByRole('button', { name: 'fit view' });
     await expect(fitViewBtn).toBeVisible();
     await fitViewBtn.click();
-    // Allow animation to settle
-    await page.waitForTimeout(500);
   });
 
   test('dragging a node into a new folder should update its fullPath in the simulation state', async ({ page }) => {
@@ -67,9 +65,6 @@ test.describe('Simulation State', () => {
         // Move in steps to simulate drag
         await page.mouse.move(dropX, dropY, { steps: 20 });
         await page.mouse.up();
-
-        // Wait for potential state updates/animations
-        await page.waitForTimeout(1000);
     }
 
     // 3. Verify Updated State
