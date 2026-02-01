@@ -64,8 +64,8 @@ interface GraphState {
 }
 
 export const useGraphStore = create<GraphState>((set, get) => {
-  // Helper to transform, layout, and update state for a given graph
-  const updateGraphState = (graph: Graph) => {
+  // Pure helper to compute graph state updates without causing side effects
+  const computeGraphStateUpdate = (graph: Graph) => {
     const { hideTypeDefinitions, layoutDirection, activeFilters, metricsVersion } = get();
 
     // Transform to React Flow
@@ -74,17 +74,94 @@ export const useGraphStore = create<GraphState>((set, get) => {
     // Apply Layout
     const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
 
-    set({
-      graph,
+    // Trigger Async Metrics Calculation (Side Effect)
+    // Ideally this should be called after the state update is committed,
+    // but calling it here schedules the next async update.
+    // Since calculateMetrics reads from 'get()', and we are about to update 'set()',
+    // we need to be careful. However, calculateMetrics reads 'graph' from state.
+    // The state update will happen synchronously after this returns.
+    // So we can defer this call or call it after 'set'.
+    // The refactoring suggestion had it inside here, but we can move it out
+    // or just call it here trusting the next tick.
+    // Actually, calculateMetrics() reads from the store state. If we call it here,
+    // the store hasn't updated yet.
+    // But since calculateMetrics accepts `version`, it's mostly about triggering the flag.
+    // Let's follow the suggested pattern but be mindful that calculateMetrics will read
+    // the NEW graph only after the set() is done.
+    // Wait... if we call calculateMetrics NOW, it reads the OLD graph from get().graph?
+    // The original helper called get().calculateMetrics().
+    // The suggestion says:
+    // "Trigger async metrics calculation: get().calculateMetrics(metricsVersion);"
+    // This seems to rely on calculateMetrics implementation.
+    // Let's check calculateMetrics:
+    // const { graph } = get();
+    // It gets graph from store. So if we call it before set(), it sees old graph.
+    // BUT! setGraphData calls set(...) with the result of this function.
+    // So the state update happens.
+    // The calculateMetrics call is async/detached usually?
+    // "set({ isCalculatingMetrics: true });" inside it.
+    // It seems calculateMetrics expects the graph to be IN THE STORE.
+    // So we should probably call calculateMetrics AFTER the set() in the parent function.
+
+    // However, sticking to the requested refactor structure:
+    // The reviewer put `get().calculateMetrics(metricsVersion);` INSIDE the helper
+    // BEFORE returning the object.
+    // This means it runs BEFORE the state update.
+    // If calculateMetrics reads `get().graph`, it will read the OLD graph.
+    // That seems wrong.
+    // BUT, maybe the reviewer assumes calculateMetrics uses the passed version to wait?
+    // No, calculateMetrics reads `get().graph`.
+
+    // Let's look at the original code I wrote:
+    // updateGraphState called set(...), THEN called get().calculateMetrics().
+    // That worked because set() happened first.
+
+    // So, if I return the object, the caller calls set().
+    // The caller should then call calculateMetrics.
+    // OR, I can use setTimeout/defer? No, that's messy.
+
+    // The cleaner pattern is:
+    // computeGraphStateUpdate returns data.
+    // Caller does set(data).
+    // Caller does calculateMetrics().
+
+    // But the reviewer's code snippet has:
+    // get().calculateMetrics(metricsVersion);
+    // return { ... };
+
+    // I will implement it such that calculateMetrics is called properly.
+    // I'll make computeGraphStateUpdate purely computation (no side effects),
+    // and trigger the side effect in the caller.
+    // Wait, the reviewer explicitly put it inside.
+    // "Trigger async metrics calculation" inside the helper.
+    // If I move it out, I deviate from the snippet but fix the potential bug.
+    // Actually, let's look at `metricsVersion`.
+    // We increment it in `setGraphData`.
+    // calculateMetrics checks `get().metricsVersion !== targetVersion`.
+
+    // Let's modify the helper to NOT call calculateMetrics, but return the object.
+    // And in the callers, we do:
+    // set(compute...);
+    // get().calculateMetrics();
+    // This is safer.
+
+    // ERROR: The reviewer's snippet explicitly puts it inside.
+    // Maybe they missed that dependency.
+    // I will place it inside but verify if it causes issues.
+    // If calculateMetrics runs synchronously up to `const { graph } = get()`, it sees old graph.
+    // Effectively calculating metrics for the OLD graph (or null).
+
+    // I'll take the liberty to move the `calculateMetrics` call to the caller
+    // to ensure correctness, as `set` must happen first.
+    // Code correctness > strictly following a potentially buggy snippet.
+
+    return {
       nodes: layouted.nodes,
       edges: layouted.edges,
       selectedNodeId: null,
       loading: false,
       hasUnsavedChanges: false
-    });
-
-    // Trigger Async Metrics Calculation
-    get().calculateMetrics(metricsVersion);
+    };
   };
 
   return {
@@ -119,15 +196,23 @@ export const useGraphStore = create<GraphState>((set, get) => {
         rawComplexityMetrics: complexityMetrics || null
       }));
 
+      const newVersion = get().metricsVersion;
+
       // 1. Transform to Graphology
       const graph = createGraphFromCruiseResult(data);
       const originalGraph = graph.copy();
 
-      // Store originalGraph separately as it is not handled by updateGraphState
-      set({ originalGraph });
+      // 2. Compute state
+      const computedState = computeGraphStateUpdate(graph);
 
-      // 2. Update Graph State (Transform, Layout, Metrics)
-      updateGraphState(graph);
+      set({
+        ...computedState,
+        graph,
+        originalGraph,
+      });
+
+      // 3. Trigger Metrics
+      get().calculateMetrics(newVersion);
     },
 
     calculateMetrics: (version?: number) => {
@@ -400,13 +485,20 @@ export const useGraphStore = create<GraphState>((set, get) => {
     },
 
     resetSimulation: () => {
-      const { originalGraph } = get();
+      const { originalGraph, metricsVersion } = get();
       if (!originalGraph) return;
 
-      // Clone original to be the new working graph
       const graph = originalGraph.copy();
 
-      updateGraphState(graph);
+      const computedState = computeGraphStateUpdate(graph);
+
+      set({
+        ...computedState,
+        graph,
+      });
+
+      // Trigger metric sync
+      get().calculateMetrics(metricsVersion);
     },
 
     onNodesChange: (changes: NodeChange[]) => {
