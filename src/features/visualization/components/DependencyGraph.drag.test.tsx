@@ -17,6 +17,7 @@ interface ReactFlowMockProps {
 let capturedReactFlowProps: ReactFlowMockProps = {};
 const mockGetIntersectingNodes = vi.fn();
 const mockGetInternalNode = vi.fn();
+const mockGetNode = vi.fn();
 
 // Mock @xyflow/react
 vi.mock('@xyflow/react', async (importOriginal) => {
@@ -33,6 +34,7 @@ vi.mock('@xyflow/react', async (importOriginal) => {
     useReactFlow: () => ({
       getIntersectingNodes: mockGetIntersectingNodes,
       getInternalNode: mockGetInternalNode,
+      getNode: mockGetNode,
     }),
     ReactFlowProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     Background: () => <div>Background</div>,
@@ -95,6 +97,7 @@ describe('DependencyGraph Drag Logic', () => {
     capturedReactFlowProps = {};
     mockGetIntersectingNodes.mockReset();
     mockGetInternalNode.mockReset();
+    mockGetNode.mockReset();
     vi.clearAllMocks();
   });
 
@@ -112,12 +115,6 @@ describe('DependencyGraph Drag Logic', () => {
 
     mockGetIntersectingNodes.mockReturnValue(intersections);
 
-    mockGetInternalNode.mockImplementation((id: string) => {
-      if (id === 'src') return srcGroup;
-      if (id === 'src/features') return featuresGroup;
-      return null;
-    });
-
     const draggedNode = {
       id: 'node-1',
       type: 'appNode',
@@ -126,6 +123,16 @@ describe('DependencyGraph Drag Logic', () => {
       positionAbsolute: { x: 50, y: 50 },
       data: { label: 'App.tsx' },
     } as Node;
+
+    const getNodeImplementation = (id: string) => {
+      if (id === 'src') return srcGroup;
+      if (id === 'src/features') return featuresGroup;
+      if (id === 'node-1') return draggedNode;
+      return null;
+    };
+
+    mockGetInternalNode.mockImplementation(getNodeImplementation);
+    mockGetNode.mockImplementation(getNodeImplementation);
 
     return { reparentNodeMock, draggedNode };
   };

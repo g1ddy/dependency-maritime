@@ -32,7 +32,7 @@ const miniMapNodeColor = (node: Node<AppNodeData>) => {
 };
 
 export function DependencyGraph() {
-  const disableAnimations = import.meta.env.VITE_DISABLE_ANIMATIONS === 'true';
+  const disableAnimations = import.meta.env.VITE_DISABLE_ANIMATIONS === 'true' || new URLSearchParams(window.location.search).get('disableAnimations') === 'true';
   const {
     nodes,
     edges,
@@ -43,7 +43,7 @@ export function DependencyGraph() {
     reparentNode,
   } = useGraphStore();
 
-  const { getIntersectingNodes, getInternalNode } = useReactFlow();
+  const { getIntersectingNodes, getInternalNode, getNode } = useReactFlow();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
@@ -57,16 +57,61 @@ export function DependencyGraph() {
 
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      // Get the accurate position of the node (after drag)
-      // We rely on getInternalNode to ensure we have the latest positionAbsolute
-      const internalNode = getInternalNode(node.id) as CustomNode | undefined;
-      const targetNode = (internalNode || node);
-      const nodeAbs = internalNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
+      // Recursive helper to get absolute position
+      const getAbsolutePosition = (nodeId: string): { x: number; y: number } | undefined => {
+        const internalNode = getInternalNode(nodeId);
+        const publicNode = getNode(nodeId);
+        const target = internalNode || publicNode;
 
-      if (!nodeAbs) return;
+        if (!target) return undefined;
+
+        // Try direct absolute position
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+        let absPos = (internalNode as any)?.positionAbsolute || (publicNode as any)?.positionAbsolute || (internalNode as any)?.computed?.positionAbsolute;
+
+        // Ensure shape
+        const safeAbs = absPos as { x: unknown; y: unknown } | undefined;
+        if (!safeAbs || typeof safeAbs.x !== 'number' || typeof safeAbs.y !== 'number') {
+           absPos = undefined;
+        }
+
+        if (absPos) return absPos as { x: number; y: number };
+
+        // Fallback: Calculate recursively using parent
+        if (target.parentId) {
+          const parentAbs = getAbsolutePosition(target.parentId);
+          if (parentAbs && target.position) {
+            return {
+              x: parentAbs.x + target.position.x,
+              y: parentAbs.y + target.position.y
+            };
+          }
+        } else if (target.position) {
+          // No parent, so position is absolute
+          return target.position;
+        }
+
+        return undefined;
+      };
+
+      const finalAbs = getAbsolutePosition(node.id);
+
+      if (!finalAbs) {
+        return;
+      }
+
+      // Use finalAbs for the target node for intersection check
+      // We need to create a temporary node object with the correct positionAbsolute
+      // because getIntersectingNodes uses the passed node's positionAbsolute
+      const intersectionTarget = {
+        ...node,
+        positionAbsolute: finalAbs,
+        width: node.width || node.measured?.width || 0,
+        height: node.height || node.measured?.height || 0,
+      };
 
       // Find intersecting nodes that are groups using the updated node
-      const intersections = getIntersectingNodes(targetNode).filter(
+      const intersections = getIntersectingNodes(intersectionTarget).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
       );
 
@@ -74,33 +119,28 @@ export function DependencyGraph() {
       intersections.sort((a, b) => b.id.length - a.id.length);
 
       const group = intersections[0] as CustomNode | undefined;
-      const currentParentId = targetNode.parentId || node.parentId;
+      const currentParentId = node.parentId;
 
       // If dropped on a group
       if (group) {
         // Only update if parent is different
         if (group.id !== currentParentId) {
-          // Get the most up-to-date absolute position of the group
-          const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
-          const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
+          const groupAbs = getAbsolutePosition(group.id);
 
           if (groupAbs) {
-            const relativeX = nodeAbs.x - groupAbs.x;
-            const relativeY = nodeAbs.y - groupAbs.y;
+            const relativeX = finalAbs.x - groupAbs.x;
+            const relativeY = finalAbs.y - groupAbs.y;
             reparentNode(node.id, group.id, { x: relativeX, y: relativeY });
           }
         }
       } else {
         // Dropped on canvas (no group)
         if (currentParentId) {
-          reparentNode(node.id, undefined, {
-            x: nodeAbs.x,
-            y: nodeAbs.y,
-          });
+          reparentNode(node.id, undefined, { x: finalAbs.x, y: finalAbs.y });
         }
       }
     },
-    [getIntersectingNodes, reparentNode, getInternalNode]
+    [getIntersectingNodes, reparentNode, getInternalNode, getNode]
   );
 
   const onNodeClick = useCallback(
