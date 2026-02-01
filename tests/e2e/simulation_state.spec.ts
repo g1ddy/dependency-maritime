@@ -40,12 +40,6 @@ test.describe('Simulation State', () => {
     const closeInspectorBtn = page.getByRole('button', { name: 'Close Inspector' });
     if (await closeInspectorBtn.isVisible()) {
         await closeInspectorBtn.click();
-    } else {
-        // If panel is open but close button not found (maybe inspector button toggles it)
-        // Let's assume selecting the node opened it.
-        // We can just click the canvas to deselect everything?
-        // await page.locator('.react-flow__pane').click();
-        // But that clears selection, so overlay disappears. We need selection for overlay.
     }
 
     // 2. Perform Drag

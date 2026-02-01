@@ -71,9 +71,7 @@ export function DependencyGraph() {
 
         // Ensure shape
         const safeAbs = absPos as { x: unknown; y: unknown } | undefined;
-        if (safeAbs && typeof safeAbs.x === 'number' && typeof safeAbs.y === 'number') {
-           // It's valid
-        } else {
+        if (!safeAbs || typeof safeAbs.x !== 'number' || typeof safeAbs.y !== 'number') {
            absPos = undefined;
         }
 
@@ -138,7 +136,7 @@ export function DependencyGraph() {
       } else {
         // Dropped on canvas (no group)
         if (currentParentId) {
-           reparentNode(node.id, undefined, { x: finalAbs.x, y: finalAbs.y });
+          reparentNode(node.id, undefined, { x: finalAbs.x, y: finalAbs.y });
         }
       }
     },

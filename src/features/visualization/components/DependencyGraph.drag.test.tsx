@@ -124,20 +124,15 @@ describe('DependencyGraph Drag Logic', () => {
       data: { label: 'App.tsx' },
     } as Node;
 
-    mockGetInternalNode.mockImplementation((id: string) => {
+    const getNodeImplementation = (id: string) => {
       if (id === 'src') return srcGroup;
       if (id === 'src/features') return featuresGroup;
       if (id === 'node-1') return draggedNode;
       return null;
-    });
+    };
 
-    // Fallback to internal node logic for get node
-    mockGetNode.mockImplementation((id: string) => {
-      if (id === 'src') return srcGroup;
-      if (id === 'src/features') return featuresGroup;
-      if (id === 'node-1') return draggedNode;
-      return null;
-    });
+    mockGetInternalNode.mockImplementation(getNodeImplementation);
+    mockGetNode.mockImplementation(getNodeImplementation);
 
     return { reparentNodeMock, draggedNode };
   };
