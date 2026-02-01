@@ -50,7 +50,7 @@ interface GraphState {
   setGraphData: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
   calculateMetrics: (version?: number) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => void;
-  selectNode: (nodeId: string | null) => void;
+  selectNode: (nodeId: string | null, shouldOpenInspector?: boolean) => void;
   toggleTypeDefinitions: () => void;
   setFilter: (filter: ModuleCategory | 'all') => void;
   setViewMode: (mode: ViewMode) => void;
@@ -355,8 +355,8 @@ export const useGraphStore = create<GraphState>((set, get) => {
       });
     },
 
-    selectNode: (nodeId: string | null) => {
-      const { graph, nodes, edges } = get();
+    selectNode: (nodeId: string | null, shouldOpenInspector = true) => {
+      const { graph, nodes, edges, isInspectorOpen } = get();
       if (!graph) return;
 
       if (!nodeId) {
@@ -414,7 +414,7 @@ export const useGraphStore = create<GraphState>((set, get) => {
 
       set({
         selectedNodeId: nodeId,
-        isInspectorOpen: true,
+        isInspectorOpen: shouldOpenInspector ? true : isInspectorOpen,
         nodes: nodes.map((n) => {
           const isHighlighted = relevantNodes.has(n.id);
           return {

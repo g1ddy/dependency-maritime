@@ -145,7 +145,12 @@ export function DependencyGraph() {
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      selectNode(node.id);
+      // Only auto-open inspector on desktop (>= 768px)
+      const isDesktop =
+        typeof window !== 'undefined' && window.matchMedia
+          ? window.matchMedia('(min-width: 768px)').matches
+          : true;
+      selectNode(node.id, isDesktop);
     },
     [selectNode]
   );
