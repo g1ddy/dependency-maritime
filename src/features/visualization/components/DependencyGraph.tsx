@@ -66,20 +66,30 @@ export function DependencyGraph() {
       const nodeAbs = internalNode?.positionAbsolute || publicNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
 
       // Try to find positionAbsolute in computed if mostly absent (v12 change)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const computedAbs = (internalNode as any)?.computed?.positionAbsolute;
+      // We safely cast to unknown first, then use a safer access pattern or keep explicit-any with a justification comment
+      // since the internal type definition might be missing 'computed'.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      const computedAbs = (internalNode as any)?.computed?.positionAbsolute as { x: number; y: number } | undefined;
       let finalAbs = nodeAbs || computedAbs;
 
       // Fallback: Calculate positionAbsolute if missing
       if (!finalAbs && targetNode.position) {
         if (targetNode.parentId) {
           const parent = getInternalNode(targetNode.parentId) || getNode(targetNode.parentId);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const parentAbs = parent?.positionAbsolute || parent?.position;
-          if (parentAbs) {
-            finalAbs = {
-              x: parentAbs.x + targetNode.position.x,
-              y: parentAbs.y + targetNode.position.y,
-            };
+
+          // Use safe casting to check for existence of x and y
+          // We cast because parentAbs types might be vague in some versions of XYFlow
+          const safeParentAbs = parentAbs as { x: number, y: number } | undefined;
+
+          if (safeParentAbs && typeof safeParentAbs.x === 'number' && typeof safeParentAbs.y === 'number') {
+            const px = safeParentAbs.x;
+            const py = safeParentAbs.y;
+            const tx = targetNode.position.x;
+            const ty = targetNode.position.y;
+
+            finalAbs = { x: px + tx, y: py + ty };
           }
         } else {
           finalAbs = targetNode.position;
@@ -139,14 +149,22 @@ export function DependencyGraph() {
       } else {
         // Dropped on canvas (no group)
         if (currentParentId) {
-          reparentNode(node.id, undefined, {
-            x: nodeAbs.x,
-            y: nodeAbs.y,
-          });
+          // Check if x and y exist before accessing.
+          // nodeAbs comes from positionAbsolute which should be {x, y} but might be missing in edge cases.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+          const safeAbs = nodeAbs as any;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          const ax = safeAbs?.x as number | undefined;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          const ay = safeAbs?.y as number | undefined;
+
+          if (typeof ax === 'number' && typeof ay === 'number') {
+             reparentNode(node.id, undefined, { x: ax, y: ay });
+          }
         }
       }
     },
-    [getIntersectingNodes, reparentNode, getInternalNode]
+    [getIntersectingNodes, reparentNode, getInternalNode, getNode]
   );
 
   const onNodeClick = useCallback(

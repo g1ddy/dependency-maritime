@@ -36,8 +36,6 @@ test.describe('Simulation State', () => {
     await expect(overlayPath).toBeVisible();
 
     // Close Inspector if open to prevent obstruction later
-    // Use exact match to avoid strict mode violations
-    const inspectorBtn = page.getByRole('button', { name: 'Inspector', exact: true });
     // Check if it's the toggle button in the top bar.
     // To close the panel, we might need to click the "Close" button inside the panel if it exists, or toggle the top button.
     // The error showed "Close Inspector" button exists.
