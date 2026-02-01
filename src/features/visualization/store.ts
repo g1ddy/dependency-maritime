@@ -66,7 +66,7 @@ interface GraphState {
 export const useGraphStore = create<GraphState>((set, get) => {
   // Pure helper to compute graph state updates without causing side effects
   const computeGraphStateUpdate = (graph: Graph) => {
-    const { hideTypeDefinitions, layoutDirection, activeFilters, metricsVersion } = get();
+    const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
 
     // Transform to React Flow
     const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters });
