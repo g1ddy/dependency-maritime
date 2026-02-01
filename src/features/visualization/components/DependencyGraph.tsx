@@ -43,7 +43,7 @@ export function DependencyGraph() {
     reparentNode,
   } = useGraphStore();
 
-  const { getIntersectingNodes, getInternalNode } = useReactFlow();
+  const { getIntersectingNodes, getInternalNode, getNode } = useReactFlow();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
@@ -60,13 +60,48 @@ export function DependencyGraph() {
       // Get the accurate position of the node (after drag)
       // We rely on getInternalNode to ensure we have the latest positionAbsolute
       const internalNode = getInternalNode(node.id) as CustomNode | undefined;
-      const targetNode = (internalNode || node);
-      const nodeAbs = internalNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
+      const publicNode = getNode(node.id) as CustomNode | undefined;
 
-      if (!nodeAbs) return;
+      const targetNode = (internalNode || publicNode || node);
+      const nodeAbs = internalNode?.positionAbsolute || publicNode?.positionAbsolute || (node as CustomNode).positionAbsolute;
+
+      // Try to find positionAbsolute in computed if mostly absent (v12 change)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const computedAbs = (internalNode as any)?.computed?.positionAbsolute;
+      let finalAbs = nodeAbs || computedAbs;
+
+      // Fallback: Calculate positionAbsolute if missing
+      if (!finalAbs && targetNode.position) {
+        if (targetNode.parentId) {
+          const parent = getInternalNode(targetNode.parentId) || getNode(targetNode.parentId);
+          const parentAbs = parent?.positionAbsolute || parent?.position;
+          if (parentAbs) {
+            finalAbs = {
+              x: parentAbs.x + targetNode.position.x,
+              y: parentAbs.y + targetNode.position.y,
+            };
+          }
+        } else {
+          finalAbs = targetNode.position;
+        }
+      }
+
+      if (!finalAbs) {
+        return;
+      }
+
+      // Use finalAbs for the target node for intersection check
+      // We need to create a temporary node object with the correct positionAbsolute
+      // because getIntersectingNodes uses the passed node's positionAbsolute
+      const intersectionTarget = {
+        ...targetNode,
+        positionAbsolute: finalAbs,
+        width: targetNode.width || targetNode.measured?.width || 0,
+        height: targetNode.height || targetNode.measured?.height || 0,
+      };
 
       // Find intersecting nodes that are groups using the updated node
-      const intersections = getIntersectingNodes(targetNode).filter(
+      const intersections = getIntersectingNodes(intersectionTarget).filter(
         (n) => n.type === 'groupNode' && n.id !== node.id
       );
 
@@ -82,11 +117,22 @@ export function DependencyGraph() {
         if (group.id !== currentParentId) {
           // Get the most up-to-date absolute position of the group
           const internalGroup = getInternalNode(group.id) as CustomNode | undefined;
-          const groupAbs = internalGroup?.positionAbsolute || group.positionAbsolute;
+          const publicGroup = getNode(group.id) as CustomNode | undefined;
+          let groupAbs = internalGroup?.positionAbsolute || publicGroup?.positionAbsolute || group.positionAbsolute;
 
-          if (groupAbs) {
-            const relativeX = nodeAbs.x - groupAbs.x;
-            const relativeY = nodeAbs.y - groupAbs.y;
+          // Fallback for group position
+          if (!groupAbs && (internalGroup?.position || publicGroup?.position || group.position)) {
+            // Groups are often top-level or nested. We should ideally calculate recursively,
+            // but for now, if it's top level, position is absolute.
+            // If nested, this fallback might be inaccurate but better than nothing.
+            // However, getIntersectingNodes returned it, so it must have had a bbox.
+            // Use the position property as a best guess.
+            groupAbs = internalGroup?.position || publicGroup?.position || group.position;
+          }
+
+          if (groupAbs && finalAbs) {
+            const relativeX = finalAbs.x - groupAbs.x;
+            const relativeY = finalAbs.y - groupAbs.y;
             reparentNode(node.id, group.id, { x: relativeX, y: relativeY });
           }
         }
