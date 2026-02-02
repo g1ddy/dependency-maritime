@@ -212,6 +212,34 @@ describe('Visualization Store', () => {
       store.toggleTypeDefinitions();
       expect(useGraphStore.getState().hideTypeDefinitions).toBe(true);
     });
+
+    it('should conditionally open inspector based on shouldOpenInspector arg', () => {
+      const store = useGraphStore.getState();
+      const node = useGraphStore.getState().nodes[0];
+
+      // 1. Default (true) behavior
+      store.selectNode(node.id); // shouldOpenInspector defaults to true
+      expect(useGraphStore.getState().isInspectorOpen).toBe(true);
+
+      // Reset
+      store.setInspectorOpen(false);
+
+      // 2. Explicit true
+      store.selectNode(node.id, true);
+      expect(useGraphStore.getState().isInspectorOpen).toBe(true);
+
+      // Reset
+      store.setInspectorOpen(false);
+
+      // 3. Explicit false (should NOT open)
+      store.selectNode(node.id, false);
+      expect(useGraphStore.getState().isInspectorOpen).toBe(false);
+
+      // 4. Verify false preserves existing open state
+      store.setInspectorOpen(true);
+      store.selectNode(node.id, false);
+      expect(useGraphStore.getState().isInspectorOpen).toBe(true);
+    });
   });
 
   describe('Simulation Mode', () => {

@@ -19,6 +19,8 @@ describe('DependencyGraph', () => {
       onNodesChange: vi.fn(),
       onEdgesChange: vi.fn(),
       setGraphData: setGraphDataMock,
+      selectNode: vi.fn(),
+      reparentNode: vi.fn(),
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
