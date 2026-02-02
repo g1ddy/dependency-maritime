@@ -28,7 +28,12 @@ test.describe('Documentation Screenshots', () => {
     }
 
     // Wait for inspector to appear by checking for the Panel Title
-    await expect(page.getByText('Node Inspector')).toBeVisible();
+    // On mobile, the inspector might not open automatically, so we check and toggle if needed
+    const inspectorTitle = page.getByText('Node Inspector');
+    if (!await inspectorTitle.isVisible()) {
+        await page.getByRole('button', { name: 'Inspector' }).click();
+    }
+    await expect(inspectorTitle).toBeVisible();
 
     // Then verify content is loaded
     await expect(page.locator('h4', { hasText: 'Metrics' })).toBeVisible();
