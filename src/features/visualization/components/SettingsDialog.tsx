@@ -15,7 +15,8 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
-  const { nodeSize, setNodeSize } = useGraphStore()
+  const nodeSize = useGraphStore((s) => s.nodeSize)
+  const setNodeSize = useGraphStore((s) => s.setNodeSize)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
