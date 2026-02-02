@@ -1,8 +1,6 @@
-import { useState } from "react"
 import { Menu, Upload, Code, Download, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
-import { SettingsDialog } from "@/features/visualization/components/SettingsDialog"
 import {
   Sheet,
   SheetContent,
@@ -14,15 +12,14 @@ import {
 
 interface HeaderProps {
   onOpenDataSource: () => void;
+  onOpenSettings: () => void;
 }
 
-export function Header({ onOpenDataSource }: HeaderProps) {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+export function Header({ onOpenDataSource, onOpenSettings }: HeaderProps) {
   const appVersion = import.meta.env.VITE_APP_VERSION as string
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 z-50 relative">
-      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <div className="flex items-center gap-2">
         <Sheet>
           <SheetTrigger asChild>
@@ -41,7 +38,7 @@ export function Header({ onOpenDataSource }: HeaderProps) {
               {[
                 { icon: Code, label: "Code", onClick: () => {} },
                 { icon: Download, label: "Export", onClick: () => {} },
-                { icon: Settings, label: "Settings", onClick: () => setIsSettingsOpen(true) },
+                { icon: Settings, label: "Settings", onClick: onOpenSettings },
               ].map(({ icon: Icon, label, onClick }) => (
                 <Button
                   key={label}
