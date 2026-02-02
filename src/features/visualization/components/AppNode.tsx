@@ -67,7 +67,7 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
   // Handle Node Sizing
   if (nodeSize === 'centrality') {
     // Scale based on centrality.
-    // Base 1.0. Max 1.5. Min 0.8.
+    // Base 1.0. Max 1.8. Min 0.7.
     // Assuming centrality range [0, 0.05] effectively.
     const scale = Math.min(1.8, Math.max(0.7, 1 + (centrality * 20)));
 
