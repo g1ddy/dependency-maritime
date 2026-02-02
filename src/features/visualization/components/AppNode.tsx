@@ -9,6 +9,7 @@ type AppNodeProps = NodeProps<Node<AppNodeData>>;
 
 export const AppNode = memo(({ data, selected }: AppNodeProps) => {
   const viewMode = useGraphStore((s) => s.viewMode);
+  const nodeSize = useGraphStore((s) => s.nodeSize);
 
   const label = data.label || 'unknown';
   const isExternal = !!data.external;
@@ -61,7 +62,10 @@ export const AppNode = memo(({ data, selected }: AppNodeProps) => {
 
     dynamicStyle.borderColor = color;
     dynamicStyle.backgroundColor = bgColor;
-  } else if (viewMode === 'centrality') {
+  }
+
+  // Handle Node Sizing
+  if (nodeSize === 'centrality') {
     // Scale based on centrality.
     // Base 1.0. Max 1.5. Min 0.8.
     // Assuming centrality range [0, 0.05] effectively.

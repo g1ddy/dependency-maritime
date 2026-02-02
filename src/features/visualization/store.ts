@@ -20,7 +20,8 @@ import { type AppNodeData, type GroupNodeData, type ComplexityMetricsMap } from 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
 
-export type ViewMode = 'standard' | 'instability' | 'centrality';
+export type ViewMode = 'standard' | 'instability';
+export type NodeSizeMode = 'uniform' | 'centrality';
 
 interface GraphState {
   // React Flow State
@@ -44,6 +45,7 @@ interface GraphState {
   isInspectorOpen: boolean;
   rawComplexityMetrics: ComplexityMetricsMap | null;
   viewMode: ViewMode;
+  nodeSize: NodeSizeMode;
 
   // Actions
   setInspectorOpen: (isOpen: boolean) => void;
@@ -54,6 +56,7 @@ interface GraphState {
   toggleTypeDefinitions: () => void;
   setFilter: (filter: ModuleCategory | 'all') => void;
   setViewMode: (mode: ViewMode) => void;
+  setNodeSize: (mode: NodeSizeMode) => void;
   reset: () => void;
   resetSimulation: () => void;
   reparentNode: (nodeId: string, newParentId: string | undefined, newPosition: { x: number; y: number }) => void;
@@ -180,6 +183,7 @@ export const useGraphStore = create<GraphState>((set, get) => {
     isInspectorOpen: false,
     rawComplexityMetrics: null,
     viewMode: 'standard',
+    nodeSize: 'uniform',
 
     setInspectorOpen: (isOpen: boolean) => {
       set({ isInspectorOpen: isOpen });
@@ -187,6 +191,10 @@ export const useGraphStore = create<GraphState>((set, get) => {
 
     setViewMode: (mode: ViewMode) => {
       set({ viewMode: mode });
+    },
+
+    setNodeSize: (mode: NodeSizeMode) => {
+      set({ nodeSize: mode });
     },
 
     setGraphData: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => {
@@ -481,7 +489,7 @@ export const useGraphStore = create<GraphState>((set, get) => {
     },
 
     reset: () => {
-      set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null });
+      set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform' });
     },
 
     resetSimulation: () => {

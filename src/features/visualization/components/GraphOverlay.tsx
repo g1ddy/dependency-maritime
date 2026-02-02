@@ -41,7 +41,6 @@ const STATUS_CONFIG = {
 const VIEW_MODE_LABELS: Record<ViewMode, string> = {
   standard: 'Standard',
   instability: 'Instability Heatmap',
-  centrality: 'Centrality Scale'
 };
 
 export function GraphOverlay() {
@@ -140,7 +139,6 @@ export function GraphOverlay() {
                    <DropdownMenuRadioGroup value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
                       <DropdownMenuRadioItem value="standard">Standard</DropdownMenuRadioItem>
                       <DropdownMenuRadioItem value="instability">Instability Heatmap</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="centrality">Centrality Scale</DropdownMenuRadioItem>
                    </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
