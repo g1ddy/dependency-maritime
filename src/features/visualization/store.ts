@@ -414,7 +414,7 @@ export const useGraphStore = create<GraphState>((set, get) => {
 
       set({
         selectedNodeId: nodeId,
-        isInspectorOpen: shouldOpenInspector ? true : isInspectorOpen,
+        isInspectorOpen: shouldOpenInspector || isInspectorOpen,
         nodes: nodes.map((n) => {
           const isHighlighted = relevantNodes.has(n.id);
           return {
