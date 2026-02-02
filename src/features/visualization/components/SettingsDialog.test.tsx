@@ -56,7 +56,7 @@ describe('SettingsDialog', () => {
   });
 
   it('reflects active state when nodeSize is centrality', () => {
-    // Override mock for this test
+    // Override mock for this test scenario
     (useGraphStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: any) => {
         const state = {
             nodeSize: 'centrality',
