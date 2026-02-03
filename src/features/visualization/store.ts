@@ -71,6 +71,26 @@ interface GraphState {
   onEdgesChange: OnEdgesChange;
 }
 
+// Robust storage implementation that falls back to in-memory storage if localStorage is missing
+const robustStorage = {
+  getItem: (name: string): string | null => {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem(name);
+    }
+    return null;
+  },
+  setItem: (name: string, value: string): void => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(name, value);
+    }
+  },
+  removeItem: (name: string): void => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(name);
+    }
+  },
+};
+
 export const useGraphStore = create<GraphState>()(
   persist(
     (set, get) => {
@@ -458,7 +478,7 @@ export const useGraphStore = create<GraphState>()(
     },
     {
       name: 'dependency-graph-settings',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => robustStorage),
       partialize: (state) => ({
         layoutEngine: state.layoutEngine,
         viewMode: state.viewMode,
