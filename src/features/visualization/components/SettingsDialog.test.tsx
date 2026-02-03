@@ -10,6 +10,7 @@ vi.mock('../store', () => ({
 
 describe('SettingsDialog', () => {
   const setNodeSizeMock = vi.fn();
+  const setLayoutEngineMock = vi.fn();
   const onOpenChangeMock = vi.fn();
 
   beforeEach(() => {
@@ -20,7 +21,9 @@ describe('SettingsDialog', () => {
         // Simulate the selectors used in the component
         const state = {
             nodeSize: 'uniform',
-            setNodeSize: setNodeSizeMock
+            setNodeSize: setNodeSizeMock,
+            layoutEngine: 'dagre',
+            setLayoutEngine: setLayoutEngineMock
         };
         return selector(state);
     });
@@ -34,6 +37,8 @@ describe('SettingsDialog', () => {
     render(<SettingsDialog open={true} onOpenChange={onOpenChangeMock} />);
     expect(screen.getByText('Visual Settings')).toBeDefined();
     expect(screen.getByText('Size by Centrality')).toBeDefined();
+    expect(screen.getByText('Layout Engine')).toBeDefined();
+    expect(screen.getByText('Hierarchical (Dagre)')).toBeDefined();
   });
 
   it('does not render content when closed', () => {
@@ -60,7 +65,9 @@ describe('SettingsDialog', () => {
     (useGraphStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: (state: unknown) => unknown) => {
         const state = {
             nodeSize: 'centrality',
-            setNodeSize: setNodeSizeMock
+            setNodeSize: setNodeSizeMock,
+            layoutEngine: 'dagre',
+            setLayoutEngine: setLayoutEngineMock
         };
         return selector(state);
     });
@@ -69,5 +76,23 @@ describe('SettingsDialog', () => {
 
     const switchElement = screen.getByRole('switch', { name: /size by centrality/i });
     expect(switchElement.getAttribute('aria-checked')).toBe('true');
+  });
+
+  // Since Radix UI DropdownMenu behavior is hard to test with just fireEvent (it uses portals and focus traps),
+  // verifying the button text changes or existence of options usually requires finding the portal content.
+  // For this unit test, simply verifying the trigger button displays the correct text is sufficient to prove the prop is read.
+  it('displays correct layout engine label', () => {
+    (useGraphStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: (state: unknown) => unknown) => {
+        const state = {
+            nodeSize: 'uniform',
+            setNodeSize: setNodeSizeMock,
+            layoutEngine: 'elk',
+            setLayoutEngine: setLayoutEngineMock
+        };
+        return selector(state);
+    });
+
+    render(<SettingsDialog open={true} onOpenChange={onOpenChangeMock} />);
+    expect(screen.getByText('ELK')).toBeDefined();
   });
 });
