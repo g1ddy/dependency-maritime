@@ -22,6 +22,11 @@ interface SettingsDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
+const LAYOUT_ENGINE_LABELS: Record<LayoutEngine, string> = {
+  dagre: 'Hierarchical (Dagre)',
+  elk: 'ELK',
+};
+
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const nodeSize = useGraphStore((s) => s.nodeSize)
   const setNodeSize = useGraphStore((s) => s.setNodeSize)
@@ -62,13 +67,13 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             <DropdownMenu>
                <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="min-w-[140px] justify-center">
-                    {layoutEngine === 'dagre' ? 'Hierarchical (Dagre)' : 'ELK'}
+                    {LAYOUT_ENGINE_LABELS[layoutEngine]}
                   </Button>
                </DropdownMenuTrigger>
                <DropdownMenuContent>
                   <DropdownMenuRadioGroup value={layoutEngine} onValueChange={(v) => setLayoutEngine(v as LayoutEngine)}>
-                     <DropdownMenuRadioItem value="dagre">Hierarchical (Dagre)</DropdownMenuRadioItem>
-                     <DropdownMenuRadioItem value="elk">ELK</DropdownMenuRadioItem>
+                     <DropdownMenuRadioItem value="dagre">{LAYOUT_ENGINE_LABELS.dagre}</DropdownMenuRadioItem>
+                     <DropdownMenuRadioItem value="elk">{LAYOUT_ENGINE_LABELS.elk}</DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                </DropdownMenuContent>
             </DropdownMenu>

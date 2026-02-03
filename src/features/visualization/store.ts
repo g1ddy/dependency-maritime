@@ -79,8 +79,9 @@ const robustStorage = {
     if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
       try {
         return localStorage.getItem(name);
-      } catch {
+      } catch (error) {
         // Fallback if access is denied or fails
+        console.warn('Failed to get item from localStorage, falling back to memory storage:', error);
       }
     }
     return memoryStorage.get(name) || null;
@@ -90,8 +91,9 @@ const robustStorage = {
       try {
         localStorage.setItem(name, value);
         return;
-      } catch {
+      } catch (error) {
         // Fallback
+        console.warn('Failed to set item in localStorage, falling back to memory storage:', error);
       }
     }
     memoryStorage.set(name, value);
@@ -101,8 +103,9 @@ const robustStorage = {
       try {
         localStorage.removeItem(name);
         return;
-      } catch {
+      } catch (error) {
         // Fallback
+        console.warn('Failed to remove item from localStorage, falling back to memory storage:', error);
       }
     }
     memoryStorage.delete(name);
