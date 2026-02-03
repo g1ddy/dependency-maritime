@@ -15,7 +15,7 @@ describe('SettingsDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default mock implementation
-    (useGraphStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: any) => {
+    (useGraphStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: (state: unknown) => unknown) => {
         if (!selector) return {}; // Safety fallback
         // Simulate the selectors used in the component
         const state = {
@@ -57,7 +57,7 @@ describe('SettingsDialog', () => {
 
   it('reflects active state when nodeSize is centrality', () => {
     // Override mock for this test scenario
-    (useGraphStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: any) => {
+    (useGraphStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: (state: unknown) => unknown) => {
         const state = {
             nodeSize: 'centrality',
             setNodeSize: setNodeSizeMock
