@@ -24,7 +24,12 @@ describe('DependencyGraph', () => {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(storeModule.useGraphStore).mockReturnValue(mockState as any);
+    vi.mocked(storeModule.useGraphStore).mockImplementation(((selector: any) => {
+      if (selector) {
+        return selector(mockState);
+      }
+      return mockState;
+    }) as any);
 
     const { container } = render(
       <ReactFlowProvider>
