@@ -52,21 +52,17 @@ export function GraphOverlay() {
     isInspectorOpen,
     viewMode,
     hasUnsavedChanges,
-  } = useGraphStore(useShallow((state) => ({
-    hideTypeDefinitions: state.hideTypeDefinitions,
-    activeFilters: state.activeFilters,
-    isInspectorOpen: state.isInspectorOpen,
-    viewMode: state.viewMode,
-    hasUnsavedChanges: state.hasUnsavedChanges,
-  })));
-
-  const {
     toggleTypeDefinitions,
     setFilter,
     setInspectorOpen,
     setViewMode,
     resetSimulation
   } = useGraphStore(useShallow((state) => ({
+    hideTypeDefinitions: state.hideTypeDefinitions,
+    activeFilters: state.activeFilters,
+    isInspectorOpen: state.isInspectorOpen,
+    viewMode: state.viewMode,
+    hasUnsavedChanges: state.hasUnsavedChanges,
     toggleTypeDefinitions: state.toggleTypeDefinitions,
     setFilter: state.setFilter,
     setInspectorOpen: state.setInspectorOpen,
