@@ -189,10 +189,17 @@ export function transformToReactFlow(
 
   // Add group nodes to the nodes list
   // We place group nodes FIRST so they render BEHIND the file nodes
-  const groupNodes = Array.from(groupNodesMap.values()).sort((a, b) => {
-    // Sort by path depth (number of slashes) ascending, so 'src' comes before 'src/features'
-    return a.id.split('/').length - b.id.split('/').length;
-  });
+  const groupNodes = Array.from(groupNodesMap.values())
+    .map((node) => ({
+      node,
+      // Pre-calculate depth to avoid repeated string splitting in the sort comparator
+      depth: node.id.split('/').length,
+    }))
+    .sort((a, b) => {
+      // Sort by path depth (number of slashes) ascending, so 'src' comes before 'src/features'
+      return a.depth - b.depth;
+    })
+    .map((item) => item.node);
 
   const finalNodes = [...groupNodes, ...nodes];
 
