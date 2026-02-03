@@ -84,8 +84,14 @@ export function transformToReactFlow(
   const edges: Edge[] = [];
   const visibleNodeIds = new Set<string>();
   const groupNodesMap = new Map<string, Node>();
-  const dirToNodes = new Map<string, Array<{ id: string; attributes: any }>>();
-  const rootNodes: Array<{ id: string; attributes: any }> = [];
+  const dirToNodes = new Map<
+    string,
+    Array<{ id: string; attributes: Record<string, unknown> }>
+  >();
+  const rootNodes: Array<{
+    id: string;
+    attributes: Record<string, unknown>;
+  }> = [];
 
   const activeFilters = options.activeFilters || [];
 
@@ -161,9 +167,9 @@ export function transformToReactFlow(
       position: { x: 0, y: 0 },
       parentId: undefined,
       data: {
-        label: attributes.label,
-        fullPath: attributes.fullPath,
-        ...attributes
+        label: attributes.label as string,
+        fullPath: attributes.fullPath as string,
+        ...attributes,
       },
     });
   }
@@ -177,10 +183,10 @@ export function transformToReactFlow(
         position: { x: 0, y: 0 },
         parentId: dirPath,
         data: {
-          label: attributes.label,
-          fullPath: attributes.fullPath,
-          ...attributes
-        },
+          label: attributes.label as string,
+          fullPath: attributes.fullPath as string,
+          ...attributes,
+      },
       });
     }
   }
