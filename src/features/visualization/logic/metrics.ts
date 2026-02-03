@@ -53,6 +53,15 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
     return folderAggregations.get(path)!;
   };
 
+  const accumulateMetrics = (target: FolderAggregation, source: Partial<FolderAggregation>) => {
+    target.count += source.count || 0;
+    target.totalInstability += source.totalInstability || 0;
+    target.totalCentrality += source.totalCentrality || 0;
+    target.totalComplexity += source.totalComplexity || 0;
+    target.totalLoc += source.totalLoc || 0;
+    target.totalCompoundScore += source.totalCompoundScore || 0;
+  };
+
   // 2. Iterate nodes to calculate Instability and assign all metrics
   graph.forEachNode((nodeId) => {
     // Fan-Out (Efferent Coupling - Ce): Dependencies (outgoing edges)
@@ -118,24 +127,48 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
     // We walk up the directory tree to attribute these metrics to all ancestors.
     const parts = fullPath.split('/');
     parts.pop(); // Remove filename
+    const parentPath = parts.join('/');
 
-    // Iterate all parent directories
-    let currentPath = parts.join('/');
-    while (currentPath) {
-       const agg = getFolderEntry(currentPath);
-       agg.count += 1;
-       agg.totalInstability += instability;
-       agg.totalCentrality += centrality;
-       agg.totalComplexity += effectiveComplexity;
-       agg.totalLoc += effectiveLoc;
-       agg.totalCompoundScore += compoundScore;
-
-       // Move up
-       const lastSlash = currentPath.lastIndexOf('/');
-       if (lastSlash === -1) break;
-       currentPath = currentPath.substring(0, lastSlash);
+    if (parentPath) {
+      const agg = getFolderEntry(parentPath);
+      accumulateMetrics(agg, {
+        count: 1,
+        totalInstability: instability,
+        totalCentrality: centrality,
+        totalComplexity: effectiveComplexity,
+        totalLoc: effectiveLoc,
+        totalCompoundScore: compoundScore
+      });
     }
   });
+
+  // 3.5 Propagate Aggregations Up the Tree
+  // First, identify all directory paths involved (including intermediates)
+  const initialPaths = Array.from(folderAggregations.keys());
+  const allPaths = new Set<string>();
+
+  for (const path of initialPaths) {
+    let current = path;
+    while (current) {
+      allPaths.add(current);
+      const lastSlash = current.lastIndexOf('/');
+      if (lastSlash === -1) break;
+      current = current.substring(0, lastSlash);
+    }
+  }
+
+  // Sort paths by length (descending) to ensure we process children before parents
+  const sortedPaths = Array.from(allPaths).sort((a, b) => b.length - a.length);
+
+  for (const path of sortedPaths) {
+    const lastSlash = path.lastIndexOf('/');
+    if (lastSlash !== -1) {
+      const parentPath = path.substring(0, lastSlash);
+      const childAgg = folderAggregations.get(path)!;
+      const parentAgg = getFolderEntry(parentPath);
+      accumulateMetrics(parentAgg, childAgg);
+    }
+  }
 
   // 4. Finalize Folder Metrics
   const folderMetrics: Record<string, GroupNodeData['metrics']> = {};
