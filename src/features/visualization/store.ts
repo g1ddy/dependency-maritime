@@ -71,23 +71,41 @@ interface GraphState {
   onEdgesChange: OnEdgesChange;
 }
 
-// Robust storage implementation that falls back to in-memory storage if localStorage is missing
+// In-memory fallback storage
+const memoryStorage = new Map<string, string>();
+
 const robustStorage = {
   getItem: (name: string): string | null => {
-    if (typeof localStorage !== 'undefined') {
-      return localStorage.getItem(name);
+    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
+      try {
+        return localStorage.getItem(name);
+      } catch {
+        // Fallback if access is denied or fails
+      }
     }
-    return null;
+    return memoryStorage.get(name) || null;
   },
   setItem: (name: string, value: string): void => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(name, value);
+    if (typeof localStorage !== 'undefined' && typeof localStorage.setItem === 'function') {
+      try {
+        localStorage.setItem(name, value);
+        return;
+      } catch {
+        // Fallback
+      }
     }
+    memoryStorage.set(name, value);
   },
   removeItem: (name: string): void => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(name);
+    if (typeof localStorage !== 'undefined' && typeof localStorage.removeItem === 'function') {
+      try {
+        localStorage.removeItem(name);
+        return;
+      } catch {
+        // Fallback
+      }
     }
+    memoryStorage.delete(name);
   },
 };
 
