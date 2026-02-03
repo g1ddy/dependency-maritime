@@ -48,13 +48,16 @@ vi.mock('../store', () => ({
   useGraphStore: vi.fn(),
 }));
 
+type GraphState = ReturnType<typeof storeModule.useGraphStore.getState>;
+
 // Helper factory for creating a type-safe mock state
-const createMockGraphState = (overrides: Partial<ReturnType<typeof storeModule.useGraphStore.getState>> = {}) => {
+const createMockGraphState = (overrides: Partial<GraphState> = {}): GraphState => {
   return {
     nodes: [],
     edges: [],
     selectedNodeId: null,
     graph: null,
+    originalGraph: null,
     loading: false,
     isCalculatingMetrics: false,
     metricsVersion: 0,
@@ -62,7 +65,10 @@ const createMockGraphState = (overrides: Partial<ReturnType<typeof storeModule.u
     layoutDirection: 'TB',
     activeFilters: [],
     isInspectorOpen: false,
+    rawComplexityMetrics: null,
+    viewMode: 'standard',
     setInspectorOpen: vi.fn(),
+    setViewMode: vi.fn(),
     setGraphData: vi.fn(),
     calculateMetrics: vi.fn(),
     layoutGraph: vi.fn(),
@@ -70,9 +76,11 @@ const createMockGraphState = (overrides: Partial<ReturnType<typeof storeModule.u
     toggleTypeDefinitions: vi.fn(),
     setFilter: vi.fn(),
     reset: vi.fn(),
+    resetSimulation: vi.fn(),
     reparentNode: vi.fn(),
     onNodesChange: vi.fn(),
     onEdgesChange: vi.fn(),
+    hasUnsavedChanges: false,
     ...overrides,
   };
 };
@@ -108,13 +116,12 @@ describe('DependencyGraph Drag Logic', () => {
       reparentNode: reparentNodeMock,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(storeModule.useGraphStore).mockImplementation(((selector: any) => {
+    vi.mocked(storeModule.useGraphStore).mockImplementation(((selector?: (state: GraphState) => unknown) => {
       if (selector) {
         return selector(mockState);
       }
       return mockState;
-    }) as any);
+    }) as typeof storeModule.useGraphStore);
 
     render(<DependencyGraph />);
 
