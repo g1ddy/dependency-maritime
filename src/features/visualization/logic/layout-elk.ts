@@ -121,14 +121,24 @@ export async function applyElkLayout(
   }
 }
 
-// Helper to find a node in the ELK tree
+// Helper to find a node in the ELK tree (Iterative DFS)
 function findElkNode(root: ElkNode, id: string): ElkNode | undefined {
-  if (root.id === id) return root;
-  if (root.children) {
-    for (const child of root.children) {
-      const found = findElkNode(child, id);
-      if (found) return found;
+  const stack = [root];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current) continue;
+
+    if (current.id === id) {
+      return current;
+    }
+
+    if (current.children) {
+      for (const child of current.children) {
+        stack.push(child);
+      }
     }
   }
+
   return undefined;
 }
