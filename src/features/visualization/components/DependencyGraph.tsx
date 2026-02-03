@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } from '@xyflow/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - CSS import might not be recognized by tsc but works in Vite
@@ -33,15 +34,22 @@ const miniMapNodeColor = (node: Node<AppNodeData>) => {
 
 export function DependencyGraph() {
   const disableAnimations = import.meta.env.VITE_DISABLE_ANIMATIONS === 'true' || new URLSearchParams(window.location.search).get('disableAnimations') === 'true';
+  const nodes = useGraphStore((s) => s.nodes);
+  const edges = useGraphStore((s) => s.edges);
+
   const {
-    nodes,
-    edges,
     onNodesChange,
     onEdgesChange,
     setGraphData,
     selectNode,
     reparentNode,
-  } = useGraphStore();
+  } = useGraphStore(useShallow((s) => ({
+    onNodesChange: s.onNodesChange,
+    onEdgesChange: s.onEdgesChange,
+    setGraphData: s.setGraphData,
+    selectNode: s.selectNode,
+    reparentNode: s.reparentNode,
+  })));
 
   const { getIntersectingNodes, getInternalNode, getNode } = useReactFlow();
 

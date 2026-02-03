@@ -1,4 +1,5 @@
 import { useMemo } from "react"
+import { useShallow } from 'zustand/react/shallow'
 import { Box, Hammer, Globe, Wand2, Monitor, Cpu, PanelRight, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -45,24 +46,41 @@ const VIEW_MODE_LABELS: Record<ViewMode, string> = {
 
 export function GraphOverlay() {
   const {
-    selectedNodeId,
-    nodes,
     hideTypeDefinitions,
-    toggleTypeDefinitions,
     activeFilters,
-    setFilter,
     isInspectorOpen,
-    setInspectorOpen,
     viewMode,
-    setViewMode,
     hasUnsavedChanges,
+    toggleTypeDefinitions,
+    setFilter,
+    setInspectorOpen,
+    setViewMode,
     resetSimulation
-  } = useGraphStore();
+  } = useGraphStore(useShallow((state) => ({
+    hideTypeDefinitions: state.hideTypeDefinitions,
+    activeFilters: state.activeFilters,
+    isInspectorOpen: state.isInspectorOpen,
+    viewMode: state.viewMode,
+    hasUnsavedChanges: state.hasUnsavedChanges,
+    toggleTypeDefinitions: state.toggleTypeDefinitions,
+    setFilter: state.setFilter,
+    setInspectorOpen: state.setInspectorOpen,
+    setViewMode: state.setViewMode,
+    resetSimulation: state.resetSimulation,
+  })));
 
-  const selectedNode = useMemo(
-    () => (selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null),
-    [selectedNodeId, nodes]
-  );
+  // Optimize: Select only the necessary data for the selected node to prevent re-renders
+  // when other nodes (including the selected one) move during drag.
+  // We explicitly pick data fields to ensure shallow equality works if the node object
+  // reference changes but data content remains the same.
+  const selectedNode = useGraphStore(useShallow((state) => {
+    const node = state.selectedNodeId ? state.nodes.find((n) => n.id === state.selectedNodeId) : null;
+    if (!node) return null;
+    return {
+      id: node.id,
+      data: node.data,
+    };
+  }));
 
   const { scoreDisplay, statusConfig } = useMemo(() => {
     if (!selectedNode) return { scoreDisplay: 'N/A', statusConfig: STATUS_CONFIG.default };
