@@ -184,14 +184,14 @@ describe('Visualization Store', () => {
       expect(resetNode.data.dimmed).toBe(false);
     });
 
-    it('should layout graph', () => {
+    it('should layout graph', async () => {
       const store = useGraphStore.getState();
 
       // Initial direction is TB
       expect(useGraphStore.getState().layoutDirection).toBe('TB');
 
       // Change to LR
-      store.layoutGraph('LR');
+      await store.layoutGraph('LR');
       expect(useGraphStore.getState().layoutDirection).toBe('LR');
 
       // Verify nodes still exist (layout updates positions but shouldn't lose nodes)
