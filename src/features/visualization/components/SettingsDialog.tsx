@@ -5,9 +5,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { useGraphStore } from "../store"
+import { useGraphStore, type LayoutEngine } from "../store"
 
 interface SettingsDialogProps {
   open: boolean
@@ -17,6 +25,8 @@ interface SettingsDialogProps {
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const nodeSize = useGraphStore((s) => s.nodeSize)
   const setNodeSize = useGraphStore((s) => s.setNodeSize)
+  const layoutEngine = useGraphStore((s) => s.layoutEngine)
+  const setLayoutEngine = useGraphStore((s) => s.setLayoutEngine)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -40,6 +50,28 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               checked={nodeSize === 'centrality'}
               onCheckedChange={(checked) => setNodeSize(checked ? 'centrality' : 'uniform')}
             />
+          </div>
+
+          <div className="flex items-center justify-between space-x-2">
+            <Label className="flex flex-col space-y-1">
+              <span>Layout Engine</span>
+              <span className="font-normal text-xs text-muted-foreground">
+                Choose the algorithm for arranging nodes
+              </span>
+            </Label>
+            <DropdownMenu>
+               <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="min-w-[140px] justify-center">
+                    {layoutEngine === 'dagre' ? 'Hierarchical (Dagre)' : 'ELK'}
+                  </Button>
+               </DropdownMenuTrigger>
+               <DropdownMenuContent>
+                  <DropdownMenuRadioGroup value={layoutEngine} onValueChange={(v) => setLayoutEngine(v as LayoutEngine)}>
+                     <DropdownMenuRadioItem value="dagre">Hierarchical (Dagre)</DropdownMenuRadioItem>
+                     <DropdownMenuRadioItem value="elk">ELK</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+               </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </DialogContent>

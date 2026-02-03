@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { useShallow } from 'zustand/react/shallow'
-import { Box, Hammer, Globe, Wand2, Monitor, Cpu, PanelRight, Eye, Network } from "lucide-react"
+import { Box, Hammer, Globe, Wand2, Monitor, Cpu, PanelRight, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -13,7 +13,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useGraphStore, type ViewMode, type LayoutEngine } from "../store"
+import { useGraphStore, type ViewMode } from "../store"
 import { cn } from "@/lib/utils"
 import { type ModuleCategory } from "../logic/filters"
 import { type AppNodeData, type GroupNodeData } from "../types"
@@ -44,37 +44,28 @@ const VIEW_MODE_LABELS: Record<ViewMode, string> = {
   instability: 'Instability Heatmap',
 };
 
-const LAYOUT_ENGINE_LABELS: Record<LayoutEngine, string> = {
-  dagre: 'Standard',
-  elk: 'ELK',
-};
-
 export function GraphOverlay() {
   const {
     hideTypeDefinitions,
     activeFilters,
     isInspectorOpen,
     viewMode,
-    layoutEngine,
     hasUnsavedChanges,
     toggleTypeDefinitions,
     setFilter,
     setInspectorOpen,
     setViewMode,
-    setLayoutEngine,
     resetSimulation
   } = useGraphStore(useShallow((state) => ({
     hideTypeDefinitions: state.hideTypeDefinitions,
     activeFilters: state.activeFilters,
     isInspectorOpen: state.isInspectorOpen,
     viewMode: state.viewMode,
-    layoutEngine: state.layoutEngine,
     hasUnsavedChanges: state.hasUnsavedChanges,
     toggleTypeDefinitions: state.toggleTypeDefinitions,
     setFilter: state.setFilter,
     setInspectorOpen: state.setInspectorOpen,
     setViewMode: state.setViewMode,
-    setLayoutEngine: state.setLayoutEngine,
     resetSimulation: state.resetSimulation,
   })));
 
@@ -153,22 +144,6 @@ export function GraphOverlay() {
                  />
                  <Label htmlFor="hide-type-defs" className="text-sm cursor-pointer">Hide Type Definitions</Label>
               </div>
-
-              {/* Layout Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                   <Button variant="outline" size="sm" className="bg-background/50 backdrop-blur border-border/50 gap-2">
-                      <Network className="h-4 w-4" />
-                      Layout: {LAYOUT_ENGINE_LABELS[layoutEngine]}
-                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                   <DropdownMenuRadioGroup value={layoutEngine} onValueChange={(v) => setLayoutEngine(v as LayoutEngine)}>
-                      <DropdownMenuRadioItem value="dagre">Standard</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="elk">ELK</DropdownMenuRadioItem>
-                   </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
               {/* View Mode Dropdown */}
               <DropdownMenu>
