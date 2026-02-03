@@ -82,7 +82,7 @@ const createMockGraphState = (overrides: Partial<GraphState> = {}): GraphState =
     onEdgesChange: vi.fn(),
     hasUnsavedChanges: false,
     ...overrides,
-  };
+  } as GraphState;
 };
 
 describe('DependencyGraph Drag Logic', () => {
