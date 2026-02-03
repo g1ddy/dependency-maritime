@@ -150,6 +150,7 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
   for (const path of initialPaths) {
     let current = path;
     while (current) {
+      if (allPaths.has(current)) break;
       allPaths.add(current);
       const lastSlash = current.lastIndexOf('/');
       if (lastSlash === -1) break;
