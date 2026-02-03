@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   type Node,
   type Edge,
@@ -458,6 +458,7 @@ export const useGraphStore = create<GraphState>()(
     },
     {
       name: 'dependency-graph-settings',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         layoutEngine: state.layoutEngine,
         viewMode: state.viewMode,
