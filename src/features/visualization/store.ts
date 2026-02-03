@@ -287,23 +287,12 @@ export const useGraphStore = create<GraphState>((set, get) => {
       set({ loading: true });
 
       try {
-        let layoutedNodes = nodes;
-        let layoutedEdges = edges;
-
-        if (layoutEngine === 'elk') {
-          const result = await applyElkLayout(nodes, edges, { direction: targetDirection });
-          layoutedNodes = result.nodes;
-          layoutedEdges = result.edges;
-        } else {
-          // Dagre (Synchronous)
-          const result = applyDagreLayout(nodes, edges, { direction: targetDirection });
-          layoutedNodes = result.nodes;
-          layoutedEdges = result.edges;
-        }
+        const layoutFn = layoutEngine === 'elk' ? applyElkLayout : applyDagreLayout;
+        const result = await layoutFn(nodes, edges, { direction: targetDirection });
 
         set({
-          nodes: layoutedNodes,
-          edges: layoutedEdges,
+          nodes: result.nodes,
+          edges: result.edges,
           layoutDirection: targetDirection,
           loading: false
         });
