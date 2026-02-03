@@ -84,9 +84,18 @@ export function transformToReactFlow(
   const edges: Edge[] = [];
   const visibleNodeIds = new Set<string>();
   const groupNodesMap = new Map<string, Node>();
+  const dirToNodes = new Map<
+    string,
+    Array<{ id: string; attributes: Record<string, unknown> }>
+  >();
+  const rootNodes: Array<{
+    id: string;
+    attributes: Record<string, unknown>;
+  }> = [];
 
   const activeFilters = options.activeFilters || [];
 
+  // 1. First pass: Filter nodes and group them by directory
   graph.forEachNode((nodeId, attributes) => {
     // attributes.fullPath should be something like "src/features/visualization/logic/transformer.ts"
     const fullPath = (attributes.fullPath as string) || '';
@@ -102,59 +111,81 @@ export function transformToReactFlow(
 
     visibleNodeIds.add(nodeId);
 
-    // Determine directory hierarchy using the fullPath attribute
-    const parts = fullPath.split('/');
-    parts.pop(); // Remove filename
-
-    // Create/Find Group Nodes
-    let parentId: string | undefined = undefined;
-
-    if (parts.length > 0) {
-      const dirPath = parts.join('/');
-      parentId = dirPath;
-
-      // Ensure all ancestor groups exist
-      let currentPath = dirPath;
-      while (currentPath) {
-        if (!groupNodesMap.has(currentPath)) {
-          const groupParts = currentPath.split('/');
-          const label = groupParts[groupParts.length - 1];
-          // Parent of this group
-          groupParts.pop();
-          const groupParentId = groupParts.length > 0 ? groupParts.join('/') : undefined;
-
-          groupNodesMap.set(currentPath, {
-            id: currentPath,
-            type: 'groupNode',
-            position: { x: 0, y: 0 },
-            data: { label },
-            parentId: groupParentId,
-            style: { width: 100, height: 100 }, // Default size, Dagre will resize
-          });
-        } else {
-          // If we found the group, we assume its ancestors are also created
-          break;
-        }
-
-        // Move up one level
-        const lastSlash = currentPath.lastIndexOf('/');
-        if (lastSlash === -1) break;
-        currentPath = currentPath.substring(0, lastSlash);
+    const lastSlashIndex = fullPath.lastIndexOf('/');
+    if (lastSlashIndex === -1) {
+      rootNodes.push({ id: nodeId, attributes });
+    } else {
+      const dirPath = fullPath.substring(0, lastSlashIndex);
+      if (!dirToNodes.has(dirPath)) {
+        dirToNodes.set(dirPath, []);
       }
+      dirToNodes.get(dirPath)!.push({ id: nodeId, attributes });
     }
-
-    nodes.push({
-      id: nodeId, // This is now a GUID
-      type: 'appNode',
-      position: { x: 0, y: 0 }, // Layout will fix this
-      parentId, // This refers to the Group Node ID (path)
-      data: {
-        label: attributes.label,
-        fullPath: attributes.fullPath, // Pass this along
-        ...attributes
-      },
-    });
   });
+
+  // 2. Process directories to create group nodes
+  // Iterating over unique directories minimizes redundant ancestor checks
+  for (const dirPath of dirToNodes.keys()) {
+    let currentPath = dirPath;
+    while (currentPath) {
+      if (groupNodesMap.has(currentPath)) {
+        // If we found the group, we assume its ancestors are also created
+        break;
+      }
+
+      const lastSlash = currentPath.lastIndexOf('/');
+      const label =
+        lastSlash === -1
+          ? currentPath
+          : currentPath.substring(lastSlash + 1);
+      const parentId =
+        lastSlash === -1 ? undefined : currentPath.substring(0, lastSlash);
+
+      groupNodesMap.set(currentPath, {
+        id: currentPath,
+        type: 'groupNode',
+        position: { x: 0, y: 0 },
+        data: { label },
+        parentId,
+        style: { width: 100, height: 100 }, // Default size, Dagre will resize
+      });
+
+      if (!parentId) {
+        break;
+      }
+      currentPath = parentId;
+    }
+  }
+
+  // 3. Create App Nodes
+
+  const createAppNode = (
+    id: string,
+    attributes: Record<string, unknown>,
+    parentId: string | undefined
+  ): Node => ({
+    id,
+    type: 'appNode',
+    position: { x: 0, y: 0 },
+    parentId,
+    data: {
+      label: attributes.label as string,
+      fullPath: attributes.fullPath as string,
+      ...attributes,
+    },
+  });
+
+  // Add root nodes
+  for (const { id, attributes } of rootNodes) {
+    nodes.push(createAppNode(id, attributes, undefined));
+  }
+
+  // Add directory nodes
+  for (const [dirPath, dirNodes] of dirToNodes) {
+    for (const { id, attributes } of dirNodes) {
+      nodes.push(createAppNode(id, attributes, dirPath));
+    }
+  }
 
   // Add group nodes to the nodes list
   // We place group nodes FIRST so they render BEHIND the file nodes
