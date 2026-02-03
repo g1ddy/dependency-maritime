@@ -128,66 +128,62 @@ export function transformToReactFlow(
   for (const dirPath of dirToNodes.keys()) {
     let currentPath = dirPath;
     while (currentPath) {
-      if (!groupNodesMap.has(currentPath)) {
-        const lastSlash = currentPath.lastIndexOf('/');
-        const label =
-          lastSlash === -1
-            ? currentPath
-            : currentPath.substring(lastSlash + 1);
-        const parentId =
-          lastSlash === -1 ? undefined : currentPath.substring(0, lastSlash);
-
-        groupNodesMap.set(currentPath, {
-          id: currentPath,
-          type: 'groupNode',
-          position: { x: 0, y: 0 },
-          data: { label },
-          parentId,
-          style: { width: 100, height: 100 }, // Default size, Dagre will resize
-        });
-      } else {
+      if (groupNodesMap.has(currentPath)) {
         // If we found the group, we assume its ancestors are also created
         break;
       }
 
-      // Move up one level
       const lastSlash = currentPath.lastIndexOf('/');
-      if (lastSlash === -1) break;
-      currentPath = currentPath.substring(0, lastSlash);
+      const label =
+        lastSlash === -1
+          ? currentPath
+          : currentPath.substring(lastSlash + 1);
+      const parentId =
+        lastSlash === -1 ? undefined : currentPath.substring(0, lastSlash);
+
+      groupNodesMap.set(currentPath, {
+        id: currentPath,
+        type: 'groupNode',
+        position: { x: 0, y: 0 },
+        data: { label },
+        parentId,
+        style: { width: 100, height: 100 }, // Default size, Dagre will resize
+      });
+
+      if (!parentId) {
+        break;
+      }
+      currentPath = parentId;
     }
   }
 
   // 3. Create App Nodes
 
+  const createAppNode = (
+    id: string,
+    attributes: Record<string, unknown>,
+    parentId: string | undefined
+  ): Node => ({
+    id,
+    type: 'appNode',
+    position: { x: 0, y: 0 },
+    parentId,
+    data: {
+      label: attributes.label as string,
+      fullPath: attributes.fullPath as string,
+      ...attributes,
+    },
+  });
+
   // Add root nodes
   for (const { id, attributes } of rootNodes) {
-    nodes.push({
-      id,
-      type: 'appNode',
-      position: { x: 0, y: 0 },
-      parentId: undefined,
-      data: {
-        label: attributes.label as string,
-        fullPath: attributes.fullPath as string,
-        ...attributes,
-      },
-    });
+    nodes.push(createAppNode(id, attributes, undefined));
   }
 
   // Add directory nodes
   for (const [dirPath, dirNodes] of dirToNodes) {
     for (const { id, attributes } of dirNodes) {
-      nodes.push({
-        id,
-        type: 'appNode',
-        position: { x: 0, y: 0 },
-        parentId: dirPath,
-        data: {
-          label: attributes.label as string,
-          fullPath: attributes.fullPath as string,
-          ...attributes,
-      },
-      });
+      nodes.push(createAppNode(id, attributes, dirPath));
     }
   }
 
