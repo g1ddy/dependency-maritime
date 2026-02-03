@@ -12,9 +12,10 @@ import {
 
 interface HeaderProps {
   onOpenDataSource: () => void;
+  onOpenSettings: () => void;
 }
 
-export function Header({ onOpenDataSource }: HeaderProps) {
+export function Header({ onOpenDataSource, onOpenSettings }: HeaderProps) {
   const appVersion = import.meta.env.VITE_APP_VERSION as string
 
   return (
@@ -35,14 +36,15 @@ export function Header({ onOpenDataSource }: HeaderProps) {
             </SheetHeader>
             <div className="flex gap-4 mt-4">
               {[
-                { icon: Code, label: "Code" },
-                { icon: Download, label: "Export" },
-                { icon: Settings, label: "Settings" },
-              ].map(({ icon: Icon, label }) => (
+                { icon: Code, label: "Code", onClick: () => {} },
+                { icon: Download, label: "Export", onClick: () => {} },
+                { icon: Settings, label: "Settings", onClick: onOpenSettings },
+              ].map(({ icon: Icon, label, onClick }) => (
                 <Button
                   key={label}
                   variant="ghost"
                   className="flex flex-col items-center gap-1 h-auto p-2"
+                  onClick={onClick}
                 >
                   <Icon className="h-6 w-6" />
                   <span className="text-xs">{label}</span>
