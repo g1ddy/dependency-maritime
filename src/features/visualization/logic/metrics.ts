@@ -53,6 +53,15 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
     return folderAggregations.get(path)!;
   };
 
+  const accumulateMetrics = (target: FolderAggregation, source: Partial<FolderAggregation>) => {
+    target.count += source.count || 0;
+    target.totalInstability += source.totalInstability || 0;
+    target.totalCentrality += source.totalCentrality || 0;
+    target.totalComplexity += source.totalComplexity || 0;
+    target.totalLoc += source.totalLoc || 0;
+    target.totalCompoundScore += source.totalCompoundScore || 0;
+  };
+
   // 2. Iterate nodes to calculate Instability and assign all metrics
   graph.forEachNode((nodeId) => {
     // Fan-Out (Efferent Coupling - Ce): Dependencies (outgoing edges)
@@ -122,12 +131,14 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
 
     if (parentPath) {
       const agg = getFolderEntry(parentPath);
-      agg.count += 1;
-      agg.totalInstability += instability;
-      agg.totalCentrality += centrality;
-      agg.totalComplexity += effectiveComplexity;
-      agg.totalLoc += effectiveLoc;
-      agg.totalCompoundScore += compoundScore;
+      accumulateMetrics(agg, {
+        count: 1,
+        totalInstability: instability,
+        totalCentrality: centrality,
+        totalComplexity: effectiveComplexity,
+        totalLoc: effectiveLoc,
+        totalCompoundScore: compoundScore
+      });
     }
   });
 
@@ -155,13 +166,7 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
       const parentPath = path.substring(0, lastSlash);
       const childAgg = folderAggregations.get(path)!;
       const parentAgg = getFolderEntry(parentPath);
-
-      parentAgg.count += childAgg.count;
-      parentAgg.totalInstability += childAgg.totalInstability;
-      parentAgg.totalCentrality += childAgg.totalCentrality;
-      parentAgg.totalComplexity += childAgg.totalComplexity;
-      parentAgg.totalLoc += childAgg.totalLoc;
-      parentAgg.totalCompoundScore += childAgg.totalCompoundScore;
+      accumulateMetrics(parentAgg, childAgg);
     }
   }
 
