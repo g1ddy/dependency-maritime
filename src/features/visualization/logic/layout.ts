@@ -14,7 +14,7 @@ export interface LayoutOptions {
 /**
  * Helper to determine node dimensions with proper fallback precedence.
  */
-function getNodeDimensions(node: Node, options: LayoutOptions) {
+export function getNodeDimensions(node: Node, options: LayoutOptions) {
   // 1. Measured dimensions (from React Flow)
   // 2. Explicit style dimensions
   // 3. User-provided options
