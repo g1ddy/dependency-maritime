@@ -116,6 +116,8 @@ const robustStorage = {
 
 // --- Worker Management ---
 let currentWorker: Worker | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let currentReject: ((reason?: any) => void) | null = null;
 
 function getWorker() {
   if (!currentWorker) {
@@ -125,6 +127,10 @@ function getWorker() {
 }
 
 function terminateWorker() {
+  if (currentReject) {
+    currentReject(new Error('Layout cancelled'));
+    currentReject = null;
+  }
   if (currentWorker) {
     currentWorker.terminate();
     currentWorker = null;
@@ -137,13 +143,17 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
 
   const worker = getWorker();
 
-  return new Promise<{ nodes: Node[], edges: Edge[] }>((resolve) => {
+  return new Promise<{ nodes: Node[], edges: Edge[] }>((resolve, reject) => {
+      currentReject = reject;
+
       // One-time listener
       worker.onmessage = (event: MessageEvent<LayoutWorkerResponse>) => {
+          currentReject = null;
           resolve(event.data);
       };
       worker.onerror = (err) => {
           console.error("Worker Error:", err);
+          currentReject = null;
           // Fallback: resolve with original nodes to prevent crash
           resolve({ nodes, edges });
       };
@@ -360,6 +370,10 @@ export const useGraphStore = create<GraphState>()(
               loading: false
             });
           } catch (error) {
+            if (error instanceof Error && error.message === 'Layout cancelled') {
+              // Ignore cancellation, likely superseded by new layout request
+              return;
+            }
             console.error("Layout failed:", error);
             set({ loading: false });
           }
