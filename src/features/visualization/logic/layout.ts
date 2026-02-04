@@ -115,10 +115,15 @@ export function applyDagreLayout(
         newStyle.height = height;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const targetPosition = isHorizontal ? 'left' : 'top';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sourcePosition = isHorizontal ? 'right' : 'bottom';
+
     return {
       ...node,
-      targetPosition: isHorizontal ? 'left' : 'top',
-      sourcePosition: isHorizontal ? 'right' : 'bottom',
+      targetPosition: targetPosition as any,
+      sourcePosition: sourcePosition as any,
       position: {
         x,
         y,
