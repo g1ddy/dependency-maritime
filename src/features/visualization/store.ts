@@ -118,6 +118,7 @@ const robustStorage = {
 let currentWorker: Worker | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let currentReject: ((reason?: any) => void) | null = null;
+let isWorkerBusy = false;
 
 function getWorker() {
   if (!currentWorker) {
@@ -135,27 +136,39 @@ function terminateWorker() {
     currentWorker.terminate();
     currentWorker = null;
   }
+  isWorkerBusy = false;
 }
 
 const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) => {
-  // Terminate existing worker to "cancel" previous stale layout and free resources
-  terminateWorker();
+  // If the worker is busy, we must terminate it to prioritize the new request.
+  // JS Workers process messages sequentially, so a new message would wait for the old one.
+  if (isWorkerBusy) {
+    terminateWorker();
+  }
 
   const worker = getWorker();
+  isWorkerBusy = true;
 
   return new Promise<{ nodes: Node[], edges: Edge[] }>((resolve, reject) => {
       currentReject = reject;
 
       // One-time listener
       worker.onmessage = (event: MessageEvent<LayoutWorkerResponse>) => {
-          currentReject = null;
-          resolve(event.data);
+          // Only resolve if this matches the current request (though worker is single-threaded)
+          if (currentReject === reject) {
+            currentReject = null;
+            isWorkerBusy = false;
+            resolve(event.data);
+          }
       };
       worker.onerror = (err) => {
-          console.error("Worker Error:", err);
-          currentReject = null;
-          // Fallback: resolve with original nodes to prevent crash
-          resolve({ nodes, edges });
+          if (currentReject === reject) {
+            console.error("Worker Error:", err);
+            currentReject = null;
+            isWorkerBusy = false;
+            // Fallback: resolve with original nodes to prevent crash
+            resolve({ nodes, edges });
+          }
       };
       worker.postMessage({ nodes, edges, options });
   });
