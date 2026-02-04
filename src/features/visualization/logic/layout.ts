@@ -115,14 +115,14 @@ export function applyDagreLayout(
         newStyle.height = height;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const targetPosition = isHorizontal ? 'left' : 'top';
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sourcePosition = isHorizontal ? 'right' : 'bottom';
 
     return {
       ...node,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
       targetPosition: targetPosition as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
       sourcePosition: sourcePosition as any,
       position: {
         x,
