@@ -109,10 +109,13 @@ export function applyDagreLayout(
     }
 
     // Update style/dimensions for group nodes so they render correctly sized
-    const newStyle = { ...node.style };
+    // We add a padding buffer to ensure children are visually contained even if font rendering differs
+    const GROUP_PADDING_BUFFER = 20;
+    const newStyle = { ...(node.style || {}) };
+
     if (node.type === 'groupNode') {
-        newStyle.width = width;
-        newStyle.height = height;
+        newStyle.width = width + GROUP_PADDING_BUFFER;
+        newStyle.height = height + GROUP_PADDING_BUFFER;
     }
 
     const targetPosition = isHorizontal ? 'left' : 'top';
