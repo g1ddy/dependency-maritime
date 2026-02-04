@@ -125,9 +125,8 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
     if (!fullPath) return;
 
     // We walk up the directory tree to attribute these metrics to all ancestors.
-    const parts = fullPath.split('/');
-    parts.pop(); // Remove filename
-    const parentPath = parts.join('/');
+    const lastSlash = fullPath.lastIndexOf('/');
+    const parentPath = lastSlash !== -1 ? fullPath.substring(0, lastSlash) : '';
 
     if (parentPath) {
       const agg = getFolderEntry(parentPath);
