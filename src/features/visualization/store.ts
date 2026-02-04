@@ -13,11 +13,13 @@ import {
 import Graph from 'graphology';
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
-import { applyDagreLayout } from './logic/layout';
 import { applyElkLayout } from './logic/layout-elk';
+import { type LayoutOptions } from './logic/layout';
 import { type ModuleCategory } from './logic/filters';
 import { calculateGraphMetrics, getHealthStatus } from './logic/metrics';
 import { type AppNodeData, type GroupNodeData, type ComplexityMetricsMap } from './types';
+import LayoutWorker from './logic/layout.worker?worker';
+import { type LayoutWorkerResponse } from './logic/layout.worker';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
@@ -112,24 +114,59 @@ const robustStorage = {
   },
 };
 
+// --- Worker Management ---
+let currentWorker: Worker | null = null;
+
+function getWorker() {
+  if (!currentWorker) {
+    currentWorker = new LayoutWorker();
+  }
+  return currentWorker;
+}
+
+function terminateWorker() {
+  if (currentWorker) {
+    currentWorker.terminate();
+    currentWorker = null;
+  }
+}
+
+const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) => {
+  // Terminate existing worker to "cancel" previous stale layout and free resources
+  terminateWorker();
+
+  const worker = getWorker();
+
+  return new Promise<{ nodes: Node[], edges: Edge[] }>((resolve) => {
+      // One-time listener
+      worker.onmessage = (event: MessageEvent<LayoutWorkerResponse>) => {
+          resolve(event.data);
+      };
+      worker.onerror = (err) => {
+          console.error("Worker Error:", err);
+          // Fallback: resolve with original nodes to prevent crash
+          resolve({ nodes, edges });
+      };
+      worker.postMessage({ nodes, edges, options });
+  });
+};
+
+
 export const useGraphStore = create<GraphState>()(
   persist(
     (set, get) => {
-      // Pure helper to compute graph state updates without causing side effects
-      const computeGraphStateUpdate = (graph: Graph) => {
-        const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
+      // Helper to compute unlayouted graph state
+      const computeGraphState = (graph: Graph) => {
+        const { hideTypeDefinitions, activeFilters } = get();
 
         // Transform to React Flow
         const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters });
 
-        // Apply Layout (Default to Dagre synchronously for immediate feedback)
-        const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
-
         return {
-          nodes: layouted.nodes,
-          edges: layouted.edges,
+          nodes,
+          edges,
           selectedNodeId: null,
-          loading: false,
+          loading: true, // Always loading until layout finishes
           hasUnsavedChanges: false
         };
       };
@@ -184,8 +221,8 @@ export const useGraphStore = create<GraphState>()(
           const graph = createGraphFromCruiseResult(data);
           const originalGraph = graph.copy();
 
-          // 2. Compute state (Synchronous Dagre)
-          const computedState = computeGraphStateUpdate(graph);
+          // 2. Compute initial state (Unlayouted)
+          const computedState = computeGraphState(graph);
 
           set({
             ...computedState,
@@ -193,13 +230,11 @@ export const useGraphStore = create<GraphState>()(
             originalGraph,
           });
 
-          // 3. Trigger Metrics
-          get().calculateMetrics(newVersion);
-
-          // 4. Trigger ELK Layout if selected (Async override)
-          if (get().layoutEngine === 'elk') {
-            void get().layoutGraph();
-          }
+          // 3. Trigger Layout (Async)
+          void get().layoutGraph().then(() => {
+             // 4. Trigger Metrics only after layout/graph is set
+             get().calculateMetrics(newVersion);
+          });
         },
 
         calculateMetrics: (version?: number) => {
@@ -259,38 +294,28 @@ export const useGraphStore = create<GraphState>()(
         },
 
         toggleTypeDefinitions: () => {
-          const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilters, layoutEngine } = get();
+          const { graph, hideTypeDefinitions, selectedNodeId } = get();
           if (!graph) return;
 
           const newValue = !hideTypeDefinitions;
 
-          // Re-transform with new filter (and sync Dagre layout)
-          const { nodes, edges } = transformToReactFlow(graph, {
-            hideTypeDefinitions: newValue,
-            activeFilters
+          // Update filter setting immediately
+          set({ hideTypeDefinitions: newValue });
+
+          // Re-transform (Unlayouted)
+          const state = computeGraphState(graph);
+          set(state);
+
+          // Trigger Layout
+          void get().layoutGraph().then(() => {
+              if (selectedNodeId) {
+                get().selectNode(selectedNodeId);
+              }
           });
-
-          // Apply initial Dagre layout
-          const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
-
-          set({
-            hideTypeDefinitions: newValue,
-            nodes: layouted.nodes,
-            edges: layouted.edges,
-          });
-
-          if (selectedNodeId) {
-            get().selectNode(selectedNodeId);
-          }
-
-          // Re-apply ELK if needed
-          if (layoutEngine === 'elk') {
-            void get().layoutGraph();
-          }
         },
 
         setFilter: (filter: ModuleCategory | 'all') => {
-          const { graph, hideTypeDefinitions, layoutDirection, activeFilters, layoutEngine } = get();
+          const { graph, activeFilters } = get();
           if (!graph) return;
 
           let newFilters: ModuleCategory[];
@@ -305,23 +330,12 @@ export const useGraphStore = create<GraphState>()(
             }
           }
 
-          const { nodes, edges } = transformToReactFlow(graph, {
-            hideTypeDefinitions,
-            activeFilters: newFilters
-          });
+          set({ activeFilters: newFilters, selectedNodeId: null });
 
-          const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
+          const state = computeGraphState(graph);
+          set(state);
 
-          set({
-            activeFilters: newFilters,
-            nodes: layouted.nodes,
-            edges: layouted.edges,
-            selectedNodeId: null
-          });
-
-          if (layoutEngine === 'elk') {
-            void get().layoutGraph();
-          }
+          void get().layoutGraph();
         },
 
         layoutGraph: async (direction) => {
@@ -331,8 +345,13 @@ export const useGraphStore = create<GraphState>()(
           set({ loading: true });
 
           try {
-            const layoutFn = layoutEngine === 'elk' ? applyElkLayout : applyDagreLayout;
-            const result = await layoutFn(nodes, edges, { direction: targetDirection });
+            let result: { nodes: Node[]; edges: Edge[] };
+
+            if (layoutEngine === 'elk') {
+                result = await applyElkLayout(nodes, edges, { direction: targetDirection });
+            } else {
+                result = await runDagreLayout(nodes, edges, { direction: targetDirection });
+            }
 
             set({
               nodes: result.nodes,
@@ -465,23 +484,23 @@ export const useGraphStore = create<GraphState>()(
         },
 
         resetSimulation: () => {
-          const { originalGraph, metricsVersion, layoutEngine } = get();
+          const { originalGraph, metricsVersion } = get();
           if (!originalGraph) return;
 
           const graph = originalGraph.copy();
 
-          const computedState = computeGraphStateUpdate(graph);
+          // Unlayouted
+          const computedState = computeGraphState(graph);
 
           set({
             ...computedState,
             graph,
           });
 
-          get().calculateMetrics(metricsVersion);
-
-          if (layoutEngine === 'elk') {
-            void get().layoutGraph();
-          }
+          // Async layout
+          void get().layoutGraph().then(() => {
+              get().calculateMetrics(metricsVersion);
+          });
         },
 
         onNodesChange: (changes: NodeChange[]) => {

@@ -132,12 +132,16 @@ describe('Visualization Store', () => {
 
       await vi.runAllTimersAsync();
 
-      // setGraphData in beforeEach -> calculateMetrics (v1) -> calculateGraphMetrics (call 1)
-      // setGraphData in test -> calculateMetrics (v2) -> calculateGraphMetrics (call 2)
-      // manual calculateMetrics(v1) -> aborted
+      // setGraphData in beforeEach -> layout (async) -> calculateMetrics (v1)
+      // setGraphData in test -> layout (async) -> calculateMetrics (v2)
+      //
+      // Because layout is async, the first calculateMetrics (v1) executes AFTER version is incremented to v2.
+      // So it aborts.
+      // The second calculateMetrics (v2) succeeds.
+      // The manual calculateMetrics(v1) aborts.
 
-      // Total calls should be 2.
-      expect(calculateGraphMetrics).toHaveBeenCalledTimes(2);
+      // Total calls should be 1.
+      expect(calculateGraphMetrics).toHaveBeenCalledTimes(1);
     });
 
     it('should handle React Flow node/edge changes', () => {
