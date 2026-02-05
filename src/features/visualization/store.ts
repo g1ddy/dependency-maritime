@@ -50,6 +50,7 @@ interface GraphState {
   viewMode: ViewMode;
   nodeSize: NodeSizeMode;
   layoutEngine: LayoutEngine;
+  isolateModule: boolean;
 
   // Actions
   setInspectorOpen: (isOpen: boolean) => void;
@@ -59,6 +60,7 @@ interface GraphState {
   setLayoutEngine: (engine: LayoutEngine) => void;
   selectNode: (nodeId: string | null, shouldOpenInspector?: boolean) => void;
   toggleTypeDefinitions: () => void;
+  toggleIsolateModule: () => void;
   setFilter: (filter: ModuleCategory | 'all') => void;
   setViewMode: (mode: ViewMode) => void;
   setNodeSize: (mode: NodeSizeMode) => void;
@@ -117,10 +119,10 @@ export const useGraphStore = create<GraphState>()(
     (set, get) => {
       // Pure helper to compute graph state updates without causing side effects
       const computeGraphStateUpdate = (graph: Graph) => {
-        const { hideTypeDefinitions, layoutDirection, activeFilters } = get();
+        const { hideTypeDefinitions, layoutDirection, activeFilters, isolateModule } = get();
 
         // Transform to React Flow
-        const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters });
+        const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
 
         // Apply Layout (Default to Dagre synchronously for immediate feedback)
         const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
@@ -152,6 +154,7 @@ export const useGraphStore = create<GraphState>()(
         viewMode: 'standard',
         nodeSize: 'uniform',
         layoutEngine: 'dagre',
+        isolateModule: false,
 
         setInspectorOpen: (isOpen: boolean) => {
           set({ isInspectorOpen: isOpen });
@@ -259,7 +262,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         toggleTypeDefinitions: () => {
-          const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilters, layoutEngine } = get();
+          const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
           if (!graph) return;
 
           const newValue = !hideTypeDefinitions;
@@ -267,7 +270,8 @@ export const useGraphStore = create<GraphState>()(
           // Re-transform with new filter (and sync Dagre layout)
           const { nodes, edges } = transformToReactFlow(graph, {
             hideTypeDefinitions: newValue,
-            activeFilters
+            activeFilters,
+            isolateModule
           });
 
           // Apply initial Dagre layout
@@ -289,8 +293,42 @@ export const useGraphStore = create<GraphState>()(
           }
         },
 
+        toggleIsolateModule: () => {
+          const { graph, isolateModule, hideTypeDefinitions, activeFilters, layoutDirection, layoutEngine, selectedNodeId } = get();
+          if (!graph) return;
+
+          const newValue = !isolateModule;
+
+          // Re-transform
+          const { nodes, edges } = transformToReactFlow(graph, {
+            hideTypeDefinitions,
+            activeFilters,
+            isolateModule: newValue
+          });
+
+          // Apply initial Dagre layout
+          const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
+
+          // Preserve selection if the node still exists in the filtered graph
+          const newSelectedId = selectedNodeId && layouted.nodes.some((n) => n.id === selectedNodeId)
+            ? selectedNodeId
+            : null;
+
+          set({
+            isolateModule: newValue,
+            nodes: layouted.nodes,
+            edges: layouted.edges,
+            selectedNodeId: newSelectedId
+          });
+
+          // Re-apply ELK if needed
+          if (layoutEngine === 'elk') {
+            void get().layoutGraph();
+          }
+        },
+
         setFilter: (filter: ModuleCategory | 'all') => {
-          const { graph, hideTypeDefinitions, layoutDirection, activeFilters, layoutEngine } = get();
+          const { graph, hideTypeDefinitions, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
           if (!graph) return;
 
           let newFilters: ModuleCategory[];
@@ -307,7 +345,8 @@ export const useGraphStore = create<GraphState>()(
 
           const { nodes, edges } = transformToReactFlow(graph, {
             hideTypeDefinitions,
-            activeFilters: newFilters
+            activeFilters: newFilters,
+            isolateModule
           });
 
           const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
@@ -461,7 +500,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         reset: () => {
-          set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: 'dagre' });
+          set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: 'dagre', isolateModule: false });
         },
 
         resetSimulation: () => {
