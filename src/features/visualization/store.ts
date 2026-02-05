@@ -152,10 +152,21 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
   return new Promise<{ nodes: Node[], edges: Edge[] }>((resolve, reject) => {
       currentReject = reject;
 
+      // Safety timeout to prevent infinite hanging
+      const timeoutId = setTimeout(() => {
+        if (currentReject === reject) {
+          console.warn('Worker layout timed out, falling back to original nodes');
+          terminateWorker(); // Kill the stuck worker
+          // Fallback: resolve with original nodes to unblock UI
+          resolve({ nodes, edges });
+        }
+      }, 60000);
+
       // One-time listener
       worker.onmessage = (event: MessageEvent<LayoutWorkerResponse>) => {
           // Only resolve if this matches the current request (though worker is single-threaded)
           if (currentReject === reject) {
+            clearTimeout(timeoutId);
             currentReject = null;
             isWorkerBusy = false;
             resolve(event.data);
@@ -163,6 +174,7 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
       };
       worker.onerror = (err) => {
           if (currentReject === reject) {
+            clearTimeout(timeoutId);
             console.error("Worker Error:", err);
             currentReject = null;
             isWorkerBusy = false;
