@@ -55,7 +55,9 @@ export function GraphOverlay() {
     setFilter,
     setInspectorOpen,
     setViewMode,
-    resetSimulation
+    resetSimulation,
+    isolateModule,
+    toggleIsolateModule
   } = useGraphStore(useShallow((state) => ({
     hideTypeDefinitions: state.hideTypeDefinitions,
     activeFilters: state.activeFilters,
@@ -67,6 +69,8 @@ export function GraphOverlay() {
     setInspectorOpen: state.setInspectorOpen,
     setViewMode: state.setViewMode,
     resetSimulation: state.resetSimulation,
+    isolateModule: state.isolateModule,
+    toggleIsolateModule: state.toggleIsolateModule,
   })));
 
   // Optimize: Select only the necessary data for the selected node to prevent re-renders
@@ -240,7 +244,12 @@ export function GraphOverlay() {
             <div className="bg-muted/50 p-3 rounded-md mt-1 border border-border/50">
               <div className="flex justify-between items-center mb-1">
                 <Label htmlFor="isolate-module" className="text-xs font-semibold cursor-pointer">Isolate Module</Label>
-                <Switch id="isolate-module" data-testid="isolate-module-toggle" />
+                <Switch
+                  id="isolate-module"
+                  data-testid="isolate-module-toggle"
+                  checked={isolateModule}
+                  onCheckedChange={toggleIsolateModule}
+                />
               </div>
               <p className="text-[10px] text-muted-foreground">Hide all unconnected nodes</p>
             </div>

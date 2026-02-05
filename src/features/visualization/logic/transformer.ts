@@ -78,11 +78,12 @@ export function transformToReactFlow(
   options: {
     hideTypeDefinitions?: boolean;
     activeFilters?: ModuleCategory[];
+    isolateModule?: boolean;
   } = {}
 ): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
-  const visibleNodeIds = new Set<string>();
+  let visibleNodeIds = new Set<string>();
   const groupNodesMap = new Map<string, Node>();
   const dirToNodes = new Map<
     string,
@@ -110,6 +111,40 @@ export function transformToReactFlow(
     }
 
     visibleNodeIds.add(nodeId);
+  });
+
+  // 1.5. Apply Isolate Module Filter (remove unconnected nodes)
+  if (options.isolateModule) {
+    const connectedNodeIds = new Set<string>();
+    graph.forEachEdge((_edgeId, attributes, source, target) => {
+      // Only consider edges where both endpoints are currently visible
+      if (!visibleNodeIds.has(source) || !visibleNodeIds.has(target)) {
+        return;
+      }
+
+      // Respect hideTypeDefinitions during isolation check
+      if (
+        options.hideTypeDefinitions &&
+        Array.isArray(attributes.dependencyTypes) &&
+        attributes.dependencyTypes.includes('type-only')
+      ) {
+        return;
+      }
+
+      connectedNodeIds.add(source);
+      connectedNodeIds.add(target);
+    });
+
+    // Intersect visibleNodeIds with connectedNodeIds
+    visibleNodeIds = new Set(
+      [...visibleNodeIds].filter((id) => connectedNodeIds.has(id))
+    );
+  }
+
+  // 1.6. Re-process visible nodes to build hierarchy
+  visibleNodeIds.forEach((nodeId) => {
+    const attributes = graph.getNodeAttributes(nodeId);
+    const fullPath = (attributes.fullPath as string) || '';
 
     const lastSlashIndex = fullPath.lastIndexOf('/');
     if (lastSlashIndex === -1) {
