@@ -5,11 +5,11 @@ def run(playwright):
     page = browser.new_page()
     page.goto("http://localhost:5173/dependency-maritime/")
 
-    # Wait for nodes to be present
-    page.wait_for_selector('[data-testid^="node-"]', timeout=30000)
+    # Wait for nodes to be present and layout to be ready
+    page.wait_for_selector('[data-layout-ready="true"]', timeout=30000)
 
-    # Wait a bit for layout and fitView
-    page.wait_for_timeout(2000)
+    # Wait a tiny bit for fitView animation if enabled (though disableAnimations is often set in E2E)
+    page.wait_for_timeout(500)
 
     # Take screenshot
     page.screenshot(path="verification-layout.png")
