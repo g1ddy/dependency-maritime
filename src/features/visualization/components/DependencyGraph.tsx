@@ -70,7 +70,7 @@ export function DependencyGraph() {
       // Small delay to allow React Flow to render updated positions
       const t = setTimeout(() => {
         window.requestAnimationFrame(() => {
-            fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 });
+            void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 });
         });
       }, 250);
       return () => clearTimeout(t);
