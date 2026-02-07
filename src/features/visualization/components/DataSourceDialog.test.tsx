@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
-import { DataSourceDialog, MAX_FILE_SIZE, MAX_MODULES } from './DataSourceDialog';
+import { DataSourceDialog, MAX_FILE_SIZE, MAX_MODULES, MAX_DEPENDENCIES } from './DataSourceDialog';
 import type { ICruiseResult } from '@/schema/dependency-cruiser';
 
 // Polyfill Blob.prototype.text for jsdom
@@ -274,6 +274,54 @@ describe('DataSourceDialog File Interactions', () => {
         };
 
         const file = new File([JSON.stringify(largeData)], 'complex.json', { type: 'application/json' });
+
+        fireEvent.drop(dropZone!, {
+            dataTransfer: {
+                files: [file],
+                types: ['Files']
+            }
+        });
+
+        const errorElement = await within(dialog).findByText('Graph Too Complex');
+        expect(errorElement).toBeTruthy();
+        expect(mockOnDataLoaded).not.toHaveBeenCalled();
+    });
+
+    it('rejects graph that exceeds dependency limits', async () => {
+        render(
+            <DataSourceDialog
+                open={true}
+                onOpenChange={mockOnOpenChange}
+                onDataLoaded={mockOnDataLoaded}
+            />
+        );
+
+        const dialog = screen.getByRole('dialog');
+        const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
+        expect(dropZone).not.toBeNull();
+
+        // Create a graph with many dependencies
+        // We simulate a single module with MAX_DEPENDENCIES + 1 dependencies
+        const manyDependencies = new Array(MAX_DEPENDENCIES + 1).fill(null).map((_, i) => ({
+             module: `dep${i}`,
+             resolved: `src/dep${i}.ts`,
+             coreModule: false,
+             followable: true,
+             couldNotResolve: false,
+             dependencyTypes: ["local"]
+        }));
+
+        const modules = [{
+            source: 'src/hub.ts',
+            dependencies: manyDependencies
+        }];
+
+        // Omit 'summary' to force the manual calculation fallback
+        const largeData = {
+            modules
+        };
+
+        const file = new File([JSON.stringify(largeData)], 'many-deps.json', { type: 'application/json' });
 
         fireEvent.drop(dropZone!, {
             dataTransfer: {

@@ -37,7 +37,14 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     if (result.modules.length > MAX_MODULES) {
       return `The graph contains ${result.modules.length} modules, exceeding the limit of ${MAX_MODULES}. Large graphs can cause browser performance issues.`;
     }
-    const totalDependencies = result.modules.reduce((sum, m) => sum + m.dependencies.length, 0);
+
+    let totalDependencies = 0;
+    if (result.summary && typeof result.summary.totalDependenciesCruised === 'number') {
+      totalDependencies = result.summary.totalDependenciesCruised;
+    } else {
+      totalDependencies = result.modules.reduce((sum, m) => sum + m.dependencies.length, 0);
+    }
+
     if (totalDependencies > MAX_DEPENDENCIES) {
       return `The graph contains ${totalDependencies} dependencies, exceeding the limit of ${MAX_DEPENDENCIES}. Large graphs can cause browser performance issues.`;
     }
