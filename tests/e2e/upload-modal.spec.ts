@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('verify upload modal functionality', async ({ page }) => {
   // Navigate to the app
   await page.goto('/');
-  await page.waitForLoadState('networkidle');
+  // await page.waitForLoadState('networkidle');
 
   // Click the upload button
   // The button has aria-label="Upload/Select Data Source"
