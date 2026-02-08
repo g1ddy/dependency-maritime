@@ -52,6 +52,7 @@ interface GraphState {
   viewMode: ViewMode;
   nodeSize: NodeSizeMode;
   layoutEngine: LayoutEngine;
+  isolateModule: boolean;
 
   // Actions
   setInspectorOpen: (isOpen: boolean) => void;
@@ -61,6 +62,7 @@ interface GraphState {
   setLayoutEngine: (engine: LayoutEngine) => void;
   selectNode: (nodeId: string | null, shouldOpenInspector?: boolean) => void;
   toggleTypeDefinitions: () => void;
+  toggleIsolateModule: () => void;
   setFilter: (filter: ModuleCategory | 'all') => void;
   setViewMode: (mode: ViewMode) => void;
   setNodeSize: (mode: NodeSizeMode) => void;
@@ -117,7 +119,7 @@ const robustStorage = {
 // --- Worker Management ---
 let currentWorker: Worker | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let currentReject: ((reason?: any) => void) | null = null;
+let currentReject: ((reason?: Error) => void) | null = null;
 let isWorkerBusy = false;
 
 function getWorker() {
@@ -176,11 +178,12 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
           if (currentReject === reject) {
             clearTimeout(timeoutId);
             console.error("Worker Error:", err);
-            currentReject = null;
-            isWorkerBusy = false;
-            // Fallback: resolve with original nodes to prevent crash
-            resolve({ nodes, edges });
+      worker.onerror = (err) => {
+          console.error("Worker Error:", err);
+          if (currentReject) {
+              currentReject(new Error('Worker failed with: ' + (err.message || 'Unknown error')));
           }
+          currentReject = null;
       };
       worker.postMessage({ nodes, edges, options });
   });
@@ -192,10 +195,10 @@ export const useGraphStore = create<GraphState>()(
     (set, get) => {
       // Helper to compute unlayouted graph state
       const computeGraphState = (graph: Graph) => {
-        const { hideTypeDefinitions, activeFilters } = get();
+        const { hideTypeDefinitions, activeFilters, isolateModule } = get();
 
         // Transform to React Flow
-        const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters });
+        const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
 
         return {
           nodes,
@@ -224,6 +227,7 @@ export const useGraphStore = create<GraphState>()(
         viewMode: 'standard',
         nodeSize: 'uniform',
         layoutEngine: 'dagre',
+        isolateModule: false,
 
         setInspectorOpen: (isOpen: boolean) => {
           set({ isInspectorOpen: isOpen });
@@ -329,13 +333,19 @@ export const useGraphStore = create<GraphState>()(
         },
 
         toggleTypeDefinitions: () => {
-          const { graph, hideTypeDefinitions, selectedNodeId } = get();
+          const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
           if (!graph) return;
 
           const newValue = !hideTypeDefinitions;
 
           // Update filter setting immediately
           set({ hideTypeDefinitions: newValue });
+          // Re-transform with new filter (and sync Dagre layout)
+          const { nodes, edges } = transformToReactFlow(graph, {
+            hideTypeDefinitions: newValue,
+            activeFilters,
+            isolateModule
+          });
 
           // Re-transform (Unlayouted)
           const state = computeGraphState(graph);
@@ -349,8 +359,42 @@ export const useGraphStore = create<GraphState>()(
           });
         },
 
+        toggleIsolateModule: () => {
+          const { graph, isolateModule, hideTypeDefinitions, activeFilters, layoutDirection, layoutEngine, selectedNodeId } = get();
+          if (!graph) return;
+
+          const newValue = !isolateModule;
+
+          // Re-transform
+          const { nodes, edges } = transformToReactFlow(graph, {
+            hideTypeDefinitions,
+            activeFilters,
+            isolateModule: newValue
+          });
+
+          // Apply initial Dagre layout
+          const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
+
+          // Preserve selection if the node still exists in the filtered graph
+          const newSelectedId = selectedNodeId && layouted.nodes.some((n) => n.id === selectedNodeId)
+            ? selectedNodeId
+            : null;
+
+          set({
+            isolateModule: newValue,
+            nodes: layouted.nodes,
+            edges: layouted.edges,
+            selectedNodeId: newSelectedId
+          });
+
+          // Re-apply ELK if needed
+          if (layoutEngine === 'elk') {
+            void get().layoutGraph();
+          }
+        },
+
         setFilter: (filter: ModuleCategory | 'all') => {
-          const { graph, activeFilters } = get();
+          const { graph, hideTypeDefinitions, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
           if (!graph) return;
 
           let newFilters: ModuleCategory[];
@@ -366,6 +410,11 @@ export const useGraphStore = create<GraphState>()(
           }
 
           set({ activeFilters: newFilters, selectedNodeId: null });
+          const { nodes, edges } = transformToReactFlow(graph, {
+            hideTypeDefinitions,
+            activeFilters: newFilters,
+            isolateModule
+          });
 
           const state = computeGraphState(graph);
           set(state);
@@ -519,7 +568,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         reset: () => {
-          set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: 'dagre' });
+          set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: 'dagre', isolateModule: false });
         },
 
         resetSimulation: () => {
