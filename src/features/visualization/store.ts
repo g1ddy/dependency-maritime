@@ -178,12 +178,11 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
           if (currentReject === reject) {
             clearTimeout(timeoutId);
             console.error("Worker Error:", err);
-      worker.onerror = (err) => {
-          console.error("Worker Error:", err);
-          if (currentReject) {
+            if (currentReject) {
               currentReject(new Error('Worker failed with: ' + (err.message || 'Unknown error')));
+            }
+            currentReject = null;
           }
-          currentReject = null;
       };
       worker.postMessage({ nodes, edges, options });
   });
@@ -333,19 +332,13 @@ export const useGraphStore = create<GraphState>()(
         },
 
         toggleTypeDefinitions: () => {
-          const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
+          const { graph, hideTypeDefinitions, selectedNodeId } = get();
           if (!graph) return;
 
           const newValue = !hideTypeDefinitions;
 
           // Update filter setting immediately
           set({ hideTypeDefinitions: newValue });
-          // Re-transform with new filter (and sync Dagre layout)
-          const { nodes, edges } = transformToReactFlow(graph, {
-            hideTypeDefinitions: newValue,
-            activeFilters,
-            isolateModule
-          });
 
           // Re-transform (Unlayouted)
           const state = computeGraphState(graph);
@@ -360,41 +353,26 @@ export const useGraphStore = create<GraphState>()(
         },
 
         toggleIsolateModule: () => {
-          const { graph, isolateModule, hideTypeDefinitions, activeFilters, layoutDirection, layoutEngine, selectedNodeId } = get();
+          const { graph, isolateModule, selectedNodeId } = get();
           if (!graph) return;
 
           const newValue = !isolateModule;
+          set({ isolateModule: newValue });
 
-          // Re-transform
-          const { nodes, edges } = transformToReactFlow(graph, {
-            hideTypeDefinitions,
-            activeFilters,
-            isolateModule: newValue
+          // Re-transform (Unlayouted)
+          const state = computeGraphState(graph);
+          set(state);
+
+          // Trigger Layout
+          void get().layoutGraph().then(() => {
+              if (selectedNodeId) {
+                get().selectNode(selectedNodeId);
+              }
           });
-
-          // Apply initial Dagre layout
-          const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
-
-          // Preserve selection if the node still exists in the filtered graph
-          const newSelectedId = selectedNodeId && layouted.nodes.some((n) => n.id === selectedNodeId)
-            ? selectedNodeId
-            : null;
-
-          set({
-            isolateModule: newValue,
-            nodes: layouted.nodes,
-            edges: layouted.edges,
-            selectedNodeId: newSelectedId
-          });
-
-          // Re-apply ELK if needed
-          if (layoutEngine === 'elk') {
-            void get().layoutGraph();
-          }
         },
 
         setFilter: (filter: ModuleCategory | 'all') => {
-          const { graph, hideTypeDefinitions, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
+          const { graph, activeFilters } = get();
           if (!graph) return;
 
           let newFilters: ModuleCategory[];
@@ -410,12 +388,6 @@ export const useGraphStore = create<GraphState>()(
           }
 
           set({ activeFilters: newFilters, selectedNodeId: null });
-          const { nodes, edges } = transformToReactFlow(graph, {
-            hideTypeDefinitions,
-            activeFilters: newFilters,
-            isolateModule
-          });
-
           const state = computeGraphState(graph);
           set(state);
 
