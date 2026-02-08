@@ -17,9 +17,7 @@ interface DataSourceDialogProps {
   onDataLoaded: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
 }
 
-export const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
-export const MAX_MODULES = 2500;
-export const MAX_DEPENDENCIES = 5000;
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourceDialogProps) {
   const [dragActive, setDragActive] = useState(false);
@@ -33,37 +31,9 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     }
   }, [open]);
 
-  const validateComplexity = (result: ICruiseResult): string | null => {
-    if (result.modules.length > MAX_MODULES) {
-      return `The graph contains ${result.modules.length} modules, exceeding the limit of ${MAX_MODULES}. Large graphs can cause browser performance issues.`;
-    }
-
-    let totalDependencies = 0;
-    if (result.summary && typeof result.summary.totalDependenciesCruised === 'number') {
-      totalDependencies = result.summary.totalDependenciesCruised;
-    } else {
-      totalDependencies = result.modules.reduce((sum, m) => sum + m.dependencies.length, 0);
-    }
-
-    if (totalDependencies > MAX_DEPENDENCIES) {
-      return `The graph contains ${totalDependencies} dependencies, exceeding the limit of ${MAX_DEPENDENCIES}. Large graphs can cause browser performance issues.`;
-    }
-    return null;
-  };
-
   const loadData = (data: unknown, sourceName: string, complexityMetrics?: ComplexityMetricsMap) => {
     try {
       const result = CruiseResultSchema.parse(data);
-
-      const complexityError = validateComplexity(result);
-      if (complexityError) {
-        setError({
-          title: "Graph Too Complex",
-          description: complexityError
-        });
-        return;
-      }
-
       onDataLoaded(result, complexityMetrics);
       onOpenChange(false);
       setError(null);
@@ -97,7 +67,10 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       const text = await file.text();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const json = JSON.parse(text);
-      loadData(json, file.name, undefined);
+      const result = CruiseResultSchema.parse(json);
+      onDataLoaded(result, undefined);
+      onOpenChange(false);
+      setError(null);
     } catch (err) {
        console.error("Upload error:", err);
        let title = "Error";
@@ -106,6 +79,10 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
        if (err instanceof SyntaxError) {
          title = "Invalid JSON";
          description = "The file content is not valid JSON.";
+       } else if (err instanceof ZodError) {
+         title = "Validation Error";
+         const details = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(", ");
+         description = "Schema mismatch: " + details;
        } else if (err instanceof Error) {
          description = err.message;
        }

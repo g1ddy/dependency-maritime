@@ -36,7 +36,6 @@ export function DependencyGraph() {
   const disableAnimations = import.meta.env.VITE_DISABLE_ANIMATIONS === 'true' || new URLSearchParams(window.location.search).get('disableAnimations') === 'true';
   const nodes = useGraphStore((s) => s.nodes);
   const edges = useGraphStore((s) => s.edges);
-  const loading = useGraphStore((s) => s.loading);
 
   const {
     onNodesChange,
@@ -52,7 +51,7 @@ export function DependencyGraph() {
     reparentNode: s.reparentNode,
   })));
 
-  const { getIntersectingNodes, getInternalNode, getNode, fitView } = useReactFlow();
+  const { getIntersectingNodes, getInternalNode, getNode } = useReactFlow();
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
@@ -63,19 +62,6 @@ export function DependencyGraph() {
     const parsedMetrics = ComplexityMetricsMapSchema.parse(complexityMetrics);
     setGraphData(parsedData, parsedMetrics);
   }, [setGraphData]);
-
-  // Re-fit view when layout finishes
-  useEffect(() => {
-    if (!loading && nodes.length > 0) {
-      // Small delay to allow React Flow to render updated positions
-      const t = setTimeout(() => {
-        window.requestAnimationFrame(() => {
-            void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 });
-        });
-      }, 250);
-      return () => clearTimeout(t);
-    }
-  }, [loading, nodes.length, fitView, disableAnimations]);
 
   const onNodeDragStop = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -178,12 +164,8 @@ export function DependencyGraph() {
     selectNode(null);
   }, [selectNode]);
 
-  // data-layout-ready is used by E2E tests to verify layout completion
   return (
-    <div
-        className="absolute inset-0 w-full h-full"
-        data-layout-ready={!loading && nodes.length > 0}
-    >
+    <div className="absolute inset-0 w-full h-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
