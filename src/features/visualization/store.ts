@@ -333,19 +333,13 @@ export const useGraphStore = create<GraphState>()(
         },
 
         toggleTypeDefinitions: () => {
-          const { graph, hideTypeDefinitions, selectedNodeId, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
+          const { graph, hideTypeDefinitions, selectedNodeId } = get();
           if (!graph) return;
 
           const newValue = !hideTypeDefinitions;
 
           // Update filter setting immediately
           set({ hideTypeDefinitions: newValue });
-          // Re-transform with new filter (and sync Dagre layout)
-          const { nodes, edges } = transformToReactFlow(graph, {
-            hideTypeDefinitions: newValue,
-            activeFilters,
-            isolateModule
-          });
 
           // Re-transform (Unlayouted)
           const state = computeGraphState(graph);
@@ -388,7 +382,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         setFilter: (filter: ModuleCategory | 'all') => {
-          const { graph, hideTypeDefinitions, layoutDirection, activeFilters, layoutEngine, isolateModule } = get();
+          const { graph, activeFilters } = get();
           if (!graph) return;
 
           let newFilters: ModuleCategory[];
@@ -404,11 +398,6 @@ export const useGraphStore = create<GraphState>()(
           }
 
           set({ activeFilters: newFilters, selectedNodeId: null });
-          const { nodes, edges } = transformToReactFlow(graph, {
-            hideTypeDefinitions,
-            activeFilters: newFilters,
-            isolateModule
-          });
 
           const state = computeGraphState(graph);
           set(state);
