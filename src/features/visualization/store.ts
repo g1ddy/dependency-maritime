@@ -175,15 +175,15 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
           }
       };
       worker.onerror = (err) => {
-          if (currentReject === reject) {
-            clearTimeout(timeoutId);
-            console.error("Worker Error:", err);
-      worker.onerror = (err) => {
+        if (currentReject === reject) {
+          clearTimeout(timeoutId);
           console.error("Worker Error:", err);
           if (currentReject) {
-              currentReject(new Error('Worker failed with: ' + (err.message || 'Unknown error')));
+            currentReject(new Error('Worker failed with: ' + (err.message || 'Unknown error')));
           }
           currentReject = null;
+          isWorkerBusy = false;
+        }
       };
       worker.postMessage({ nodes, edges, options });
   });
@@ -360,7 +360,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         toggleIsolateModule: () => {
-          const { graph, isolateModule, hideTypeDefinitions, activeFilters, layoutDirection, layoutEngine, selectedNodeId } = get();
+          const { graph, isolateModule, hideTypeDefinitions, activeFilters, selectedNodeId } = get();
           if (!graph) return;
 
           const newValue = !isolateModule;
@@ -372,25 +372,19 @@ export const useGraphStore = create<GraphState>()(
             isolateModule: newValue
           });
 
-          // Apply initial Dagre layout
-          const layouted = applyDagreLayout(nodes, edges, { direction: layoutDirection });
-
-          // Preserve selection if the node still exists in the filtered graph
-          const newSelectedId = selectedNodeId && layouted.nodes.some((n) => n.id === selectedNodeId)
-            ? selectedNodeId
-            : null;
-
           set({
             isolateModule: newValue,
-            nodes: layouted.nodes,
-            edges: layouted.edges,
-            selectedNodeId: newSelectedId
+            nodes,
+            edges,
+            selectedNodeId: null,
           });
 
-          // Re-apply ELK if needed
-          if (layoutEngine === 'elk') {
-            void get().layoutGraph();
-          }
+          void get().layoutGraph().then(() => {
+            const { nodes: newNodes } = get();
+            if (selectedNodeId && newNodes.some((n) => n.id === selectedNodeId)) {
+              get().selectNode(selectedNodeId);
+            }
+          });
         },
 
         setFilter: (filter: ModuleCategory | 'all') => {
