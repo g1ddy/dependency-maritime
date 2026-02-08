@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from "react";
 import { X, ArrowRight, ArrowLeft, Activity, Info, Box } from "lucide-react";
 import { useGraphStore } from "../store";
+import { getFolderDescendants } from "../logic/graph-utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -27,13 +28,7 @@ export function NodeInspectorPanel() {
 
     // If Group Node: Aggregate dependencies from all descendants
     if (selectedNode?.type === 'groupNode') {
-       const descendants: string[] = [];
-       // Find all file descendants
-       graph.forEachNode((nodeId) => {
-          if (nodeId.startsWith(selectedNodeId + '/')) {
-             descendants.push(nodeId);
-          }
-       });
+       const descendants = getFolderDescendants(graph, selectedNodeId);
 
        const uniqueNeighbors = new Set<string>();
 

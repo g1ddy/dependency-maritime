@@ -477,6 +477,8 @@ export const useGraphStore = create<GraphState>()(
 
           if (graph && graph.hasNode(nodeId)) {
             graph.setNodeAttribute(nodeId, 'fullPath', newFullPath);
+            // Clear cached descendants map as hierarchy has changed
+            graph.removeAttribute('folderToDescendants');
           }
 
           set({
