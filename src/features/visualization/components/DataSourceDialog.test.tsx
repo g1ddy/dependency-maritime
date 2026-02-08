@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
-import { DataSourceDialog, MAX_FILE_SIZE } from './DataSourceDialog';
+import { DataSourceDialog, MAX_FILE_SIZE, MAX_MODULES, MAX_DEPENDENCIES } from './DataSourceDialog';
 import type { ICruiseResult } from '@/schema/dependency-cruiser';
 
 // Polyfill Blob.prototype.text for jsdom
@@ -57,14 +57,6 @@ vi.mock('../../../../config/dependency-graph.json', () => ({
   default: mockProjectData
 }));
 
-// Mock dynamic import of complexity metrics
-// Since the component uses `await import(...)`, we can't easily spy on it without intercepting the module loading.
-// However, since it's an external file, we can trust that in the test environment (where it likely doesn't exist or we don't mock it),
-// it throws or returns undefined.
-// But `DataSourceDialog.tsx` has a try/catch.
-// For the test "loads project data", we should expect `undefined` as the second argument unless we can mock the dynamic import successfully.
-// To keep it simple and robust, we'll verify it's called with *some* second argument (likely undefined here).
-
 describe('DataSourceDialog', () => {
   const mockOnOpenChange = vi.fn();
   const mockOnDataLoaded = vi.fn();
@@ -106,7 +98,6 @@ describe('DataSourceDialog', () => {
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /Sample Data/i }));
 
-    // Expect undefined for the second argument (complexity metrics)
     expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData, undefined);
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
@@ -123,7 +114,6 @@ describe('DataSourceDialog', () => {
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /Project Graph/i }));
 
-    // Wait for the async operation
     await waitFor(() => {
         expect(mockOnDataLoaded).toHaveBeenCalledWith(mockProjectData, expect.anything());
     });
@@ -170,8 +160,6 @@ describe('DataSourceDialog File Interactions', () => {
         });
 
         await waitFor(() => {
-             // Expect mockSampleData AND explicitly undefined as second arg, or expect.anything() if we don't care.
-             // Given the implementation passes undefined for upload, we expect undefined.
              expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData, undefined);
         });
         expect(mockOnOpenChange).toHaveBeenCalledWith(false);
@@ -216,7 +204,6 @@ describe('DataSourceDialog File Interactions', () => {
         const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
         expect(dropZone).not.toBeNull();
 
-        // Missing 'modules' array
         const invalidData = { foo: 'bar' };
         const file = new File([JSON.stringify(invalidData)], 'schema-error.json', { type: 'application/json' });
 
@@ -245,8 +232,6 @@ describe('DataSourceDialog File Interactions', () => {
         const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
         expect(dropZone).not.toBeNull();
 
-        // Create a fake file with size > 50MB
-        // We don't need actual content, just the size property mocked
         const file = new File([''], 'huge.json', { type: 'application/json' });
         Object.defineProperty(file, 'size', { value: MAX_FILE_SIZE + 1 });
 
@@ -258,6 +243,94 @@ describe('DataSourceDialog File Interactions', () => {
         });
 
         const errorElement = await within(dialog).findByText('File Too Large');
+        expect(errorElement).toBeTruthy();
+        expect(mockOnDataLoaded).not.toHaveBeenCalled();
+    });
+
+    it('rejects graph that exceeds complexity limits', async () => {
+        render(
+          <DataSourceDialog
+            open={true}
+            onOpenChange={mockOnOpenChange}
+            onDataLoaded={mockOnDataLoaded}
+          />
+        );
+
+        const dialog = screen.getByRole('dialog');
+        const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
+        expect(dropZone).not.toBeNull();
+
+        // Create a large graph
+        const modules = new Array(MAX_MODULES + 1).fill(null).map((_, i) => ({
+            source: `src/file_${i}.ts`,
+            dependencies: []
+        }));
+
+        const largeData = {
+            modules,
+            summary: {
+                error: 0, warn: 0, info: 0, totalCruised: modules.length, totalDependenciesCruised: 0, violations: []
+            }
+        };
+
+        const file = new File([JSON.stringify(largeData)], 'complex.json', { type: 'application/json' });
+
+        fireEvent.drop(dropZone!, {
+            dataTransfer: {
+                files: [file],
+                types: ['Files']
+            }
+        });
+
+        const errorElement = await within(dialog).findByText('Graph Too Complex');
+        expect(errorElement).toBeTruthy();
+        expect(mockOnDataLoaded).not.toHaveBeenCalled();
+    });
+
+    it('rejects graph that exceeds dependency limits', async () => {
+        render(
+            <DataSourceDialog
+                open={true}
+                onOpenChange={mockOnOpenChange}
+                onDataLoaded={mockOnDataLoaded}
+            />
+        );
+
+        const dialog = screen.getByRole('dialog');
+        const dropZone = within(dialog).getByText(/Click to upload/i).closest('button');
+        expect(dropZone).not.toBeNull();
+
+        // Create a graph with many dependencies
+        // We simulate a single module with MAX_DEPENDENCIES + 1 dependencies
+        const manyDependencies = new Array(MAX_DEPENDENCIES + 1).fill(null).map((_, i) => ({
+             module: `dep${i}`,
+             resolved: `src/dep${i}.ts`,
+             coreModule: false,
+             followable: true,
+             couldNotResolve: false,
+             dependencyTypes: ["local"]
+        }));
+
+        const modules = [{
+            source: 'src/hub.ts',
+            dependencies: manyDependencies
+        }];
+
+        // Omit 'summary' to force the manual calculation fallback
+        const largeData = {
+            modules
+        };
+
+        const file = new File([JSON.stringify(largeData)], 'many-deps.json', { type: 'application/json' });
+
+        fireEvent.drop(dropZone!, {
+            dataTransfer: {
+                files: [file],
+                types: ['Files']
+            }
+        });
+
+        const errorElement = await within(dialog).findByText('Graph Too Complex');
         expect(errorElement).toBeTruthy();
         expect(mockOnDataLoaded).not.toHaveBeenCalled();
     });
