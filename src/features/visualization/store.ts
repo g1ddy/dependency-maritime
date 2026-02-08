@@ -178,9 +178,7 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
         if (currentReject === reject) {
           clearTimeout(timeoutId);
           console.error("Worker Error:", err);
-          if (currentReject) {
-            currentReject(new Error('Worker failed with: ' + (err.message || 'Unknown error')));
-          }
+          currentReject(new Error('Worker failed with: ' + (err.message || 'Unknown error')));
           currentReject = null;
           isWorkerBusy = false;
         }
@@ -371,6 +369,7 @@ export const useGraphStore = create<GraphState>()(
             nodes,
             edges,
             selectedNodeId: null,
+            loading: true,
           });
 
           void get().layoutGraph().then(() => {
