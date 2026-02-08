@@ -26,7 +26,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    setupFiles: ["./tests/utils/setup.ts", "./tests/utils/setup-layout-mock.ts"],
+    setupFiles: ["./tests/utils/setup.ts", "./tests/utils/setup-layout-mock.ts", "./tests/utils/setup-worker-mock.ts"],
     exclude: ["tests/e2e/**", "node_modules/**"],
     coverage: {
       provider: 'v8',
