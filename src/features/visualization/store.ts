@@ -117,7 +117,7 @@ const robustStorage = {
 // --- Worker Management ---
 let currentWorker: Worker | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let currentReject: ((reason?: any) => void) | null = null;
+let currentReject: ((reason?: Error) => void) | null = null;
 let isWorkerBusy = false;
 
 function getWorker() {
