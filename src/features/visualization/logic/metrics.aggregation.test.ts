@@ -99,15 +99,15 @@ describe('Metrics Aggregation', () => {
     const result = calculateGraphMetrics(graph, complexityMetrics);
 
     // src/a/b/c
-    expect(result['src/a/b/c'].loc).toBe(100);
+    expect(result['src/a/b/c']?.loc).toBe(100);
 
     // src/a/b
-    expect(result['src/a/b'].loc).toBe(100);
+    expect(result['src/a/b']?.loc).toBe(100);
 
     // src/a
-    expect(result['src/a'].loc).toBe(100);
+    expect(result['src/a']?.loc).toBe(100);
 
     // src
-    expect(result['src'].loc).toBe(100);
+    expect(result['src']?.loc).toBe(100);
   });
 });
