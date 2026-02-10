@@ -143,31 +143,22 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
   });
 
   // 3.5 Propagate Aggregations Up the Tree
-  // First, identify all directory paths involved (including intermediates)
-  const initialPaths = Array.from(folderAggregations.keys());
-  const allPaths = new Set<string>();
+  // We use a snapshot of the initial aggregations (which only contain file metrics)
+  // to avoid double-counting as we walk up the tree. This is more efficient than
+  // building a full path set and sorting, as it processes each file contribution independently.
+  const initialEntries = Array.from(folderAggregations.entries()).map(([path, agg]) => [path, { ...agg }] as const);
 
-  for (const path of initialPaths) {
-    let current = path;
-    while (current) {
-      if (allPaths.has(current)) break;
-      allPaths.add(current);
-      const lastSlash = current.lastIndexOf('/');
+  for (const [path, metrics] of initialEntries) {
+    let currentPath = path;
+    while (true) {
+      const lastSlash = currentPath.lastIndexOf('/');
       if (lastSlash === -1) break;
-      current = current.substring(0, lastSlash);
-    }
-  }
 
-  // Sort paths by length (descending) to ensure we process children before parents
-  const sortedPaths = Array.from(allPaths).sort((a, b) => b.length - a.length);
-
-  for (const path of sortedPaths) {
-    const lastSlash = path.lastIndexOf('/');
-    if (lastSlash !== -1) {
-      const parentPath = path.substring(0, lastSlash);
-      const childAgg = folderAggregations.get(path)!;
+      const parentPath = currentPath.substring(0, lastSlash);
       const parentAgg = getFolderEntry(parentPath);
-      accumulateMetrics(parentAgg, childAgg);
+      accumulateMetrics(parentAgg, metrics);
+
+      currentPath = parentPath;
     }
   }
 

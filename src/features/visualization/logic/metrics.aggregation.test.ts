@@ -83,4 +83,31 @@ describe('Metrics Aggregation', () => {
     expect(folderMetrics['src']!.loc).toBe(50);
     expect(folderMetrics['src/features']!.loc).toBe(50);
   });
+
+  it('handles intermediate folders with no files', () => {
+    const graph = new Graph({ multi: false, type: 'directed' });
+
+    // src/a/b/c/file.ts
+    // src/a has no files directly.
+    // src/a/b has no files directly.
+    graph.addNode('fileD', { fullPath: 'src/a/b/c/fileD.ts' });
+
+    const complexityMetrics: ComplexityMetricsMap = {
+      'src/a/b/c/fileD.ts': { complexity: 10, loc: 100, instability: 0, fanIn: 0, fanOut: 0 },
+    };
+
+    const result = calculateGraphMetrics(graph, complexityMetrics);
+
+    // src/a/b/c
+    expect(result['src/a/b/c'].loc).toBe(100);
+
+    // src/a/b
+    expect(result['src/a/b'].loc).toBe(100);
+
+    // src/a
+    expect(result['src/a'].loc).toBe(100);
+
+    // src
+    expect(result['src'].loc).toBe(100);
+  });
 });
