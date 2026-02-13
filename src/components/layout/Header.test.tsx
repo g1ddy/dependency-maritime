@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { Header } from './Header';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 
 describe('Header', () => {
   const onOpenDataSourceMock = vi.fn();
@@ -15,12 +16,21 @@ describe('Header', () => {
   });
 
   it('renders without crashing', () => {
-    render(<Header onOpenDataSource={onOpenDataSourceMock} onOpenSettings={onOpenSettingsMock} />);
-    expect(screen.getByTestId('app-title')).toBeDefined();
+    render(
+      <MemoryRouter>
+        <Header onOpenDataSource={onOpenDataSourceMock} onOpenSettings={onOpenSettingsMock} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('Code Dependencies')).toBeDefined();
+    expect(screen.getByText('Relationships')).toBeDefined();
   });
 
   it('calls onOpenDataSource when upload button is clicked', () => {
-    render(<Header onOpenDataSource={onOpenDataSourceMock} onOpenSettings={onOpenSettingsMock} />);
+    render(
+      <MemoryRouter>
+        <Header onOpenDataSource={onOpenDataSourceMock} onOpenSettings={onOpenSettingsMock} />
+      </MemoryRouter>
+    );
     const uploadButton = screen.getByLabelText('Upload/Select Data Source');
     fireEvent.click(uploadButton);
     expect(onOpenDataSourceMock).toHaveBeenCalled();

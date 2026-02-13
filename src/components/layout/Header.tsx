@@ -19,7 +19,7 @@ interface HeaderProps {
 }
 
 export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: HeaderProps) {
-  const appVersion = import.meta.env.VITE_APP_VERSION as string
+  const appVersion = (import.meta.env.VITE_APP_VERSION as string) || '0.0.0'
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 z-50 relative">

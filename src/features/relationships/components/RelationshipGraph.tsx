@@ -8,6 +8,13 @@ export function RelationshipGraph() {
   const svgRef = useRef<SVGSVGElement>(null);
   const { nodes, links, selectNode, selectedNodeId } = useRelationshipStore();
 
+  // Use a ref for selectedNodeId to access the latest value inside d3 event handlers
+  // without re-running the simulation effect when selection changes.
+  const selectedNodeIdRef = useRef(selectedNodeId);
+  useEffect(() => {
+    selectedNodeIdRef.current = selectedNodeId;
+  }, [selectedNodeId]);
+
   useEffect(() => {
     if (!containerRef.current || !svgRef.current || nodes.length === 0) return;
 
@@ -26,8 +33,8 @@ export function RelationshipGraph() {
     // Zoom
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 4])
-      .on("zoom", (event) => {
-        g.attr("transform", event.transform);
+      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+        g.attr("transform", event.transform.toString());
       });
 
     svg.call(zoom);
@@ -75,15 +82,15 @@ export function RelationshipGraph() {
                 d.fx = d.x;
                 d.fy = d.y;
             })
-            .on("drag", (event, d) => {
+            .on("drag", (event: d3.D3DragEvent<SVGCircleElement, RelationshipNode, RelationshipNode>, d) => {
                 d.fx = event.x;
                 d.fy = event.y;
             })
-            .on("end", (event, d) => {
+            .on("end", (event: d3.D3DragEvent<SVGCircleElement, RelationshipNode, RelationshipNode>, d) => {
                 if (!event.active) simulation.alphaTarget(0);
                 d.fx = null;
                 d.fy = null;
-            }) as any
+            }) as unknown as (selection: d3.Selection<SVGCircleElement | d3.BaseType, RelationshipNode, SVGGElement, unknown>) => void
         );
 
     // Labels
@@ -103,7 +110,7 @@ export function RelationshipGraph() {
 
     // Interactions
     node.on("mouseover", (_, d) => {
-        if (!selectedNodeId) {
+        if (!selectedNodeIdRef.current) {
             node.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
             link.attr("opacity", l => (l.source as RelationshipNode) === d || (l.target as RelationshipNode) === d ? 1 : 0.1);
             label.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
@@ -111,14 +118,14 @@ export function RelationshipGraph() {
     });
 
     node.on("mouseout", () => {
-        if (!selectedNodeId) {
+        if (!selectedNodeIdRef.current) {
             node.attr("opacity", 1);
             link.attr("opacity", 0.6);
             label.attr("opacity", 1);
         }
     });
 
-    node.on("click", (event, d) => {
+    node.on("click", (event: PointerEvent, d) => {
         event.stopPropagation();
         selectNode(d.id);
     });
@@ -159,7 +166,7 @@ export function RelationshipGraph() {
         simulation.stop();
         resizeObserver.disconnect();
     };
-  }, [nodes, links, selectNode, selectedNodeId]); // Re-run when data changes
+  }, [nodes, links, selectNode]); // Re-run when data changes
 
   // Separate effect for selection highlighting to avoid re-running simulation
   useEffect(() => {

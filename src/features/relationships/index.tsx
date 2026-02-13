@@ -30,6 +30,7 @@ export function RelationshipPage({ onOpenUpload }: RelationshipPageProps) {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only on mount
 
   return (
