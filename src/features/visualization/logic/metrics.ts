@@ -155,6 +155,9 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
       if (lastSlash === -1) break;
 
       const parentPath = currentPath.substring(0, lastSlash);
+      // Avoid creating an entry for empty string if path starts with /
+      if (!parentPath) break;
+
       const parentAgg = getFolderEntry(parentPath);
       accumulateMetrics(parentAgg, metrics);
 
