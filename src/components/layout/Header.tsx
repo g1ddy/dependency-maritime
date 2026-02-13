@@ -64,7 +64,7 @@ export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: 
           <Link to="/">
             <Button variant={currentPath === '/' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/' && "bg-secondary")}>
               <Code className="h-4 w-4" />
-              <span className="hidden sm:inline">Code Dependencies</span>
+              <span className="sm:inline" data-testid="app-title">Dependency Graph</span>
             </Button>
           </Link>
           <Link to="/relationships">
@@ -76,7 +76,7 @@ export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: 
         </div>
 
         <div className="flex items-baseline gap-2">
-          <span className="text-xs text-muted-foreground mr-2">
+          <span className="text-xs text-muted-foreground mr-2" data-testid="app-version">
             v{appVersion}
           </span>
         </div>

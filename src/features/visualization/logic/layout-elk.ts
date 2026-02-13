@@ -74,51 +74,44 @@ export async function applyElkLayout(
   };
 
   // 5. Run Layout
-  try {
-    const layoutedGraph = await elk.layout(rootGraph);
+  const layoutedGraph = await elk.layout(rootGraph);
 
-    // 6. Map positions back to React Flow nodes
-    // ELK returns relative positions for children, which matches React Flow's expectation.
-    // We need to flatten the results to update our flat nodes array.
+  // 6. Map positions back to React Flow nodes
+  // ELK returns relative positions for children, which matches React Flow's expectation.
+  // We need to flatten the results to update our flat nodes array.
 
-    const nextNodes = nodes.map((originalNode) => {
-      const elkNode = findElkNode(layoutedGraph, originalNode.id);
+  const nextNodes = nodes.map((originalNode) => {
+    const elkNode = findElkNode(layoutedGraph, originalNode.id);
 
-      if (!elkNode) {
-        return originalNode;
-      }
+    if (!elkNode) {
+      return originalNode;
+    }
 
-      // Update position
-      const x = elkNode.x || 0;
-      const y = elkNode.y || 0;
+    // Update position
+    const x = elkNode.x || 0;
+    const y = elkNode.y || 0;
 
-      // Update dimensions if ELK resized them (e.g. groups)
-      const width = elkNode.width;
-      const height = elkNode.height;
+    // Update dimensions if ELK resized them (e.g. groups)
+    const width = elkNode.width;
+    const height = elkNode.height;
 
-      // Update style for group nodes
-      const newStyle = { ...originalNode.style };
-      if (originalNode.type === 'groupNode' && width && height) {
-        newStyle.width = width;
-        newStyle.height = height;
-      }
+    // Update style for group nodes
+    const newStyle = { ...originalNode.style };
+    if (originalNode.type === 'groupNode' && width && height) {
+      newStyle.width = width;
+      newStyle.height = height;
+    }
 
-      return {
-        ...originalNode,
-        targetPosition: isHorizontal ? Position.Left : Position.Top,
-        sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
-        position: { x, y },
-        style: newStyle,
-      };
-    });
+    return {
+      ...originalNode,
+      targetPosition: isHorizontal ? Position.Left : Position.Top,
+      sourcePosition: isHorizontal ? Position.Right : Position.Bottom,
+      position: { x, y },
+      style: newStyle,
+    };
+  });
 
-    return { nodes: nextNodes, edges };
-
-  } catch (error) {
-    console.error('ELK Layout failed:', error);
-    // Fallback: return original
-    return { nodes, edges };
-  }
+  return { nodes: nextNodes, edges };
 }
 
 // Helper to find a node in the ELK tree (Iterative DFS)

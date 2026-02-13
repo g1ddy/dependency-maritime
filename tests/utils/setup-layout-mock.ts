@@ -11,11 +11,11 @@ vi.mock('@/features/visualization/logic/layout', () => ({
 }));
 
 vi.mock('@/features/visualization/logic/layout-elk', () => ({
-  applyElkLayout: async (nodes: Node[], edges: Edge[]) => {
+  applyElkLayout: vi.fn(async (nodes: Node[], edges: Edge[]) => {
     await Promise.resolve(); // Simulate async
     return {
       nodes: nodes.map(n => ({ ...n, position: { x: 0, y: 0 } })),
       edges
     };
-  }
+  })
 }));

@@ -76,14 +76,23 @@ export function applyDagreLayout(
   dagre.layout(dagreGraph);
 
   // 4. Update Node Positions
+  const GROUP_PADDING_BUFFER = 20;
+
   // Capture all absolute top-left positions first
   const absolutePositions = new Map<string, { x: number; y: number }>();
 
   nodes.forEach((node) => {
       const nodeWithPosition = dagreGraph.node(node.id);
       // Dagre returns center coordinates, convert to top-left
-      const x = nodeWithPosition.x - nodeWithPosition.width / 2;
-      const y = nodeWithPosition.y - nodeWithPosition.height / 2;
+      let x = nodeWithPosition.x - nodeWithPosition.width / 2;
+      let y = nodeWithPosition.y - nodeWithPosition.height / 2;
+
+      // Shift top-left for group nodes to provide padding
+      if (node.type === 'groupNode') {
+          x -= GROUP_PADDING_BUFFER / 2;
+          y -= GROUP_PADDING_BUFFER / 2;
+      }
+
       absolutePositions.set(node.id, { x, y });
   });
 
@@ -95,6 +104,11 @@ export function applyDagreLayout(
 
     let x = nodeWithPosition.x - width / 2;
     let y = nodeWithPosition.y - height / 2;
+
+    if (node.type === 'groupNode') {
+        x -= GROUP_PADDING_BUFFER / 2;
+        y -= GROUP_PADDING_BUFFER / 2;
+    }
 
     // Convert to relative position if parent exists
     if (node.parentId) {
@@ -110,7 +124,6 @@ export function applyDagreLayout(
 
     // Update style/dimensions for group nodes so they render correctly sized
     // We add a padding buffer to ensure children are visually contained even if font rendering differs
-    const GROUP_PADDING_BUFFER = 20;
     const newStyle = { ...(node.style || {}) };
 
     if (node.type === 'groupNode') {
