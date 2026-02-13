@@ -1,0 +1,17 @@
+Source,Target,Target_Role,Target_Domain,Relationship,Relationship_Type,Relationship_Weight,Relationship_Start,Relationship_End,Reference_Type,Reference_Context,Reference_Date,Notes
+UserController,UserService,Class,Business Layer,injects,Dependency,1,v1.0,Current,Static Analysis,UserController.java,,Constructor injection
+UserController,UserDTO,Class,Data Transfer Layer,instantiates,Dependency,5,v1.0,Current,Static Analysis,UserController.java,,Maps request to DTO
+UserService,IUserService,Interface,Business Layer,implements,Inheritance,1,v1.0,Current,Static Analysis,UserService.java,,Standard interface implementation
+UserService,UserRepository,Class,Data Access Layer,injects,Dependency,1,v1.0,Current,Static Analysis,UserService.java,,Direct dependency on repository
+UserRepository,IUserRepository,Interface,Data Access Layer,implements,Inheritance,1,v1.0,Current,Static Analysis,UserRepository.java,,Spring Data JPA
+UserRepository,UserEntity,Class,Database Layer,returns,Association,10,v1.0,Current,Static Analysis,UserRepository.java,,ORM Mapping
+UserEntity,AddressEntity,Class,Database Layer,contains,Composition,1,v1.1,Current,Static Analysis,UserEntity.java,,One-to-many relationship
+UserService,EmailService,Class,Infrastructure Layer,calls,Flow,1,v1.2,Current,Runtime Trace,UserService.java,,Sends welcome email
+EmailService,SmtpClient,External Library,Infrastructure Layer,wraps,Adapter,1,v1.0,Current,Static Analysis,EmailService.java,,3rd party lib wrapper
+GlobalExceptionHandler,UserNotFoundException,Class,Error Handling,catches,Flow,1,v1.0,Current,Static Analysis,GlobalExceptionHandler.java,,Centralized error handling
+UserService,UserNotFoundException,Class,Error Handling,throws,Flow,1,v1.0,Current,Static Analysis,UserService.java,,Business logic validation
+AuthController,UserService,Class,Business Layer,calls,Flow,1,v2.0,Current,Static Analysis,AuthController.java,,Added for JWT generation
+AppConfig,DatabaseConfig,Configuration,Configuration Layer,imports,Structural,1,v1.0,Current,Static Analysis,AppConfig.java,,Spring configuration
+PaymentService,UserService,Class,Business Layer,calls,Flow,1,v2.1,Current,Static Analysis,PaymentService.java,,Legacy call - marked for refactor
+PaymentService,StripeAdapter,Class,Infrastructure Layer,uses,Dependency,1,v2.1,Current,Static Analysis,PaymentService.java,,Payment gateway
+LegacyUtil,UserService,Class,Business Layer,calls,Flow,50,v0.5,v1.0,Manual Audit,LegacyUtil.java,,High coupling detected - Deprecated

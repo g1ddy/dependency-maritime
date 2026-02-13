@@ -29,8 +29,8 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
       if (!nodesMap.has(row.Source)) {
         nodesMap.set(row.Source, {
             id: row.Source,
-            role: row.Source === 'Jeffrey Epstein' ? 'Central Figure' : (row.Source === 'Ghislaine Maxwell' ? 'Accomplice' : 'Associated Figure'),
-            cluster: row.Source === 'Jeffrey Epstein' ? 'Central Node' : row.Context_Cluster,
+          role: 'Source', // Default role for source nodes
+          cluster: 'Source', // Default cluster for source nodes, or could be inferred
             degree: 0
         });
       }
@@ -39,8 +39,8 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
       if (!nodesMap.has(row.Target)) {
         nodesMap.set(row.Target, {
             id: row.Target,
-            role: row.Target_Role,
-            cluster: row.Context_Cluster,
+          role: row.Target_Role || 'Target',
+          cluster: row.Target_Domain || 'Unspecified',
             degree: 0
         });
       }
@@ -49,12 +49,17 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
       links.push({
           source: row.Source,
           target: row.Target,
-          relationshipType: row.Relationship_Type,
-          value: +row.Value || 1,
-          evidenceType: row.Evidence_Type,
-          releaseContext: row.Release_Context,
-          contextCluster: row.Context_Cluster,
-          targetRole: row.Target_Role
+        relationship: row.Relationship,
+        relationshipType: row.Relationship_Type,
+        relationshipWeight: +row.Relationship_Weight || 1,
+        relationshipStart: row.Relationship_Start,
+        relationshipEnd: row.Relationship_End,
+        referenceType: row.Reference_Type,
+        referenceContext: row.Reference_Context,
+        referenceDate: row.Reference_Date,
+        notes: row.Notes,
+        targetRole: row.Target_Role,
+        targetDomain: row.Target_Domain
       });
     });
 

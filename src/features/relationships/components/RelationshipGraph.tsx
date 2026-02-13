@@ -57,7 +57,7 @@ export function RelationshipGraph() {
         .join("line")
         .attr("stroke", "#4b5563")
         .attr("stroke-opacity", 0.6)
-        .attr("stroke-width", d => Math.max(1, Math.log10(d.value + 1) * 3));
+        .attr("stroke-width", d => Math.max(1, Math.log10(d.relationshipWeight + 1) * 3));
 
     // Draw Nodes
     const node = g.append("g")
