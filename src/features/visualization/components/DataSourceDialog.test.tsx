@@ -127,6 +127,7 @@ describe('DataSourceDialog File Interactions', () => {
 
     beforeEach(() => {
       vi.clearAllMocks();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
     afterEach(() => {

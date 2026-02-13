@@ -15,8 +15,10 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
   const [searchQuery, setSearchQuery] = useState("");
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId);
+
+  const getId = (node: string | RelationshipNode) => typeof node === 'string' ? node : node.id;
   const connections = selectedNode
-    ? links.filter(l => (l.source as RelationshipNode).id === selectedNode.id || (l.target as RelationshipNode).id === selectedNode.id)
+    ? links.filter(l => getId(l.source) === selectedNode.id || getId(l.target) === selectedNode.id)
     : [];
 
   const uniqueClusters = Array.from(new Set(nodes.map(d => d.cluster))).sort();

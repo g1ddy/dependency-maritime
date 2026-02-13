@@ -8,6 +8,13 @@ export function RelationshipGraph() {
   const svgRef = useRef<SVGSVGElement>(null);
   const { nodes, links, selectNode, selectedNodeId } = useRelationshipStore();
 
+  // Use a ref for selectedNodeId to access the latest value inside d3 event handlers
+  // without re-running the simulation effect when selection changes.
+  const selectedNodeIdRef = useRef(selectedNodeId);
+  useEffect(() => {
+    selectedNodeIdRef.current = selectedNodeId;
+  }, [selectedNodeId]);
+
   useEffect(() => {
     if (!containerRef.current || !svgRef.current || nodes.length === 0) return;
 
@@ -103,7 +110,7 @@ export function RelationshipGraph() {
 
     // Interactions
     node.on("mouseover", (_, d) => {
-        if (!selectedNodeId) {
+        if (!selectedNodeIdRef.current) {
             node.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
             link.attr("opacity", l => (l.source as RelationshipNode) === d || (l.target as RelationshipNode) === d ? 1 : 0.1);
             label.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
@@ -111,7 +118,7 @@ export function RelationshipGraph() {
     });
 
     node.on("mouseout", () => {
-        if (!selectedNodeId) {
+        if (!selectedNodeIdRef.current) {
             node.attr("opacity", 1);
             link.attr("opacity", 0.6);
             label.attr("opacity", 1);
@@ -159,7 +166,7 @@ export function RelationshipGraph() {
         simulation.stop();
         resizeObserver.disconnect();
     };
-  }, [nodes, links, selectNode, selectedNodeId]); // Re-run when data changes
+  }, [nodes, links, selectNode]); // Re-run when data changes
 
   // Separate effect for selection highlighting to avoid re-running simulation
   useEffect(() => {
