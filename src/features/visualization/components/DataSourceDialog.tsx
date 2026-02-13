@@ -155,13 +155,21 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       console.warn("Complexity metrics not found or invalid, skipping.", e);
     }
 
-    // Slight delay to ensure UI updates if import is too fast (optional, but nice for UX consistency)
-    // await new Promise(resolve => setTimeout(resolve, 300));
-
     try {
         loadData(projectData, "Project Graph", metrics);
     } finally {
         setLoadingSource(null);
+    }
+  };
+
+  const handleSampleDataLoad = async () => {
+    setLoadingSource('sample');
+    // Simulate slight delay for visual consistency, as local parsing is instant
+    await new Promise(resolve => setTimeout(resolve, 300));
+    try {
+      loadData(sampleData, "Sample Data", undefined);
+    } finally {
+      setLoadingSource(null);
     }
   };
 
@@ -181,10 +189,14 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
               variant="outline"
               disabled={!!loadingSource}
               className="h-24 flex flex-col gap-2 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
-              onClick={() => loadData(sampleData, "Sample Data")}
+              onClick={() => void handleSampleDataLoad()}
             >
-              <Database className="h-8 w-8 text-blue-500" />
-              <span>Sample Data</span>
+              {loadingSource === 'sample' ? (
+                <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+              ) : (
+                <Database className="h-8 w-8 text-blue-500" />
+              )}
+              <span>{loadingSource === 'sample' ? 'Loading...' : 'Sample Data'}</span>
             </Button>
             <Button
               variant="outline"
