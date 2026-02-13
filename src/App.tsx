@@ -14,8 +14,7 @@ import { DataSourceDialog as RelationshipDataSourceDialog } from "@/features/rel
 
 function App() {
   const setGraphData = useGraphStore((state) => state.setGraphData)
-  const [isDataSourceOpen, setIsDataSourceOpen] = useState(false)
-  const [isRelationshipDataSourceOpen, setIsRelationshipDataSourceOpen] = useState(false)
+  const [activeDialog, setActiveDialog] = useState<'dependency' | 'relationship' | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const location = useLocation();
@@ -23,9 +22,9 @@ function App() {
 
   const handleOpenDataSource = () => {
     if (isRelationshipMode) {
-      setIsRelationshipDataSourceOpen(true);
+      setActiveDialog('relationship');
     } else {
-      setIsDataSourceOpen(true);
+      setActiveDialog('dependency');
     }
   };
 
@@ -45,24 +44,20 @@ function App() {
               <NodeInspectorPanel />
             </ReactFlowProvider>
           } />
-          <Route path="/relationships" element={<RelationshipPage onOpenUpload={() => setIsRelationshipDataSourceOpen(true)} />} />
+          <Route path="/relationships" element={<RelationshipPage onOpenUpload={() => setActiveDialog('relationship')} />} />
         </Routes>
       </div>
 
-      {!isRelationshipMode && (
-        <DataSourceDialog
-          open={isDataSourceOpen}
-          onOpenChange={setIsDataSourceOpen}
-          onDataLoaded={setGraphData}
-        />
-      )}
+      <DataSourceDialog
+        open={activeDialog === 'dependency'}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onDataLoaded={setGraphData}
+      />
 
-      {isRelationshipMode && (
-        <RelationshipDataSourceDialog
-          open={isRelationshipDataSourceOpen}
-          onOpenChange={setIsRelationshipDataSourceOpen}
-        />
-      )}
+      <RelationshipDataSourceDialog
+        open={activeDialog === 'relationship'}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+      />
 
       <SettingsDialog
         open={isSettingsOpen}
