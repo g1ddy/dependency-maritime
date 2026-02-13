@@ -86,7 +86,7 @@ describe('DataSourceDialog', () => {
     expect(within(dialog).getByText(/Click to upload/i)).toBeTruthy();
   });
 
-  it('loads sample data when clicked', () => {
+  it('loads sample data when clicked', async () => {
     render(
       <DataSourceDialog
         open={true}
@@ -98,8 +98,10 @@ describe('DataSourceDialog', () => {
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /Sample Data/i }));
 
-    expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData, undefined);
-    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+    await waitFor(() => {
+      expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData, undefined);
+      expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+    });
   });
 
   it('loads project data when clicked', async () => {
@@ -116,8 +118,8 @@ describe('DataSourceDialog', () => {
 
     await waitFor(() => {
         expect(mockOnDataLoaded).toHaveBeenCalledWith(mockProjectData, expect.anything());
+        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
-    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 });
 
