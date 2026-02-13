@@ -55,7 +55,9 @@ export function GraphOverlay() {
     setFilter,
     setInspectorOpen,
     setViewMode,
-    resetSimulation
+    resetSimulation,
+    isolateModule,
+    toggleIsolateModule
   } = useGraphStore(useShallow((state) => ({
     hideTypeDefinitions: state.hideTypeDefinitions,
     activeFilters: state.activeFilters,
@@ -67,6 +69,8 @@ export function GraphOverlay() {
     setInspectorOpen: state.setInspectorOpen,
     setViewMode: state.setViewMode,
     resetSimulation: state.resetSimulation,
+    isolateModule: state.isolateModule,
+    toggleIsolateModule: state.toggleIsolateModule,
   })));
 
   // Optimize: Select only the necessary data for the selected node to prevent re-renders
@@ -108,8 +112,8 @@ export function GraphOverlay() {
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col p-4">
       {/* Top Bar */}
-      <div className="flex justify-between items-start pointer-events-auto">
-        <div className="flex flex-col gap-4">
+      <div className="flex justify-between items-start pointer-events-none">
+        <div className="flex flex-col gap-4 pointer-events-auto">
           {/* Filters */}
           <div className="flex gap-2">
             {FILTERS.map((filter) => {
@@ -126,6 +130,7 @@ export function GraphOverlay() {
                   size="sm"
                   className={getFilterButtonClass(isActive)}
                   onClick={() => setFilter(filter.key)}
+                  aria-pressed={isActive}
                 >
                   <Icon className="h-3 w-3" /> {filter.label}
                 </Button>
@@ -178,6 +183,7 @@ export function GraphOverlay() {
             variant="outline"
             className={cn("gap-2 shadow-lg bg-background/50 backdrop-blur border-border/50 hover:bg-background/80", isInspectorOpen && "bg-accent text-accent-foreground")}
             onClick={() => setInspectorOpen(!isInspectorOpen)}
+            aria-pressed={isInspectorOpen}
           >
             <PanelRight className="h-4 w-4" /> Inspector
           </Button>
@@ -194,10 +200,10 @@ export function GraphOverlay() {
       <div className="flex-1" />
 
       {/* Bottom Interface */}
-      <div className="flex items-end justify-between pointer-events-auto">
+      <div className="flex items-end justify-between pointer-events-none">
         {/* Node Details Panel */}
         {selectedNode ? (
-          <Card className="w-96 p-4 bg-card/90 backdrop-blur flex flex-col gap-4 shadow-xl border-border/50">
+          <Card className="w-96 p-4 bg-card/90 backdrop-blur flex flex-col gap-4 shadow-xl border-border/50 pointer-events-auto">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded bg-blue-600/20 flex items-center justify-center text-blue-400">
                 <Globe className="h-5 w-5" />
@@ -237,8 +243,13 @@ export function GraphOverlay() {
 
             <div className="bg-muted/50 p-3 rounded-md mt-1 border border-border/50">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-xs font-semibold">Isolate Module</span>
-                <Switch id="isolate-module" data-testid="isolate-module-toggle" />
+                <Label htmlFor="isolate-module" className="text-xs font-semibold cursor-pointer">Isolate Module</Label>
+                <Switch
+                  id="isolate-module"
+                  data-testid="isolate-module-toggle"
+                  checked={isolateModule}
+                  onCheckedChange={toggleIsolateModule}
+                />
               </div>
               <p className="text-[10px] text-muted-foreground">Hide all unconnected nodes</p>
             </div>
