@@ -13,6 +13,7 @@ import {
 import Graph from 'graphology';
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
+import { FOLDER_DESCENDANTS_CACHE_KEY } from './logic/graph-utils';
 import { applyElkLayout } from './logic/layout-elk';
 import { type LayoutOptions } from './logic/layout';
 import { type ModuleCategory } from './logic/filters';
@@ -118,7 +119,6 @@ const robustStorage = {
 
 // --- Worker Management ---
 let currentWorker: Worker | null = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let currentReject: ((reason?: Error) => void) | null = null;
 let isWorkerBusy = false;
 
@@ -527,6 +527,8 @@ export const useGraphStore = create<GraphState>()(
 
           if (graph && graph.hasNode(nodeId)) {
             graph.setNodeAttribute(nodeId, 'fullPath', newFullPath);
+            // Clear cached descendants map as hierarchy has changed
+            graph.removeAttribute(FOLDER_DESCENDANTS_CACHE_KEY);
           }
 
           set({

@@ -52,6 +52,34 @@ describe('NodeInspectorPanel', () => {
     expect(screen.getByText('0.1000')).not.toBeNull(); // Centrality
   });
 
+  it('aggregates dependencies when folder is selected', () => {
+    const graph = new Graph();
+    // Add two nodes in the same folder
+    graph.addNode('node-1', { fullPath: 'src/folder/A.tsx', label: 'A.tsx' });
+    graph.addNode('node-2', { fullPath: 'src/folder/B.tsx', label: 'B.tsx' });
+    // Add an external dependency from node-1
+    graph.addNode('ext-1', { fullPath: 'node_modules/lib.ts', label: 'lib.ts' });
+    graph.addEdge('node-1', 'ext-1');
+
+    useGraphStore.setState({
+      isInspectorOpen: true,
+      selectedNodeId: 'src/folder',
+      graph: graph,
+      nodes: [
+        { id: 'src/folder', type: 'groupNode', position: { x: 0, y: 0 }, data: { label: 'folder' } },
+        { id: 'node-1', position: { x: 0, y: 0 }, data: { label: 'A.tsx', fullPath: 'src/folder/A.tsx' } },
+        { id: 'node-2', position: { x: 0, y: 0 }, data: { label: 'B.tsx', fullPath: 'src/folder/B.tsx' } },
+        { id: 'ext-1', position: { x: 0, y: 0 }, data: { label: 'lib.ts', fullPath: 'node_modules/lib.ts' } }
+      ]
+    });
+
+    render(<NodeInspectorPanel />);
+
+    expect(screen.getByText('folder')).not.toBeNull();
+    // Should show 1 dependency (aggregated from descendants)
+    expect(screen.getByText('lib.ts')).not.toBeNull();
+  });
+
   it('closes panel when close button clicked', () => {
     useGraphStore.setState({ isInspectorOpen: true });
 

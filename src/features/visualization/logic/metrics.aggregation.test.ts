@@ -100,14 +100,22 @@ describe('Metrics Aggregation', () => {
 
     // src/a/b/c
     expect(result['src/a/b/c']?.loc).toBe(100);
+    expect(result['src/a/b/c']?.cyclomaticComplexity).toBe(10);
+    expect(result['src/a/b/c']?.compoundScore).toBeGreaterThan(0);
 
     // src/a/b
     expect(result['src/a/b']?.loc).toBe(100);
+    expect(result['src/a/b']?.cyclomaticComplexity).toBe(10);
+    expect(result['src/a/b']?.compoundScore).toBeGreaterThan(0);
 
     // src/a
     expect(result['src/a']?.loc).toBe(100);
+    expect(result['src/a']?.cyclomaticComplexity).toBe(10);
+    expect(result['src/a']?.compoundScore).toBeGreaterThan(0);
 
     // src
     expect(result['src']?.loc).toBe(100);
+    expect(result['src']?.cyclomaticComplexity).toBe(10);
+    expect(result['src/a']?.compoundScore).toBeGreaterThan(0);
   });
 });
