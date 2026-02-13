@@ -1,4 +1,4 @@
-import { Menu, Upload, Code, Download, Settings } from "lucide-react"
+import { Menu, Upload, Code, Settings, Network } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 import {
@@ -9,64 +9,85 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Link } from "react-router-dom"
+import { cn } from "@/lib/utils"
 
 interface HeaderProps {
   onOpenDataSource: () => void;
   onOpenSettings: () => void;
+  currentPath?: string;
 }
 
-export function Header({ onOpenDataSource, onOpenSettings }: HeaderProps) {
+export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: HeaderProps) {
   const appVersion = import.meta.env.VITE_APP_VERSION as string
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 z-50 relative">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="top">
+          <SheetContent side="left">
             <SheetHeader>
-              <SheetTitle>Actions</SheetTitle>
+              <SheetTitle>Menu</SheetTitle>
               <SheetDescription>
-                Project settings and tools
+                Navigate and configure the application
               </SheetDescription>
             </SheetHeader>
-            <div className="flex gap-4 mt-4">
-              {[
-                { icon: Code, label: "Code", onClick: () => {} },
-                { icon: Download, label: "Export", onClick: () => {} },
-                { icon: Settings, label: "Settings", onClick: onOpenSettings },
-              ].map(({ icon: Icon, label, onClick }) => (
-                <Button
-                  key={label}
-                  variant="ghost"
-                  className="flex flex-col items-center gap-1 h-auto p-2"
-                  onClick={onClick}
-                >
-                  <Icon className="h-6 w-6" />
-                  <span className="text-xs">{label}</span>
+            <div className="flex flex-col gap-2 mt-4">
+              <Link to="/">
+                <Button variant={currentPath === '/' ? "secondary" : "ghost"} className="w-full justify-start">
+                  <Code className="h-4 w-4 mr-2" />
+                  Dependency Graph
                 </Button>
-              ))}
+              </Link>
+              <Link to="/relationships">
+                <Button variant={currentPath === '/relationships' ? "secondary" : "ghost"} className="w-full justify-start">
+                  <Network className="h-4 w-4 mr-2" />
+                  Relationship Diagram
+                </Button>
+              </Link>
+            </div>
+            <div className="border-t my-4 pt-4">
+              <Button variant="ghost" className="w-full justify-start" onClick={onOpenSettings}>
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
             </div>
           </SheetContent>
         </Sheet>
+
+        <div className="flex items-center gap-1 border-r pr-4 mr-1">
+          <Link to="/">
+            <Button variant={currentPath === '/' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/' && "bg-secondary")}>
+              <Code className="h-4 w-4" />
+              <span className="hidden sm:inline">Code Dependencies</span>
+            </Button>
+          </Link>
+          <Link to="/relationships">
+            <Button variant={currentPath === '/relationships' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/relationships' && "bg-secondary")}>
+              <Network className="h-4 w-4" />
+              <span className="hidden sm:inline">Relationships</span>
+            </Button>
+          </Link>
+        </div>
+
         <div className="flex items-baseline gap-2">
-          <span className="font-semibold text-lg" data-testid="app-title">
-            Dependency Graph
-          </span>
-          <span className="text-xs text-muted-foreground" data-testid="app-version">
+          <span className="text-xs text-muted-foreground mr-2">
             v{appVersion}
           </span>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <ModeToggle />
-        <Button variant="ghost" size="icon" onClick={onOpenDataSource} aria-label="Upload/Select Data Source">
-          <Upload className="h-5 w-5" />
-        </Button>
+        {currentPath === '/' && (
+          <Button variant="ghost" size="icon" onClick={onOpenDataSource} aria-label="Upload/Select Data Source">
+            <Upload className="h-5 w-5" />
+          </Button>
+        )}
       </div>
     </header>
   )
