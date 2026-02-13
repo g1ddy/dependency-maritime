@@ -1,5 +1,7 @@
 import Graph from 'graphology';
 
+export const FOLDER_DESCENDANTS_CACHE_KEY = 'folderToDescendants';
+
 /**
  * Builds a map from folder paths to lists of descendant node IDs.
  */
@@ -35,11 +37,11 @@ function buildDescendantsMap(graph: Graph): Map<string, string[]> {
  */
 export function getFolderDescendants(graph: Graph, folderPath: string): string[] {
   // Check if we have a cached map
-  if (!graph.hasAttribute('folderToDescendants')) {
+  if (!graph.hasAttribute(FOLDER_DESCENDANTS_CACHE_KEY)) {
     const map = buildDescendantsMap(graph);
-    graph.setAttribute('folderToDescendants', map);
+    graph.setAttribute(FOLDER_DESCENDANTS_CACHE_KEY, map);
   }
 
-  const map = graph.getAttribute('folderToDescendants') as Map<string, string[]>;
+  const map = graph.getAttribute(FOLDER_DESCENDANTS_CACHE_KEY) as Map<string, string[]>;
   return map.get(folderPath) || [];
 }

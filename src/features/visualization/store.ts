@@ -14,6 +14,7 @@ import Graph from 'graphology';
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
 import { applyDagreLayout } from './logic/layout';
+import { FOLDER_DESCENDANTS_CACHE_KEY } from './logic/graph-utils';
 import { applyElkLayout } from './logic/layout-elk';
 import { type ModuleCategory } from './logic/filters';
 import { calculateGraphMetrics, getHealthStatus } from './logic/metrics';
@@ -478,7 +479,7 @@ export const useGraphStore = create<GraphState>()(
           if (graph && graph.hasNode(nodeId)) {
             graph.setNodeAttribute(nodeId, 'fullPath', newFullPath);
             // Clear cached descendants map as hierarchy has changed
-            graph.removeAttribute('folderToDescendants');
+            graph.removeAttribute(FOLDER_DESCENDANTS_CACHE_KEY);
           }
 
           set({
