@@ -13,7 +13,6 @@ import {
 import Graph from 'graphology';
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
-import { applyDagreLayout } from './logic/layout';
 import { FOLDER_DESCENDANTS_CACHE_KEY } from './logic/graph-utils';
 import { applyElkLayout } from './logic/layout-elk';
 import { type LayoutOptions } from './logic/layout';
@@ -120,7 +119,6 @@ const robustStorage = {
 
 // --- Worker Management ---
 let currentWorker: Worker | null = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let currentReject: ((reason?: Error) => void) | null = null;
 let isWorkerBusy = false;
 
