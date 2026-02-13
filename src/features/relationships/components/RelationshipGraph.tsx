@@ -90,7 +90,7 @@ export function RelationshipGraph() {
                 if (!event.active) simulation.alphaTarget(0);
                 d.fx = null;
                 d.fy = null;
-            })
+            }) as unknown as (selection: d3.Selection<SVGCircleElement | d3.BaseType, RelationshipNode, SVGGElement, unknown>) => void
         );
 
     // Labels
