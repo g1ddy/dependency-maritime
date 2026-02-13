@@ -14,13 +14,6 @@ export interface LayoutWorkerResponse {
 
 self.onmessage = (event: MessageEvent<LayoutWorkerMessage>) => {
   const { nodes, edges, options } = event.data;
-
-  try {
-    const result = applyDagreLayout(nodes, edges, options);
-    self.postMessage(result);
-  } catch (error) {
-    console.error('Worker layout failed', error);
-    // In case of error, return the original nodes/edges so the app doesn't crash
-    self.postMessage({ nodes, edges });
-  }
+  const result = applyDagreLayout(nodes, edges, options);
+  self.postMessage(result);
 };

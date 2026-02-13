@@ -177,10 +177,9 @@ const runDagreLayout = (nodes: Node[], edges: Edge[], options: LayoutOptions) =>
       worker.onerror = (err) => {
         if (currentReject === reject) {
           clearTimeout(timeoutId);
-          console.error("Worker Error:", err);
-          currentReject(new Error('Worker failed with: ' + (err.message || 'Unknown error')));
-          currentReject = null;
           isWorkerBusy = false;
+          currentReject = null;
+          reject(new Error(err.message || 'Worker layout failed'));
         }
       };
       worker.postMessage({ nodes, edges, options });

@@ -21,7 +21,7 @@ describe('Header', () => {
         <Header onOpenDataSource={onOpenDataSourceMock} onOpenSettings={onOpenSettingsMock} />
       </MemoryRouter>
     );
-    expect(screen.getByText('Code Dependencies')).toBeDefined();
+    expect(screen.getByText('Dependency Graph')).toBeDefined();
     expect(screen.getByText('Relationships')).toBeDefined();
   });
 
