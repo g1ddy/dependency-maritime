@@ -178,8 +178,8 @@ describe('applyDagreLayout', () => {
     const groupNode = layoutedNodes[0];
     expect(groupNode.style).toEqual({
       backgroundColor: 'red',
-      width: 500,
-      height: 300
+      width: 520, // 500 + 20 buffer
+      height: 320 // 300 + 20 buffer
     });
   });
 
