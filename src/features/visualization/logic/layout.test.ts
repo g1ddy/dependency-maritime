@@ -159,13 +159,14 @@ describe('applyDagreLayout', () => {
     expect(childNode).toBeDefined();
 
     // Check Parent Position (Absolute)
-    // Center (200, 200) - Half (200, 200) = (0, 0)
-    expect(parentNode!.position).toEqual({ x: 0, y: 0 });
+    // Original Top-Left: Center (200, 200) - Half (200, 200) = (0, 0)
+    // With Padding Adjustment (Buffer=20): Top-Left = (0 - 10, 0 - 10) = (-10, -10)
+    expect(parentNode!.position).toEqual({ x: -10, y: -10 });
 
     // Check Child Position (Relative to Parent)
     // Child Absolute: Center (100, 100) - Half (50, 25) = (50, 75)
-    // Relative = Child Absolute (50, 75) - Parent Absolute (0, 0) = (50, 75)
-    expect(childNode!.position).toEqual({ x: 50, y: 75 });
+    // Relative = Child Absolute (50, 75) - Parent Absolute (-10, -10) = (60, 85)
+    expect(childNode!.position).toEqual({ x: 60, y: 85 });
   });
 
   it('should update group node style dimensions', () => {
