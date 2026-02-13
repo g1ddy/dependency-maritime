@@ -33,8 +33,8 @@ export function RelationshipGraph() {
     // Zoom
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 4])
-      .on("zoom", (event) => {
-        g.attr("transform", event.transform);
+      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+        g.attr("transform", event.transform.toString());
       });
 
     svg.call(zoom);
@@ -82,15 +82,15 @@ export function RelationshipGraph() {
                 d.fx = d.x;
                 d.fy = d.y;
             })
-            .on("drag", (event, d) => {
+            .on("drag", (event: d3.D3DragEvent<SVGCircleElement, RelationshipNode, RelationshipNode>, d) => {
                 d.fx = event.x;
                 d.fy = event.y;
             })
-            .on("end", (event, d) => {
+            .on("end", (event: d3.D3DragEvent<SVGCircleElement, RelationshipNode, RelationshipNode>, d) => {
                 if (!event.active) simulation.alphaTarget(0);
                 d.fx = null;
                 d.fy = null;
-            }) as any
+            })
         );
 
     // Labels
@@ -125,7 +125,7 @@ export function RelationshipGraph() {
         }
     });
 
-    node.on("click", (event, d) => {
+    node.on("click", (event: PointerEvent, d) => {
         event.stopPropagation();
         selectNode(d.id);
     });

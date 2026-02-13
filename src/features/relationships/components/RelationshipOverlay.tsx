@@ -107,7 +107,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
                         <div key={i} className="bg-gray-700/50 rounded p-3 border border-gray-700">
                           <div className="flex justify-between items-start mb-1">
                           <span className="font-medium text-blue-400">
-                            {typeof link.source === 'object' ? (link.source as RelationshipNode).id : link.source} ↔ {typeof link.target === 'object' ? (link.target as RelationshipNode).id : link.target}
+                            {typeof link.source === 'object' ? link.source.id : link.source} ↔ {typeof link.target === 'object' ? link.target.id : link.target}
                           </span>
                             <span className="text-xs bg-gray-600 px-1.5 py-0.5 rounded text-gray-300">{link.relationshipWeight}</span>
                         </div>
