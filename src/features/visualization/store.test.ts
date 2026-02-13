@@ -244,6 +244,34 @@ describe('Visualization Store', () => {
       store.selectNode(node.id, false);
       expect(useGraphStore.getState().isInspectorOpen).toBe(true);
     });
+
+    it('should handle layout worker errors gracefully', async () => {
+      const store = useGraphStore.getState();
+
+      // Trigger the mocked error by passing a special direction
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      await store.layoutGraph('TRIGGER_ERROR' as any);
+
+      const state = useGraphStore.getState();
+      expect(state.loading).toBe(false);
+      // Nodes should still be present (unlayouted or previous layout)
+      expect(state.nodes.length).toBeGreaterThan(0);
+    });
+
+    it('should handle ELK layout errors gracefully', async () => {
+      const store = useGraphStore.getState();
+      const { applyElkLayout } = await import('./logic/layout-elk');
+
+      // Mock ELK to throw
+      vi.mocked(applyElkLayout).mockRejectedValueOnce(new Error('ELK Failed'));
+
+      store.setLayoutEngine('elk');
+      await store.layoutGraph();
+
+      const state = useGraphStore.getState();
+      expect(state.loading).toBe(false);
+      expect(state.nodes.length).toBeGreaterThan(0);
+    });
   });
 
   describe('Simulation Mode', () => {
