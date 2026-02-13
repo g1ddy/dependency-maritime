@@ -59,7 +59,7 @@ export function RelationshipGraph() {
     // Draw Links
     const link = g.append("g")
         .attr("class", "links")
-        .selectAll("line")
+        .selectAll<SVGLineElement, RelationshipLink>("line")
         .data(links)
         .join("line")
         .attr("stroke", "#4b5563")
@@ -69,14 +69,14 @@ export function RelationshipGraph() {
     // Draw Nodes
     const node = g.append("g")
         .attr("class", "nodes")
-        .selectAll("circle")
+        .selectAll<SVGCircleElement, RelationshipNode>("circle")
         .data(nodes)
         .join("circle")
         .attr("r", d => getRadius(d))
         .attr("fill", d => color(d.cluster))
         .attr("stroke", "#374151")
         .attr("stroke-width", 1.5)
-        .call(d3.drag<SVGCircleElement, RelationshipNode>()
+        .call(d3.drag<SVGCircleElement, RelationshipNode, RelationshipNode>()
             .on("start", (event: d3.D3DragEvent<SVGCircleElement, RelationshipNode, RelationshipNode>, d) => {
                 if (!event.active) simulation.alphaTarget(0.3).restart();
                 d.fx = d.x;
@@ -90,13 +90,13 @@ export function RelationshipGraph() {
                 if (!event.active) simulation.alphaTarget(0);
                 d.fx = null;
                 d.fy = null;
-            }) as unknown as (selection: d3.Selection<SVGCircleElement | d3.BaseType, RelationshipNode, SVGGElement, unknown>) => void
+            })
         );
 
     // Labels
     const label = g.append("g")
         .attr("class", "labels")
-        .selectAll("text")
+        .selectAll<SVGTextElement, RelationshipNode>("text")
         .data(nodes)
         .join("text")
         .attr("dy", d => getRadius(d) + 12)
@@ -172,9 +172,9 @@ export function RelationshipGraph() {
   useEffect(() => {
      if (!svgRef.current) return;
      const svg = d3.select(svgRef.current);
-     const node = svg.selectAll(".nodes circle");
-     const link = svg.selectAll(".links line");
-     const label = svg.selectAll(".labels text");
+     const node = svg.selectAll<SVGCircleElement, RelationshipNode>(".nodes circle");
+     const link = svg.selectAll<SVGLineElement, RelationshipLink>(".links line");
+     const label = svg.selectAll<SVGTextElement, RelationshipNode>(".labels text");
 
      if (selectedNodeId) {
          // Find node object
@@ -185,12 +185,11 @@ export function RelationshipGraph() {
             return links.some(l => (l.source === a && l.target === b) || (l.source === b && l.target === a));
          };
 
-         node.attr("opacity", n => n === d || isConnected(n as RelationshipNode, d) ? 1 : 0.2);
+         node.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
          link.attr("opacity", l => {
-             const linkData = l as RelationshipLink;
-             return (linkData.source as RelationshipNode) === d || (linkData.target as RelationshipNode) === d ? 1 : 0.1;
+             return (l.source as RelationshipNode) === d || (l.target as RelationshipNode) === d ? 1 : 0.1;
          });
-         label.attr("opacity", n => n === d || isConnected(n as RelationshipNode, d) ? 1 : 0.2);
+         label.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
      } else {
          node.attr("opacity", 1);
          link.attr("opacity", 0.6);
