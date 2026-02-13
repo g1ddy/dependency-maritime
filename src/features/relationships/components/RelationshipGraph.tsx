@@ -37,7 +37,7 @@ export function RelationshipGraph() {
         .force("link", d3.forceLink<RelationshipNode, RelationshipLink>(links).id(d => d.id).distance(120))
         .force("charge", d3.forceManyBody().strength(-400))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collide", d3.forceCollide().radius((d: any) => (d.degree ? 5 + Math.min(d.degree * 2, 25) : 5) + 5).iterations(2));
+        .force("collide", d3.forceCollide<RelationshipNode>().radius((d) => (d.degree ? 5 + Math.min(d.degree * 2, 25) : 5) + 5).iterations(2));
 
     // Color Scale
     const uniqueClusters = Array.from(new Set(nodes.map(d => d.cluster)));

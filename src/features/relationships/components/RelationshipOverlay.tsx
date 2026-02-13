@@ -58,7 +58,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
         <div className="px-5 py-3 border-b border-gray-700 bg-gray-800 relative">
           <input
             type="text"
-            placeholder="Search for a person..."
+            placeholder="Search for a component..."
             className="w-full bg-gray-900 text-sm text-gray-200 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors placeholder:text-gray-500"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
