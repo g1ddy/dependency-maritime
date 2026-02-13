@@ -6,7 +6,7 @@ import { Upload, Database } from 'lucide-react';
 import Papa from 'papaparse';
 import { useRelationshipStore } from '../store';
 import type { CsvRow } from '../types';
-import classVisualizationCsv from '../../../../../sample-data/class_visualization.csv?raw';
+import classVisualizationCsv from '../../../../sample-data/class_visualization.csv?raw';
 import { cn } from '@/lib/utils';
 
 interface DataSourceDialogProps {
