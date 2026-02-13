@@ -100,8 +100,8 @@ describe('DataSourceDialog', () => {
 
     await waitFor(() => {
       expect(mockOnDataLoaded).toHaveBeenCalledWith(mockSampleData, undefined);
+      expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
-    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 
   it('loads project data when clicked', async () => {
@@ -118,8 +118,8 @@ describe('DataSourceDialog', () => {
 
     await waitFor(() => {
         expect(mockOnDataLoaded).toHaveBeenCalledWith(mockProjectData, expect.anything());
+        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
-    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 });
 
