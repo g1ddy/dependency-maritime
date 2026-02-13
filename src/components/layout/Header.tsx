@@ -83,7 +83,7 @@ export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: 
       </div>
       <div className="flex items-center gap-2">
         <ModeToggle />
-        {currentPath === '/' && (
+        {(currentPath === '/' || currentPath === '/relationships') && (
           <Button variant="ghost" size="icon" onClick={onOpenDataSource} aria-label="Upload/Select Data Source">
             <Upload className="h-5 w-5" />
           </Button>

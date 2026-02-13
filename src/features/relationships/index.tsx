@@ -1,15 +1,17 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { RelationshipGraph } from './components/RelationshipGraph';
 import { RelationshipOverlay } from './components/RelationshipOverlay';
-import { DataSourceDialog } from './components/DataSourceDialog';
 import { useRelationshipStore } from './store';
 import Papa from 'papaparse';
 import type { CsvRow } from './types';
 import classVisualizationCsv from '../../../sample-data/class_visualization.csv?raw';
 
-export function RelationshipPage() {
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
+interface RelationshipPageProps {
+  onOpenUpload: () => void;
+}
+
+export function RelationshipPage({ onOpenUpload }: RelationshipPageProps) {
   const { nodes, setData } = useRelationshipStore();
 
   useEffect(() => {
@@ -33,8 +35,7 @@ export function RelationshipPage() {
   return (
     <div className="relative w-full h-full bg-gray-900 overflow-hidden">
       <RelationshipGraph />
-      <RelationshipOverlay onUploadClick={() => setIsUploadOpen(true)} />
-      <DataSourceDialog open={isUploadOpen} onOpenChange={setIsUploadOpen} />
+      <RelationshipOverlay onUploadClick={onOpenUpload} />
     </div>
   );
 }
