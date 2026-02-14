@@ -12,6 +12,15 @@ vi.mock('@/features/visualization/logic/layout.worker?worker', () => {
       postMessage(data: LayoutWorkerMessage) {
         // Simulate async response
         setTimeout(() => {
+          // Special hook for testing errors
+          // @ts-expect-error - testing purpose
+          if (data.options?.direction === 'TRIGGER_ERROR') {
+            if (this.onerror) {
+              this.onerror({ message: 'Mocked Worker Error' } as ErrorEvent);
+            }
+            return;
+          }
+
           if (this.onmessage) {
             const { nodes, edges } = data;
             // Return dummy layout result (preserve inputs but reset positions)

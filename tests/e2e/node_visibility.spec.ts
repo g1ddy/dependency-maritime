@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('File nodes are visible and interactable (not obscured by folders)', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?disableAnimations=true');
 
   // Wait for the graph to load and render nodes.
   // We look for a specific file node that we know exists in the sample data (e.g., main.tsx).

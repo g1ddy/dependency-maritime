@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('verify upload modal functionality', async ({ page }) => {
   // Navigate to the app
-  await page.goto('/');
+  await page.goto('/?disableAnimations=true');
   // await page.waitForLoadState('networkidle');
 
   // Click the upload button
