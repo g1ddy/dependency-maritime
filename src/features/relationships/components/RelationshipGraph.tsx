@@ -64,8 +64,10 @@ export function RelationshipGraph() {
     const isConnected = (a: RelationshipNode, b: RelationshipNode) => {
         // Use simulationLinks which have been resolved by D3 (source/target are nodes)
         return simulationLinks.some(l => {
-             const sourceId = (l.source as RelationshipNode).id;
-             const targetId = (l.target as RelationshipNode).id;
+             // Cast to unknown first to satisfy TS2352 (casting string|Node to Node directly is unsafe if TS thinks it might be string)
+             // But we know simulation has run, so they are Nodes.
+             const sourceId = (l.source as unknown as RelationshipNode).id;
+             const targetId = (l.target as unknown as RelationshipNode).id;
              return (sourceId === a.id && targetId === b.id) || (sourceId === b.id && targetId === a.id);
         });
     }
@@ -126,7 +128,7 @@ export function RelationshipGraph() {
     node.on("mouseover", (_, d) => {
         if (!selectedNodeIdRef.current) {
             node.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
-            link.attr("opacity", l => (l.source as RelationshipNode).id === d.id || (l.target as RelationshipNode).id === d.id ? 1 : 0.1);
+            link.attr("opacity", l => (l.source as unknown as RelationshipNode).id === d.id || (l.target as unknown as RelationshipNode).id === d.id ? 1 : 0.1);
             label.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
         }
     });
@@ -150,10 +152,10 @@ export function RelationshipGraph() {
 
     simulation.on("tick", () => {
         link
-            .attr("x1", d => (d.source as RelationshipNode).x!)
-            .attr("y1", d => (d.source as RelationshipNode).y!)
-            .attr("x2", d => (d.target as RelationshipNode).x!)
-            .attr("y2", d => (d.target as RelationshipNode).y!);
+            .attr("x1", d => (d.source as unknown as RelationshipNode).x!)
+            .attr("y1", d => (d.source as unknown as RelationshipNode).y!)
+            .attr("x2", d => (d.target as unknown as RelationshipNode).x!)
+            .attr("y2", d => (d.target as unknown as RelationshipNode).y!);
 
         node
             .attr("cx", d => d.x!)
