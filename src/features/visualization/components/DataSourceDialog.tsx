@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Upload, FileJson, Database, Loader2 } from 'lucide-react';
+import { FileJson, Database, Loader2 } from 'lucide-react';
 import { CruiseResultSchema, type ICruiseResult } from '@/schema/dependency-cruiser';
 import { ZodError } from 'zod';
-import { cn } from '@/lib/utils';
 import { type ComplexityMetricsMap } from '../types';
+import { FileUploadZone } from '@/components/FileUploadZone';
 
 // Import data sources
 import sampleData from '../../../../sample-data/dependency-graph.json';
@@ -22,15 +22,12 @@ export const MAX_MODULES = 2500;
 export const MAX_DEPENDENCIES = 5000;
 
 export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourceDialogProps) {
-  const [dragActive, setDragActive] = useState(false);
   const [loadingSource, setLoadingSource] = useState<'sample' | 'project' | 'upload' | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<{ title: string; description: string } | null>(null);
 
   useEffect(() => {
     if (open) {
       setError(null);
-      setDragActive(false);
       setLoadingSource(null);
     }
   }, [open]);
@@ -118,27 +115,6 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     }
   };
 
-  const onDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (loadingSource) return; // Disable drag if loading
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (loadingSource) return; // Disable drop if loading
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      void handleFile(e.dataTransfer.files[0]);
-    }
-  };
-
   const handleProjectDataLoad = async () => {
     setLoadingSource('project');
     let metrics: ComplexityMetricsMap | undefined;
@@ -213,42 +189,12 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
             </Button>
           </div>
 
-          <button
-            type="button"
-            disabled={!!loadingSource}
-            className={cn(
-              "w-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              loadingSource ? "cursor-not-allowed opacity-70" : "cursor-pointer",
-              dragActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
-            )}
-            onDragEnter={onDrag}
-            onDragLeave={onDrag}
-            onDragOver={onDrag}
-            onDrop={onDrop}
-            onClick={() => !loadingSource && fileInputRef.current?.click()}
-          >
-            {loadingSource === 'upload' ? (
-                <Loader2 className="h-8 w-8 text-primary animate-spin" />
-            ) : (
-                <Upload className="h-8 w-8 text-muted-foreground" />
-            )}
-            <span className="text-center flex flex-col items-center">
-              <span className="text-sm font-medium block">
-                  {loadingSource === 'upload' ? 'Processing...' : 'Click to upload or drag and drop'}
-              </span>
-              {!loadingSource && <span className="text-xs text-muted-foreground mt-1 block">JSON files only</span>}
-            </span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
+          <FileUploadZone
+            onFileSelect={(file) => void handleFile(file)}
             accept=".json"
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files?.[0]) void handleFile(e.target.files[0]);
-              // Reset value to allow re-selection
-              e.target.value = '';
-            }}
+            loading={loadingSource === 'upload'}
+            label="Click to upload or drag and drop"
+            sublabel="JSON files only"
           />
 
           {error && (

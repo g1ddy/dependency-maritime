@@ -1,13 +1,13 @@
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Upload, Database } from 'lucide-react';
+import { Database } from 'lucide-react';
 import Papa from 'papaparse';
 import { useRelationshipStore } from '../store';
 import type { CsvRow } from '../types';
 import classVisualizationCsv from '../../../../sample-data/class_visualization.csv?raw';
-import { cn } from '@/lib/utils';
+import { FileUploadZone } from '@/components/FileUploadZone';
 
 interface DataSourceDialogProps {
   open: boolean;
@@ -15,10 +15,8 @@ interface DataSourceDialogProps {
 }
 
 export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { setData, setLoading } = useRelationshipStore();
-  const [error, setError] = useState<string | null>(null);
-  const [dragActive, setDragActive] = useState(false);
+  const { setData, setLoading, isLoading } = useRelationshipStore();
+  const [error, setError] = useState<{ title: string; description: string } | null>(null);
 
   const parseCsv = (csvString: string, sourceName: string) => {
     setLoading(true);
@@ -30,7 +28,10 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
       complete: (results) => {
         if (results.errors.length > 0) {
            console.error("CSV Errors:", results.errors);
-           setError(`Failed to parse ${sourceName}: ${results.errors[0].message}`);
+           setError({
+             title: "Parsing Error",
+             description: `Failed to parse ${sourceName}: ${results.errors[0].message}`
+           });
            setLoading(false);
            return;
         }
@@ -38,9 +39,12 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
         // Validate required columns (basic check)
         const firstRow = results.data[0];
         if (!firstRow || !firstRow.Source || !firstRow.Target || !firstRow.Target_Domain || !firstRow.Relationship_Weight) {
-          setError(`Invalid CSV format in ${sourceName}. Missing required columns (Source, Target, Target_Domain, Relationship_Weight).`);
-            setLoading(false);
-            return;
+          setError({
+            title: "Invalid Format",
+            description: `Invalid CSV format in ${sourceName}. Missing required columns (Source, Target, Target_Domain, Relationship_Weight).`
+          });
+          setLoading(false);
+          return;
         }
 
         setData(results.data);
@@ -48,7 +52,10 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
         onOpenChange(false);
       },
       error: (err: Error) => {
-          setError(`Error reading ${sourceName}: ${err.message}`);
+          setError({
+            title: "Read Error",
+            description: `Error reading ${sourceName}: ${err.message}`
+          });
           setLoading(false);
       }
     });
@@ -56,7 +63,10 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
 
   const handleFile = (file: File) => {
       if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
-          setError("Please upload a CSV file.");
+          setError({
+            title: "Invalid File Type",
+            description: "Please upload a CSV file."
+          });
           return;
       }
 
@@ -66,28 +76,12 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
           parseCsv(text, file.name);
       };
       reader.onerror = () => {
-          setError("Failed to read file.");
+          setError({
+            title: "Read Error",
+            description: "Failed to read file."
+          });
       };
       reader.readAsText(file);
-  };
-
-  const onDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
-    }
   };
 
   return (
@@ -124,40 +118,19 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
                 </div>
             </div>
 
-          <button
-            type="button"
-            className={cn(
-                "w-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                dragActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
-            )}
-            onDragEnter={onDrag}
-            onDragLeave={onDrag}
-            onDragOver={onDrag}
-            onDrop={onDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="h-8 w-8 text-muted-foreground" />
-             <span className="text-center flex flex-col items-center">
-              <span className="text-sm font-medium block">Click to upload or drag and drop</span>
-              <span className="text-xs text-muted-foreground mt-1 block">CSV files only</span>
-            </span>
-          </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
+          <FileUploadZone
+            onFileSelect={handleFile}
             accept=".csv"
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files?.[0]) handleFile(e.target.files[0]);
-              e.target.value = '';
-            }}
+            loading={isLoading}
+            label="Click to upload or drag and drop"
+            sublabel="CSV files only"
           />
 
           {error && (
-              <div className="text-destructive text-sm bg-destructive/10 p-2 rounded">
-                  {error}
-              </div>
+             <div role="alert" className="bg-destructive/10 text-destructive text-sm p-3 rounded-md border border-destructive/20 max-h-40 overflow-auto">
+               <div className="font-semibold">{error.title}</div>
+               <div className="mt-1 whitespace-pre-wrap break-all">{error.description}</div>
+             </div>
           )}
         </div>
       </DialogContent>
