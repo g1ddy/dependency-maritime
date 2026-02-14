@@ -23,8 +23,8 @@ export function RelationshipGraph() {
     const simulationLinks = links.map(d => ({
         ...d,
         // Ensure source/target are IDs for D3 to resolve
-        source: typeof d.source === 'object' ? (d.source as RelationshipNode).id : d.source,
-        target: typeof d.target === 'object' ? (d.target as RelationshipNode).id : d.target
+        source: typeof d.source === 'object' ? d.source.id : d.source,
+        target: typeof d.target === 'object' ? d.target.id : d.target
     }));
 
     const width = containerRef.current.clientWidth;
@@ -64,8 +64,8 @@ export function RelationshipGraph() {
     const isConnected = (a: RelationshipNode, b: RelationshipNode) => {
         // Use simulationLinks which have been resolved by D3 (source/target are nodes)
         return simulationLinks.some(l => {
-             const sourceId = (l.source as unknown as RelationshipNode).id;
-             const targetId = (l.target as unknown as RelationshipNode).id;
+             const sourceId = (l.source as RelationshipNode).id;
+             const targetId = (l.target as RelationshipNode).id;
              return (sourceId === a.id && targetId === b.id) || (sourceId === b.id && targetId === a.id);
         });
     }
@@ -126,7 +126,7 @@ export function RelationshipGraph() {
     node.on("mouseover", (_, d) => {
         if (!selectedNodeIdRef.current) {
             node.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
-            link.attr("opacity", l => (l.source as unknown as RelationshipNode).id === d.id || (l.target as unknown as RelationshipNode).id === d.id ? 1 : 0.1);
+            link.attr("opacity", l => (l.source as RelationshipNode).id === d.id || (l.target as RelationshipNode).id === d.id ? 1 : 0.1);
             label.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
         }
     });
@@ -150,10 +150,10 @@ export function RelationshipGraph() {
 
     simulation.on("tick", () => {
         link
-            .attr("x1", d => (d.source as unknown as RelationshipNode).x!)
-            .attr("y1", d => (d.source as unknown as RelationshipNode).y!)
-            .attr("x2", d => (d.target as unknown as RelationshipNode).x!)
-            .attr("y2", d => (d.target as unknown as RelationshipNode).y!);
+            .attr("x1", d => (d.source as RelationshipNode).x!)
+            .attr("y1", d => (d.source as RelationshipNode).y!)
+            .attr("x2", d => (d.target as RelationshipNode).x!)
+            .attr("y2", d => (d.target as RelationshipNode).y!);
 
         node
             .attr("cx", d => d.x!)
@@ -197,8 +197,8 @@ export function RelationshipGraph() {
          connectedNodeIds.add(selectedNodeId);
 
          links.forEach(l => {
-             const s = typeof l.source === 'object' ? (l.source as RelationshipNode).id : l.source as string;
-             const t = typeof l.target === 'object' ? (l.target as RelationshipNode).id : l.target as string;
+             const s = typeof l.source === 'object' ? l.source.id : l.source;
+             const t = typeof l.target === 'object' ? l.target.id : l.target;
              if (s === selectedNodeId) connectedNodeIds.add(t);
              if (t === selectedNodeId) connectedNodeIds.add(s);
          });
@@ -207,12 +207,11 @@ export function RelationshipGraph() {
 
          link.attr("opacity", l => {
              // 'l' here is simulationLink, so source/target are objects (from forceLink)
-             // However, checking types safely is good.
-             // But wait, this is the DOM element's data.
-             // If d3.forceLink ran, they are objects.
-             const sId = (l.source as unknown as RelationshipNode).id;
-             const tId = (l.target as unknown as RelationshipNode).id;
-             return sId === selectedNodeId || tId === selectedNodeId ? 1 : 0.1;
+             // D3 force simulation replaces source/target string IDs with actual Node objects
+             // We can safely cast source/target to RelationshipNode because simulation has run
+             const s = l.source as unknown as RelationshipNode;
+             const t = l.target as unknown as RelationshipNode;
+             return s.id === selectedNodeId || t.id === selectedNodeId ? 1 : 0.1;
          });
 
          label.attr("opacity", n => connectedNodeIds.has(n.id) ? 1 : 0.2);
