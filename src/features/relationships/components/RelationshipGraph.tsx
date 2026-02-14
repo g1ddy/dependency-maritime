@@ -18,6 +18,15 @@ export function RelationshipGraph() {
   useEffect(() => {
     if (!containerRef.current || !svgRef.current || nodes.length === 0) return;
 
+    // Deep clone nodes and links to avoid mutating Zustand store state
+    const simulationNodes = nodes.map(d => ({ ...d }));
+    const simulationLinks = links.map(d => ({
+        ...d,
+        // Ensure source/target are IDs for D3 to resolve
+        source: typeof d.source === 'object' ? (d.source as RelationshipNode).id : d.source,
+        target: typeof d.target === 'object' ? (d.target as RelationshipNode).id : d.target
+    }));
+
     const width = containerRef.current.clientWidth;
     const height = containerRef.current.clientHeight;
 
@@ -40,27 +49,32 @@ export function RelationshipGraph() {
     svg.call(zoom);
 
     // Simulation
-    const simulation = d3.forceSimulation<RelationshipNode>(nodes)
-        .force("link", d3.forceLink<RelationshipNode, RelationshipLink>(links).id(d => d.id).distance(120))
+    const simulation = d3.forceSimulation<RelationshipNode>(simulationNodes)
+        .force("link", d3.forceLink<RelationshipNode, RelationshipLink>(simulationLinks).id(d => d.id).distance(120))
         .force("charge", d3.forceManyBody().strength(-400))
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force("collide", d3.forceCollide<RelationshipNode>().radius((d) => (d.degree ? 5 + Math.min(d.degree * 2, 25) : 5) + 5).iterations(2));
 
     // Color Scale
-    const uniqueClusters = Array.from(new Set(nodes.map(d => d.cluster)));
+    const uniqueClusters = Array.from(new Set(simulationNodes.map(d => d.cluster)));
     const color = d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters);
 
     // Helpers
     const getRadius = (d: RelationshipNode) => 5 + Math.min(d.degree * 2, 25);
     const isConnected = (a: RelationshipNode, b: RelationshipNode) => {
-        return links.some(l => (l.source === a && l.target === b) || (l.source === b && l.target === a));
+        // Use simulationLinks which have been resolved by D3 (source/target are nodes)
+        return simulationLinks.some(l => {
+             const sourceId = (l.source as unknown as RelationshipNode).id;
+             const targetId = (l.target as unknown as RelationshipNode).id;
+             return (sourceId === a.id && targetId === b.id) || (sourceId === b.id && targetId === a.id);
+        });
     }
 
     // Draw Links
     const link = g.append("g")
         .attr("class", "links")
         .selectAll<SVGLineElement, RelationshipLink>("line")
-        .data(links)
+        .data(simulationLinks)
         .join("line")
         .attr("stroke", "#4b5563")
         .attr("stroke-opacity", 0.6)
@@ -70,7 +84,7 @@ export function RelationshipGraph() {
     const node = g.append("g")
         .attr("class", "nodes")
         .selectAll<SVGCircleElement, RelationshipNode>("circle")
-        .data(nodes)
+        .data(simulationNodes)
         .join("circle")
         .attr("r", d => getRadius(d))
         .attr("fill", d => color(d.cluster))
@@ -97,7 +111,7 @@ export function RelationshipGraph() {
     const label = g.append("g")
         .attr("class", "labels")
         .selectAll<SVGTextElement, RelationshipNode>("text")
-        .data(nodes)
+        .data(simulationNodes)
         .join("text")
         .attr("dy", d => getRadius(d) + 12)
         .attr("text-anchor", "middle")
@@ -111,9 +125,9 @@ export function RelationshipGraph() {
     // Interactions
     node.on("mouseover", (_, d) => {
         if (!selectedNodeIdRef.current) {
-            node.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
-            link.attr("opacity", l => (l.source as RelationshipNode) === d || (l.target as RelationshipNode) === d ? 1 : 0.1);
-            label.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
+            node.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
+            link.attr("opacity", l => (l.source as unknown as RelationshipNode).id === d.id || (l.target as unknown as RelationshipNode).id === d.id ? 1 : 0.1);
+            label.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
         }
     });
 
@@ -136,10 +150,10 @@ export function RelationshipGraph() {
 
     simulation.on("tick", () => {
         link
-            .attr("x1", d => (d.source as RelationshipNode).x!)
-            .attr("y1", d => (d.source as RelationshipNode).y!)
-            .attr("x2", d => (d.target as RelationshipNode).x!)
-            .attr("y2", d => (d.target as RelationshipNode).y!);
+            .attr("x1", d => (d.source as unknown as RelationshipNode).x!)
+            .attr("y1", d => (d.source as unknown as RelationshipNode).y!)
+            .attr("x2", d => (d.target as unknown as RelationshipNode).x!)
+            .attr("y2", d => (d.target as unknown as RelationshipNode).y!);
 
         node
             .attr("cx", d => d.x!)
@@ -172,24 +186,36 @@ export function RelationshipGraph() {
   useEffect(() => {
      if (!svgRef.current) return;
      const svg = d3.select(svgRef.current);
+     // Note: Bound data is simulationNodes/simulationLinks (cloned), not store nodes/links
      const node = svg.selectAll<SVGCircleElement, RelationshipNode>(".nodes circle");
      const link = svg.selectAll<SVGLineElement, RelationshipLink>(".links line");
      const label = svg.selectAll<SVGTextElement, RelationshipNode>(".labels text");
 
      if (selectedNodeId) {
-         // Find node object
-         const d = nodes.find(n => n.id === selectedNodeId);
-         if (!d) return;
+         // Pre-calculate connected nodes for O(E + N) highlighting instead of O(N * E)
+         const connectedNodeIds = new Set<string>();
+         connectedNodeIds.add(selectedNodeId);
 
-         const isConnected = (a: RelationshipNode, b: RelationshipNode) => {
-            return links.some(l => (l.source === a && l.target === b) || (l.source === b && l.target === a));
-         };
-
-         node.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
-         link.attr("opacity", l => {
-             return (l.source as RelationshipNode) === d || (l.target as RelationshipNode) === d ? 1 : 0.1;
+         links.forEach(l => {
+             const s = typeof l.source === 'object' ? (l.source as RelationshipNode).id : l.source as string;
+             const t = typeof l.target === 'object' ? (l.target as RelationshipNode).id : l.target as string;
+             if (s === selectedNodeId) connectedNodeIds.add(t);
+             if (t === selectedNodeId) connectedNodeIds.add(s);
          });
-         label.attr("opacity", n => n === d || isConnected(n, d) ? 1 : 0.2);
+
+         node.attr("opacity", n => connectedNodeIds.has(n.id) ? 1 : 0.2);
+
+         link.attr("opacity", l => {
+             // 'l' here is simulationLink, so source/target are objects (from forceLink)
+             // However, checking types safely is good.
+             // But wait, this is the DOM element's data.
+             // If d3.forceLink ran, they are objects.
+             const sId = (l.source as unknown as RelationshipNode).id;
+             const tId = (l.target as unknown as RelationshipNode).id;
+             return sId === selectedNodeId || tId === selectedNodeId ? 1 : 0.1;
+         });
+
+         label.attr("opacity", n => connectedNodeIds.has(n.id) ? 1 : 0.2);
      } else {
          node.attr("opacity", 1);
          link.attr("opacity", 0.6);
