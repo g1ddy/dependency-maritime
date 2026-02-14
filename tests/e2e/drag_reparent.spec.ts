@@ -7,7 +7,7 @@ test.describe('Graph Interaction', () => {
 
   test.beforeEach(async ({ page }) => {
     // Navigate to the app
-    await page.goto('http://localhost:5173/dependency-maritime/');
+    await page.goto('http://localhost:5173/dependency-maritime/?disableAnimations=true');
     // Wait for canvas to be present
     await page.waitForSelector('.react-flow__renderer');
     // Wait for at least one node to render

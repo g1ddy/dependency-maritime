@@ -57,6 +57,17 @@ export function DependencyGraph() {
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
   useEffect(() => {
+    if (disableAnimations) {
+      document.body.classList.add('disable-animations');
+    } else {
+      document.body.classList.remove('disable-animations');
+    }
+    return () => {
+      document.body.classList.remove('disable-animations');
+    };
+  }, [disableAnimations]);
+
+  useEffect(() => {
     // Load graph data on mount
     const parsedData = CruiseResultSchema.parse(graphData);
     // Validate metrics data at runtime for robustness

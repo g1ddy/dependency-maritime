@@ -1,12 +1,18 @@
 import { test, expect } from '@playwright/test';
 
 test('App elements are visible', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?disableAnimations=true');
 
   await test.step('Verify Header elements', async () => {
     await expect(page.getByTestId('app-title')).toBeVisible();
     await expect(page.getByTestId('app-version')).toBeVisible();
     await expect(page.getByTestId('app-title')).toHaveText('Dependency Graph');
+  });
+
+  await test.step('Verify Zoom controls', async () => {
+    await expect(page.getByRole('button', { name: 'zoom in' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'zoom out' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'fit view' })).toBeVisible();
   });
 
   await test.step('Verify GraphOverlay controls', async () => {
@@ -23,11 +29,5 @@ test('App elements are visible', async ({ page }) => {
     await node.click();
 
     await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
-  });
-
-  await test.step('Verify Zoom controls', async () => {
-    await expect(page.getByRole('button', { name: 'zoom in' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'zoom out' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'fit view' })).toBeVisible();
   });
 });
