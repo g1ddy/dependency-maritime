@@ -28,27 +28,37 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
       // Source Node
       if (!nodesMap.has(row.Source)) {
         nodesMap.set(row.Source, {
-            id: row.Source,
+          id: row.Source,
           role: 'Source', // Default role for source nodes
           cluster: 'Source', // Default cluster for source nodes, or could be inferred
-            degree: 0
+          degree: 0
         });
       }
 
       // Target Node
-      if (!nodesMap.has(row.Target)) {
+      const targetNode = nodesMap.get(row.Target);
+      if (!targetNode) {
         nodesMap.set(row.Target, {
-            id: row.Target,
+          id: row.Target,
           role: row.Target_Role || 'Target',
           cluster: row.Target_Domain || 'Unspecified',
-            degree: 0
+          degree: 0
         });
+      } else {
+        // Update existing node with Target info if it's more specific
+        // We prioritize explicit Target_Role/Domain over default 'Source'/'Target'/'Unspecified'
+        if (row.Target_Role && (targetNode.role === 'Source' || targetNode.role === 'Target')) {
+          targetNode.role = row.Target_Role;
+        }
+        if (row.Target_Domain && (targetNode.cluster === 'Source' || targetNode.cluster === 'Unspecified')) {
+          targetNode.cluster = row.Target_Domain;
+        }
       }
 
       // Link
       links.push({
-          source: row.Source,
-          target: row.Target,
+        source: row.Source,
+        target: row.Target,
         relationship: row.Relationship,
         relationshipType: row.Relationship_Type,
         relationshipWeight: +row.Relationship_Weight || 1,
@@ -67,7 +77,7 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
 
     // Calculate degree
     nodes.forEach(n => {
-        n.degree = links.filter(l => l.source === n.id || l.target === n.id).length;
+      n.degree = links.filter(l => l.source === n.id || l.target === n.id).length;
     });
 
     set({ nodes, links, selectedNodeId: null, isLoading: false });
