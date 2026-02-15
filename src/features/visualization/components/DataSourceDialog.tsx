@@ -121,8 +121,10 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       const mod = await import('../../../../config/complexity-metrics.json');
       // Handle both default export (traditional JSON module) and direct export
       if (mod && typeof mod === 'object' && 'default' in mod) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          metrics = mod.default as ComplexityMetricsMap;
+          // The check 'default' in mod ensures this is safe enough for our needs,
+          // though TS might complain about 'default' on object.
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+          metrics = (mod as any).default as ComplexityMetricsMap;
       } else {
           metrics = mod as unknown as ComplexityMetricsMap;
       }

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
 import { DataSourceDialog } from './DataSourceDialog';
 import Papa from 'papaparse';
+import type { CsvRow } from '../types';
 
 // Mock the store
 const mockSetData = vi.fn();
@@ -43,9 +44,7 @@ class MockFileReader {
     }
   }
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).FileReader = MockFileReader;
-
+vi.stubGlobal('FileReader', MockFileReader);
 
 describe('Relationship DataSourceDialog', () => {
   const mockOnOpenChange = vi.fn();
@@ -69,11 +68,14 @@ describe('Relationship DataSourceDialog', () => {
   it('loads sample data', async () => {
     // Setup Papa.parse mock for success
     const papaParseMock = Papa.parse as unknown as ReturnType<typeof vi.fn>;
-    papaParseMock.mockImplementation((csv, config) => {
-        config.complete({
-            data: [{ Source: 'A', Target: 'B', Target_Domain: 'Core', Relationship_Weight: '5' }],
-            errors: []
-        });
+    papaParseMock.mockImplementation((_csv: string, config: Papa.ParseConfig<CsvRow>) => {
+        if (config.complete) {
+            config.complete({
+                data: [{ Source: 'A', Target: 'B', Target_Domain: 'Core', Relationship_Weight: 5, Relationship: 'Depends' } as unknown as CsvRow],
+                errors: [],
+                meta: { delimiter: ',', linebreak: '\n', aborted: false, truncated: false, cursor: 0 }
+            });
+        }
     });
 
     render(<DataSourceDialog open={true} onOpenChange={mockOnOpenChange} />);
@@ -90,11 +92,14 @@ describe('Relationship DataSourceDialog', () => {
 
   it('handles file upload success', async () => {
     const papaParseMock = Papa.parse as unknown as ReturnType<typeof vi.fn>;
-    papaParseMock.mockImplementation((csv, config) => {
-        config.complete({
-            data: [{ Source: 'C', Target: 'D', Target_Domain: 'UI', Relationship_Weight: '3' }],
-            errors: []
-        });
+    papaParseMock.mockImplementation((_csv: string, config: Papa.ParseConfig<CsvRow>) => {
+        if (config.complete) {
+            config.complete({
+                data: [{ Source: 'C', Target: 'D', Target_Domain: 'UI', Relationship_Weight: 3, Relationship: 'Depends' } as unknown as CsvRow],
+                errors: [],
+                meta: { delimiter: ',', linebreak: '\n', aborted: false, truncated: false, cursor: 0 }
+            });
+        }
     });
 
     render(<DataSourceDialog open={true} onOpenChange={mockOnOpenChange} />);
@@ -115,11 +120,14 @@ describe('Relationship DataSourceDialog', () => {
 
   it('displays error on parsing failure', async () => {
       const papaParseMock = Papa.parse as unknown as ReturnType<typeof vi.fn>;
-      papaParseMock.mockImplementation((csv, config) => {
-          config.complete({
-              data: [],
-              errors: [{ message: 'Bad CSV format' }]
-          });
+      papaParseMock.mockImplementation((_csv: string, config: Papa.ParseConfig<CsvRow>) => {
+          if (config.complete) {
+              config.complete({
+                  data: [],
+                  errors: [{ message: 'Bad CSV format', type: 'Quotes', code: 'MissingQuotes', row: 0, index: 0 }],
+                  meta: { delimiter: ',', linebreak: '\n', aborted: false, truncated: false, cursor: 0 }
+              });
+          }
       });
 
       render(<DataSourceDialog open={true} onOpenChange={mockOnOpenChange} />);
