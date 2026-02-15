@@ -1,5 +1,5 @@
 import { render, screen, cleanup } from '@testing-library/react'
-import { createRef, ElementType } from 'react'
+import { createRef, type ElementType } from 'react'
 import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card'
 import { describe, it, expect, afterEach } from 'vitest'
 
