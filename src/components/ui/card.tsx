@@ -21,16 +21,16 @@ const CardHeader = ({ className, ...props }: React.ComponentProps<"div">) => (
 )
 CardHeader.displayName = "CardHeader"
 
-const CardTitle = ({ className, ...props }: React.ComponentProps<"div">) => (
-  <div
+const CardTitle = ({ className, ...props }: React.ComponentProps<"h3">) => (
+  <h3
     className={cn("font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 )
 CardTitle.displayName = "CardTitle"
 
-const CardDescription = ({ className, ...props }: React.ComponentProps<"div">) => (
-  <div
+const CardDescription = ({ className, ...props }: React.ComponentProps<"p">) => (
+  <p
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />

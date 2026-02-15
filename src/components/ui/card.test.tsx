@@ -1,5 +1,5 @@
 import { render, screen, cleanup } from '@testing-library/react'
-import { createRef } from 'react'
+import { createRef, ElementType } from 'react'
 import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card'
 import { describe, it, expect, afterEach } from 'vitest'
 
@@ -34,25 +34,35 @@ describe('Card Component', () => {
     expect(ref.current).toBe(screen.getByTestId('card'))
   })
 
-  it('should forward ref to sub-components', () => {
-    const headerRef = createRef<HTMLDivElement>()
-    render(<CardHeader ref={headerRef} data-testid="header" />)
-    expect(headerRef.current).toBe(screen.getByTestId('header'))
+  interface TestCase {
+    Component: ElementType;
+    name: string;
+    testId: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectedInstance: any;
+  }
 
-    const titleRef = createRef<HTMLDivElement>()
-    render(<CardTitle ref={titleRef} data-testid="title" />)
-    expect(titleRef.current).toBe(screen.getByTestId('title'))
+  const testCases: TestCase[] = [
+    { Component: CardHeader, name: 'CardHeader', testId: 'header', expectedInstance: HTMLDivElement },
+    { Component: CardTitle, name: 'CardTitle', testId: 'title', expectedInstance: HTMLHeadingElement },
+    { Component: CardDescription, name: 'CardDescription', testId: 'desc', expectedInstance: HTMLParagraphElement },
+    { Component: CardContent, name: 'CardContent', testId: 'content', expectedInstance: HTMLDivElement },
+    { Component: CardFooter, name: 'CardFooter', testId: 'footer', expectedInstance: HTMLDivElement },
+  ]
 
-    const descRef = createRef<HTMLDivElement>()
-    render(<CardDescription ref={descRef} data-testid="desc" />)
-    expect(descRef.current).toBe(screen.getByTestId('desc'))
+  it.each(testCases)('should forward ref to $name', ({ Component, testId, expectedInstance }) => {
+    // We use a generic HTMLElement ref here since the actual type varies (Div, Heading, Paragraph)
+    // but they all inherit from HTMLElement
+    const ref = createRef<HTMLElement>()
 
-    const contentRef = createRef<HTMLDivElement>()
-    render(<CardContent ref={contentRef} data-testid="content" />)
-    expect(contentRef.current).toBe(screen.getByTestId('content'))
+    // We cast the Component to any to bypass strict prop type checks for this generic test loop
+    // knowing that all our components accept a ref.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+    const Comp = Component as any
 
-    const footerRef = createRef<HTMLDivElement>()
-    render(<CardFooter ref={footerRef} data-testid="footer" />)
-    expect(footerRef.current).toBe(screen.getByTestId('footer'))
+    render(<Comp ref={ref} data-testid={testId} />)
+
+    expect(ref.current).toBeInstanceOf(expectedInstance)
+    expect(ref.current).toBe(screen.getByTestId(testId))
   })
 })
