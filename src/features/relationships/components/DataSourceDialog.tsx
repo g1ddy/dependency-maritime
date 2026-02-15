@@ -1,13 +1,10 @@
-
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Database } from 'lucide-react';
 import Papa from 'papaparse';
 import { useRelationshipStore } from '../store';
 import type { CsvRow } from '../types';
 import classVisualizationCsv from '../../../../sample-data/class_visualization.csv?raw';
-import { FileUploadZone } from '@/components/FileUploadZone';
+import { GenericDataSourceDialog, type DataSourcePreset } from '@/components/DataSourceDialog';
 
 interface DataSourceDialogProps {
   open: boolean;
@@ -84,56 +81,32 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
       reader.readAsText(file);
   };
 
+  const presets: DataSourcePreset[] = [
+    {
+      id: 'sample',
+      label: 'Sample Data',
+      sublabel: 'Class Visualization (Software Arch)',
+      icon: Database,
+      onClick: () => parseCsv(classVisualizationCsv, "Sample Class Visualization"),
+      loading: isLoading,
+      className: 'hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30',
+      iconClassName: 'text-blue-500'
+    }
+  ];
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Select Data Source</DialogTitle>
-          <DialogDescription>
-            Choose a preset dataset or upload your own CSV.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-1 gap-4">
-                 <Button
-                    variant="outline"
-                    className="h-24 flex flex-col gap-2 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
-                    onClick={() => parseCsv(classVisualizationCsv, "Sample Class Visualization")}
-                  >
-                    <Database className="h-8 w-8 text-blue-500" />
-                    <span className="flex flex-col items-center">
-                        <span className="font-semibold">Sample Data</span>
-                        <span className="text-xs text-muted-foreground font-normal">Class Visualization (Software Arch)</span>
-                    </span>
-                  </Button>
-            </div>
-
-            <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">Or upload CSV</span>
-                </div>
-            </div>
-
-          <FileUploadZone
-            onFileSelect={handleFile}
-            accept=".csv"
-            loading={isLoading}
-            label="Click to upload or drag and drop"
-            sublabel="CSV files only"
-          />
-
-          {error && (
-             <div role="alert" className="bg-destructive/10 text-destructive text-sm p-3 rounded-md border border-destructive/20 max-h-40 overflow-auto">
-               <div className="font-semibold">{error.title}</div>
-               <div className="mt-1 whitespace-pre-wrap break-all">{error.description}</div>
-             </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <GenericDataSourceDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Select Data Source"
+      description="Choose a preset dataset or upload your own CSV."
+      presets={presets}
+      onFileSelect={handleFile}
+      accept=".csv"
+      uploadLabel="Click to upload or drag and drop"
+      uploadSublabel="CSV files only"
+      uploadLoading={isLoading}
+      error={error}
+    />
   );
 }
