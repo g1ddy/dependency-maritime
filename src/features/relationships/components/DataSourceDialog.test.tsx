@@ -36,12 +36,15 @@ class MockFileReader {
   result: string | null = null;
 
   readAsText(file: File) {
-    if (file.name === 'error.csv') {
-        this.onerror?.();
-    } else {
-        this.result = 'Source,Target,Target_Domain,Relationship_Weight\nC,D,UI,3';
-        this.onload?.({ target: { result: this.result } } as ProgressEvent<FileReader>);
-    }
+    // Simulate async behavior
+    setTimeout(() => {
+        if (file.name === 'error.csv') {
+            this.onerror?.();
+        } else {
+            this.result = 'Source,Target,Target_Domain,Relationship_Weight\nC,D,UI,3';
+            this.onload?.({ target: { result: this.result } } as ProgressEvent<FileReader>);
+        }
+    }, 0);
   }
 }
 vi.stubGlobal('FileReader', MockFileReader);
