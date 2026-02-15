@@ -74,7 +74,7 @@ describe('Relationship DataSourceDialog', () => {
                 data: [{ Source: 'A', Target: 'B', Target_Domain: 'Core', Relationship_Weight: 5, Relationship: 'Depends' } as unknown as CsvRow],
                 errors: [],
                 meta: { delimiter: ',', linebreak: '\n', aborted: false, truncated: false, cursor: 0 }
-            });
+            }, undefined);
         }
     });
 
@@ -98,7 +98,7 @@ describe('Relationship DataSourceDialog', () => {
                 data: [{ Source: 'C', Target: 'D', Target_Domain: 'UI', Relationship_Weight: 3, Relationship: 'Depends' } as unknown as CsvRow],
                 errors: [],
                 meta: { delimiter: ',', linebreak: '\n', aborted: false, truncated: false, cursor: 0 }
-            });
+            }, undefined);
         }
     });
 
@@ -126,7 +126,7 @@ describe('Relationship DataSourceDialog', () => {
                   data: [],
                   errors: [{ message: 'Bad CSV format', type: 'Quotes', code: 'MissingQuotes', row: 0, index: 0 }],
                   meta: { delimiter: ',', linebreak: '\n', aborted: false, truncated: false, cursor: 0 }
-              });
+              }, undefined);
           }
       });
 
