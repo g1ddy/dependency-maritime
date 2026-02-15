@@ -60,7 +60,7 @@ export function GenericDataSourceDialog({
                   <Button
                     key={preset.id}
                     variant="outline"
-                    disabled={preset.loading || uploadLoading}
+                    disabled={uploadLoading || presets.some(p => p.loading)}
                     className={cn(
                       "h-24 flex flex-col gap-2 transition-colors",
                       preset.className
