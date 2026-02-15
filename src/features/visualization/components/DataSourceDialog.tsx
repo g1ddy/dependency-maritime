@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { FileJson, Database, Loader2 } from 'lucide-react';
+import { FileJson, Database } from 'lucide-react';
 import { CruiseResultSchema, type ICruiseResult } from '@/schema/dependency-cruiser';
 import { ZodError } from 'zod';
 import { type ComplexityMetricsMap } from '../types';
-import { FileUploadZone } from '@/components/FileUploadZone';
+import { GenericDataSourceDialog, type DataSourcePreset } from '@/components/DataSourceDialog';
 
 // Import data sources
 import sampleData from '../../../../sample-data/dependency-graph.json';
@@ -123,6 +121,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       const mod = await import('../../../../config/complexity-metrics.json');
       // Handle both default export (traditional JSON module) and direct export
       if (mod && typeof mod === 'object' && 'default' in mod) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           metrics = mod.default as ComplexityMetricsMap;
       } else {
           metrics = mod as unknown as ComplexityMetricsMap;
@@ -149,62 +148,40 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     }
   };
 
+  const presets: DataSourcePreset[] = [
+    {
+      id: 'sample',
+      label: 'Sample Data',
+      icon: Database,
+      onClick: () => void handleSampleDataLoad(),
+      loading: loadingSource === 'sample',
+      className: 'hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30',
+      iconClassName: 'text-blue-500'
+    },
+    {
+      id: 'project',
+      label: 'Project Graph',
+      icon: FileJson,
+      onClick: () => void handleProjectDataLoad(),
+      loading: loadingSource === 'project',
+      className: 'hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-950/30',
+      iconClassName: 'text-green-500'
+    }
+  ];
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Select Data Source</DialogTitle>
-          <DialogDescription>
-            Choose a preset graph or upload your own dependency-cruiser JSON output.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              variant="outline"
-              disabled={!!loadingSource}
-              className="h-24 flex flex-col gap-2 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
-              onClick={() => void handleSampleDataLoad()}
-            >
-              {loadingSource === 'sample' ? (
-                <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
-              ) : (
-                <Database className="h-8 w-8 text-blue-500" />
-              )}
-              <span>{loadingSource === 'sample' ? 'Loading...' : 'Sample Data'}</span>
-            </Button>
-            <Button
-              variant="outline"
-              disabled={!!loadingSource}
-              className="h-24 flex flex-col gap-2 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-950/30 transition-colors"
-              onClick={() => void handleProjectDataLoad()}
-            >
-              {loadingSource === 'project' ? (
-                <Loader2 className="h-8 w-8 text-green-500 animate-spin" />
-              ) : (
-                <FileJson className="h-8 w-8 text-green-500" />
-              )}
-              <span>{loadingSource === 'project' ? 'Loading...' : 'Project Graph'}</span>
-            </Button>
-          </div>
-
-          <FileUploadZone
-            onFileSelect={(file) => void handleFile(file)}
-            accept=".json"
-            loading={loadingSource === 'upload'}
-            label="Click to upload or drag and drop"
-            sublabel="JSON files only"
-          />
-
-          {error && (
-             <div role="alert" className="bg-destructive/10 text-destructive text-sm p-3 rounded-md border border-destructive/20 max-h-40 overflow-auto">
-               <div className="font-semibold">{error.title}</div>
-               <div className="mt-1 whitespace-pre-wrap break-all">{error.description}</div>
-             </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <GenericDataSourceDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Select Data Source"
+      description="Choose a preset graph or upload your own dependency-cruiser JSON output."
+      presets={presets}
+      onFileSelect={(file) => void handleFile(file)}
+      accept=".json"
+      uploadLabel="Click to upload or drag and drop"
+      uploadSublabel="JSON files only"
+      uploadLoading={loadingSource === 'upload'}
+      error={error}
+    />
   );
 }
