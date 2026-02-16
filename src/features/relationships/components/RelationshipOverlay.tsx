@@ -20,8 +20,6 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
     nodes.find(n => n.id === selectedNodeId)
   , [nodes, selectedNodeId]);
 
-  const getId = (node: string | RelationshipNode) => typeof node === 'string' ? node : node.id;
-
   const sortedConnections = useMemo(() => {
     if (!selectedNode) return [];
 
