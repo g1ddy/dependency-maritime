@@ -3,7 +3,7 @@ import { useRelationshipStore } from '../store';
 import * as d3 from 'd3';
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { RelationshipNode } from '../types';
 
 interface RelationshipOverlayProps {
@@ -17,9 +17,14 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
   const selectedNode = nodes.find(n => n.id === selectedNodeId);
 
   const getId = (node: string | RelationshipNode) => typeof node === 'string' ? node : node.id;
-  const connections = selectedNode
-    ? links.filter(l => getId(l.source) === selectedNode.id || getId(l.target) === selectedNode.id)
-    : [];
+
+  const sortedConnections = useMemo(() => {
+    if (!selectedNode) return [];
+
+    return links
+      .filter(l => getId(l.source) === selectedNode.id || getId(l.target) === selectedNode.id)
+      .sort((a, b) => b.relationshipWeight - a.relationshipWeight);
+  }, [selectedNode, links]);
 
   const uniqueClusters = Array.from(new Set(nodes.map(d => d.cluster))).sort();
   const color = d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters);
@@ -99,11 +104,11 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
 
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider border-b border-gray-700 pb-2 mb-3">Documented Links</h3>
               <div className="space-y-4">
-                {connections.length === 0 ? (
+                {sortedConnections.length === 0 ? (
                   <p className="italic text-gray-500">No connections found.</p>
                 ) : (
                     <div className="space-y-4">
-                      {connections.sort((a, b) => b.relationshipWeight - a.relationshipWeight).map((link, i) => (
+                      {sortedConnections.map((link, i) => (
                         <div key={i} className="bg-gray-700/50 rounded p-3 border border-gray-700">
                           <div className="flex justify-between items-start mb-1">
                           <span className="font-medium text-blue-400">
