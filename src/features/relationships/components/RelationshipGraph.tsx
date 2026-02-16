@@ -69,12 +69,15 @@ export function RelationshipGraph() {
 
     // Helpers
     const getRadius = (d: RelationshipNode) => 5 + Math.min(d.degree * 2, 25);
-    const isConnected = (a: RelationshipNode, b: RelationshipNode) => {
-        // Use simulatedLinks which have been resolved by D3 (source/target are nodes)
-        return simulatedLinks.some(l => {
-             return (l.source.id === a.id && l.target.id === b.id) || (l.source.id === b.id && l.target.id === a.id);
-        });
-    }
+    const isConnected = (() => {
+        const linkedByIndex = new Set<string>();
+        for (const l of simulatedLinks) {
+            linkedByIndex.add(`${l.source.id},${l.target.id}`);
+        }
+        return (a: RelationshipNode, b: RelationshipNode) => {
+            return linkedByIndex.has(`${a.id},${b.id}`) || linkedByIndex.has(`${b.id},${a.id}`);
+        };
+    })();
 
     // Draw Links
     const link = g.append("g")
