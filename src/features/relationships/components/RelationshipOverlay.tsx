@@ -27,12 +27,14 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
       .sort((a, b) => b.relationshipWeight - a.relationshipWeight);
   }, [links, selectedNode]);
 
-  const uniqueClusters = Array.from(new Set(nodes.map(d => d.cluster))).sort();
-  const color = d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters);
+  const uniqueClusters = useMemo(() => Array.from(new Set(nodes.map(d => d.cluster))).sort(), [nodes]);
+  const color = useMemo(() => d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters), [uniqueClusters]);
 
-  const searchResults = searchQuery
-    ? nodes.filter(n => n.id.toLowerCase().includes(searchQuery.toLowerCase()))
-    : [];
+  const searchResults = useMemo(() => {
+    if (!searchQuery) return [];
+    const lowerQuery = searchQuery.toLowerCase();
+    return nodes.filter(n => n.id.toLowerCase().includes(lowerQuery));
+  }, [searchQuery, nodes]);
 
   return (
     <>
