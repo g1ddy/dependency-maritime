@@ -16,14 +16,16 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
   const { nodes, links, selectNode, selectedNodeId } = useRelationshipStore();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const selectedNode = useMemo(() => nodes.find(n => n.id === selectedNodeId), [nodes, selectedNodeId]);
+  const selectedNode = useMemo(() =>
+    nodes.find(n => n.id === selectedNodeId)
+  , [nodes, selectedNodeId]);
 
   const connections = useMemo(() => {
     if (!selectedNode) return [];
     return links
       .filter(l => getId(l.source) === selectedNode.id || getId(l.target) === selectedNode.id)
       .sort((a, b) => b.relationshipWeight - a.relationshipWeight);
-  }, [selectedNode, links]);
+  }, [links, selectedNode]);
 
   const uniqueClusters = useMemo(() => Array.from(new Set(nodes.map(d => d.cluster))).sort(), [nodes]);
   const color = useMemo(() => d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters), [uniqueClusters]);
