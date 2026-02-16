@@ -109,8 +109,8 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
                   <p className="italic text-gray-500">No connections found.</p>
                 ) : (
                     <div className="space-y-4">
-                      {connections.map((link, i) => (
-                        <div key={i} className="bg-gray-700/50 rounded p-3 border border-gray-700">
+                      {connections.map((link) => (
+                        <div key={`${getId(link.source)}-${getId(link.target)}-${link.relationship}`} className="bg-gray-700/50 rounded p-3 border border-gray-700">
                           <div className="flex justify-between items-start mb-1">
                           <span className="font-medium text-blue-400">
                             {typeof link.source === 'object' ? link.source.id : link.source} ↔ {typeof link.target === 'object' ? link.target.id : link.target}
