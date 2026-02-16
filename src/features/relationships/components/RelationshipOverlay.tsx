@@ -3,30 +3,36 @@ import { useRelationshipStore } from '../store';
 import * as d3 from 'd3';
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { RelationshipNode } from '../types';
 
 interface RelationshipOverlayProps {
   onUploadClick: () => void;
 }
 
+const getId = (node: string | RelationshipNode) => typeof node === 'string' ? node : node.id;
+
 export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps) {
   const { nodes, links, selectNode, selectedNodeId } = useRelationshipStore();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const selectedNode = nodes.find(n => n.id === selectedNodeId);
+  const selectedNode = useMemo(() => nodes.find(n => n.id === selectedNodeId), [nodes, selectedNodeId]);
 
-  const getId = (node: string | RelationshipNode) => typeof node === 'string' ? node : node.id;
-  const connections = selectedNode
-    ? links.filter(l => getId(l.source) === selectedNode.id || getId(l.target) === selectedNode.id)
-    : [];
+  const connections = useMemo(() => {
+    if (!selectedNode) return [];
+    return links
+      .filter(l => getId(l.source) === selectedNode.id || getId(l.target) === selectedNode.id)
+      .sort((a, b) => b.relationshipWeight - a.relationshipWeight);
+  }, [selectedNode, links]);
 
-  const uniqueClusters = Array.from(new Set(nodes.map(d => d.cluster))).sort();
-  const color = d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters);
+  const uniqueClusters = useMemo(() => Array.from(new Set(nodes.map(d => d.cluster))).sort(), [nodes]);
+  const color = useMemo(() => d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters), [uniqueClusters]);
 
-  const searchResults = searchQuery
-    ? nodes.filter(n => n.id.toLowerCase().includes(searchQuery.toLowerCase()))
-    : [];
+  const searchResults = useMemo(() => {
+    if (!searchQuery) return [];
+    const lowerQuery = searchQuery.toLowerCase();
+    return nodes.filter(n => n.id.toLowerCase().includes(lowerQuery));
+  }, [searchQuery, nodes]);
 
   return (
     <>
@@ -103,7 +109,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
                   <p className="italic text-gray-500">No connections found.</p>
                 ) : (
                     <div className="space-y-4">
-                      {connections.sort((a, b) => b.relationshipWeight - a.relationshipWeight).map((link, i) => (
+                      {connections.map((link, i) => (
                         <div key={i} className="bg-gray-700/50 rounded p-3 border border-gray-700">
                           <div className="flex justify-between items-start mb-1">
                           <span className="font-medium text-blue-400">
