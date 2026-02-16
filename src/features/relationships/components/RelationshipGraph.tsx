@@ -3,11 +3,6 @@ import * as d3 from 'd3';
 import { useRelationshipStore } from '../store';
 import type { RelationshipNode, RelationshipLink } from '../types';
 
-type SimulatedRelationshipLink = RelationshipLink & {
-  source: RelationshipNode;
-  target: RelationshipNode;
-};
-
 export function RelationshipGraph() {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -60,30 +55,28 @@ export function RelationshipGraph() {
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force("collide", d3.forceCollide<RelationshipNode>().radius((d) => (d.degree ? 5 + Math.min(d.degree * 2, 25) : 5) + 5).iterations(2));
 
-    // After simulation is initialized, source and target in simulationLinks are Node objects
-    const simulatedLinks = simulationLinks as unknown as SimulatedRelationshipLink[];
-
     // Color Scale
     const uniqueClusters = Array.from(new Set(simulationNodes.map(d => d.cluster)));
     const color = d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters);
 
     // Helpers
     const getRadius = (d: RelationshipNode) => 5 + Math.min(d.degree * 2, 25);
-    const isConnected = (() => {
-        const linkedByIndex = new Set<string>();
-        for (const l of simulatedLinks) {
-            linkedByIndex.add(`${l.source.id},${l.target.id}`);
-        }
-        return (a: RelationshipNode, b: RelationshipNode) => {
-            return linkedByIndex.has(`${a.id},${b.id}`) || linkedByIndex.has(`${b.id},${a.id}`);
-        };
-    })();
+    const isConnected = (a: RelationshipNode, b: RelationshipNode) => {
+        // Use simulationLinks which have been resolved by D3 (source/target are nodes)
+        return simulationLinks.some(l => {
+             // Cast to unknown first to satisfy TS2352 (casting string|Node to Node directly is unsafe if TS thinks it might be string)
+             // But we know simulation has run, so they are Nodes.
+             const sourceId = (l.source as unknown as RelationshipNode).id;
+             const targetId = (l.target as unknown as RelationshipNode).id;
+             return (sourceId === a.id && targetId === b.id) || (sourceId === b.id && targetId === a.id);
+        });
+    }
 
     // Draw Links
     const link = g.append("g")
         .attr("class", "links")
-        .selectAll<SVGLineElement, SimulatedRelationshipLink>("line")
-        .data(simulatedLinks)
+        .selectAll<SVGLineElement, RelationshipLink>("line")
+        .data(simulationLinks)
         .join("line")
         .attr("stroke", "#4b5563")
         .attr("stroke-opacity", 0.6)
@@ -135,7 +128,7 @@ export function RelationshipGraph() {
     node.on("mouseover", (_, d) => {
         if (!selectedNodeIdRef.current) {
             node.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
-            link.attr("opacity", l => l.source.id === d.id || l.target.id === d.id ? 1 : 0.1);
+            link.attr("opacity", l => (l.source as unknown as RelationshipNode).id === d.id || (l.target as unknown as RelationshipNode).id === d.id ? 1 : 0.1);
             label.attr("opacity", n => n.id === d.id || isConnected(n, d) ? 1 : 0.2);
         }
     });
@@ -159,10 +152,10 @@ export function RelationshipGraph() {
 
     simulation.on("tick", () => {
         link
-            .attr("x1", d => d.source.x!)
-            .attr("y1", d => d.source.y!)
-            .attr("x2", d => d.target.x!)
-            .attr("y2", d => d.target.y!);
+            .attr("x1", d => (d.source as unknown as RelationshipNode).x!)
+            .attr("y1", d => (d.source as unknown as RelationshipNode).y!)
+            .attr("x2", d => (d.target as unknown as RelationshipNode).x!)
+            .attr("y2", d => (d.target as unknown as RelationshipNode).y!);
 
         node
             .attr("cx", d => d.x!)
@@ -197,7 +190,7 @@ export function RelationshipGraph() {
      const svg = d3.select(svgRef.current);
      // Note: Bound data is simulationNodes/simulationLinks (cloned), not store nodes/links
      const node = svg.selectAll<SVGCircleElement, RelationshipNode>(".nodes circle");
-     const link = svg.selectAll<SVGLineElement, SimulatedRelationshipLink>(".links line");
+     const link = svg.selectAll<SVGLineElement, RelationshipLink>(".links line");
      const label = svg.selectAll<SVGTextElement, RelationshipNode>(".labels text");
 
      if (selectedNodeId) {
@@ -215,7 +208,12 @@ export function RelationshipGraph() {
          node.attr("opacity", n => connectedNodeIds.has(n.id) ? 1 : 0.2);
 
          link.attr("opacity", l => {
-             return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? 1 : 0.1;
+             // 'l' here is simulationLink, so source/target are objects (from forceLink)
+             // D3 force simulation replaces source/target string IDs with actual Node objects
+             // We can safely cast source/target to RelationshipNode because simulation has run
+             const s = l.source as unknown as RelationshipNode;
+             const t = l.target as unknown as RelationshipNode;
+             return s.id === selectedNodeId || t.id === selectedNodeId ? 1 : 0.1;
          });
 
          label.attr("opacity", n => connectedNodeIds.has(n.id) ? 1 : 0.2);

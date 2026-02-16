@@ -16,11 +16,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
   const { nodes, links, selectNode, selectedNodeId } = useRelationshipStore();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const selectedNode = useMemo(() =>
-    nodes.find(n => n.id === selectedNodeId)
-  , [nodes, selectedNodeId]);
-
-  const getId = (node: string | RelationshipNode) => typeof node === 'string' ? node : node.id;
+  const selectedNode = nodes.find(n => n.id === selectedNodeId);
 
   const sortedConnections = useMemo(() => {
     if (!selectedNode) return [];
@@ -116,7 +112,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
                         <div key={i} className="bg-gray-700/50 rounded p-3 border border-gray-700">
                           <div className="flex justify-between items-start mb-1">
                           <span className="font-medium text-blue-400">
-                            {typeof link.source === 'object' ? link.source.id : link.source} ↔ {typeof link.target === 'object' ? link.target.id : link.target}
+                            {getId(link.source)} ↔ {getId(link.target)}
                           </span>
                             <span className="text-xs bg-gray-600 px-1.5 py-0.5 rounded text-gray-300">{link.relationshipWeight}</span>
                         </div>
