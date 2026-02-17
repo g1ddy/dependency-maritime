@@ -490,12 +490,20 @@ export const useGraphStore = create<GraphState>()(
             isInspectorOpen: shouldOpenInspector || isInspectorOpen,
             nodes: nodes.map((n) => {
               const isHighlighted = relevantNodes.has(n.id);
+              const isDimmed = !isHighlighted;
+
+              // Optimization: Return existing object if state matches
+              // This prevents unnecessary re-renders in React Flow
+              if (n.data.highlighted === isHighlighted && n.data.dimmed === isDimmed) {
+                return n;
+              }
+
               return {
                 ...n,
                 data: {
                   ...n.data,
                   highlighted: isHighlighted,
-                  dimmed: !isHighlighted,
+                  dimmed: isDimmed,
                 },
               };
             }),
@@ -503,12 +511,23 @@ export const useGraphStore = create<GraphState>()(
               const isSourceRelevant = relevantNodes.has(e.source);
               const isTargetRelevant = relevantNodes.has(e.target);
               const isHighlighted = isSourceRelevant && isTargetRelevant;
+              const targetStyle = isHighlighted ? HIGHLIGHTED_EDGE_STYLE : DIMMED_EDGE_STYLE;
+              const targetZIndex = isHighlighted ? 10 : 0;
+
+              // Optimization: Return existing object if state matches
+              if (
+                e.animated === isHighlighted &&
+                e.style === targetStyle &&
+                e.zIndex === targetZIndex
+              ) {
+                return e;
+              }
 
               return {
                 ...e,
                 animated: isHighlighted,
-                style: isHighlighted ? HIGHLIGHTED_EDGE_STYLE : DIMMED_EDGE_STYLE,
-                zIndex: isHighlighted ? 10 : 0,
+                style: targetStyle,
+                zIndex: targetZIndex,
               };
             }),
           });
