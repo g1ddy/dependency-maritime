@@ -61,16 +61,18 @@ export function RelationshipGraph() {
 
     // Helpers
     const getRadius = (d: RelationshipNode) => 5 + Math.min(d.degree * 2, 25);
-    const isConnected = (a: RelationshipNode, b: RelationshipNode) => {
-        // Use simulationLinks which have been resolved by D3 (source/target are nodes)
-        return simulationLinks.some(l => {
-             // Cast to unknown first to satisfy TS2352 (casting string|Node to Node directly is unsafe if TS thinks it might be string)
-             // But we know simulation has run, so they are Nodes.
-             const sourceId = (l.source as unknown as RelationshipNode).id;
-             const targetId = (l.target as unknown as RelationshipNode).id;
-             return (sourceId === a.id && targetId === b.id) || (sourceId === b.id && targetId === a.id);
-        });
-    }
+    const isConnected = (() => {
+        const linkedByIndex = new Set<string>();
+        // After D3 simulation is initialized, source and target in simulationLinks are Node objects.
+        for (const l of simulationLinks) {
+            const sourceId = (l.source as unknown as RelationshipNode).id;
+            const targetId = (l.target as unknown as RelationshipNode).id;
+            linkedByIndex.add(`${sourceId},${targetId}`);
+        }
+        return (a: RelationshipNode, b: RelationshipNode) => {
+            return linkedByIndex.has(`${a.id},${b.id}`) || linkedByIndex.has(`${b.id},${a.id}`);
+        };
+    })();
 
     // Draw Links
     const link = g.append("g")

@@ -111,7 +111,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
                 ) : (
                     <div className="space-y-4">
                       {sortedConnections.map((link, i) => (
-                        <div key={i} className="bg-gray-700/50 rounded p-3 border border-gray-700">
+                        <div key={`${getId(link.source)}-${getId(link.target)}-${link.relationship}`} className="bg-gray-700/50 rounded p-3 border border-gray-700">
                           <div className="flex justify-between items-start mb-1">
                           <span className="font-medium text-blue-400">
                             {getId(link.source)} ↔ {getId(link.target)}
