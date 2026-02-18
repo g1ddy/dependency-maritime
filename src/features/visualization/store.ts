@@ -24,6 +24,8 @@ import { type LayoutWorkerResponse } from './logic/layout.worker';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
+const HIGHLIGHTED_EDGE_Z_INDEX = 10;
+const DIMMED_EDGE_Z_INDEX = 0;
 
 export type ViewMode = 'standard' | 'instability';
 export type NodeSizeMode = 'uniform' | 'centrality';
@@ -512,7 +514,7 @@ export const useGraphStore = create<GraphState>()(
               const isTargetRelevant = relevantNodes.has(e.target);
               const isHighlighted = isSourceRelevant && isTargetRelevant;
               const targetStyle = isHighlighted ? HIGHLIGHTED_EDGE_STYLE : DIMMED_EDGE_STYLE;
-              const targetZIndex = isHighlighted ? 10 : 0;
+              const targetZIndex = isHighlighted ? HIGHLIGHTED_EDGE_Z_INDEX : DIMMED_EDGE_Z_INDEX;
 
               // Optimization: Return existing object if state matches
               if (
