@@ -24,6 +24,8 @@ import { type LayoutWorkerResponse } from './logic/layout.worker';
 
 const HIGHLIGHTED_EDGE_STYLE = { stroke: '#60a5fa', strokeWidth: 2, opacity: 1 };
 const DIMMED_EDGE_STYLE = { stroke: '#334155', strokeWidth: 1, opacity: 0.2 };
+const HIGHLIGHTED_EDGE_Z_INDEX = 10;
+const DIMMED_EDGE_Z_INDEX = 0;
 
 export type ViewMode = 'standard' | 'instability';
 export type NodeSizeMode = 'uniform' | 'centrality';
@@ -490,12 +492,20 @@ export const useGraphStore = create<GraphState>()(
             isInspectorOpen: shouldOpenInspector || isInspectorOpen,
             nodes: nodes.map((n) => {
               const isHighlighted = relevantNodes.has(n.id);
+              const isDimmed = !isHighlighted;
+
+              // Optimization: Return existing object if state matches
+              // This prevents unnecessary re-renders in React Flow
+              if (n.data.highlighted === isHighlighted && n.data.dimmed === isDimmed) {
+                return n;
+              }
+
               return {
                 ...n,
                 data: {
                   ...n.data,
                   highlighted: isHighlighted,
-                  dimmed: !isHighlighted,
+                  dimmed: isDimmed,
                 },
               };
             }),
@@ -503,12 +513,23 @@ export const useGraphStore = create<GraphState>()(
               const isSourceRelevant = relevantNodes.has(e.source);
               const isTargetRelevant = relevantNodes.has(e.target);
               const isHighlighted = isSourceRelevant && isTargetRelevant;
+              const targetStyle = isHighlighted ? HIGHLIGHTED_EDGE_STYLE : DIMMED_EDGE_STYLE;
+              const targetZIndex = isHighlighted ? HIGHLIGHTED_EDGE_Z_INDEX : DIMMED_EDGE_Z_INDEX;
+
+              // Optimization: Return existing object if state matches
+              if (
+                e.animated === isHighlighted &&
+                e.style === targetStyle &&
+                e.zIndex === targetZIndex
+              ) {
+                return e;
+              }
 
               return {
                 ...e,
                 animated: isHighlighted,
-                style: isHighlighted ? HIGHLIGHTED_EDGE_STYLE : DIMMED_EDGE_STYLE,
-                zIndex: isHighlighted ? 10 : 0,
+                style: targetStyle,
+                zIndex: targetZIndex,
               };
             }),
           });
