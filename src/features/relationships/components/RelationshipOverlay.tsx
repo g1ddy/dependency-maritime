@@ -16,7 +16,9 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
   const { nodes, links, selectNode, selectedNodeId } = useRelationshipStore();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const selectedNode = nodes.find(n => n.id === selectedNodeId);
+  const selectedNode = useMemo(() =>
+    nodes.find(n => n.id === selectedNodeId)
+  , [nodes, selectedNodeId]);
 
   const sortedConnections = useMemo(() => {
     if (!selectedNode) return [];
