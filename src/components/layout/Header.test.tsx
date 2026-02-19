@@ -35,4 +35,16 @@ describe('Header', () => {
     fireEvent.click(uploadButton);
     expect(onOpenDataSourceMock).toHaveBeenCalled();
   });
+
+  it('has accessible buttons', () => {
+    render(
+      <MemoryRouter>
+        <Header onOpenDataSource={onOpenDataSourceMock} onOpenSettings={onOpenSettingsMock} />
+      </MemoryRouter>
+    );
+    expect(screen.getByLabelText('Open Menu')).toBeDefined();
+    expect(screen.getByLabelText('Dependency Graph')).toBeDefined();
+    expect(screen.getByLabelText('Relationships')).toBeDefined();
+    expect(screen.getByLabelText('Upload/Select Data Source')).toBeDefined();
+  });
 });
