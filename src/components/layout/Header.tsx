@@ -64,7 +64,7 @@ export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: 
           <Link to="/">
             <Button variant={currentPath === '/' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/' && "bg-secondary")} aria-label="Dependency Graph">
               <Code className="h-4 w-4" />
-              <span className="sm:inline" data-testid="app-title">Dependency Graph</span>
+              <span className="hidden sm:inline" data-testid="app-title">Dependency Graph</span>
             </Button>
           </Link>
           <Link to="/relationships">
