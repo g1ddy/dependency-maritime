@@ -4,9 +4,17 @@ test('App elements are visible', async ({ page }) => {
   await page.goto('/?disableAnimations=true');
 
   await test.step('Verify Header elements', async () => {
-    await expect(page.getByTestId('app-title')).toBeVisible();
+    const viewport = page.viewportSize();
+    // Tailwind sm is 640px. The title is hidden on smaller screens.
+    const isMobile = viewport && viewport.width < 640;
+
+    if (isMobile) {
+      await expect(page.getByTestId('app-title')).toBeHidden();
+    } else {
+      await expect(page.getByTestId('app-title')).toBeVisible();
+      await expect(page.getByTestId('app-title')).toHaveText('Dependency Graph');
+    }
     await expect(page.getByTestId('app-version')).toBeVisible();
-    await expect(page.getByTestId('app-title')).toHaveText('Dependency Graph');
   });
 
   await test.step('Verify Zoom controls', async () => {
