@@ -23,10 +23,9 @@ const cspPlugin = (): Plugin => {
 
       // Prod: Strict CSP (No unsafe-eval, no ws/wss)
       // Note: We keep unsafe-inline for styles as Tailwind/CSS-in-JS often needs it.
-      // We also keep unsafe-inline for scripts because Vite injects some inline scripts for module loading.
-      // Ideally, we'd use a nonce or hash, but that requires more complex setup.
-      // For now, removing unsafe-eval is a good step forward.
-      const prodPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self';";
+      // We removed unsafe-inline for scripts because modern Vite builds with ES modules do not require it.
+      // This significantly reduces XSS risks.
+      const prodPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self';";
 
       const policy = isDev ? devPolicy : prodPolicy;
 
