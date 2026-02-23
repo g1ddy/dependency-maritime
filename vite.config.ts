@@ -25,7 +25,17 @@ const cspPlugin = (): Plugin => {
       // Note: We keep unsafe-inline for styles as Tailwind/CSS-in-JS often needs it.
       // We removed unsafe-inline for scripts because modern Vite builds with ES modules do not require it.
       // This significantly reduces XSS risks.
-      const prodPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self';";
+      const prodPolicy = [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: blob:",
+        "font-src 'self' data:",
+        "connect-src 'self'",
+        "worker-src 'self' blob:",
+        "object-src 'none'",
+        "base-uri 'self'",
+      ].join('; ');
 
       const policy = isDev ? devPolicy : prodPolicy;
 
