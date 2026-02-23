@@ -26,7 +26,7 @@ export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: 
       <div className="flex items-center gap-4">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" aria-label="Open Menu">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
@@ -62,13 +62,13 @@ export function Header({ onOpenDataSource, onOpenSettings, currentPath = '/' }: 
 
         <div className="flex items-center gap-1 border-r pr-4 mr-1">
           <Link to="/">
-            <Button variant={currentPath === '/' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/' && "bg-secondary")}>
+            <Button variant={currentPath === '/' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/' && "bg-secondary")} aria-label="Dependency Graph">
               <Code className="h-4 w-4" />
-              <span className="sm:inline" data-testid="app-title">Dependency Graph</span>
+              <span className="hidden sm:inline" data-testid="app-title">Dependency Graph</span>
             </Button>
           </Link>
           <Link to="/relationships">
-            <Button variant={currentPath === '/relationships' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/relationships' && "bg-secondary")}>
+            <Button variant={currentPath === '/relationships' ? "secondary" : "ghost"} size="sm" className={cn("gap-2", currentPath === '/relationships' && "bg-secondary")} aria-label="Relationships">
               <Network className="h-4 w-4" />
               <span className="hidden sm:inline">Relationships</span>
             </Button>
