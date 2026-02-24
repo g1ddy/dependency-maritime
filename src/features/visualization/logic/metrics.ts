@@ -146,9 +146,13 @@ export function calculateGraphMetrics(graph: Graph, complexityMetrics?: Complexi
   // We use a snapshot of the initial aggregations (which only contain file metrics)
   // to avoid double-counting as we walk up the tree. This is more efficient than
   // building a full path set and sorting, as it processes each file contribution independently.
-  const initialEntries = Array.from(folderAggregations.entries()).map(([path, agg]) => [path, { ...agg }] as const);
+  // Optimization: Use a Map directly to avoid intermediate array allocation
+  const snapshot = new Map<string, FolderAggregation>();
+  folderAggregations.forEach((agg, path) => {
+    snapshot.set(path, { ...agg });
+  });
 
-  for (const [path, metrics] of initialEntries) {
+  for (const [path, metrics] of snapshot) {
     let currentPath = path;
     while (true) {
       const lastSlash = currentPath.lastIndexOf('/');
