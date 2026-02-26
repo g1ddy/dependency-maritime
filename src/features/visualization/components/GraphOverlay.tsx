@@ -194,7 +194,7 @@ export function GraphOverlay() {
                 className="bg-blue-600/50 gap-2 shadow-lg shadow-blue-900/10 text-white/50 cursor-not-allowed hover:bg-blue-600/50"
                 data-testid="refactor-graph-btn"
                 aria-disabled="true"
-                onClick={(e) => e.preventDefault()}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
               >
                 <Wand2 className="h-4 w-4" /> Refactor Graph
               </Button>
