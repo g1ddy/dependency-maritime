@@ -70,9 +70,13 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
         const sourceNode = nodesMap.get(l.source as string);
         const targetNode = nodesMap.get(l.target as string);
 
-        if (sourceNode) sourceNode.degree++;
+        if (sourceNode) {
+            sourceNode.degree++;
+        }
         // Avoid double-counting self-loops
-        if (targetNode && l.source !== l.target) targetNode.degree++;
+        if (targetNode && l.source !== l.target) {
+            targetNode.degree++;
+        }
     });
 
     set({ nodes, links, selectedNodeId: null, isLoading: false });
