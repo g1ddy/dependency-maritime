@@ -6,7 +6,7 @@ import type { CsvRow } from '../types';
 import classVisualizationCsv from '../../../../sample-data/class_visualization.csv?raw';
 import { GenericDataSourceDialog, type DataSourcePreset } from '@/components/DataSourceDialog';
 
-export const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+export const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 interface DataSourceDialogProps {
   open: boolean;
