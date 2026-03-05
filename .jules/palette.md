@@ -5,3 +5,7 @@
 ## 2024-05-24 - Accessible Names for Icon-Only Buttons
 **Learning:** Icon-only buttons (like the menu trigger) and buttons with responsive text visibility (hidden on mobile) are completely invisible to screen readers without explicit accessible names.
 **Action:** Always add `aria-label` to icon-only buttons and buttons where text content might be hidden via CSS.
+
+## 2026-03-05 - Added Tooltips to Icon-Only Buttons
+**Learning:** Icon-only buttons lack visual context, making it hard for sighted users to guess their action. While `aria-label` helps screen readers, tooltips provide critical context for all users.
+**Action:** Always wrap icon-only buttons with tooltips to improve accessibility and user experience.
