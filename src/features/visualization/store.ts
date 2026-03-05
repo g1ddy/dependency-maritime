@@ -401,7 +401,7 @@ export const useGraphStore = create<GraphState>()(
 
           set({ activeFilters: newFilters, selectedNodeId: null });
 
-          const state = computeGraphState(graph);
+          const { state } = computeGraphState(graph);
           set(state);
 
           void get().layoutGraph();
