@@ -3,7 +3,10 @@ import * as SwitchPrimitives from "@radix-ui/react-switch"
 
 import { cn } from "@/lib/utils"
 
-export type SwitchProps = React.ComponentProps<typeof SwitchPrimitives.Root>
+export interface SwitchProps extends React.ComponentProps<typeof SwitchPrimitives.Root> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
 
 const Switch = ({ className, ref, ...props }: SwitchProps) => (
   <SwitchPrimitives.Root
