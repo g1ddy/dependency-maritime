@@ -16,7 +16,7 @@ describe("Header", () => {
     vi.clearAllMocks();
   });
 
-  it("renders without crashing", () => {
+  const renderComponent = () => {
     render(
       <TooltipProvider>
         <MemoryRouter>
@@ -27,37 +27,23 @@ describe("Header", () => {
         </MemoryRouter>
       </TooltipProvider>,
     );
+  };
+
+  it("renders without crashing", () => {
+    renderComponent();
     expect(screen.getByText("Dependency Graph")).toBeDefined();
     expect(screen.getByText("Relationships")).toBeDefined();
   });
 
   it("calls onOpenDataSource when upload button is clicked", () => {
-    render(
-      <TooltipProvider>
-        <MemoryRouter>
-          <Header
-            onOpenDataSource={onOpenDataSourceMock}
-            onOpenSettings={onOpenSettingsMock}
-          />
-        </MemoryRouter>
-      </TooltipProvider>,
-    );
+    renderComponent();
     const uploadButton = screen.getByLabelText("Upload/Select Data Source");
     fireEvent.click(uploadButton);
     expect(onOpenDataSourceMock).toHaveBeenCalled();
   });
 
   it("has accessible buttons", () => {
-    render(
-      <TooltipProvider>
-        <MemoryRouter>
-          <Header
-            onOpenDataSource={onOpenDataSourceMock}
-            onOpenSettings={onOpenSettingsMock}
-          />
-        </MemoryRouter>
-      </TooltipProvider>,
-    );
+    renderComponent();
     expect(screen.getByLabelText("Open Menu")).toBeDefined();
     expect(screen.getByLabelText("Dependency Graph")).toBeDefined();
     expect(screen.getByLabelText("Relationships")).toBeDefined();
