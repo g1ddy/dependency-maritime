@@ -197,7 +197,7 @@ export const useGraphStore = create<GraphState>()(
         const { hideTypeDefinitions, activeFilters, isolateModule } = get();
 
         // Transform to React Flow
-        const { nodes, edges, visibleIds } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
+        const { nodes, edges, finalNodeIds } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
 
         return {
           state: {
@@ -207,7 +207,7 @@ export const useGraphStore = create<GraphState>()(
             loading: true, // Always loading until layout finishes
             hasUnsavedChanges: false
           },
-          visibleIds
+          finalNodeIds
         };
       };
 
@@ -344,12 +344,12 @@ export const useGraphStore = create<GraphState>()(
           set({ hideTypeDefinitions: newValue });
 
           // Re-transform (Unlayouted)
-          const { state, visibleIds } = computeGraphState(graph);
+          const { state, finalNodeIds } = computeGraphState(graph);
           set(state);
 
           // Trigger Layout
           void get().layoutGraph().then(() => {
-              if (selectedNodeId && visibleIds.has(selectedNodeId)) {
+              if (selectedNodeId && finalNodeIds.has(selectedNodeId)) {
                 get().selectNode(selectedNodeId);
               }
           });
@@ -362,7 +362,7 @@ export const useGraphStore = create<GraphState>()(
           const newValue = !isolateModule;
 
           // Re-transform
-          const { nodes, edges, visibleIds } = transformToReactFlow(graph, {
+          const { nodes, edges, finalNodeIds } = transformToReactFlow(graph, {
             hideTypeDefinitions,
             activeFilters,
             isolateModule: newValue
@@ -377,7 +377,7 @@ export const useGraphStore = create<GraphState>()(
           });
 
           void get().layoutGraph().then(() => {
-            if (selectedNodeId && visibleIds.has(selectedNodeId)) {
+            if (selectedNodeId && finalNodeIds.has(selectedNodeId)) {
               get().selectNode(selectedNodeId);
             }
           });
