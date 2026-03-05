@@ -197,14 +197,17 @@ export const useGraphStore = create<GraphState>()(
         const { hideTypeDefinitions, activeFilters, isolateModule } = get();
 
         // Transform to React Flow
-        const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
+        const { nodes, edges, finalNodeIds } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
 
         return {
-          nodes,
-          edges,
-          selectedNodeId: null,
-          loading: true, // Always loading until layout finishes
-          hasUnsavedChanges: false
+          state: {
+            nodes,
+            edges,
+            selectedNodeId: null,
+            loading: true, // Always loading until layout finishes
+            hasUnsavedChanges: false
+          },
+          finalNodeIds
         };
       };
 
@@ -260,7 +263,7 @@ export const useGraphStore = create<GraphState>()(
           const originalGraph = graph.copy();
 
           // 2. Compute initial state (Unlayouted)
-          const computedState = computeGraphState(graph);
+          const { state: computedState } = computeGraphState(graph);
 
           set({
             ...computedState,
@@ -341,12 +344,12 @@ export const useGraphStore = create<GraphState>()(
           set({ hideTypeDefinitions: newValue });
 
           // Re-transform (Unlayouted)
-          const state = computeGraphState(graph);
+          const { state, finalNodeIds } = computeGraphState(graph);
           set(state);
 
           // Trigger Layout
           void get().layoutGraph().then(() => {
-              if (selectedNodeId) {
+              if (selectedNodeId && finalNodeIds.has(selectedNodeId)) {
                 get().selectNode(selectedNodeId);
               }
           });
@@ -359,7 +362,7 @@ export const useGraphStore = create<GraphState>()(
           const newValue = !isolateModule;
 
           // Re-transform
-          const { nodes, edges } = transformToReactFlow(graph, {
+          const { nodes, edges, finalNodeIds } = transformToReactFlow(graph, {
             hideTypeDefinitions,
             activeFilters,
             isolateModule: newValue
@@ -374,8 +377,7 @@ export const useGraphStore = create<GraphState>()(
           });
 
           void get().layoutGraph().then(() => {
-            const { nodes: newNodes } = get();
-            if (selectedNodeId && newNodes.some((n) => n.id === selectedNodeId)) {
+            if (selectedNodeId && finalNodeIds.has(selectedNodeId)) {
               get().selectNode(selectedNodeId);
             }
           });
@@ -399,7 +401,7 @@ export const useGraphStore = create<GraphState>()(
 
           set({ activeFilters: newFilters, selectedNodeId: null });
 
-          const state = computeGraphState(graph);
+          const { state } = computeGraphState(graph);
           set(state);
 
           void get().layoutGraph();
@@ -582,7 +584,7 @@ export const useGraphStore = create<GraphState>()(
           const graph = originalGraph.copy();
 
           // Unlayouted
-          const computedState = computeGraphState(graph);
+          const { state: computedState } = computeGraphState(graph);
 
           set({
             ...computedState,
