@@ -4,27 +4,62 @@ This file defines the domain boundaries, schemas, and rules for the Dependency M
 
 ## 1. The Schema (Dependency Cruiser Output)
 
-**TODO:** Replace this with the exact TypeScript interface from `dependency-cruiser` output once available.
-For now, assume the standard JSON structure:
+This project uses the official `ICruiseResult` interface from the `dependency-cruiser` package.
 
 ```typescript
 export interface ICruiseResult {
   modules: IModule[];
-  summary: any;
+  folders?: IFolder[];
+  summary: ISummary;
+  revisionData?: IRevisionData;
 }
 
 export interface IModule {
   source: string;
-  dependencies: IDependency[];
   valid: boolean;
-  // ... other fields like orphan, reachable, etc.
+  dependencies: IDependency[];
+  dependents: string[];
+  coreModule?: boolean;
+  couldNotResolve?: boolean;
+  dependencyTypes?: DependencyType[];
+  followable?: boolean;
+  license?: string;
+  matchesDoNotFollow?: boolean;
+  matchesFocus?: boolean;
+  matchesReaches?: boolean;
+  matchesHighlight?: boolean;
+  orphan?: boolean;
+  reachable?: IReachable[];
+  reaches?: IReaches[];
+  rules?: IRuleSummary[];
+  consolidated?: boolean;
+  instability?: number;
+  experimentalStats?: ExperimentalStatsType;
+  checksum?: string;
 }
 
 export interface IDependency {
-  module: string;
-  moduleSystem: string;
+  circular: boolean;
+  coreModule: boolean;
+  couldNotResolve: boolean;
+  preCompilationOnly?: boolean;
+  typeOnly?: boolean;
+  cycle?: IMiniDependency[];
+  dependencyTypes: DependencyType[];
   dynamic: boolean;
-  // ... other fields like circular, valid, etc.
+  exoticallyRequired: boolean;
+  exoticRequire?: string;
+  followable: boolean;
+  license?: string;
+  matchesDoNotFollow?: boolean;
+  module: string;
+  protocol: ProtocolType;
+  mimeType: string;
+  moduleSystem: ModuleSystemType;
+  resolved: string;
+  rules?: IRuleSummary[];
+  valid: boolean;
+  instability: number;
 }
 ```
 

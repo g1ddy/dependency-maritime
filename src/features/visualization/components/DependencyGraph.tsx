@@ -8,7 +8,7 @@ import '@xyflow/react/dist/style.css';
 import { useGraphStore } from '../store';
 import graphData from '../../../../config/dependency-graph.json';
 import complexityMetrics from '../../../../config/complexity-metrics.json';
-import { CruiseResultSchema } from '@/schema/dependency-cruiser';
+import { CruiseResultSchema, type ICruiseResult } from '@/schema/dependency-cruiser';
 import { ComplexityMetricsMapSchema } from '@/schema/complexity-metrics';
 import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
@@ -69,7 +69,7 @@ export function DependencyGraph() {
 
   useEffect(() => {
     // Load graph data on mount
-    const parsedData = CruiseResultSchema.parse(graphData);
+    const parsedData = CruiseResultSchema.parse(graphData) as ICruiseResult;
     // Validate metrics data at runtime for robustness
     const parsedMetrics = ComplexityMetricsMapSchema.parse(complexityMetrics);
     setGraphData(parsedData, parsedMetrics);

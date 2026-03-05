@@ -19,7 +19,11 @@ describe('Type Definition Hiding Logic', () => {
             followable: true,
             couldNotResolve: false,
             circular: false,
-            valid: true
+            valid: true,
+            exoticallyRequired: false,
+            protocol: 'file:',
+            mimeType: '',
+            instability: 0
           },
           {
             dynamic: false,
@@ -31,7 +35,11 @@ describe('Type Definition Hiding Logic', () => {
             followable: true,
             couldNotResolve: false,
             circular: false,
-            valid: true
+            valid: true,
+            exoticallyRequired: false,
+            protocol: 'file:',
+            mimeType: '',
+            instability: 0
           },
           {
              dynamic: false,
@@ -45,7 +53,11 @@ describe('Type Definition Hiding Logic', () => {
              couldNotResolve: false,
              circular: false,
              valid: true,
-             preCompilationOnly: true
+             preCompilationOnly: true,
+             exoticallyRequired: false,
+             protocol: 'file:',
+             mimeType: '',
+             instability: 0
            }
         ],
         dependents: [],
@@ -79,6 +91,7 @@ describe('Type Definition Hiding Logic', () => {
       error: 0,
       warn: 0,
       info: 0,
+      ignore: 0,
       totalCruised: 4,
       totalDependenciesCruised: 3,
       optionsUsed: {}
