@@ -99,6 +99,8 @@ export const CruiseResultSchema = z.object({
     totalDependenciesCruised: z.number().optional(),
     violations: z.array(ViolationSchema),
     warn: z.number(),
-    optionsUsed: z.object({ args: z.string() }).passthrough(),
+    optionsUsed: z.object({
+      args: z.string().optional(),
+    }).passthrough().optional(),
   }).passthrough(),
 }).passthrough();
