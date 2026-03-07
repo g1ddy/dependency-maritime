@@ -6,3 +6,7 @@
 **Vulnerability:** Missing file size limits on CSV uploads in the Relationship feature.
 **Learning:** Unrestricted file uploads parsed entirely in the browser (via PapaParse) can block the main thread or crash the user's browser (client-side DoS).
 **Prevention:** Implement `MAX_FILE_SIZE` checks (e.g., 20MB) early in the file upload handler before initiating any parsing operations.
+## 2026-03-07 - Secure UUID Generation Fallback
+**Vulnerability:** Weak PRNG (`Math.random()`) used as a fallback for UUID generation.
+**Learning:** While `crypto.randomUUID()` is preferred, fallbacks often mistakenly use non-cryptographically secure random generators. This codebase had such a fallback in `src/features/visualization/logic/transformer.ts`.
+**Prevention:** Always use `crypto.getRandomValues()` as the primary fallback before resorting to `Math.random()`, or use a proven UUID library.
