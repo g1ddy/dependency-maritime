@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -187,12 +188,21 @@ export function GraphOverlay() {
           >
             <PanelRight className="h-4 w-4" /> Inspector
           </Button>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 gap-2 shadow-lg shadow-blue-900/20 text-white"
-            data-testid="refactor-graph-btn"
-          >
-            <Wand2 className="h-4 w-4" /> Refactor Graph
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bg-blue-600/50 gap-2 shadow-lg shadow-blue-900/10 text-white/50 cursor-not-allowed hover:bg-blue-600/50"
+                data-testid="refactor-graph-btn"
+                aria-disabled="true"
+                onClick={(e) => e.preventDefault()}
+              >
+                <Wand2 className="h-4 w-4" /> Refactor Graph
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Coming in Phase 3</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 

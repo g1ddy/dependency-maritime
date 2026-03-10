@@ -16,7 +16,8 @@ test.describe('Graph Interaction', () => {
     // Fit view to ensure nodes are within viewport for consistent coordinates
     const fitViewBtn = page.getByRole('button', { name: 'fit view' });
     await expect(fitViewBtn).toBeVisible();
-    await fitViewBtn.click();
+    // Force click in case it's partially obscured or animating
+    await fitViewBtn.click({ force: true });
   });
 
   test('nodes should be visually contained in their parent groups initially', async ({ page }) => {
@@ -88,6 +89,9 @@ test.describe('Graph Interaction', () => {
         // Move in steps to simulate drag
         await page.mouse.move(dropX, dropY, { steps: 20 });
         await page.mouse.up();
+
+        // Wait for React Flow to settle and process the drop
+        await page.waitForTimeout(500);
 
         // Verify new position
         const newBox = await targetNode.boundingBox();
