@@ -78,7 +78,7 @@ export function GraphOverlay() {
   // We explicitly pick data fields to ensure shallow equality works if the node object
   // reference changes but data content remains the same.
   const selectedNode = useGraphStore(useShallow((state) => {
-    const node = state.selectedNodeId ? state.nodes.find((n) => n.id === state.selectedNodeId) : null;
+    const node = state.selectedNodeId ? state.nodesById.get(state.selectedNodeId) : null;
     if (!node) return null;
     return {
       id: node.id,

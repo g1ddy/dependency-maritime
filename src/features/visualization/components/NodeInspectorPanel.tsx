@@ -13,12 +13,10 @@ export function NodeInspectorPanel() {
     isInspectorOpen,
     setInspectorOpen,
     selectedNodeId,
-    nodes,
+    nodesById,
     graph,
     selectNode
   } = useGraphStore();
-
-  const nodesById = useMemo(() => new Map(nodes.map(node => [node.id, node])), [nodes]);
 
   // Helper to get neighbors
   const getNeighbors = useCallback((direction: 'in' | 'out') => {
@@ -77,7 +75,7 @@ export function NodeInspectorPanel() {
   const dependents = useMemo(() => getNeighbors('in'), [getNeighbors]);
 
   // Find the selected node data.
-  const selectedNode = selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null;
+  const selectedNode = selectedNodeId ? nodesById.get(selectedNodeId) : null;
   const metrics = selectedNode ? (selectedNode.data as AppNodeData | GroupNodeData).metrics : undefined;
   const label = selectedNode ? (selectedNode.data.label as string) : '';
   const fullPath = selectedNode ? ((selectedNode.data as AppNodeData).fullPath || selectedNode.id) : '';
