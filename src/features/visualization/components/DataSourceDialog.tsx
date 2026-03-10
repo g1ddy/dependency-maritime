@@ -39,7 +39,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     if (result.summary && typeof result.summary.totalDependenciesCruised === 'number') {
       totalDependencies = result.summary.totalDependenciesCruised;
     } else {
-      totalDependencies = result.modules.reduce((sum, m) => sum + m.dependencies.length, 0);
+      totalDependencies = result.modules.reduce((sum, m) => sum + (m.dependencies?.length || 0), 0);
     }
 
     if (totalDependencies > MAX_DEPENDENCIES) {
@@ -50,7 +50,10 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
 
   const loadData = (data: unknown, sourceName: string, complexityMetrics?: ComplexityMetricsMap) => {
     try {
-      const result = CruiseResultSchema.parse(data);
+      // Cast the result of Zod parsing to ICruiseResult to satisfy TypeScript.
+      // We've marked optional fields in Zod to ensure validation passes,
+      // even if the output is missing some of the 'required' fields in the official interface.
+      const result = CruiseResultSchema.parse(data) as ICruiseResult;
 
       const complexityError = validateComplexity(result);
       if (complexityError) {

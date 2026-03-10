@@ -20,19 +20,80 @@ const mockData: ICruiseResult = {
     error: 0,
     warn: 0,
     info: 0,
-    totalCruised: 1,
-    totalDependenciesCruised: 0,
+    ignore: 0,
+    totalCruised: 6,
+    totalDependenciesCruised: 2,
     optionsUsed: {}
   },
   modules: [
-    { source: 'src/A.ts', dependencies: [{ resolved: 'src/B.ts', module: 'src/B.ts', dependencyTypes: ['local'], coreModule: false, followable: true, couldNotResolve: false }], dependents: [] },
-    { source: 'src/B.ts', dependencies: [{ resolved: 'src/C.ts', module: 'src/C.ts', dependencyTypes: ['local'], coreModule: false, followable: true, couldNotResolve: false }], dependents: ['src/A.ts'] },
-    { source: 'src/C.ts', dependencies: [], dependents: ['src/B.ts'] },
+    {
+      source: 'src/A.ts',
+      valid: true,
+      dependents: [],
+      dependencies: [{
+        resolved: 'src/B.ts',
+        module: 'src/B.ts',
+        dependencyTypes: ['local'],
+        coreModule: false,
+        followable: true,
+        couldNotResolve: false,
+        circular: false,
+        dynamic: false,
+        exoticallyRequired: false,
+        protocol: 'file:',
+        mimeType: '',
+        instability: 0,
+        valid: true,
+        moduleSystem: 'es6'
+      }]
+    },
+    {
+      source: 'src/B.ts',
+      valid: true,
+      dependents: ['src/A.ts'],
+      dependencies: [{
+        resolved: 'src/C.ts',
+        module: 'src/C.ts',
+        dependencyTypes: ['local'],
+        coreModule: false,
+        followable: true,
+        couldNotResolve: false,
+        circular: false,
+        dynamic: false,
+        exoticallyRequired: false,
+        protocol: 'file:',
+        mimeType: '',
+        instability: 0,
+        valid: true,
+        moduleSystem: 'es6'
+      }]
+    },
+    {
+      source: 'src/C.ts',
+      valid: true,
+      dependents: ['src/B.ts'],
+      dependencies: []
+    },
     // Isolated node
-    { source: 'src/D.ts', dependencies: [], dependents: [] },
+    {
+      source: 'src/D.ts',
+      valid: true,
+      dependents: [],
+      dependencies: []
+    },
     // Nodes for filtering
-    { source: 'src/features/core/Core.ts', dependencies: [], dependents: [] },
-    { source: 'src/components/ui/Button.tsx', dependencies: [], dependents: [] },
+    {
+      source: 'src/features/core/Core.ts',
+      valid: true,
+      dependents: [],
+      dependencies: []
+    },
+    {
+      source: 'src/components/ui/Button.tsx',
+      valid: true,
+      dependents: [],
+      dependencies: []
+    },
   ]
 };
 
