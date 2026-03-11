@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { NodeInspectorPanel } from './NodeInspectorPanel';
 import { useGraphStore } from '../store';
 import Graph from 'graphology';
+import { type Node } from '@xyflow/react';
 
 describe('NodeInspectorPanel', () => {
   afterEach(() => {
@@ -35,13 +36,13 @@ describe('NodeInspectorPanel', () => {
     const graph = new Graph();
     graph.addNode('node-1', { label: 'My Node', metrics: { instability: 0.5, centrality: 0.1 } });
 
+    const node: Node = { id: 'node-1', position: { x: 0, y: 0 }, data: { label: 'My Node', fullPath: 'src/MyNode.tsx', metrics: { instability: 0.5, centrality: 0.1 } } };
     useGraphStore.setState({
       isInspectorOpen: true,
       selectedNodeId: 'node-1',
       graph: graph,
-      nodes: [
-        { id: 'node-1', position: { x: 0, y: 0 }, data: { label: 'My Node', fullPath: 'src/MyNode.tsx', metrics: { instability: 0.5, centrality: 0.1 } } }
-      ]
+      nodes: [node],
+      nodesById: new Map([['node-1', node]])
     });
 
     render(<NodeInspectorPanel />);
@@ -61,16 +62,22 @@ describe('NodeInspectorPanel', () => {
     graph.addNode('ext-1', { fullPath: 'node_modules/lib.ts', label: 'lib.ts' });
     graph.addEdge('node-1', 'ext-1');
 
+    const folderNode: Node = { id: 'src/folder', type: 'groupNode', position: { x: 0, y: 0 }, data: { label: 'folder' } };
+    const node1: Node = { id: 'node-1', position: { x: 0, y: 0 }, data: { label: 'A.tsx', fullPath: 'src/folder/A.tsx' } };
+    const node2: Node = { id: 'node-2', position: { x: 0, y: 0 }, data: { label: 'B.tsx', fullPath: 'src/folder/B.tsx' } };
+    const ext1: Node = { id: 'ext-1', position: { x: 0, y: 0 }, data: { label: 'lib.ts', fullPath: 'node_modules/lib.ts' } };
+
     useGraphStore.setState({
       isInspectorOpen: true,
       selectedNodeId: 'src/folder',
       graph: graph,
-      nodes: [
-        { id: 'src/folder', type: 'groupNode', position: { x: 0, y: 0 }, data: { label: 'folder' } },
-        { id: 'node-1', position: { x: 0, y: 0 }, data: { label: 'A.tsx', fullPath: 'src/folder/A.tsx' } },
-        { id: 'node-2', position: { x: 0, y: 0 }, data: { label: 'B.tsx', fullPath: 'src/folder/B.tsx' } },
-        { id: 'ext-1', position: { x: 0, y: 0 }, data: { label: 'lib.ts', fullPath: 'node_modules/lib.ts' } }
-      ]
+      nodes: [folderNode, node1, node2, ext1],
+      nodesById: new Map([
+        ['src/folder', folderNode],
+        ['node-1', node1],
+        ['node-2', node2],
+        ['ext-1', ext1]
+      ])
     });
 
     render(<NodeInspectorPanel />);
