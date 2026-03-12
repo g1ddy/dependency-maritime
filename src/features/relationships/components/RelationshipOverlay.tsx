@@ -68,6 +68,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
         <div className="px-5 py-3 border-b border-gray-700 bg-gray-800 relative">
           <input
             type="text"
+            aria-label="Search components"
             placeholder="Search for a component..."
             className="w-full bg-gray-900 text-sm text-gray-200 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors placeholder:text-gray-500"
             value={searchQuery}
@@ -76,16 +77,17 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
           {searchQuery && (
             <div className="absolute left-5 right-5 mt-1 bg-gray-700 border border-gray-600 rounded shadow-xl max-h-48 overflow-y-auto text-sm z-50">
               {searchResults.length > 0 ? searchResults.map(node => (
-                <div
+                <button
                   key={node.id}
-                  className="px-3 py-2 cursor-pointer hover:bg-gray-600 text-gray-200 border-b border-gray-600 last:border-0"
+                  type="button"
+                  className="w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-600 text-gray-200 border-b border-gray-600 last:border-0 focus:outline-none focus:bg-gray-600"
                   onClick={() => {
                     selectNode(node.id);
                     setSearchQuery("");
                   }}
                 >
                   {node.id} <span className="text-xs text-gray-400 ml-1">({node.role})</span>
-                </div>
+                </button>
               )) : (
                 <div className="px-3 py-2 text-gray-400 italic">No matches found</div>
               )}
