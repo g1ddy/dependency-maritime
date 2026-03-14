@@ -9,7 +9,15 @@ function generateUUID(): string {
     return crypto.randomUUID();
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    let r = Math.random() * 16 | 0;
+    // Sentinel: Medium - Fix weak random number generation
+    // crypto.getRandomValues is a cryptographically secure random number generator
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      const randomValues = new Uint8Array(1);
+      crypto.getRandomValues(randomValues);
+      r = randomValues[0] % 16;
+    }
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
 }
