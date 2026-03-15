@@ -80,7 +80,7 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
                 <button
                   key={node.id}
                   type="button"
-                  className="w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-600 text-gray-200 border-b border-gray-600 last:border-0 focus:outline-none focus:bg-gray-600"
+                  className="w-full text-left px-3 py-2 hover:bg-gray-600 text-gray-200 border-b border-gray-600 last:border-0 focus:outline-none focus:bg-gray-600"
                   onClick={() => {
                     selectNode(node.id);
                     setSearchQuery("");
