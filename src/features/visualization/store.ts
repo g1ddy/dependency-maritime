@@ -35,6 +35,7 @@ interface GraphState {
   // React Flow State
   nodes: Node[];
   edges: Edge[];
+  nodesById: Map<string, Node>;
   selectedNodeId: string | null;
 
   // Graphology Instance (Headless Graph)
@@ -197,20 +198,24 @@ export const useGraphStore = create<GraphState>()(
         const { hideTypeDefinitions, activeFilters, isolateModule } = get();
 
         // Transform to React Flow
-        const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
+        const { nodes, edges, finalNodeIds } = transformToReactFlow(graph, { hideTypeDefinitions, activeFilters, isolateModule });
 
         return {
-          nodes,
-          edges,
-          selectedNodeId: null,
-          loading: true, // Always loading until layout finishes
-          hasUnsavedChanges: false
+          state: {
+            nodes,
+            edges,
+            selectedNodeId: null,
+            loading: true, // Always loading until layout finishes
+            hasUnsavedChanges: false
+          },
+          finalNodeIds
         };
       };
 
       return {
         nodes: [],
         edges: [],
+        nodesById: new Map(),
         selectedNodeId: null,
         graph: null,
         originalGraph: null,
@@ -260,10 +265,11 @@ export const useGraphStore = create<GraphState>()(
           const originalGraph = graph.copy();
 
           // 2. Compute initial state (Unlayouted)
-          const computedState = computeGraphState(graph);
+          const { state: computedState } = computeGraphState(graph);
 
           set({
             ...computedState,
+            nodesById: new Map(computedState.nodes.map(n => [n.id, n])),
             graph,
             originalGraph,
           });
@@ -320,7 +326,10 @@ export const useGraphStore = create<GraphState>()(
               return node;
             });
 
-            set({ nodes: updatedNodes });
+            set({
+              nodes: updatedNodes,
+              nodesById: new Map(updatedNodes.map(n => [n.id, n]))
+            });
 
           } catch (error) {
             console.error("Failed to calculate metrics:", error);
@@ -341,12 +350,15 @@ export const useGraphStore = create<GraphState>()(
           set({ hideTypeDefinitions: newValue });
 
           // Re-transform (Unlayouted)
-          const state = computeGraphState(graph);
-          set(state);
+          const { state, finalNodeIds } = computeGraphState(graph);
+          set({
+            ...state,
+            nodesById: new Map(state.nodes.map(n => [n.id, n]))
+          });
 
           // Trigger Layout
           void get().layoutGraph().then(() => {
-              if (selectedNodeId) {
+              if (selectedNodeId && finalNodeIds.has(selectedNodeId)) {
                 get().selectNode(selectedNodeId);
               }
           });
@@ -359,7 +371,7 @@ export const useGraphStore = create<GraphState>()(
           const newValue = !isolateModule;
 
           // Re-transform
-          const { nodes, edges } = transformToReactFlow(graph, {
+          const { nodes, edges, finalNodeIds } = transformToReactFlow(graph, {
             hideTypeDefinitions,
             activeFilters,
             isolateModule: newValue
@@ -369,13 +381,13 @@ export const useGraphStore = create<GraphState>()(
             isolateModule: newValue,
             nodes,
             edges,
+            nodesById: new Map(nodes.map(n => [n.id, n])),
             selectedNodeId: null,
             loading: true,
           });
 
           void get().layoutGraph().then(() => {
-            const { nodes: newNodes } = get();
-            if (selectedNodeId && newNodes.some((n) => n.id === selectedNodeId)) {
+            if (selectedNodeId && finalNodeIds.has(selectedNodeId)) {
               get().selectNode(selectedNodeId);
             }
           });
@@ -399,8 +411,11 @@ export const useGraphStore = create<GraphState>()(
 
           set({ activeFilters: newFilters, selectedNodeId: null });
 
-          const state = computeGraphState(graph);
-          set(state);
+          const { state } = computeGraphState(graph);
+          set({
+            ...state,
+            nodesById: new Map(state.nodes.map(n => [n.id, n]))
+          });
 
           void get().layoutGraph();
         },
@@ -423,6 +438,7 @@ export const useGraphStore = create<GraphState>()(
             set({
               nodes: result.nodes,
               edges: result.edges,
+              nodesById: new Map(result.nodes.map(n => [n.id, n])),
               layoutDirection: targetDirection,
               loading: false
             });
@@ -487,10 +503,7 @@ export const useGraphStore = create<GraphState>()(
 
           const relevantNodes = new Set([...ancestors, ...descendants, nodeId]);
 
-          set({
-            selectedNodeId: nodeId,
-            isInspectorOpen: shouldOpenInspector || isInspectorOpen,
-            nodes: nodes.map((n) => {
+          const updatedNodes = nodes.map((n) => {
               const isHighlighted = relevantNodes.has(n.id);
               const isDimmed = !isHighlighted;
 
@@ -508,7 +521,13 @@ export const useGraphStore = create<GraphState>()(
                   dimmed: isDimmed,
                 },
               };
-            }),
+          });
+
+          set({
+            selectedNodeId: nodeId,
+            isInspectorOpen: shouldOpenInspector || isInspectorOpen,
+            nodes: updatedNodes,
+            nodesById: new Map(updatedNodes.map(n => [n.id, n])),
             edges: edges.map((e) => {
               const isSourceRelevant = relevantNodes.has(e.source);
               const isTargetRelevant = relevantNodes.has(e.target);
@@ -536,9 +555,9 @@ export const useGraphStore = create<GraphState>()(
         },
 
         reparentNode: (nodeId, newParentId, newPosition) => {
-          const { nodes, graph } = get();
+          const { nodes, graph, nodesById } = get();
 
-          const targetNode = nodes.find(n => n.id === nodeId);
+          const targetNode = nodesById.get(nodeId);
           if (!targetNode) return;
 
           const label = (targetNode.data.label as string) || '';
@@ -551,28 +570,31 @@ export const useGraphStore = create<GraphState>()(
             graph.removeAttribute(FOLDER_DESCENDANTS_CACHE_KEY);
           }
 
+          const updatedNodes = nodes.map((n) => {
+            if (n.id === nodeId) {
+              return {
+                ...n,
+                parentId: newParentId,
+                position: newPosition,
+                extent: newParentId ? undefined : undefined,
+                data: {
+                  ...n.data,
+                  fullPath: newFullPath,
+                },
+              };
+            }
+            return n;
+          });
+
           set({
             hasUnsavedChanges: true,
-            nodes: nodes.map((n) => {
-              if (n.id === nodeId) {
-                return {
-                  ...n,
-                  parentId: newParentId,
-                  position: newPosition,
-                  extent: newParentId ? undefined : undefined,
-                  data: {
-                    ...n.data,
-                    fullPath: newFullPath,
-                  },
-                };
-              }
-              return n;
-            }),
+            nodes: updatedNodes,
+            nodesById: new Map(updatedNodes.map(n => [n.id, n]))
           });
         },
 
         reset: () => {
-          set({ nodes: [], edges: [], graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: 'dagre', isolateModule: false });
+          set({ nodes: [], edges: [], nodesById: new Map(), graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: 'dagre', isolateModule: false });
         },
 
         resetSimulation: () => {
@@ -582,7 +604,7 @@ export const useGraphStore = create<GraphState>()(
           const graph = originalGraph.copy();
 
           // Unlayouted
-          const computedState = computeGraphState(graph);
+          const { state: computedState } = computeGraphState(graph);
 
           set({
             ...computedState,
@@ -596,8 +618,10 @@ export const useGraphStore = create<GraphState>()(
         },
 
         onNodesChange: (changes: NodeChange[]) => {
+          const updatedNodes = applyNodeChanges(changes, get().nodes);
           set({
-            nodes: applyNodeChanges(changes, get().nodes),
+            nodes: updatedNodes,
+            nodesById: new Map(updatedNodes.map(n => [n.id, n]))
           });
         },
 

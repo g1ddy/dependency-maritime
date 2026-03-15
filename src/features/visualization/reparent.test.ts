@@ -9,7 +9,8 @@ const mockData: ICruiseResult = {
     error: 0,
     warn: 0,
     info: 0,
-    totalCruised: 1,
+    ignore: 0,
+    totalCruised: 3,
     totalDependenciesCruised: 0,
     optionsUsed: {}
   },
@@ -17,17 +18,20 @@ const mockData: ICruiseResult = {
     {
       source: 'src/App.tsx',
       dependencies: [],
-      dependents: []
+      dependents: [],
+      valid: true
     },
     {
       source: 'src/components/Button.tsx',
       dependencies: [],
-      dependents: []
+      dependents: [],
+      valid: true
     },
     {
       source: 'src/features/Game.tsx',
       dependencies: [],
-      dependents: []
+      dependents: [],
+      valid: true
     }
   ]
 };

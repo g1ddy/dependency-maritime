@@ -6,6 +6,8 @@ import type { CsvRow } from '../types';
 import classVisualizationCsv from '../../../../sample-data/class_visualization.csv?raw';
 import { GenericDataSourceDialog, type DataSourcePreset } from '@/components/DataSourceDialog';
 
+export const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+
 interface DataSourceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -59,6 +61,14 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
   };
 
   const handleFile = (file: File) => {
+      if (file.size > MAX_FILE_SIZE) {
+          setError({
+            title: "File Too Large",
+            description: `The file exceeds the maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)}MB.`
+          });
+          return;
+      }
+
       if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
           setError({
             title: "Invalid File Type",

@@ -65,9 +65,18 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
 
     const nodes = Array.from(nodesMap.values());
 
-    // Calculate degree
-    nodes.forEach(n => {
-        n.degree = links.filter(l => l.source === n.id || l.target === n.id).length;
+    // Calculate degree (O(E) instead of O(N*E))
+    links.forEach(l => {
+        const sourceNode = nodesMap.get(l.source as string);
+        const targetNode = nodesMap.get(l.target as string);
+
+        if (sourceNode) {
+            sourceNode.degree++;
+        }
+        // Avoid double-counting self-loops
+        if (targetNode && l.source !== l.target) {
+            targetNode.degree++;
+        }
     });
 
     set({ nodes, links, selectedNodeId: null, isLoading: false });

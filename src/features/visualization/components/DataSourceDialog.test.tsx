@@ -17,33 +17,37 @@ if (!Blob.prototype.text) {
 
 // Mock data using vi.hoisted
 const { mockSampleData, mockProjectData } = vi.hoisted(() => {
-  const sample: ICruiseResult = {
+  const sample = {
     modules: [
-      { source: 'src/App.tsx', dependencies: [] }
+      { source: 'src/App.tsx', dependencies: [], valid: true, dependents: [] }
     ],
     summary: {
       error: 0,
       warn: 0,
       info: 0,
+      ignore: 0,
       totalCruised: 1,
       totalDependenciesCruised: 0,
-      violations: []
+      violations: [],
+      optionsUsed: {}
     }
-  };
+  } as unknown as ICruiseResult;
 
-  const project: ICruiseResult = {
+  const project = {
     modules: [
-      { source: 'src/main.tsx', dependencies: [] }
+      { source: 'src/main.tsx', dependencies: [], valid: true, dependents: [] }
     ],
     summary: {
       error: 0,
       warn: 0,
       info: 0,
+      ignore: 0,
       totalCruised: 1,
       totalDependenciesCruised: 0,
-      violations: []
+      violations: [],
+      optionsUsed: {}
     }
-  };
+  } as unknown as ICruiseResult;
 
   return { mockSampleData: sample, mockProjectData: project };
 });
@@ -266,13 +270,15 @@ describe('DataSourceDialog File Interactions', () => {
         // Create a large graph
         const modules = new Array(MAX_MODULES + 1).fill(null).map((_, i) => ({
             source: `src/file_${i}.ts`,
-            dependencies: []
+            dependencies: [],
+            valid: true,
+            dependents: []
         }));
 
         const largeData = {
             modules,
             summary: {
-                error: 0, warn: 0, info: 0, totalCruised: modules.length, totalDependenciesCruised: 0, violations: []
+                error: 0, warn: 0, info: 0, ignore: 0, totalCruised: modules.length, totalDependenciesCruised: 0, violations: [], optionsUsed: {}
             }
         };
 
@@ -311,17 +317,29 @@ describe('DataSourceDialog File Interactions', () => {
              coreModule: false,
              followable: true,
              couldNotResolve: false,
-             dependencyTypes: ["local"]
+             dependencyTypes: ["local"],
+             circular: false,
+             dynamic: false,
+             exoticallyRequired: false,
+             protocol: 'file:',
+             mimeType: '',
+             instability: 0,
+             valid: true,
+             moduleSystem: 'es6'
         }));
 
         const modules = [{
             source: 'src/hub.ts',
-            dependencies: manyDependencies
+            dependencies: manyDependencies,
+            valid: true,
+            dependents: []
         }];
 
-        // Omit 'summary' to force the manual calculation fallback
         const largeData = {
-            modules
+            modules,
+            summary: {
+                error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 1, totalDependenciesCruised: manyDependencies.length, violations: [], optionsUsed: {}
+            }
         };
 
         const file = new File([JSON.stringify(largeData)], 'many-deps.json', { type: 'application/json' });

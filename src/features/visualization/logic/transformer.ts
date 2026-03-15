@@ -80,7 +80,7 @@ export function transformToReactFlow(
     activeFilters?: ModuleCategory[];
     isolateModule?: boolean;
   } = {}
-): { nodes: Node[]; edges: Edge[] } {
+): { nodes: Node[]; edges: Edge[]; finalNodeIds: Set<string> } {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   let visibleNodeIds = new Set<string>();
@@ -112,6 +112,8 @@ export function transformToReactFlow(
 
     visibleNodeIds.add(nodeId);
   });
+
+  const finalNodeIds = new Set<string>();
 
   // 1.5. Apply Isolate Module Filter (remove unconnected nodes)
   if (options.isolateModule) {
@@ -184,6 +186,7 @@ export function transformToReactFlow(
         parentId,
         style: { width: 100, height: 100 }, // Default size, Dagre will resize
       });
+      finalNodeIds.add(currentPath);
 
       if (!parentId) {
         break;
@@ -213,12 +216,14 @@ export function transformToReactFlow(
   // Add root nodes
   for (const { id, attributes } of rootNodes) {
     nodes.push(createAppNode(id, attributes, undefined));
+    finalNodeIds.add(id);
   }
 
   // Add directory nodes
   for (const [dirPath, dirNodes] of dirToNodes) {
     for (const { id, attributes } of dirNodes) {
       nodes.push(createAppNode(id, attributes, dirPath));
+      finalNodeIds.add(id);
     }
   }
 
@@ -270,5 +275,5 @@ export function transformToReactFlow(
     });
   });
 
-  return { nodes: finalNodes, edges };
+  return { nodes: finalNodes, edges, finalNodeIds };
 }
