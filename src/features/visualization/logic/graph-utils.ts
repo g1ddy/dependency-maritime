@@ -1,3 +1,4 @@
+import { type Node } from '@xyflow/react';
 import Graph from 'graphology';
 
 export const FOLDER_DESCENDANTS_CACHE_KEY = 'folderToDescendants';
@@ -44,4 +45,20 @@ export function getFolderDescendants(graph: Graph, folderPath: string): string[]
 
   const map = graph.getAttribute(FOLDER_DESCENDANTS_CACHE_KEY) as Map<string, string[]>;
   return map.get(folderPath) || [];
+}
+
+
+/**
+ * Creates a Map of nodes by ID efficiently for O(1) lookups.
+ * Using a manual loop is faster and generates less garbage than new Map(nodes.map(...)).
+ */
+export function createNodesById(nodes: Node[]): Map<string, Node> {
+  const map = new Map<string, Node>();
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (node) {
+        map.set(node.id, node);
+    }
+  }
+  return map;
 }
