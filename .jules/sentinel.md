@@ -6,3 +6,7 @@
 **Vulnerability:** Missing file size limits on CSV uploads in the Relationship feature.
 **Learning:** Unrestricted file uploads parsed entirely in the browser (via PapaParse) can block the main thread or crash the user's browser (client-side DoS).
 **Prevention:** Implement `MAX_FILE_SIZE` checks (e.g., 20MB) early in the file upload handler before initiating any parsing operations.
+## 2025-03-14 - Fix weak random number generation for UUIDs
+**Vulnerability:** Weak random number generation (`Math.random()`) used as a fallback for UUID creation when `crypto.randomUUID()` is unavailable.
+**Learning:** `Math.random()` is not cryptographically secure, and can be predictable. Using it to generate UUIDs can lead to collisions or predictability, which might be an issue in contexts where unpredictability is required.
+**Prevention:** When falling back from `crypto.randomUUID()`, always prioritize `crypto.getRandomValues()` over `Math.random()` to maintain cryptographically secure UUID generation in browser environments.
