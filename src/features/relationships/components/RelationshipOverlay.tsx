@@ -2,7 +2,7 @@
 import { useRelationshipStore } from '../store';
 import * as d3 from 'd3';
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, Search, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import type { RelationshipNode } from '../types';
 
@@ -66,14 +66,27 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
         </div>
 
         <div className="px-5 py-3 border-b border-gray-700 bg-gray-800 relative">
-          <input
-            type="text"
-            aria-label="Search components"
-            placeholder="Search for a component..."
-            className="w-full bg-gray-900 text-sm text-gray-200 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors placeholder:text-gray-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+            <input
+              type="text"
+              aria-label="Search components"
+              placeholder="Search for a component..."
+              className="w-full bg-gray-900 text-sm text-gray-200 border border-gray-600 rounded pl-9 pr-9 py-2 focus:outline-none focus:border-blue-500 transition-colors placeholder:text-gray-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           {searchQuery && (
             <div className="absolute left-5 right-5 mt-1 bg-gray-700 border border-gray-600 rounded shadow-xl max-h-48 overflow-y-auto text-sm z-50">
               {searchResults.length > 0 ? searchResults.map(node => (
