@@ -13,7 +13,7 @@ import {
 import Graph from 'graphology';
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
-import { FOLDER_DESCENDANTS_CACHE_KEY } from './logic/graph-utils';
+import { FOLDER_DESCENDANTS_CACHE_KEY, createNodesById } from './logic/graph-utils';
 import { applyElkLayout } from './logic/layout-elk';
 import { type LayoutOptions } from './logic/layout';
 import { type ModuleCategory } from './logic/filters';
@@ -269,7 +269,7 @@ export const useGraphStore = create<GraphState>()(
 
           set({
             ...computedState,
-            nodesById: new Map(computedState.nodes.map(n => [n.id, n])),
+            nodesById: createNodesById(computedState.nodes),
             graph,
             originalGraph,
           });
@@ -328,7 +328,7 @@ export const useGraphStore = create<GraphState>()(
 
             set({
               nodes: updatedNodes,
-              nodesById: new Map(updatedNodes.map(n => [n.id, n]))
+              nodesById: createNodesById(updatedNodes)
             });
 
           } catch (error) {
@@ -353,7 +353,7 @@ export const useGraphStore = create<GraphState>()(
           const { state, finalNodeIds } = computeGraphState(graph);
           set({
             ...state,
-            nodesById: new Map(state.nodes.map(n => [n.id, n]))
+            nodesById: createNodesById(state.nodes)
           });
 
           // Trigger Layout
@@ -381,7 +381,7 @@ export const useGraphStore = create<GraphState>()(
             isolateModule: newValue,
             nodes,
             edges,
-            nodesById: new Map(nodes.map(n => [n.id, n])),
+            nodesById: createNodesById(nodes),
             selectedNodeId: null,
             loading: true,
           });
@@ -414,7 +414,7 @@ export const useGraphStore = create<GraphState>()(
           const { state } = computeGraphState(graph);
           set({
             ...state,
-            nodesById: new Map(state.nodes.map(n => [n.id, n]))
+            nodesById: createNodesById(state.nodes)
           });
 
           void get().layoutGraph();
@@ -438,7 +438,7 @@ export const useGraphStore = create<GraphState>()(
             set({
               nodes: result.nodes,
               edges: result.edges,
-              nodesById: new Map(result.nodes.map(n => [n.id, n])),
+              nodesById: createNodesById(result.nodes),
               layoutDirection: targetDirection,
               loading: false
             });
@@ -527,7 +527,7 @@ export const useGraphStore = create<GraphState>()(
             selectedNodeId: nodeId,
             isInspectorOpen: shouldOpenInspector || isInspectorOpen,
             nodes: updatedNodes,
-            nodesById: new Map(updatedNodes.map(n => [n.id, n])),
+            nodesById: createNodesById(updatedNodes),
             edges: edges.map((e) => {
               const isSourceRelevant = relevantNodes.has(e.source);
               const isTargetRelevant = relevantNodes.has(e.target);
@@ -589,7 +589,7 @@ export const useGraphStore = create<GraphState>()(
           set({
             hasUnsavedChanges: true,
             nodes: updatedNodes,
-            nodesById: new Map(updatedNodes.map(n => [n.id, n]))
+            nodesById: createNodesById(updatedNodes)
           });
         },
 
@@ -621,7 +621,7 @@ export const useGraphStore = create<GraphState>()(
           const updatedNodes = applyNodeChanges(changes, get().nodes);
           set({
             nodes: updatedNodes,
-            nodesById: new Map(updatedNodes.map(n => [n.id, n]))
+            nodesById: createNodesById(updatedNodes)
           });
         },
 
