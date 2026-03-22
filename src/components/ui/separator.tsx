@@ -3,10 +3,7 @@ import * as SeparatorPrimitive from "@radix-ui/react-separator"
 
 import { cn } from "@/lib/utils"
 
-export interface SeparatorProps extends React.ComponentProps<typeof SeparatorPrimitive.Root> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-}
+export type SeparatorProps = React.ComponentProps<typeof SeparatorPrimitive.Root>;
 
 const Separator = ({
   className,
