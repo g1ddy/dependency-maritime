@@ -5,3 +5,7 @@
 ## 2025-03-11 - [Accessible Search Results List]
 **Learning:** Using a `<div>` with an `onClick` handler for interactive list items (like search results) is an accessibility anti-pattern. It prevents keyboard focus (Tab key) and fails to announce the interactive role to screen readers, leaving non-mouse users unable to navigate or select results.
 **Action:** Replace clickable `<div>` elements with semantic `<button type="button">` tags. Apply `w-full text-left` to maintain the block layout, and add focus styles (e.g., `focus:outline-none focus:bg-gray-600`) to ensure keyboard users receive clear visual feedback when navigating.
+
+## 2024-03-19 - [Accessible Search Input with Clear Button]
+**Learning:** A plain text input used for searching is less intuitive without visual indicators (like a magnifying glass icon). Furthermore, requiring users to manually backspace to clear a search is poor UX. Adding an absolute-positioned clear (X) button inside the input improves this. However, this icon button must be keyboard accessible.
+**Action:** When adding absolute-positioned icons inside inputs, always adjust the input's padding (`pl-9`, `pr-9`) to prevent text overlap. For the clear button, ensure it uses `type="button"`, has an `aria-label`, and includes focus styles (`focus-visible:ring-2`) so keyboard users can navigate to it and trigger it.
