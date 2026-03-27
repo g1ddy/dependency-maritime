@@ -222,7 +222,7 @@ function RelationList({ title, items, icon: Icon, onSelect, emptyText }: Relatio
            {items.map((item) => (
              <li key={item.id}>
                <button
-                 className="w-full text-left text-xs px-2 py-1.5 rounded-md hover:bg-muted/80 truncate transition-colors flex items-center gap-2"
+                 className="w-full text-left text-xs px-2 py-1.5 rounded-md hover:bg-muted/80 truncate transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                  onClick={() => onSelect(item.id)}
                  title={item.id}
                >
