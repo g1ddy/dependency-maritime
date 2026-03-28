@@ -10,3 +10,7 @@
 **Vulnerability:** Weak random number generation (`Math.random()`) used as a fallback for UUID creation when `crypto.randomUUID()` is unavailable.
 **Learning:** `Math.random()` is not cryptographically secure, and can be predictable. Using it to generate UUIDs can lead to collisions or predictability, which might be an issue in contexts where unpredictability is required.
 **Prevention:** When falling back from `crypto.randomUUID()`, always prioritize `crypto.getRandomValues()` over `Math.random()` to maintain cryptographically secure UUID generation in browser environments.
+## 2025-05-18 - Enforce cryptographically secure UUID generation
+**Vulnerability:** The UUID generation fallback eventually used `Math.random()`, which is not cryptographically secure and predictable, leading to a risk of collision or prediction attacks.
+**Learning:** Even as a fallback, generating predictable UUIDs using `Math.random()` breaks cryptographic security expectations. If secure APIs (`crypto.randomUUID` or `crypto.getRandomValues`) are not available, it is safer to fail explicitly than to proceed with weak randomness.
+**Prevention:** Do not provide weak fallbacks like `Math.random()` for critical operations requiring unique identifiers; explicitly throw an error if secure random generation APIs are unavailable.
