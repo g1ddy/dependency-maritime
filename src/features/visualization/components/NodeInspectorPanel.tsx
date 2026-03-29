@@ -40,7 +40,7 @@ export function NodeInspectorPanel() {
              // Optimization (Bolt): Replaced array allocation nId.split('/').pop().join('/')
              // with lastIndexOf/substring to minimize GC pressure when processing large folders.
              const lastSlashIndex = nId.lastIndexOf('/');
-             const parentPath = lastSlashIndex !== -1 ? nId.substring(0, lastSlashIndex) : '';
+             const parentPath = lastSlashIndex > 0 ? nId.substring(0, lastSlashIndex) : (lastSlashIndex === 0 ? '/' : '');
 
              // If parent path is valid and not the selected node itself (circular case?), add it
              // Also ensure we don't just add empty string for external deps
