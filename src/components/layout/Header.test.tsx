@@ -3,6 +3,7 @@ import { Header } from "./Header";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/theme-provider";
 
 describe("Header", () => {
   const onOpenDataSourceMock = vi.fn();
@@ -18,14 +19,16 @@ describe("Header", () => {
 
   const renderComponent = () => {
     render(
-      <TooltipProvider>
-        <MemoryRouter>
-          <Header
-            onOpenDataSource={onOpenDataSourceMock}
-            onOpenSettings={onOpenSettingsMock}
-          />
-        </MemoryRouter>
-      </TooltipProvider>,
+      <ThemeProvider>
+        <TooltipProvider>
+          <MemoryRouter>
+            <Header
+              onOpenDataSource={onOpenDataSourceMock}
+              onOpenSettings={onOpenSettingsMock}
+            />
+          </MemoryRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     );
   };
 
