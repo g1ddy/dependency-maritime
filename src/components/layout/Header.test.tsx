@@ -3,6 +3,7 @@ import { Header } from "./Header";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/theme-provider";
 
 describe("Header", () => {
   const onOpenDataSourceMock = vi.fn();
@@ -14,18 +15,33 @@ describe("Header", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(), // deprecated
+        removeListener: vi.fn(), // deprecated
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
   });
 
   const renderComponent = () => {
     render(
-      <TooltipProvider>
-        <MemoryRouter>
-          <Header
-            onOpenDataSource={onOpenDataSourceMock}
-            onOpenSettings={onOpenSettingsMock}
-          />
-        </MemoryRouter>
-      </TooltipProvider>,
+      <ThemeProvider>
+        <TooltipProvider>
+          <MemoryRouter>
+            <Header
+              onOpenDataSource={onOpenDataSourceMock}
+              onOpenSettings={onOpenSettingsMock}
+            />
+          </MemoryRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     );
   };
 
