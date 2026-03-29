@@ -17,7 +17,7 @@ export const ThemeProviderContext = createContext<ThemeProviderState>(initialSta
 export const useTheme = () => {
   const context = use(ThemeProviderContext)
 
-  if (context === undefined)
+  if (context.setTheme === initialState.setTheme)
     throw new Error("useTheme must be used within a ThemeProvider")
 
   return context
