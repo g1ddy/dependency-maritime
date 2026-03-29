@@ -19,7 +19,18 @@ const cspPlugin = (): Plugin => {
     transformIndexHtml(html, ctx) {
       const isDev = !!ctx.server;
       // Dev: Relaxed CSP for HMR and eval
-      const devPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none';";
+      const devPolicy = [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: blob:",
+        "font-src 'self' data:",
+        "connect-src 'self' ws: wss:",
+        "worker-src 'self' blob:",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "frame-ancestors 'none'",
+      ].join('; ');
 
       // Prod: Strict CSP (No unsafe-eval, no ws/wss)
       // Note: We keep unsafe-inline for styles as Tailwind/CSS-in-JS often needs it.
