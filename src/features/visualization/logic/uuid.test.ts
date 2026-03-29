@@ -16,6 +16,7 @@ describe('generateUUID', () => {
   });
 
   it('should use crypto.randomUUID if available', () => {
+    // @ts-ignore
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
       const spy = vi.spyOn(crypto, 'randomUUID');
       generateUUID();
@@ -25,6 +26,7 @@ describe('generateUUID', () => {
   });
 
   it('should use crypto.getRandomValues if randomUUID is not available', () => {
+    // @ts-ignore
     if (typeof crypto !== 'undefined' && !crypto.randomUUID && crypto.getRandomValues) {
         const spy = vi.spyOn(crypto, 'getRandomValues');
         generateUUID();
