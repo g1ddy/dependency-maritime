@@ -12,11 +12,11 @@ interface RelationshipPageProps {
 }
 
 export function RelationshipPage({ onOpenUpload }: RelationshipPageProps) {
-  const { nodes, setData } = useRelationshipStore();
+  const { nodesById, setData } = useRelationshipStore();
 
   useEffect(() => {
     // Load sample data by default if no data exists
-    if (nodes.length === 0) {
+    if (nodesById.size === 0) {
       Papa.parse<CsvRow>(classVisualizationCsv, {
         header: true,
         skipEmptyLines: true,

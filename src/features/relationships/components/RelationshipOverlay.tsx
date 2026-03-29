@@ -13,8 +13,10 @@ interface RelationshipOverlayProps {
 const getId = (node: string | RelationshipNode) => typeof node === 'string' ? node : node.id;
 
 export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps) {
-  const { nodes, nodesById, links, selectNode, selectedNodeId } = useRelationshipStore();
+  const { nodesById, links, selectNode, selectedNodeId } = useRelationshipStore();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const nodes = useMemo(() => Array.from(nodesById.values()), [nodesById]);
 
   const selectedNode = useMemo(() =>
     selectedNodeId ? nodesById.get(selectedNodeId) : undefined

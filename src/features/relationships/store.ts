@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import type { RelationshipNode, RelationshipLink, CsvRow } from './types';
 
 interface RelationshipState {
-  nodes: RelationshipNode[];
   nodesById: Map<string, RelationshipNode>;
   links: RelationshipLink[];
   selectedNodeId: string | null;
@@ -16,7 +15,6 @@ interface RelationshipState {
 }
 
 export const useRelationshipStore = create<RelationshipState>((set) => ({
-  nodes: [],
   nodesById: new Map(),
   links: [],
   selectedNodeId: null,
@@ -65,8 +63,6 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
       });
     });
 
-    const nodes = Array.from(nodesMap.values());
-
     // Calculate degree (O(E) instead of O(N*E))
     links.forEach(l => {
         const sourceNode = nodesMap.get(l.source as string);
@@ -81,10 +77,10 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
         }
     });
 
-    set({ nodes, nodesById: nodesMap, links, selectedNodeId: null, isLoading: false });
+    set({ nodesById: nodesMap, links, selectedNodeId: null, isLoading: false });
   },
 
   selectNode: (nodeId) => set({ selectedNodeId: nodeId }),
   setLoading: (loading) => set({ isLoading: loading }),
-  reset: () => set({ nodes: [], nodesById: new Map(), links: [], selectedNodeId: null })
+  reset: () => set({ nodesById: new Map(), links: [], selectedNodeId: null })
 }));
