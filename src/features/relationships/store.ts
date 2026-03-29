@@ -3,6 +3,7 @@ import type { RelationshipNode, RelationshipLink, CsvRow } from './types';
 
 interface RelationshipState {
   nodes: RelationshipNode[];
+  nodesById: Map<string, RelationshipNode>;
   links: RelationshipLink[];
   selectedNodeId: string | null;
   isLoading: boolean;
@@ -16,6 +17,7 @@ interface RelationshipState {
 
 export const useRelationshipStore = create<RelationshipState>((set) => ({
   nodes: [],
+  nodesById: new Map(),
   links: [],
   selectedNodeId: null,
   isLoading: false,
@@ -79,10 +81,10 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
         }
     });
 
-    set({ nodes, links, selectedNodeId: null, isLoading: false });
+    set({ nodes, nodesById: nodesMap, links, selectedNodeId: null, isLoading: false });
   },
 
   selectNode: (nodeId) => set({ selectedNodeId: nodeId }),
   setLoading: (loading) => set({ isLoading: loading }),
-  reset: () => set({ nodes: [], links: [], selectedNodeId: null })
+  reset: () => set({ nodes: [], nodesById: new Map(), links: [], selectedNodeId: null })
 }));
