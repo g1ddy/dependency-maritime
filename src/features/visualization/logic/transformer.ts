@@ -4,7 +4,7 @@ import { type ICruiseResult, type IModule, type IDependency } from '../../../sch
 import { classifyNode, type ModuleCategory } from './filters';
 
 // Simple UUID generator for browser/node compatibility
-function generateUUID(): string {
+export function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
   }
@@ -20,11 +20,7 @@ function generateUUID(): string {
       return v.toString(16);
     });
   }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+  throw new Error('No cryptographically secure random number generator available.');
 }
 
 /**
