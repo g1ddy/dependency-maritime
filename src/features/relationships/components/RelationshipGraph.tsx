@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import * as d3 from 'd3';
 import { useRelationshipStore } from '../store';
 import type { RelationshipNode, RelationshipLink } from '../types';
@@ -11,7 +11,9 @@ type SimulatedRelationshipLink = RelationshipLink & {
 export function RelationshipGraph() {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const { nodes, links, selectNode, selectedNodeId } = useRelationshipStore();
+  const { nodesById, links, selectNode, selectedNodeId } = useRelationshipStore();
+
+  const nodes = useMemo(() => Array.from(nodesById.values()), [nodesById]);
 
   // Use a ref for selectedNodeId to access the latest value inside d3 event handlers
   // without re-running the simulation effect when selection changes.
