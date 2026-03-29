@@ -10,3 +10,7 @@
 **Vulnerability:** Weak random number generation (`Math.random()`) used as a fallback for UUID creation when `crypto.randomUUID()` is unavailable.
 **Learning:** `Math.random()` is not cryptographically secure, and can be predictable. Using it to generate UUIDs can lead to collisions or predictability, which might be an issue in contexts where unpredictability is required.
 **Prevention:** When falling back from `crypto.randomUUID()`, always prioritize `crypto.getRandomValues()` over `Math.random()` to maintain cryptographically secure UUID generation in browser environments.
+## 2024-05-24 - Prevent Clickjacking attacks
+**Vulnerability:** The Content Security Policy (CSP) lacked the `frame-ancestors` directive, which means the application could be embedded in an iframe on a malicious third-party site. This exposes users to Clickjacking attacks where their clicks are hijacked to perform unintended actions.
+**Learning:** Even with strict CSP for scripts and objects, Clickjacking remains a risk unless framing is explicitly restricted.
+**Prevention:** Always include `frame-ancestors 'none'` (or specify trusted domains) in the CSP to prevent unauthorized embedding of the application.
