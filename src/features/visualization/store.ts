@@ -474,10 +474,9 @@ export const useGraphStore = create<GraphState>()(
             return;
           }
 
-          const ancestors = new Set<string>();
-          const descendants = new Set<string>();
+          const relevantNodes = new Set<string>([nodeId]);
 
-          const bfs = (start: string, direction: 'in' | 'out', result: Set<string>) => {
+          const bfs = (start: string, direction: 'in' | 'out') => {
             if (!graph.hasNode(start)) return;
 
             const queue = [start];
@@ -491,17 +490,15 @@ export const useGraphStore = create<GraphState>()(
               for (const neighbor of neighbors) {
                 if (!visited.has(neighbor)) {
                   visited.add(neighbor);
-                  result.add(neighbor);
+                  relevantNodes.add(neighbor);
                   queue.push(neighbor);
                 }
               }
             }
           };
 
-          bfs(nodeId, 'in', ancestors);
-          bfs(nodeId, 'out', descendants);
-
-          const relevantNodes = new Set([...ancestors, ...descendants, nodeId]);
+          bfs(nodeId, 'in');
+          bfs(nodeId, 'out');
 
           const updatedNodes = nodes.map((n) => {
               const isHighlighted = relevantNodes.has(n.id);
