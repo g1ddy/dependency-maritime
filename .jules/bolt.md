@@ -1,6 +1,11 @@
 ## 2024-05-18 - [Optimization of Relationship Graph Degree Calculation]
 **Learning:** In the `src/features/relationships/store.ts` file, the `setData` action was computing the degree of each node using a nested loop (`nodes.forEach` and `links.filter`), resulting in an O(N*E) time complexity. For dense graphs, this caused significant performance issues when loading the CSV data.
 **Action:** The logic was rewritten to process the `links` array directly to calculate the degree of source and target nodes. By maintaining a lookup via `nodesMap`, the complexity was reduced to O(E). A critical detail here is verifying that self-loops do not result in double-counting the degree. I used `if (targetNode && l.source !== l.target) targetNode.degree++;` to correctly increment the target node's degree only when the connection is not a self-loop, perfectly mirroring the logic in the original `.filter()` logic.
+
 ## 2026-03-17 - Optimization of Nodes Map Creation
 **Learning:** In highly dynamic Graph-to-ReactFlow synchronizations, repeatedly constructing `Map` instances from large arrays using `new Map(array.map(n => [n.id, n]))` introduces unnecessary garbage collection overhead due to the creation of intermediate tuple arrays (`[id, node]`).
 **Action:** Replace `new Map(array.map(...))` with a manual `for` loop helper `createNodesById(nodes)` that populates the `Map` directly, avoiding the intermediate tuple allocations and minimizing GC pressure during frequent drag/layout operations.
+
+## 2024-05-18 - [Optimization of Visualization Graph Node Selection]
+**Learning:** In highly dynamic Graph-to-ReactFlow synchronizations, repeatedly constructing `Set` instances from large arrays and merging them using the spread operator (`[...ancestors, ...descendants, nodeId]`) introduces unnecessary garbage collection overhead due to the creation of intermediate arrays and multiple set creations.
+**Action:** Replaced the creation of the `relevantNodes` Set with a lightweight `isRelevantNode` closure function that checks for the presence of a node ID in the `ancestors` or `descendants` Sets or if it matches the selected `nodeId`. This avoids intermediate array allocations and minimizes GC pressure during frequent node selections in the graph.

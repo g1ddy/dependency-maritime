@@ -501,10 +501,12 @@ export const useGraphStore = create<GraphState>()(
           bfs(nodeId, 'in', ancestors);
           bfs(nodeId, 'out', descendants);
 
-          const relevantNodes = new Set([...ancestors, ...descendants, nodeId]);
+          // Optimization (Bolt): Avoid intermediate array allocation from spread operator
+          // new Set([...ancestors, ...descendants, nodeId])
+          const isRelevantNode = (id: string) => id === nodeId || ancestors.has(id) || descendants.has(id);
 
           const updatedNodes = nodes.map((n) => {
-              const isHighlighted = relevantNodes.has(n.id);
+              const isHighlighted = isRelevantNode(n.id);
               const isDimmed = !isHighlighted;
 
               // Optimization: Return existing object if state matches
@@ -529,8 +531,8 @@ export const useGraphStore = create<GraphState>()(
             nodes: updatedNodes,
             nodesById: createNodesById(updatedNodes),
             edges: edges.map((e) => {
-              const isSourceRelevant = relevantNodes.has(e.source);
-              const isTargetRelevant = relevantNodes.has(e.target);
+              const isSourceRelevant = isRelevantNode(e.source);
+              const isTargetRelevant = isRelevantNode(e.target);
               const isHighlighted = isSourceRelevant && isTargetRelevant;
               const targetStyle = isHighlighted ? HIGHLIGHTED_EDGE_STYLE : DIMMED_EDGE_STYLE;
               const targetZIndex = isHighlighted ? HIGHLIGHTED_EDGE_Z_INDEX : DIMMED_EDGE_Z_INDEX;
