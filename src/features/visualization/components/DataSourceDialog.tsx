@@ -70,15 +70,14 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     } catch (err) {
       console.error(`Error loading ${sourceName}:`, err);
       if (err instanceof ZodError) {
-        const details = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(", ");
         setError({
           title: 'Validation Error',
-          description: `The ${sourceName} data is invalid: ${details}`
+          description: 'The provided data is invalid. It does not match the expected dependency-cruiser JSON schema.'
         });
       } else {
         setError({
           title: 'Invalid Data',
-          description: `Failed to load ${sourceName}. The data does not match the expected schema.`
+          description: 'Failed to load the data source. The data does not match the expected format.'
         });
       }
     }
@@ -102,13 +101,11 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     } catch (err) {
        console.error("Upload error:", err);
        let title = "Error";
-       let description = "An unexpected error occurred.";
+       let description = "An unexpected error occurred during upload.";
 
        if (err instanceof SyntaxError) {
          title = "Invalid JSON";
-         description = "The file content is not valid JSON.";
-       } else if (err instanceof Error) {
-         description = err.message;
+         description = "The provided file content is not valid JSON.";
        }
        setError({ title, description });
     } finally {

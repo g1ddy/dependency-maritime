@@ -140,7 +140,7 @@ describe('Relationship DataSourceDialog', () => {
 
       await waitFor(() => {
           expect(screen.getByText('Parsing Error')).toBeTruthy();
-          expect(screen.getByText(/Bad CSV format/)).toBeTruthy();
+          expect(screen.getByText(/Failed to parse the provided CSV data/)).toBeTruthy();
       });
       expect(mockSetData).not.toHaveBeenCalled();
   });
