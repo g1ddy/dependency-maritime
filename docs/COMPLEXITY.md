@@ -54,39 +54,39 @@ Following the "AI to Rules" refactor and "Split Coach" initiative, here are the 
 
 ## 🚨 Automated Complexity Report
 
-**Last Updated:** 2026-01-31
+**Last Updated:** 2026-04-06
 
-### 🏥 Repository Health Score: **93.0 / 100**
+### 🏥 Repository Health Score: **89.0 / 100**
 
 *   **Formula**: 100 - Penalties for Files exceeding thresholds (LOC > 300, Complexity > 10, Fan-Out > 15).
-*   **Total Files Scanned**: 34
+*   **Total Files Scanned**: 47
 
 ### 🔥 Top 10 High-Complexity Files (Compound Score)
 _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/features/visualization/components/NodeInspectorPanel.tsx` | **97.7** | 246 | 22 | 6 | 0.86 |
-| `src/features/visualization/store.ts` | **75.5** | 395 | 7 | 6 | 0.5 |
-| `src/features/visualization/components/GraphOverlay.tsx` | **74.9** | 227 | 7 | 10 | 0.91 |
-| `src/features/visualization/components/AppNode.tsx` | **68.6** | 96 | 19 | 3 | 0.75 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **67.4** | 143 | 12 | 6 | 0.86 |
-| `src/features/visualization/components/DataSourceDialog.tsx` | **58.7** | 200 | 6 | 5 | 0.83 |
-| `src/features/visualization/logic/transformer.ts` | **54.8** | 195 | 9 | 2 | 0.67 |
-| `src/features/visualization/components/GroupNode.tsx` | **54.2** | 72 | 13 | 3 | 0.75 |
-| `src/features/visualization/logic/metrics.ts` | **53.7** | 157 | 13 | 1 | 0.5 |
-| `src/features/visualization/logic/layout.ts` | **39.2** | 132 | 13 | 0 | 0 |
+| `src/features/visualization/store.ts` | **110.7** | 649 | 7 | 10 | 0.59 |
+| `src/features/visualization/components/NodeInspectorPanel.tsx` | **99.5** | 240 | 22 | 7 | 0.88 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **85.3** | 222 | 17 | 6 | 0.86 |
+| `src/features/visualization/components/GraphOverlay.tsx` | **83.8** | 275 | 8 | 11 | 0.92 |
+| `src/features/visualization/logic/transformer.ts` | **74** | 270 | 13 | 3 | 0.75 |
+| `src/features/visualization/components/AppNode.tsx` | **69** | 100 | 19 | 3 | 0.75 |
+| `src/components/layout/Header.tsx` | **63.6** | 149 | 11 | 5 | 0.83 |
+| `src/features/visualization/logic/metrics.ts` | **58.9** | 189 | 14 | 1 | 0.5 |
+| `src/features/relationships/components/RelationshipOverlay.tsx` | **56.3** | 173 | 9 | 3 | 0.75 |
+| `src/components/DataSourceDialog.tsx` | **55** | 117 | 11 | 4 | 0.67 |
 
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
-| `src/features/visualization/components/NodeInspectorPanel.tsx` | **22** | 246 |
-| `src/features/visualization/components/AppNode.tsx` | **19** | 96 |
-| `src/features/visualization/logic/layout.ts` | **13** | 132 |
-| `src/features/visualization/logic/metrics.ts` | **13** | 157 |
+| `src/features/visualization/components/NodeInspectorPanel.tsx` | **22** | 240 |
+| `src/features/visualization/components/AppNode.tsx` | **19** | 100 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **17** | 222 |
+| `src/features/visualization/logic/metrics.ts` | **14** | 189 |
+| `src/features/visualization/logic/layout.ts` | **13** | 153 |
+| `src/features/visualization/logic/transformer.ts` | **13** | 270 |
 | `src/features/visualization/components/GroupNode.tsx` | **13** | 72 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **12** | 143 |
-| `src/features/visualization/logic/transformer.ts` | **9** | 195 |
-| `src/features/visualization/store.ts` | **7** | 395 |
-| `src/features/visualization/components/GraphOverlay.tsx` | **7** | 227 |
-| `src/features/visualization/components/DataSourceDialog.tsx` | **6** | 200 |
+| `src/components/layout/Header.tsx` | **11** | 149 |
+| `src/components/DataSourceDialog.tsx` | **11** | 117 |
+| `src/components/FileUploadZone.tsx` | **11** | 91 |
