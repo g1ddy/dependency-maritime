@@ -71,13 +71,23 @@ export function RelationshipGraph() {
 
     // Helpers
     const getRadius = (d: RelationshipNode) => 5 + Math.min(d.degree * 2, 25);
+
+    // ⚡ Bolt Optimization: Replace Set with string concatenated keys with a bidirectional Map
+    // adjacency list. This prevents intermediate string allocations (e.g., `${a.id},${b.id}`)
+    // during high-frequency d3 'mouseover' and 'mouseout' events, reducing GC pressure and lookup time.
     const isConnected = (() => {
-        const linkedByIndex = new Set<string>();
+        const adjacencyList = new Map<string, Set<string>>();
+
         for (const l of simulatedLinks) {
-            linkedByIndex.add(`${l.source.id},${l.target.id}`);
+            if (!adjacencyList.has(l.source.id)) adjacencyList.set(l.source.id, new Set());
+            if (!adjacencyList.has(l.target.id)) adjacencyList.set(l.target.id, new Set());
+
+            adjacencyList.get(l.source.id)!.add(l.target.id);
+            adjacencyList.get(l.target.id)!.add(l.source.id);
         }
+
         return (a: RelationshipNode, b: RelationshipNode) => {
-            return linkedByIndex.has(`${a.id},${b.id}`) || linkedByIndex.has(`${b.id},${a.id}`);
+            return adjacencyList.get(a.id)?.has(b.id) || false;
         };
     })();
 
