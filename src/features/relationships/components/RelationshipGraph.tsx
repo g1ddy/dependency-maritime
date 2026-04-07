@@ -72,12 +72,23 @@ export function RelationshipGraph() {
     // Helpers
     const getRadius = (d: RelationshipNode) => 5 + Math.min(d.degree * 2, 25);
     const isConnected = (() => {
-        const linkedByIndex = new Set<string>();
+        const linkedByIndex = new Map<string, Set<string>>();
+        const addLink = (from: string, to: string) => {
+            let set = linkedByIndex.get(from);
+            if (!set) {
+                set = new Set();
+                linkedByIndex.set(from, set);
+            }
+            set.add(to);
+        };
+
         for (const l of simulatedLinks) {
-            linkedByIndex.add(`${l.source.id},${l.target.id}`);
+            addLink(l.source.id, l.target.id);
+            addLink(l.target.id, l.source.id);
         }
+
         return (a: RelationshipNode, b: RelationshipNode) => {
-            return linkedByIndex.has(`${a.id},${b.id}`) || linkedByIndex.has(`${b.id},${a.id}`);
+            return linkedByIndex.get(a.id)?.has(b.id) || false;
         };
     })();
 
