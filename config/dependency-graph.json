@@ -22,10 +22,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -46,10 +43,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -70,10 +64,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -94,10 +85,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -118,10 +106,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -142,10 +127,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -166,10 +148,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -190,10 +169,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -214,13 +190,12 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "src/main.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -246,10 +221,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -270,10 +242,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -294,10 +263,28 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/tooltip",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/tooltip.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         },
         {
           "dynamic": false,
@@ -318,13 +305,12 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "src/App.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -350,10 +336,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -374,10 +357,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -398,20 +378,22 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "src/components/layout/Header.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
     {
       "source": "src/components/theme-context.tsx",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        "src/components/mode-toggle.tsx",
+        "src/components/theme-provider.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -437,20 +419,42 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "src/components/layout/Header.tsx",
+        "src/components/mode-toggle.tsx",
+        "src/features/relationships/components/RelationshipOverlay.tsx",
+        "src/components/DataSourceDialog.tsx",
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/features/visualization/components/NodeInspectorPanel.tsx",
+        "src/features/visualization/components/SettingsDialog.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
     {
       "source": "src/lib/utils.ts",
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        "src/components/layout/Header.tsx",
+        "src/components/ui/button.tsx",
+        "src/components/ui/dropdown-menu.tsx",
+        "src/components/ui/sheet.tsx",
+        "src/components/ui/tooltip.tsx",
+        "src/components/DataSourceDialog.tsx",
+        "src/components/FileUploadZone.tsx",
+        "src/components/ui/dialog.tsx",
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/components/ui/card.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/ui/separator.tsx",
+        "src/components/ui/switch.tsx",
+        "src/features/visualization/components/NodeInspectorPanel.tsx",
+        "src/components/ui/badge.tsx",
+        "src/components/ui/input.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -476,13 +480,14 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "src/components/mode-toggle.tsx",
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/features/visualization/components/SettingsDialog.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -508,2070 +513,12 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         }
       ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/relationships/index.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./components/RelationshipGraph",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/relationships/components/RelationshipGraph.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./components/RelationshipOverlay",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/relationships/components/RelationshipOverlay.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/relationships/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import",
-            "pre-compilation-only"
-          ],
-          "preCompilationOnly": true,
-          "resolved": "src/features/relationships/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
+      "dependents": [
+        "src/components/layout/Header.tsx"
       ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/relationships/components/RelationshipGraph.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/relationships/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import",
-            "pre-compilation-only"
-          ],
-          "preCompilationOnly": true,
-          "resolved": "src/features/relationships/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/relationships/store.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import",
-            "pre-compilation-only"
-          ],
-          "preCompilationOnly": true,
-          "resolved": "src/features/relationships/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/relationships/types.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/relationships/components/RelationshipOverlay.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/relationships/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import",
-            "pre-compilation-only"
-          ],
-          "preCompilationOnly": true,
-          "resolved": "src/features/relationships/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/button",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/button.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/relationships/components/DataSourceDialog.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/relationships/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import",
-            "pre-compilation-only"
-          ],
-          "preCompilationOnly": true,
-          "resolved": "src/features/relationships/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/DataSourceDialog",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/DataSourceDialog.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/DataSourceDialog.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/components/FileUploadZone",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/FileUploadZone.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/button",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/button.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/dialog",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/dialog.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/FileUploadZone.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/ui/dialog.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/DataSourceDialog.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/DataSourceDialog",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/DataSourceDialog.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/schema/dependency-cruiser",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/schema/dependency-cruiser.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/types.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/schema/dependency-cruiser.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/DependencyGraph.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./AppNode",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/components/AppNode.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./GroupNode",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/components/GroupNode.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/schema/complexity-metrics",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/schema/complexity-metrics.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/schema/dependency-cruiser",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/schema/dependency-cruiser.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/store.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../../schema/dependency-cruiser",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/schema/dependency-cruiser.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/filters",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/filters.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/graph-utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/graph-utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/layout",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/layout.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/layout-elk",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/layout-elk.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/layout.worker",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/layout.worker.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/layout.worker?worker",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/layout.worker.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/metrics",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/metrics.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./logic/transformer",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/transformer.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/logic/filters.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/logic/graph-utils.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/logic/layout.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/logic/layout-elk.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./layout",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/layout.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/logic/layout.worker.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./layout",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/layout.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/logic/metrics.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/logic/transformer.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../../../schema/dependency-cruiser",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/schema/dependency-cruiser.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./filters",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/filters.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/AppNode.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./styles",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/components/styles.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/styles.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/GroupNode.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "./styles",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/components/styles.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/schema/complexity-metrics.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/GraphOverlay.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../logic/filters",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/filters.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/button",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/button.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/card",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/card.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/dropdown-menu",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/dropdown-menu.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/label",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/label.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/separator",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/separator.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/switch",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/switch.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/ui/card.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/ui/label.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/ui/separator.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/ui/switch.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/NodeInspectorPanel.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../logic/graph-utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/logic/graph-utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "../types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/badge",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/badge.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/button",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/button.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/separator",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/separator.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/ui/badge.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/features/visualization/components/SettingsDialog.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../store",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/features/visualization/store.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/button",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/button.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/dialog",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/dialog.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/dropdown-menu",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/dropdown-menu.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/label",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/label.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        },
-        {
-          "dynamic": false,
-          "module": "@/components/ui/switch",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/ui/switch.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/theme-provider.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./theme-context",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/components/theme-context.tsx",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/ui/input.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "@/lib/utils",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "aliased",
-            "aliased-tsconfig",
-            "aliased-tsconfig-paths",
-            "local",
-            "import"
-          ],
-          "preCompilationOnly": false,
-          "resolved": "src/lib/utils.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
-        }
-      ],
-      "dependents": [],
       "orphan": false,
       "valid": true
     },
@@ -2597,10 +544,1981 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/layout/Header.tsx",
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/main.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/relationships/index.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./components/RelationshipGraph",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/relationships/components/RelationshipGraph.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./components/RelationshipOverlay",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/relationships/components/RelationshipOverlay.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/relationships/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/relationships/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/relationships/components/RelationshipGraph.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/relationships/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/relationships/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/relationships/index.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/relationships/store.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/relationships/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/relationships/index.tsx",
+        "src/features/relationships/components/RelationshipGraph.tsx",
+        "src/features/relationships/components/RelationshipOverlay.tsx",
+        "src/features/relationships/components/DataSourceDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/relationships/types.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/relationships/index.tsx",
+        "src/features/relationships/components/RelationshipGraph.tsx",
+        "src/features/relationships/store.ts",
+        "src/features/relationships/components/RelationshipOverlay.tsx",
+        "src/features/relationships/components/DataSourceDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/relationships/components/RelationshipOverlay.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/relationships/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/relationships/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/relationships/index.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/relationships/components/DataSourceDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/relationships/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "preCompilationOnly": true,
+          "resolved": "src/features/relationships/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/DataSourceDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/DataSourceDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/DataSourceDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/components/FileUploadZone",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/FileUploadZone.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/dialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/dialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/relationships/components/DataSourceDialog.tsx",
+        "src/features/visualization/components/DataSourceDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/FileUploadZone.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/DataSourceDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/ui/dialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/DataSourceDialog.tsx",
+        "src/features/visualization/components/SettingsDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/DataSourceDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/DataSourceDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/DataSourceDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/schema/dependency-cruiser",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/types.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/components/DataSourceDialog.tsx",
+        "src/features/visualization/components/DependencyGraph.tsx",
+        "src/features/visualization/store.ts",
+        "src/features/visualization/logic/metrics.ts",
+        "src/features/visualization/components/AppNode.tsx",
+        "src/features/visualization/components/GroupNode.tsx",
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/features/visualization/components/NodeInspectorPanel.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/schema/dependency-cruiser.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/components/DataSourceDialog.tsx",
+        "src/features/visualization/components/DependencyGraph.tsx",
+        "src/features/visualization/store.ts",
+        "src/features/visualization/logic/transformer.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/DependencyGraph.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./AppNode",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/components/AppNode.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./GroupNode",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/components/GroupNode.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/schema/complexity-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/schema/complexity-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/schema/dependency-cruiser",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/store.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../schema/dependency-cruiser",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/filters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/filters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/graph-utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/graph-utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/layout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/layout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/layout-elk",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/layout-elk.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/layout.worker",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/layout.worker.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/layout.worker?worker",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/layout.worker.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./logic/transformer",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/transformer.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx",
+        "src/features/visualization/components/DependencyGraph.tsx",
+        "src/features/visualization/components/AppNode.tsx",
+        "src/features/visualization/components/GroupNode.tsx",
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/features/visualization/components/NodeInspectorPanel.tsx",
+        "src/features/visualization/components/SettingsDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/filters.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/store.ts",
+        "src/features/visualization/logic/transformer.ts",
+        "src/features/visualization/components/GraphOverlay.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/graph-utils.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/store.ts",
+        "src/features/visualization/components/NodeInspectorPanel.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/layout.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/store.ts",
+        "src/features/visualization/logic/layout-elk.ts",
+        "src/features/visualization/logic/layout.worker.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/layout-elk.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./layout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/layout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/layout.worker.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./layout",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/layout.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/metrics.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/transformer.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../schema/dependency-cruiser",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./filters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/filters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./uuid",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/uuid.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/logic/uuid.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/logic/transformer.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/AppNode.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./styles",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/components/styles.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/components/DependencyGraph.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/styles.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/components/AppNode.tsx",
+        "src/features/visualization/components/GroupNode.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/GroupNode.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./styles",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/components/styles.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/components/DependencyGraph.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/schema/complexity-metrics.ts",
+      "dependencies": [],
+      "dependents": [
+        "src/features/visualization/components/DependencyGraph.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/GraphOverlay.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../logic/filters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/filters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/card.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/dropdown-menu",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/dropdown-menu.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/label",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/label.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/separator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/separator.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/switch",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/switch.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/tooltip",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/tooltip.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/ui/card.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/components/GraphOverlay.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/ui/label.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/features/visualization/components/SettingsDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/ui/separator.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/features/visualization/components/NodeInspectorPanel.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/ui/switch.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/components/GraphOverlay.tsx",
+        "src/features/visualization/components/SettingsDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/NodeInspectorPanel.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../logic/graph-utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/logic/graph-utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/badge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/badge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/separator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/separator.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/ui/badge.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/features/visualization/components/NodeInspectorPanel.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/features/visualization/components/SettingsDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/features/visualization/store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/dialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/dialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/dropdown-menu",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/dropdown-menu.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/label",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/label.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/switch",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/switch.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/theme-provider.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./theme-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/theme-context.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/main.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/ui/input.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@/lib/utils",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/lib/utils.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2626,10 +2544,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -2647,10 +2562,7 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
         },
         {
           "dynamic": false,
@@ -2671,10 +2583,28 @@
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
-          "valid": true,
-          "instability": 0,
-          "protocol": "file:",
-          "mimeType": ""
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@/components/ui/tooltip",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "preCompilationOnly": false,
+          "resolved": "src/components/ui/tooltip.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2692,7 +2622,9 @@
         "import"
       ],
       "dependencies": [],
-      "dependents": [],
+      "dependents": [
+        "src/main.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -2710,9 +2642,60 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 47,
-    "totalDependenciesCruised": 102,
-    "optionsUsed": {},
+    "totalCruised": 48,
+    "totalDependenciesCruised": 106,
+    "optionsUsed": {
+      "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
+      "combinedDependencies": false,
+      "detectJSDocImports": false,
+      "detectProcessBuiltinModuleCalls": false,
+      "doNotFollow": {
+        "path": "node_modules"
+      },
+      "enhancedResolveOptions": {
+        "exportsFields": [
+          "exports"
+        ],
+        "conditionNames": [
+          "import",
+          "require",
+          "node",
+          "default"
+        ]
+      },
+      "exclude": {
+        "path": "(\\.test\\.ts|\\.test\\.tsx|\\.spec\\.ts|testUtils\\.ts)$"
+      },
+      "exoticRequireStrings": [],
+      "externalModuleResolutionStrategy": "node_modules",
+      "includeOnly": "^src",
+      "metrics": false,
+      "moduleSystems": [
+        "es6",
+        "cjs",
+        "tsd",
+        "amd"
+      ],
+      "outputTo": "-",
+      "outputType": "json",
+      "preserveSymlinks": false,
+      "reporterOptions": {
+        "dot": {
+          "theme": {
+            "graph": {
+              "rankdir": "LR"
+            }
+          }
+        }
+      },
+      "rulesFile": "config/dependency-graph.cjs",
+      "skipAnalysisNotInRules": false,
+      "tsConfig": {
+        "fileName": "./tsconfig.app.json"
+      },
+      "tsPreCompilationDeps": "specify",
+      "args": "src"
+    },
     "ruleSetUsed": {
       "forbidden": [
         {
