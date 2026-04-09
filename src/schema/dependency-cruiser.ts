@@ -26,13 +26,13 @@ export const DependencySchema = z.object({
   /** Whether or not this is a dependency that can be followed any further */
   followable: z.boolean(),
   /** the instability of the dependency */
-  instability: z.number(),
+  instability: z.number().optional(),
   /** If the module specification is an URI with a protocol, this holds it */
-  protocol: z.enum(['data:', 'file:', 'node:']),
+  protocol: z.enum(['data:', 'file:', 'node:']).optional(),
   /** If the module specification is an URI and contains a mime type, this holds it */
-  mimeType: z.string(),
+  mimeType: z.string().optional(),
   /** The module system used (e.g., "es6", "cjs") */
-  moduleSystem: z.enum(['amd', 'cjs', 'es6', 'tsd']),
+  moduleSystem: z.enum(['amd', 'cjs', 'es6', 'tsd']).optional(),
   /** The import string used in the code (e.g., "./utils") */
   module: z.string(),
   /** The absolute or relative path to the resolved file (e.g., "src/utils.ts") */
@@ -62,7 +62,7 @@ export const ModuleSchema = z.object({
   /** List of outgoing dependencies */
   dependencies: z.array(DependencySchema),
   /** List of files that depend on this module (incoming edges) */
-  dependents: z.array(z.string()),
+  dependents: z.array(z.string()).optional(),
   /** Whether or not this is a node.js core module */
   coreModule: z.boolean().optional(),
   /** 'true' if dependency-cruiser could not resolve the module name to a file */
