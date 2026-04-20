@@ -7,4 +7,4 @@
 
 ## 2026-03-20 - Optimization of Node Connectivity Checks
 **Learning:** Using template literal string concatenation (e.g., `` `${source},${target}` ``) as keys in a `Set` for adjacency lookups in an $O(E)$ loop causes excessive string allocations and garbage collection pressure, especially during high-frequency events like mouseover.
-**Action:** Replace the string-keyed `Set` with a bidirectional nested `Map<string, Set<string>>` adjacency list. This structure avoids string allocations during both initialization and lookups, resulting in a ~4.8x performance improvement for connectivity checks.
+**Action:** Replace the string-keyed `Set` with a bidirectional nested `Map<string, Set<string>>` adjacency list using a concise `addLink` helper and nullish coalescing (`??`) for lookups. This structure avoids string allocations during both initialization and lookups, resulting in a ~4.8x performance improvement for connectivity checks.

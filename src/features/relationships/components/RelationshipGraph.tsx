@@ -75,10 +75,7 @@ export function RelationshipGraph() {
         const linkedByIndex = new Map<string, Set<string>>();
         const addLink = (from: string, to: string) => {
             let set = linkedByIndex.get(from);
-            if (!set) {
-                set = new Set();
-                linkedByIndex.set(from, set);
-            }
+            if (!set) linkedByIndex.set(from, (set = new Set()));
             set.add(to);
         };
 
@@ -88,7 +85,7 @@ export function RelationshipGraph() {
         }
 
         return (a: RelationshipNode, b: RelationshipNode) => {
-            return linkedByIndex.get(a.id)?.has(b.id) || false;
+            return linkedByIndex.get(a.id)?.has(b.id) ?? false;
         };
     })();
 
