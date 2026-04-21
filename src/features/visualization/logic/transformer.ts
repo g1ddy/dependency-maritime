@@ -19,8 +19,11 @@ export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
       const guid = generateUUID();
       pathMap.set(mod.source, guid);
 
+      const lastSlashIndex = mod.source.lastIndexOf('/');
+      const label = lastSlashIndex !== -1 ? mod.source.substring(lastSlashIndex + 1) : mod.source;
+
       graph.addNode(guid, {
-        label: mod.source.split('/').pop(), // Simple filename as label
+        label, // Simple filename as label
         fullPath: mod.source, // Store the original path
         ...mod
       });
@@ -39,8 +42,11 @@ export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
         targetId = generateUUID();
         pathMap.set(dep.resolved, targetId);
 
+        const lastSlashIndex = dep.resolved.lastIndexOf('/');
+        const label = lastSlashIndex !== -1 ? dep.resolved.substring(lastSlashIndex + 1) : dep.resolved;
+
         graph.addNode(targetId, {
-           label: dep.resolved.split('/').pop(),
+           label,
            fullPath: dep.resolved,
            external: true,
            coreModule: dep.coreModule
