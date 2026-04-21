@@ -17,7 +17,7 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
   const { setData, setLoading, isLoading } = useRelationshipStore();
   const [error, setError] = useState<{ title: string; description: string } | null>(null);
 
-  const parseCsv = (csvString: string, sourceName: string) => {
+  const parseCsv = (csvString: string) => {
     setLoading(true);
     setError(null);
 
@@ -29,7 +29,7 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
            console.error("CSV Errors:", results.errors);
            setError({
              title: "Parsing Error",
-             description: `Failed to parse ${sourceName}: ${results.errors[0].message}`
+             description: "Failed to parse the provided CSV data. The file may be corrupted or incorrectly formatted."
            });
            setLoading(false);
            return;
@@ -40,7 +40,7 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
         if (!firstRow || !firstRow.Source || !firstRow.Target || !firstRow.Target_Domain || !firstRow.Relationship_Weight) {
           setError({
             title: "Invalid Format",
-            description: `Invalid CSV format in ${sourceName}. Missing required columns (Source, Target, Target_Domain, Relationship_Weight).`
+            description: "Invalid CSV format. Missing required columns (Source, Target, Target_Domain, Relationship_Weight)."
           });
           setLoading(false);
           return;
@@ -51,9 +51,10 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
         onOpenChange(false);
       },
       error: (err: Error) => {
+          console.error(`Error reading CSV:`, err);
           setError({
             title: "Read Error",
-            description: `Error reading ${sourceName}: ${err.message}`
+            description: "An unexpected error occurred while reading the data source."
           });
           setLoading(false);
       }
@@ -80,7 +81,7 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
       const reader = new FileReader();
       reader.onload = (e) => {
           const text = e.target?.result as string;
-          parseCsv(text, file.name);
+          parseCsv(text);
       };
       reader.onerror = () => {
           setError({
@@ -97,7 +98,7 @@ export function DataSourceDialog({ open, onOpenChange }: DataSourceDialogProps) 
       label: 'Sample Data',
       sublabel: 'Class Visualization (Software Arch)',
       icon: Database,
-      onClick: () => parseCsv(classVisualizationCsv, "Sample Class Visualization"),
+      onClick: () => parseCsv(classVisualizationCsv),
       loading: isLoading,
       className: 'hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30',
       iconClassName: 'text-blue-500'
