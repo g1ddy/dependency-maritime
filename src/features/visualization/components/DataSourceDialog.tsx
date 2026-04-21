@@ -39,7 +39,9 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     if (result.summary && typeof result.summary.totalDependenciesCruised === 'number') {
       totalDependencies = result.summary.totalDependenciesCruised;
     } else {
-      totalDependencies = result.modules.reduce((sum, m) => sum + (m.dependencies?.length || 0), 0);
+      for (let i = 0; i < result.modules.length; i++) {
+        totalDependencies += result.modules[i].dependencies?.length || 0;
+      }
     }
 
     if (totalDependencies > MAX_DEPENDENCIES) {
