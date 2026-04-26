@@ -1,5 +1,5 @@
 import dagre from 'dagre';
-import { type Node, type Edge } from '@xyflow/react';
+import { type Node, type Edge, Position } from '@xyflow/react';
 
 // Default node dimensions if not yet measured
 const DEFAULT_NODE_WIDTH = 180;
@@ -131,15 +131,13 @@ export function applyDagreLayout(
         newStyle.height = height + GROUP_PADDING_BUFFER;
     }
 
-    const targetPosition = isHorizontal ? 'left' : 'top';
-    const sourcePosition = isHorizontal ? 'right' : 'bottom';
+    const targetPosition = isHorizontal ? Position.Left : Position.Top;
+    const sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
     return {
       ...node,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-      targetPosition: targetPosition as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-      sourcePosition: sourcePosition as any,
+      targetPosition,
+      sourcePosition,
       position: {
         x,
         y,
