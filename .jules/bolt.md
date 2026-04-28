@@ -8,3 +8,7 @@
 ## 2026-03-20 - Optimization of Node Connectivity Checks
 **Learning:** Using template literal string concatenation (e.g., `` `${source},${target}` ``) as keys in a `Set` for adjacency lookups in an $O(E)$ loop causes excessive string allocations and garbage collection pressure, especially during high-frequency events like mouseover.
 **Action:** Replace the string-keyed `Set` with a bidirectional nested `Map<string, Set<string>>` adjacency list. This structure avoids string allocations during both initialization and lookups, resulting in a ~4.8x performance improvement for connectivity checks.
+
+## 2024-04-28 - Optimization of Filename Extraction
+**Learning:** Using `string.split('/').pop()` for extracting filenames from file paths in tight loops (like graph transformation loops) creates intermediate arrays for every call, adding significant pressure to the garbage collector (GC).
+**Action:** Replace `split('/').pop()` with `lastIndexOf('/')` and `substring()`. Native string search methods are much more memory-efficient and faster for path manipulation.
