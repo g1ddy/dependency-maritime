@@ -26,11 +26,11 @@ export const DependencySchema = z.object({
   /** Whether or not this is a dependency that can be followed any further */
   followable: z.boolean(),
   /** the instability of the dependency */
-  instability: z.number(),
+  instability: z.number().optional(),
   /** If the module specification is an URI with a protocol, this holds it */
-  protocol: z.enum(['data:', 'file:', 'node:']),
+  protocol: z.enum(['data:', 'file:', 'node:']).optional(),
   /** If the module specification is an URI and contains a mime type, this holds it */
-  mimeType: z.string(),
+  mimeType: z.string().optional(),
   /** The module system used (e.g., "es6", "cjs") */
   moduleSystem: z.enum(['amd', 'cjs', 'es6', 'tsd']),
   /** The import string used in the code (e.g., "./utils") */

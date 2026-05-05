@@ -1,17 +1,17 @@
 {
   "src/App.tsx": {
-    "complexity": 1,
-    "loc": 32,
+    "complexity": 2,
+    "loc": 71,
+    "instability": 0.9,
+    "fanIn": 1,
+    "fanOut": 9
+  },
+  "src/components/layout/Header.tsx": {
+    "complexity": 11,
+    "loc": 149,
     "instability": 0.83,
     "fanIn": 1,
     "fanOut": 5
-  },
-  "src/components/layout/Header.tsx": {
-    "complexity": 1,
-    "loc": 72,
-    "instability": 0.75,
-    "fanIn": 1,
-    "fanOut": 3
   },
   "src/components/mode-toggle.tsx": {
     "complexity": 1,
@@ -29,66 +29,136 @@
   },
   "src/components/ui/button.tsx": {
     "complexity": 3,
-    "loc": 59,
-    "instability": 0.2,
-    "fanIn": 4,
+    "loc": 56,
+    "instability": 0.13,
+    "fanIn": 7,
     "fanOut": 1
   },
   "src/lib/utils.ts": {
     "complexity": 1,
     "loc": 7,
     "instability": 0,
-    "fanIn": 13,
+    "fanIn": 16,
     "fanOut": 0
   },
   "src/components/ui/dropdown-menu.tsx": {
     "complexity": 2,
-    "loc": 200,
-    "instability": 0.5,
-    "fanIn": 1,
+    "loc": 216,
+    "instability": 0.25,
+    "fanIn": 3,
     "fanOut": 1
   },
   "src/components/ui/sheet.tsx": {
     "complexity": 2,
-    "loc": 139,
+    "loc": 145,
     "instability": 0.5,
     "fanIn": 1,
     "fanOut": 1
   },
-  "src/features/visualization/components/DataSourceDialog.tsx": {
-    "complexity": 5,
-    "loc": 173,
+  "src/components/ui/tooltip.tsx": {
+    "complexity": 2,
+    "loc": 27,
+    "instability": 0.25,
+    "fanIn": 3,
+    "fanOut": 1
+  },
+  "src/features/relationships/index.tsx": {
+    "complexity": 3,
+    "loc": 43,
     "instability": 0.8,
     "fanIn": 1,
     "fanOut": 4
   },
-  "src/components/ui/dialog.tsx": {
+  "src/features/relationships/components/RelationshipGraph.tsx": {
+    "complexity": 5,
+    "loc": 253,
+    "instability": 0.67,
+    "fanIn": 1,
+    "fanOut": 2
+  },
+  "src/features/relationships/store.ts": {
+    "complexity": 6,
+    "loc": 87,
+    "instability": 0.2,
+    "fanIn": 4,
+    "fanOut": 1
+  },
+  "src/features/relationships/types.ts": {
     "complexity": 1,
-    "loc": 123,
+    "loc": 58,
+    "instability": 0,
+    "fanIn": 5,
+    "fanOut": 0
+  },
+  "src/features/relationships/components/RelationshipOverlay.tsx": {
+    "complexity": 9,
+    "loc": 173,
+    "instability": 0.75,
+    "fanIn": 1,
+    "fanOut": 3
+  },
+  "src/features/relationships/components/DataSourceDialog.tsx": {
+    "complexity": 7,
+    "loc": 124,
+    "instability": 0.75,
+    "fanIn": 1,
+    "fanOut": 3
+  },
+  "src/components/DataSourceDialog.tsx": {
+    "complexity": 11,
+    "loc": 117,
+    "instability": 0.67,
+    "fanIn": 2,
+    "fanOut": 4
+  },
+  "src/components/FileUploadZone.tsx": {
+    "complexity": 11,
+    "loc": 91,
     "instability": 0.5,
     "fanIn": 1,
     "fanOut": 1
   },
+  "src/components/ui/dialog.tsx": {
+    "complexity": 1,
+    "loc": 128,
+    "instability": 0.33,
+    "fanIn": 2,
+    "fanOut": 1
+  },
+  "src/features/visualization/components/DataSourceDialog.tsx": {
+    "complexity": 5,
+    "loc": 190,
+    "instability": 0.75,
+    "fanIn": 1,
+    "fanOut": 3
+  },
+  "src/features/visualization/types.ts": {
+    "complexity": 1,
+    "loc": 57,
+    "instability": 0,
+    "fanIn": 8,
+    "fanOut": 0
+  },
   "src/schema/dependency-cruiser.ts": {
     "complexity": 1,
-    "loc": 90,
+    "loc": 105,
     "instability": 0,
     "fanIn": 4,
     "fanOut": 0
   },
   "src/features/visualization/components/DependencyGraph.tsx": {
-    "complexity": 11,
-    "loc": 135,
-    "instability": 0.83,
+    "complexity": 17,
+    "loc": 222,
+    "instability": 0.86,
     "fanIn": 1,
-    "fanOut": 5
+    "fanOut": 6
   },
   "src/features/visualization/store.ts": {
     "complexity": 7,
-    "loc": 344,
-    "instability": 0.67,
-    "fanIn": 3,
-    "fanOut": 6
+    "loc": 651,
+    "instability": 0.59,
+    "fanIn": 7,
+    "fanOut": 10
   },
   "src/features/visualization/logic/filters.ts": {
     "complexity": 3,
@@ -97,82 +167,138 @@
     "fanIn": 3,
     "fanOut": 0
   },
+  "src/features/visualization/logic/graph-utils.ts": {
+    "complexity": 6,
+    "loc": 61,
+    "instability": 0,
+    "fanIn": 2,
+    "fanOut": 0
+  },
   "src/features/visualization/logic/layout.ts": {
     "complexity": 13,
-    "loc": 132,
+    "loc": 153,
     "instability": 0,
-    "fanIn": 1,
+    "fanIn": 3,
     "fanOut": 0
+  },
+  "src/features/visualization/logic/layout-elk.ts": {
+    "complexity": 9,
+    "loc": 138,
+    "instability": 0.5,
+    "fanIn": 1,
+    "fanOut": 1
+  },
+  "src/features/visualization/logic/layout.worker.ts": {
+    "complexity": 1,
+    "loc": 20,
+    "instability": 0.5,
+    "fanIn": 1,
+    "fanOut": 1
   },
   "src/features/visualization/logic/metrics.ts": {
-    "complexity": 3,
-    "loc": 46,
-    "instability": 0,
+    "complexity": 14,
+    "loc": 189,
+    "instability": 0.5,
     "fanIn": 1,
-    "fanOut": 0
+    "fanOut": 1
   },
   "src/features/visualization/logic/transformer.ts": {
-    "complexity": 9,
-    "loc": 195,
-    "instability": 0.67,
+    "complexity": 13,
+    "loc": 270,
+    "instability": 0.75,
     "fanIn": 1,
-    "fanOut": 2
+    "fanOut": 3
   },
-  "src/features/visualization/types.ts": {
-    "complexity": 1,
+  "src/features/visualization/logic/uuid.ts": {
+    "complexity": 5,
     "loc": 31,
     "instability": 0,
-    "fanIn": 4,
+    "fanIn": 1,
     "fanOut": 0
   },
   "src/features/visualization/components/AppNode.tsx": {
-    "complexity": 9,
-    "loc": 61,
-    "instability": 0.5,
+    "complexity": 19,
+    "loc": 100,
+    "instability": 0.75,
     "fanIn": 1,
-    "fanOut": 1
+    "fanOut": 3
+  },
+  "src/features/visualization/components/styles.ts": {
+    "complexity": 1,
+    "loc": 44,
+    "instability": 0,
+    "fanIn": 2,
+    "fanOut": 0
   },
   "src/features/visualization/components/GroupNode.tsx": {
-    "complexity": 3,
-    "loc": 34,
-    "instability": 0.5,
+    "complexity": 13,
+    "loc": 72,
+    "instability": 0.75,
     "fanIn": 1,
-    "fanOut": 1
+    "fanOut": 3
+  },
+  "src/schema/complexity-metrics.ts": {
+    "complexity": 1,
+    "loc": 14,
+    "instability": 0,
+    "fanIn": 1,
+    "fanOut": 0
   },
   "src/features/visualization/components/GraphOverlay.tsx": {
-    "complexity": 3,
-    "loc": 154,
-    "instability": 0.89,
+    "complexity": 8,
+    "loc": 275,
+    "instability": 0.92,
     "fanIn": 1,
-    "fanOut": 8
+    "fanOut": 11
   },
   "src/components/ui/card.tsx": {
     "complexity": 1,
-    "loc": 77,
+    "loc": 54,
     "instability": 0.5,
     "fanIn": 1,
     "fanOut": 1
   },
   "src/components/ui/label.tsx": {
     "complexity": 1,
-    "loc": 25,
-    "instability": 0.5,
-    "fanIn": 1,
+    "loc": 23,
+    "instability": 0.33,
+    "fanIn": 2,
     "fanOut": 1
   },
   "src/components/ui/separator.tsx": {
     "complexity": 4,
     "loc": 30,
-    "instability": 0.5,
-    "fanIn": 1,
+    "instability": 0.33,
+    "fanIn": 2,
     "fanOut": 1
   },
   "src/components/ui/switch.tsx": {
     "complexity": 1,
-    "loc": 28,
+    "loc": 27,
+    "instability": 0.33,
+    "fanIn": 2,
+    "fanOut": 1
+  },
+  "src/features/visualization/components/NodeInspectorPanel.tsx": {
+    "complexity": 22,
+    "loc": 240,
+    "instability": 0.88,
+    "fanIn": 1,
+    "fanOut": 7
+  },
+  "src/components/ui/badge.tsx": {
+    "complexity": 1,
+    "loc": 38,
     "instability": 0.5,
     "fanIn": 1,
     "fanOut": 1
+  },
+  "src/features/visualization/components/SettingsDialog.tsx": {
+    "complexity": 2,
+    "loc": 98,
+    "instability": 0.86,
+    "fanIn": 1,
+    "fanOut": 6
   },
   "src/components/theme-provider.tsx": {
     "complexity": 4,
@@ -181,37 +307,23 @@
     "fanIn": 1,
     "fanOut": 1
   },
-  "src/components/ui/badge.tsx": {
-    "complexity": 1,
-    "loc": 38,
-    "instability": 1,
-    "fanIn": 0,
-    "fanOut": 1
-  },
   "src/components/ui/input.tsx": {
     "complexity": 1,
-    "loc": 23,
-    "instability": 1,
-    "fanIn": 0,
-    "fanOut": 1
-  },
-  "src/components/ui/tooltip.tsx": {
-    "complexity": 2,
-    "loc": 31,
+    "loc": 22,
     "instability": 1,
     "fanIn": 0,
     "fanOut": 1
   },
   "src/main.tsx": {
     "complexity": 1,
-    "loc": 19,
+    "loc": 25,
     "instability": 1,
     "fanIn": 0,
-    "fanOut": 3
+    "fanOut": 4
   },
   "src/index.css": {
     "complexity": 1,
-    "loc": 149,
+    "loc": 155,
     "instability": 0,
     "fanIn": 1,
     "fanOut": 0

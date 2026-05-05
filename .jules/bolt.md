@@ -8,3 +8,7 @@
 ## 2026-03-20 - Optimization of Node Connectivity Checks
 **Learning:** Using template literal string concatenation (e.g., `` `${source},${target}` ``) as keys in a `Set` for adjacency lookups in an $O(E)$ loop causes excessive string allocations and garbage collection pressure, especially during high-frequency events like mouseover.
 **Action:** Replace the string-keyed `Set` with a bidirectional nested `Map<string, Set<string>>` adjacency list. This structure avoids string allocations during both initialization and lookups, resulting in a ~4.8x performance improvement for connectivity checks.
+
+## 2024-05-19 - Optimization of relevantNodes Set in selectNode
+**Learning:** In `src/features/visualization/store.ts`, the `selectNode` function previously allocated intermediate sets (`ancestors` and `descendants`) during BFS traversals and then merged them using `new Set([...ancestors, ...descendants, nodeId])`. This caused unnecessary array allocations and set merges, creating excessive garbage collection overhead during interactive node selections.
+**Action:** The BFS traversal was updated to accept a shared `result` set (initialized with `[nodeId]`) and write directly to it. To maintain strict standard BFS cycle detection per direction ('in' and 'out'), local `visited` sets were used inside the BFS function instead of relying on the shared result set for visited checks. This prevents array spreading and duplicate set creation while preserving correct cycle handling.

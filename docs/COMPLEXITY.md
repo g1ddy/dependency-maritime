@@ -54,7 +54,7 @@ Following the "AI to Rules" refactor and "Split Coach" initiative, here are the 
 
 ## 🚨 Automated Complexity Report
 
-**Last Updated:** 2026-04-06
+**Last Updated:** 2026-05-05
 
 ### 🏥 Repository Health Score: **89.0 / 100**
 
@@ -66,7 +66,7 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/features/visualization/store.ts` | **110.7** | 649 | 7 | 10 | 0.59 |
+| `src/features/visualization/store.ts` | **110.9** | 651 | 7 | 10 | 0.59 |
 | `src/features/visualization/components/NodeInspectorPanel.tsx` | **99.5** | 240 | 22 | 7 | 0.88 |
 | `src/features/visualization/components/DependencyGraph.tsx` | **85.3** | 222 | 17 | 6 | 0.86 |
 | `src/features/visualization/components/GraphOverlay.tsx` | **83.8** | 275 | 8 | 11 | 0.92 |

@@ -474,13 +474,14 @@ export const useGraphStore = create<GraphState>()(
             return;
           }
 
-          const ancestors = new Set<string>();
-          const descendants = new Set<string>();
+          const relevantNodes = new Set<string>([nodeId]);
 
           const bfs = (start: string, direction: 'in' | 'out', result: Set<string>) => {
             if (!graph.hasNode(start)) return;
 
             const queue = [start];
+            // Maintain a local visited set to strictly follow standard BFS cycle detection
+            // per directional traversal, safely accumulating results into the shared Set.
             const visited = new Set<string>([start]);
             let head = 0;
             while (head < queue.length) {
@@ -498,10 +499,8 @@ export const useGraphStore = create<GraphState>()(
             }
           };
 
-          bfs(nodeId, 'in', ancestors);
-          bfs(nodeId, 'out', descendants);
-
-          const relevantNodes = new Set([...ancestors, ...descendants, nodeId]);
+          bfs(nodeId, 'in', relevantNodes);
+          bfs(nodeId, 'out', relevantNodes);
 
           const updatedNodes = nodes.map((n) => {
               const isHighlighted = relevantNodes.has(n.id);
