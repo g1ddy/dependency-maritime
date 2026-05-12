@@ -474,8 +474,11 @@ export const useGraphStore = create<GraphState>()(
             return;
           }
 
-          const ancestors = new Set<string>();
-          const descendants = new Set<string>();
+          // ⚡ Bolt: Optimized BFS traversal by accumulating results into a single shared Set.
+          // The `visited` set is kept strictly scoped within the `bfs` function to ensure
+          // accurate traversal (avoiding early termination in cyclic graphs), while the
+          // `result` accumulator prevents the need to allocate and spread multiple Sets.
+          const relevantNodes = new Set<string>([nodeId]);
 
           const bfs = (start: string, direction: 'in' | 'out', result: Set<string>) => {
             if (!graph.hasNode(start)) return;
@@ -498,10 +501,8 @@ export const useGraphStore = create<GraphState>()(
             }
           };
 
-          bfs(nodeId, 'in', ancestors);
-          bfs(nodeId, 'out', descendants);
-
-          const relevantNodes = new Set([...ancestors, ...descendants, nodeId]);
+          bfs(nodeId, 'in', relevantNodes);
+          bfs(nodeId, 'out', relevantNodes);
 
           const updatedNodes = nodes.map((n) => {
               const isHighlighted = relevantNodes.has(n.id);
