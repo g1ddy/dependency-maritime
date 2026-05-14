@@ -13,3 +13,7 @@
 ## 2025-03-26 - [Interactive List Accessibility]
 **Learning:** Found custom button list items in `RelationshipOverlay.tsx` and `NodeInspectorPanel.tsx` that didn't have keyboard focus rings when tabbing through results or lists. Specifically, some lists relied on hover states or non-standard focus outlines (`focus:bg-gray-600`). In React apps with interactive custom lists (like search results or dependents/dependencies), it's easy to forget standard focus visibility since they often act as clickable rows rather than standalone buttons visually.
 **Action:** Always ensure that interactive list elements (e.g. `<li><button>...</button></li>`) explicitly declare standard focus styles. I added `focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring` (and `focus-visible:ring-blue-500` depending on the surrounding UI palette) so that keyboard-only users can clearly identify their focused item.
+
+## 2024-05-14 - Add tooltip to theme toggle button
+**Learning:** Icon-only buttons, even with `sr-only` text, lack visual discoverability for sighted users. Adding a Tooltip to an existing DropdownMenuTrigger enhances clarity without cluttering the UI.
+**Action:** Always wrap icon-only actions with Tooltips, ensuring the TooltipTrigger and DropdownMenuTrigger correctly merge refs via `asChild`.
