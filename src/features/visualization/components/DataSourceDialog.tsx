@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileJson, Database } from 'lucide-react';
 import { CruiseResultSchema, type ICruiseResult } from '@/schema/dependency-cruiser';
+import { ComplexityMetricsMapSchema } from '@/schema/complexity-metrics';
 import { ZodError } from 'zod';
 import { type ComplexityMetricsMap } from '../types';
 import { GenericDataSourceDialog, type DataSourcePreset } from '@/components/DataSourceDialog';
@@ -121,12 +122,12 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       const mod = await import('../../../../config/complexity-metrics.json');
       // Handle both default export (traditional JSON module) and direct export
       if (mod && typeof mod === 'object' && 'default' in mod) {
-          // The check 'default' in mod ensures this is safe enough for our needs,
-          // though TS might complain about 'default' on object.
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-          metrics = (mod as any).default as ComplexityMetricsMap;
+          metrics = (mod as { default: ComplexityMetricsMap }).default;
       } else {
-          metrics = mod as unknown as ComplexityMetricsMap;
+          const parseResult = ComplexityMetricsMapSchema.safeParse(mod);
+          if (parseResult.success) {
+             metrics = parseResult.data;
+          }
       }
     } catch (e) {
       console.warn("Complexity metrics not found or invalid, skipping.", e);
