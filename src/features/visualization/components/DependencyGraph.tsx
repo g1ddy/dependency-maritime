@@ -14,6 +14,11 @@ import { AppNode } from './AppNode';
 import { GroupNode } from './GroupNode';
 import { type CustomNode, type AppNodeData } from '../types';
 
+type XYFlowNodeWithComputed = Node & {
+  positionAbsolute?: { x: number; y: number };
+  computed?: { positionAbsolute?: { x: number; y: number } };
+};
+
 const MINI_MAP_NODE_COLORS = {
   EXTERNAL: '#f59e0b', // amber-500
   TSX: '#60a5fa', // blue-400
@@ -92,23 +97,16 @@ export function DependencyGraph() {
     (_: React.MouseEvent, node: Node) => {
       // Recursive helper to get absolute position
       const getAbsolutePosition = (nodeId: string): { x: number; y: number } | undefined => {
-        const internalNode = getInternalNode(nodeId);
-        const publicNode = getNode(nodeId);
+        const internalNode = getInternalNode(nodeId) as XYFlowNodeWithComputed | undefined;
+        const publicNode = getNode(nodeId) as XYFlowNodeWithComputed | undefined;
         const target = internalNode || publicNode;
 
         if (!target) return undefined;
 
         // Try direct absolute position
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-        let absPos = (internalNode as any)?.positionAbsolute || (publicNode as any)?.positionAbsolute || (internalNode as any)?.computed?.positionAbsolute;
+        const absPos = internalNode?.positionAbsolute || publicNode?.positionAbsolute || internalNode?.computed?.positionAbsolute;
 
-        // Ensure shape
-        const safeAbs = absPos as { x: unknown; y: unknown } | undefined;
-        if (!safeAbs || typeof safeAbs.x !== 'number' || typeof safeAbs.y !== 'number') {
-           absPos = undefined;
-        }
-
-        if (absPos) return absPos as { x: number; y: number };
+        if (absPos) return absPos;
 
         // Fallback: Calculate recursively using parent
         if (target.parentId) {

@@ -1,0 +1,1 @@
+## 2024-05-18 - [Pattern Detected] **Observation:** Heavy usage of `any` casts when interacting with internal React Flow node state (e.g., `positionAbsolute`). **Strategy:** Define and use explicit intersection types (e.g., `XYFlowNodeWithComputed` extending `@xyflow/react` Node) to enforce strict TS hygiene.
