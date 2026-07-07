@@ -653,11 +653,12 @@ export const useGraphStore = create<GraphState>()(
         layoutDirection: state.layoutDirection,
         activeFilters: state.activeFilters,
       }),
-      onRehydrateStorage: () => {
-        return (rehydratedState) => {
-          if (rehydratedState) {
-            rehydratedState.layoutEngine = rehydratedState.userSelectedLayoutEngine ?? getDefaultLayoutEngine();
-          }
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<GraphState> | undefined;
+        return {
+          ...currentState,
+          ...persisted,
+          layoutEngine: persisted?.userSelectedLayoutEngine ?? currentState.layoutEngine,
         };
       },
     }
