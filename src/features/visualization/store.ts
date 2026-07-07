@@ -63,6 +63,7 @@ interface GraphState {
   viewMode: ViewMode;
   nodeSize: NodeSizeMode;
   layoutEngine: LayoutEngine;
+  userSelectedLayoutEngine: LayoutEngine | null;
   isolateModule: boolean;
 
   // Actions
@@ -238,6 +239,7 @@ export const useGraphStore = create<GraphState>()(
         viewMode: 'standard',
         nodeSize: 'uniform',
         layoutEngine: getDefaultLayoutEngine(),
+        userSelectedLayoutEngine: null,
         isolateModule: false,
 
         setInspectorOpen: (isOpen: boolean) => {
@@ -253,7 +255,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         setLayoutEngine: (engine: LayoutEngine) => {
-          set({ layoutEngine: engine });
+          set({ layoutEngine: engine, userSelectedLayoutEngine: engine });
           // Trigger re-layout
           void get().layoutGraph();
         },
@@ -602,7 +604,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         reset: () => {
-          set({ nodes: [], edges: [], nodesById: new Map(), graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: getDefaultLayoutEngine(), isolateModule: false });
+          set({ nodes: [], edges: [], nodesById: new Map(), graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: getDefaultLayoutEngine(), userSelectedLayoutEngine: null, isolateModule: false });
         },
 
         resetSimulation: () => {
@@ -644,13 +646,20 @@ export const useGraphStore = create<GraphState>()(
       name: 'dependency-graph-settings',
       storage: createJSONStorage(() => robustStorage),
       partialize: (state) => ({
-        layoutEngine: state.layoutEngine,
+        userSelectedLayoutEngine: state.userSelectedLayoutEngine,
         viewMode: state.viewMode,
         nodeSize: state.nodeSize,
         hideTypeDefinitions: state.hideTypeDefinitions,
         layoutDirection: state.layoutDirection,
         activeFilters: state.activeFilters,
       }),
+      onRehydrateStorage: () => {
+        return (rehydratedState) => {
+          if (rehydratedState?.userSelectedLayoutEngine) {
+            rehydratedState.layoutEngine = rehydratedState.userSelectedLayoutEngine;
+          }
+        };
+      },
     }
   )
 );
