@@ -31,6 +31,13 @@ export type ViewMode = 'standard' | 'instability';
 export type NodeSizeMode = 'uniform' | 'centrality';
 export type LayoutEngine = 'dagre' | 'elk';
 
+const getDefaultLayoutEngine = (): LayoutEngine => {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(max-width: 768px)').matches ? 'elk' : 'dagre';
+  }
+  return 'dagre';
+};
+
 interface GraphState {
   // React Flow State
   nodes: Node[];
@@ -230,7 +237,7 @@ export const useGraphStore = create<GraphState>()(
         rawComplexityMetrics: null,
         viewMode: 'standard',
         nodeSize: 'uniform',
-        layoutEngine: 'dagre',
+        layoutEngine: getDefaultLayoutEngine(),
         isolateModule: false,
 
         setInspectorOpen: (isOpen: boolean) => {
@@ -595,7 +602,7 @@ export const useGraphStore = create<GraphState>()(
         },
 
         reset: () => {
-          set({ nodes: [], edges: [], nodesById: new Map(), graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: 'dagre', isolateModule: false });
+          set({ nodes: [], edges: [], nodesById: new Map(), graph: null, originalGraph: null, hasUnsavedChanges: false, selectedNodeId: null, activeFilters: [], isInspectorOpen: false, rawComplexityMetrics: null, viewMode: 'standard', nodeSize: 'uniform', layoutEngine: getDefaultLayoutEngine(), isolateModule: false });
         },
 
         resetSimulation: () => {
