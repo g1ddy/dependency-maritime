@@ -22,15 +22,27 @@ export function FileUploadZone({
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const onDrag = (e: React.DragEvent) => {
+  const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (loading) return;
-    if (e.type === "dragenter" || e.type === "dragover") {
+    // Check if files are being dragged
+    if (e.dataTransfer?.types?.includes('Files')) {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
     }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
+    setDragActive(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    // This is necessary to allow dropping
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   const onDrop = (e: React.DragEvent) => {
@@ -53,9 +65,9 @@ export function FileUploadZone({
           loading ? "cursor-not-allowed opacity-70" : "cursor-pointer",
           dragActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
         )}
-        onDragEnter={onDrag}
-        onDragLeave={onDrag}
-        onDragOver={onDrag}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
         onDrop={onDrop}
         onClick={() => !loading && fileInputRef.current?.click()}
       >
