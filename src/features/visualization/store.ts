@@ -655,8 +655,8 @@ export const useGraphStore = create<GraphState>()(
       }),
       onRehydrateStorage: () => {
         return (rehydratedState) => {
-          if (rehydratedState?.userSelectedLayoutEngine) {
-            rehydratedState.layoutEngine = rehydratedState.userSelectedLayoutEngine;
+          if (rehydratedState) {
+            rehydratedState.layoutEngine = rehydratedState.userSelectedLayoutEngine ?? getDefaultLayoutEngine();
           }
         };
       },

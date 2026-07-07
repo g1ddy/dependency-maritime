@@ -396,7 +396,7 @@ describe('Visualization Store', () => {
   describe('Layout Engine Persistence', () => {
     it('should default layoutEngine based on viewport', () => {
       // Mock mobile viewport
-      const matchMediaMock = vi.fn().mockImplementation(query => ({
+      const matchMediaMock = vi.fn().mockImplementation((query: string) => ({
         matches: query === '(max-width: 768px)',
         media: query,
         onchange: null,
@@ -409,7 +409,7 @@ describe('Visualization Store', () => {
       expect(useGraphStore.getState().layoutEngine).toBe('elk');
 
       // Mock desktop viewport
-      matchMediaMock.mockImplementation(query => ({
+      matchMediaMock.mockImplementation((query: string) => ({
         matches: false,
         media: query,
         onchange: null,
@@ -445,7 +445,7 @@ describe('Visualization Store', () => {
       expect(useGraphStore.getState().userSelectedLayoutEngine).toBeNull();
     });
 
-    it('should sync layoutEngine from userSelectedLayoutEngine during rehydration', () => {
+    it('should sync layoutEngine from userSelectedLayoutEngine during rehydration', async () => {
       // Access the persist configuration if possible, or just mock the storage
       // Since we use createJSONStorage(() => robustStorage), and robustStorage uses localStorage if available.
 
@@ -483,7 +483,10 @@ describe('Visualization Store', () => {
       // by asserting on the store state if I can trigger rehydration.
 
       // Let's try to trigger rehydrate
-      void (useGraphStore as any).persist.rehydrate();
+      const storeWithPersist = useGraphStore as typeof useGraphStore & {
+        persist: { rehydrate: () => Promise<void> };
+      };
+      await storeWithPersist.persist.rehydrate();
 
       // Since rehydrate is async (though storage might be sync)
       // we might need to wait.
