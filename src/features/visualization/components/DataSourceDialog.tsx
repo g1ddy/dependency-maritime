@@ -121,13 +121,12 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       // Dynamically import to prevent build failure if missing
       const mod = await import('../../../../config/complexity-metrics.json');
       // Handle both default export (traditional JSON module) and direct export
-      if (mod && typeof mod === 'object' && 'default' in mod) {
-          metrics = (mod as { default: ComplexityMetricsMap }).default;
-      } else {
-          const parseResult = ComplexityMetricsMapSchema.safeParse(mod);
-          if (parseResult.success) {
-             metrics = parseResult.data;
-          }
+      const targetData = (mod && typeof mod === 'object' && 'default' in mod)
+        ? (mod as { default: unknown }).default
+        : mod;
+      const parseResult = ComplexityMetricsMapSchema.safeParse(targetData);
+      if (parseResult.success) {
+        metrics = parseResult.data;
       }
     } catch (e) {
       console.warn("Complexity metrics not found or invalid, skipping.", e);
