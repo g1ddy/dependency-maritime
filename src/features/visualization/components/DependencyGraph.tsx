@@ -99,8 +99,15 @@ export function DependencyGraph() {
         if (!target) return undefined;
 
         // Try direct absolute position
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-        let absPos = (internalNode as any)?.positionAbsolute || (publicNode as any)?.positionAbsolute || (internalNode as any)?.computed?.positionAbsolute;
+        type XYFlowNodeWithComputed = Node & {
+          positionAbsolute?: { x: number; y: number };
+          computed?: { positionAbsolute?: { x: number; y: number } };
+        };
+
+        const internal = internalNode as XYFlowNodeWithComputed | undefined;
+        const publicN = publicNode as XYFlowNodeWithComputed | undefined;
+
+        let absPos = internal?.positionAbsolute || publicN?.positionAbsolute || internal?.computed?.positionAbsolute;
 
         // Ensure shape
         const safeAbs = absPos as { x: unknown; y: unknown } | undefined;
