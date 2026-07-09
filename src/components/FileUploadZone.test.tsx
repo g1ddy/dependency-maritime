@@ -65,6 +65,36 @@ describe('FileUploadZone', () => {
     expect(button.className).not.toContain('border-primary bg-primary/10');
   });
 
+  it('does not unset dragActive state on drag leave if moving to a child element', () => {
+    render(<FileUploadZone onFileSelect={mockOnFileSelect} />);
+    const button = screen.getByRole('button');
+    const child = screen.getByText('Click to upload or drag and drop');
+
+    // Drag enter button
+    fireEvent.dragEnter(button, {
+      dataTransfer: {
+        types: ['Files'],
+      },
+    });
+    expect(button.className).toContain('border-primary bg-primary/10');
+
+    // When moving to a child:
+    // 1. dragenter on child (bubbles to button)
+    fireEvent.dragEnter(child, {
+      dataTransfer: {
+        types: ['Files'],
+      },
+    });
+    // 2. dragleave on button
+    fireEvent.dragLeave(button);
+
+    expect(button.className).toContain('border-primary bg-primary/10');
+
+    // Final drag leave (out of button)
+    fireEvent.dragLeave(button);
+    expect(button.className).not.toContain('border-primary bg-primary/10');
+  });
+
   it('calls onFileSelect on drop', () => {
     render(<FileUploadZone onFileSelect={mockOnFileSelect} />);
     const button = screen.getByRole('button');
