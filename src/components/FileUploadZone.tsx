@@ -23,6 +23,9 @@ export function FileUploadZone({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
 
+  // Derive active state but also allow resetting via counter
+  const isActuallyActive = loading ? false : dragActive;
+
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -74,7 +77,7 @@ export function FileUploadZone({
         className={cn(
           "w-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           loading ? "cursor-not-allowed opacity-70" : "cursor-pointer",
-          dragActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
+          isActuallyActive ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}

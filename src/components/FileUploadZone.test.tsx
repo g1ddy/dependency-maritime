@@ -129,4 +129,20 @@ describe('FileUploadZone', () => {
     });
     expect(mockOnFileSelect).not.toHaveBeenCalled();
   });
+
+  it('resets dragActive state if loading becomes true during drag', () => {
+    const { rerender } = render(<FileUploadZone onFileSelect={mockOnFileSelect} loading={false} />);
+    const button = screen.getByRole('button');
+
+    fireEvent.dragEnter(button, {
+      dataTransfer: {
+        types: ['Files'],
+      },
+    });
+    expect(button.className).toContain('border-primary bg-primary/10');
+
+    // Rerender with loading=true
+    rerender(<FileUploadZone onFileSelect={mockOnFileSelect} loading={true} />);
+    expect(button.className).not.toContain('border-primary bg-primary/10');
+  });
 });
