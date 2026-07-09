@@ -36,14 +36,20 @@ export const useRelationshipStore = create<RelationshipState>((set) => ({
       }
 
       // Target Node
-      if (!nodesMap.has(row.Target)) {
-        nodesMap.set(row.Target, {
-            id: row.Target,
-          role: row.Target_Role || 'Target',
-          cluster: row.Target_Domain || 'Unspecified',
-            degree: 0
-        });
-      }
+      const existingTarget = nodesMap.get(row.Target);
+
+      const role = row.Target_Role ||
+                   (existingTarget && existingTarget.role !== 'Source' ? existingTarget.role : 'Target');
+
+      const cluster = row.Target_Domain ||
+                      (existingTarget && existingTarget.cluster !== 'Source' ? existingTarget.cluster : 'Unspecified');
+
+      nodesMap.set(row.Target, {
+        id: row.Target,
+        role,
+        cluster,
+        degree: existingTarget?.degree ?? 0
+      });
 
       // Link
       links.push({
