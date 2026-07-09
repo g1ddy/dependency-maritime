@@ -392,4 +392,108 @@ describe('Visualization Store', () => {
       expect(resetNode?.parentId).toBe('src');
     });
   });
+
+  describe('Layout Engine Persistence', () => {
+    it('should default layoutEngine based on viewport', () => {
+      // Mock mobile viewport
+      const matchMediaMock = vi.fn().mockImplementation((query: string) => ({
+        matches: query === '(max-width: 768px)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      }));
+      vi.stubGlobal('matchMedia', matchMediaMock);
+
+      useGraphStore.getState().reset();
+      expect(useGraphStore.getState().layoutEngine).toBe('elk');
+
+      // Mock desktop viewport
+      matchMediaMock.mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      }));
+
+      useGraphStore.getState().reset();
+      expect(useGraphStore.getState().layoutEngine).toBe('dagre');
+
+      vi.unstubAllGlobals();
+    });
+
+    it('should update userSelectedLayoutEngine when setLayoutEngine is called', () => {
+      const store = useGraphStore.getState();
+      expect(store.userSelectedLayoutEngine).toBeNull();
+
+      store.setLayoutEngine('elk');
+      expect(useGraphStore.getState().userSelectedLayoutEngine).toBe('elk');
+      expect(useGraphStore.getState().layoutEngine).toBe('elk');
+
+      store.setLayoutEngine('dagre');
+      expect(useGraphStore.getState().userSelectedLayoutEngine).toBe('dagre');
+      expect(useGraphStore.getState().layoutEngine).toBe('dagre');
+    });
+
+    it('should reset userSelectedLayoutEngine on reset', () => {
+      const store = useGraphStore.getState();
+      store.setLayoutEngine('elk');
+      expect(useGraphStore.getState().userSelectedLayoutEngine).toBe('elk');
+
+      store.reset();
+      expect(useGraphStore.getState().userSelectedLayoutEngine).toBeNull();
+    });
+
+    it('should sync layoutEngine from userSelectedLayoutEngine during rehydration', async () => {
+      // Access the persist configuration if possible, or just mock the storage
+      // Since we use createJSONStorage(() => robustStorage), and robustStorage uses localStorage if available.
+
+      const mockStorage: Record<string, string> = {
+        'dependency-graph-settings': JSON.stringify({
+          state: {
+            userSelectedLayoutEngine: 'elk',
+            viewMode: 'standard',
+            nodeSize: 'uniform',
+            hideTypeDefinitions: true,
+            layoutDirection: 'TB',
+            activeFilters: []
+          },
+          version: 0
+        })
+      };
+
+      vi.stubGlobal('localStorage', {
+        getItem: (key: string) => mockStorage[key] || null,
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+      });
+
+      // We need to re-create or re-initialize the store to trigger hydration,
+      // but useGraphStore is already created.
+      // Zustand's persist middleware usually hydrates on creation.
+
+      // Let's try to use the persist API if available
+      // useGraphStore.persist.rehydrate()
+
+      // But first, let's see if we can just check if it worked if we could trigger it.
+      // Actually, since it's a singleton, it might be hard to re-trigger without affecting other tests.
+
+      // Given the constraints, I will at least test the logic that would be used in onRehydrateStorage
+      // by asserting on the store state if I can trigger rehydration.
+
+      // Let's try to trigger rehydrate
+      const storeWithPersist = useGraphStore as typeof useGraphStore & {
+        persist: { rehydrate: () => Promise<void> };
+      };
+      await storeWithPersist.persist.rehydrate();
+
+      // Since rehydrate is async (though storage might be sync)
+      // we might need to wait.
+
+      expect(useGraphStore.getState().layoutEngine).toBe('elk');
+
+      vi.unstubAllGlobals();
+    });
+  });
 });
