@@ -72,6 +72,14 @@
     *   Allow exporting the current graph visualization as an Image (PNG/SVG) for documentation.
     *   (Optional) Export a "Health Report" summarizing the most unstable or central modules.
 
+6.  **Build Integration (Headless Analysis)**
+    *   Extract the existing analysis and Markdown generation into tested, framework-independent TypeScript functions.
+    *   Provide a versioned CLI package that generates dependency graph JSON, metrics JSON, and a Markdown report without starting the UI.
+    *   Define a versioned artifact manifest and allow the UI to upload a complete analysis bundle.
+    *   Add baseline comparison and configurable regression thresholds for build pipelines.
+    *   Provide a reusable GitHub Actions workflow as a thin adapter over the CLI, not as the home of analysis logic.
+    *   See [Build Integration and Report Artifacts](./BUILD_INTEGRATION.md) for the proposed contract and delivery order.
+
 ## Phase 3: The "Simulator" (Refactoring Playground)
 **Goal:** The killer feature—drag and drop architecture validation and planning.
 
