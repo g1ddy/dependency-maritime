@@ -66,7 +66,11 @@ export function RelationshipGraph() {
     const simulatedLinks = simulationLinks as unknown as SimulatedRelationshipLink[];
 
     // Color Scale
-    const uniqueClusters = Array.from(new Set(simulationNodes.map(d => d.cluster)));
+    const uniqueClustersSet = new Set<string>();
+    for (let i = 0; i < simulationNodes.length; i++) {
+        uniqueClustersSet.add(simulationNodes[i].cluster);
+    }
+    const uniqueClusters = Array.from(uniqueClustersSet);
     const color = d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters);
 
     // Helpers
