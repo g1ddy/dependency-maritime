@@ -1,0 +1,105 @@
+import { parseArgs } from 'node:util';
+import {
+    readDependencyGraph,
+    runEslintComplexityScan,
+    countLinesOfCode,
+    writeOutputFiles
+} from '../analyze/adapters';
+import { calculateMetrics } from '../analyze/calculate-metrics';
+import { parseEslintComplexityReport } from '../analyze/parse-eslint';
+import { renderMarkdownReport } from '../analyze/render-markdown-report';
+import { AnalysisThresholds } from '../analyze/models';
+
+const DEFAULT_THRESHOLDS: AnalysisThresholds = {
+    loc: 300,
+    complexity: 10,
+    fanOut: 15
+};
+
+export async function runAnalyzeCommand(args: string[]): Promise<number> {
+    try {
+        const { values } = parseArgs({
+            args,
+            allowPositionals: true,
+            options: {
+                source: { type: 'string', default: 'src' },
+                graph: { type: 'string' },
+                metrics: { type: 'string' },
+                report: { type: 'string' },
+                help: { type: 'boolean', short: 'h' }
+            }
+        });
+
+        if (values.help) {
+            console.log(`
+Usage: maritime analyze [options]
+
+Options:
+  --source <dir>     Source directory to analyze (default: "src")
+  --graph <file>     Input dependency-cruiser JSON
+  --metrics <file>   Output JSON file for metrics
+  --report <file>    Output Markdown file for the report
+            `);
+            return 0;
+        }
+
+        if (!values.graph || !values.metrics || !values.report) {
+            console.error('Error: --graph, --metrics, and --report are required for analyze command.');
+            return 1;
+        }
+
+        console.log('📊 Starting Complexity Analysis...');
+
+        // 1. Read input graph
+        console.log('   - Reading Dependency Cruiser JSON...');
+        const modules = await readDependencyGraph(values.graph);
+
+        // 2. ESLint for complexity
+        console.log('   - Running ESLint for Complexity...');
+        const eslintResults = runEslintComplexityScan(values.source as string);
+        const complexityMap = parseEslintComplexityReport(eslintResults, process.cwd());
+
+        // 3. Count LOC
+        console.log('   - Counting Lines of Code...');
+        const sourceFiles = modules
+            .map(m => m.source)
+            .filter(src => src.startsWith(values.source as string));
+        const locMap = await countLinesOfCode(sourceFiles);
+
+        // 4. Calculate metrics
+        console.log('   - Aggregating Metrics...');
+        const analysisResult = calculateMetrics(
+            modules,
+            locMap,
+            complexityMap,
+            DEFAULT_THRESHOLDS,
+            values.source as string
+        );
+
+        // 5. Generate metrics and report
+        console.log('   - Generating Outputs...');
+
+        // Match the previous script's output format: simple Record<string, FileMetric> for --metrics
+        const metricsMap = analysisResult.files.reduce((acc, f) => {
+            acc[f.file] = {
+                complexity: f.complexity,
+                loc: f.loc,
+                instability: f.instability,
+                fanIn: f.fanIn,
+                fanOut: f.fanOut
+            };
+            return acc;
+        }, {} as Record<string, any>);
+
+        const reportContent = renderMarkdownReport(analysisResult, DEFAULT_THRESHOLDS);
+
+        await writeOutputFiles(values.metrics, metricsMap, values.report, reportContent);
+
+        console.log('✅ Complexity Report Updated and Metrics Exported!');
+        return 0;
+
+    } catch (e: any) {
+        console.error(`Error analyzing project: ${e.message}`);
+        return 1;
+    }
+}
