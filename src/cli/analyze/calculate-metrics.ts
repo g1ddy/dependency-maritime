@@ -30,9 +30,17 @@ export function calculateMetrics(
     thresholds: AnalysisThresholds,
     sourcePrefix: string = 'src'
 ): AnalysisResult {
+    // Source prefix is already expected to be normalized from CLI, but we ensure basic boundaries here.
+    const normalizedPrefix = sourcePrefix === '.' ? '' : sourcePrefix.replace(/\/+$/, '');
+    const prefixBoundary = normalizedPrefix ? `${normalizedPrefix}/` : '';
 
     const files: FileMetric[] = modules
-        .filter(m => m.source.startsWith(sourcePrefix) && !m.source.includes('.test.') && !m.source.includes('.d.ts'))
+        .filter(m => {
+            const isSource = normalizedPrefix === ''
+                ? true
+                : m.source === normalizedPrefix || m.source.startsWith(prefixBoundary);
+            return isSource && !m.source.includes('.test.') && !m.source.includes('.d.ts');
+        })
         .map(m => {
             const loc = locMap[m.source] || 0;
             const fanOut = m.dependencies.length;

@@ -78,7 +78,9 @@ describe('calculate-metrics', () => {
             { source: 'src/b.ts', dependencies: [{}], dependents: [] },
             { source: 'src/a.test.ts', dependencies: [], dependents: [] },
             { source: 'src/types.d.ts', dependencies: [], dependents: [] },
-            { source: 'other/c.ts', dependencies: [], dependents: [] }
+            { source: 'other/c.ts', dependencies: [], dependents: [] },
+            { source: 'src-old/a.ts', dependencies: [], dependents: [] },
+            { source: 'src', dependencies: [], dependents: [] }
         ];
 
         const locMap: Record<string, number> = {
@@ -86,20 +88,26 @@ describe('calculate-metrics', () => {
             'src/b.ts': 200,
             'src/a.test.ts': 50,
             'src/types.d.ts': 20,
-            'other/c.ts': 100
+            'other/c.ts': 100,
+            'src-old/a.ts': 100,
+            'src': 10
         };
 
         const complexityMap: Record<string, number> = {
             'src/a.ts': 5,
-            'src/b.ts': 15
+            'src/b.ts': 15,
+            'src': 1
         };
 
-        it('should filter out test files, .d.ts files, and non-source files', () => {
+        it('should filter out test files, .d.ts files, and non-source files correctly handling path boundaries', () => {
+            // Also tests with `src` as the exact prefix since normalization is handled prior to calculateMetrics
             const result = calculateMetrics(modules, locMap, complexityMap, thresholds, 'src');
 
-            expect(result.files.length).toBe(2);
+            expect(result.files.length).toBe(3); // src/a.ts, src/b.ts, and src itself
             expect(result.files.map(f => f.file)).toContain('src/a.ts');
             expect(result.files.map(f => f.file)).toContain('src/b.ts');
+            expect(result.files.map(f => f.file)).toContain('src');
+            expect(result.files.map(f => f.file)).not.toContain('src-old/a.ts');
         });
 
         it('should correctly sort files by score and complexity', () => {

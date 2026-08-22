@@ -19,7 +19,7 @@ function main() {
         }
 
         // Run the new CLI tool using tsx since we haven't built the typescript yet for the CLI
-        const cmd = `npx tsx src/cli/main.ts analyze --source ${SRC_DIR} --graph ${DEP_GRAPH_JSON} --metrics ${METRICS_JSON_FILE} --report ${REPORT_TMP_FILE}`;
+        const cmd = `npx --no-install tsx src/cli/main.ts analyze --source ${SRC_DIR} --graph ${DEP_GRAPH_JSON} --metrics ${METRICS_JSON_FILE} --report ${REPORT_TMP_FILE}`;
         execSync(cmd, { stdio: 'inherit' });
 
         // Update the DOCS_FILE by appending the newly generated markdown report

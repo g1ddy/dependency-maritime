@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import type { DependencyCruiserModule, EslintResult } from './models';
 
 export async function readDependencyGraph(graphPath: string): Promise<DependencyCruiserModule[]> {
@@ -17,12 +17,18 @@ export async function readDependencyGraph(graphPath: string): Promise<Dependency
 
 export function runEslintComplexityScan(sourcePath: string): EslintResult[] {
     try {
-        // Use single quotes for glob to prevent shell expansion issues, but ensure robust path resolution
         // Replace backslashes with forward slashes for cross-platform compatibility with globbing
         const target = path.resolve(process.cwd(), sourcePath).replace(/\\/g, '/');
-        const cmd = `npx eslint '${target}/**/*.{ts,tsx}' --format json --rule 'complexity: ["warn", 0]' --parser @typescript-eslint/parser`;
+        const globPattern = `${target}/**/*.{ts,tsx}`;
 
-        const output = execSync(cmd, {
+        const output = execFileSync('npx', [
+            '--no-install',
+            'eslint',
+            globPattern,
+            '--format', 'json',
+            '--rule', 'complexity: ["warn", 0]',
+            '--parser', '@typescript-eslint/parser'
+        ], {
             encoding: 'utf8',
             maxBuffer: 10 * 1024 * 1024,
             stdio: ['ignore', 'pipe', 'pipe']

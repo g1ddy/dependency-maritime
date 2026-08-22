@@ -9,6 +9,7 @@ import { calculateMetrics } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import type { AnalysisThresholds } from '../analyze/models';
+import * as path from 'path';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
     loc: 300,
@@ -59,11 +60,26 @@ Options:
         const eslintResults = runEslintComplexityScan(values.source);
         const complexityMap = parseEslintComplexityReport(eslintResults, process.cwd());
 
+        const rawSource = values.source || 'src';
+        // Convert to a repo-relative path, replacing backslashes with forward slashes
+        // This handles absolute paths, './src', 'src/', etc., cleanly relative to cwd
+        let normalizedSource = path.relative(process.cwd(), path.resolve(process.cwd(), rawSource)).replace(/\\/g, '/');
+        if (normalizedSource === '') normalizedSource = '.';
+
         // 3. Count LOC
         console.log('   - Counting Lines of Code...');
+
+        // Match paths similarly to calculate-metrics boundary logic
+        const prefixBoundary = normalizedSource === '.' ? '' : `${normalizedSource}/`;
+
         const sourceFiles = modules
             .map(m => m.source)
-            .filter(src => src.startsWith(values.source || 'src'));
+            .filter(src => {
+                return normalizedSource === '.'
+                    ? true
+                    : src === normalizedSource || src.startsWith(prefixBoundary);
+            });
+
         const locMap = await countLinesOfCode(sourceFiles);
 
         // 4. Calculate metrics
@@ -73,7 +89,7 @@ Options:
             locMap,
             complexityMap,
             DEFAULT_THRESHOLDS,
-            values.source
+            normalizedSource
         );
 
         // 5. Generate metrics and report
