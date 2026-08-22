@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseEslintComplexityReport } from './parse-eslint';
-import { EslintResult } from './models';
+import type { EslintResult } from './models';
 
 describe('parse-eslint', () => {
     describe('parseEslintComplexityReport', () => {

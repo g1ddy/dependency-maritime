@@ -1,4 +1,4 @@
-import { FileMetric, AnalysisThresholds, AnalysisResult, DependencyCruiserModule } from './models';
+import type { FileMetric, AnalysisThresholds, AnalysisResult, DependencyCruiserModule } from './models';
 
 export function calculateInstability(fanIn: number, fanOut: number): number {
     if (fanIn + fanOut === 0) {

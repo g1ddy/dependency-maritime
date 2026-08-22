@@ -1,4 +1,4 @@
-import { AnalysisResult, AnalysisThresholds, FileMetric } from './models';
+import type { AnalysisResult, AnalysisThresholds, FileMetric } from './models';
 
 function escapeMarkdown(text: string): string {
     return text.replace(/_/g, '\\_').replace(/\*/g, '\\*');

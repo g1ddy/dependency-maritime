@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { EslintResult } from './models';
+import type { EslintResult } from './models';
 
 export function parseEslintComplexityReport(eslintResults: EslintResult[], cwd: string): Record<string, number> {
     const complexityMap: Record<string, number> = {};

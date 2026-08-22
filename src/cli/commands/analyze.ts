@@ -8,7 +8,7 @@ import {
 import { calculateMetrics } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
-import { AnalysisThresholds } from '../analyze/models';
+import type { AnalysisThresholds } from '../analyze/models';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
     loc: 300,

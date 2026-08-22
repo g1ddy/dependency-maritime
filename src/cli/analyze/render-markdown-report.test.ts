@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderMarkdownReport } from './render-markdown-report';
-import { AnalysisResult, AnalysisThresholds } from './models';
+import type { AnalysisResult, AnalysisThresholds } from './models';
 
 describe('render-markdown-report', () => {
     it('should generate a deterministic markdown report', () => {

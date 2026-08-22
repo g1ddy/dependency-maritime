@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateMetrics, calculateInstability, calculateScore, calculateHealthScore } from './calculate-metrics';
-import { FileMetric, AnalysisThresholds, DependencyCruiserModule } from './models';
+import type { FileMetric, AnalysisThresholds, DependencyCruiserModule } from './models';
 
 describe('calculate-metrics', () => {
     describe('calculateInstability', () => {
