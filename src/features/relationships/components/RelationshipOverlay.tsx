@@ -29,7 +29,13 @@ export function RelationshipOverlay({ onUploadClick }: RelationshipOverlayProps)
       .sort((a, b) => b.relationshipWeight - a.relationshipWeight);
   }, [links, selectedNode]);
 
-  const uniqueClusters = useMemo(() => Array.from(new Set(nodes.map(d => d.cluster))).sort(), [nodes]);
+  const uniqueClusters = useMemo(() => {
+    const set = new Set<string>();
+    for (let i = 0; i < nodes.length; i++) {
+      set.add(nodes[i].cluster);
+    }
+    return Array.from(set).sort();
+  }, [nodes]);
   const color = useMemo(() => d3.scaleOrdinal(d3.schemeCategory10).domain(uniqueClusters), [uniqueClusters]);
 
   const searchResults = useMemo(() => {
