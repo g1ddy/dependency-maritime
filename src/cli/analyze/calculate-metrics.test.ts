@@ -61,7 +61,7 @@ describe('calculate-metrics', () => {
         });
 
         it('should clamp health score between 0 and 100', () => {
-            const files: FileMetric[] = Array(150).fill({ file: 'a.ts', loc: 400, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0 });
+            const files: FileMetric[] = Array(150).fill({ file: 'a.ts', loc: 400, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0 }) as FileMetric[];
             expect(calculateHealthScore(files, thresholds)).toBe(0);
         });
     });

@@ -56,14 +56,14 @@ Options:
 
         // 2. ESLint for complexity
         console.log('   - Running ESLint for Complexity...');
-        const eslintResults = runEslintComplexityScan(values.source as string);
+        const eslintResults = runEslintComplexityScan(values.source);
         const complexityMap = parseEslintComplexityReport(eslintResults, process.cwd());
 
         // 3. Count LOC
         console.log('   - Counting Lines of Code...');
         const sourceFiles = modules
             .map(m => m.source)
-            .filter(src => src.startsWith(values.source as string));
+            .filter(src => src.startsWith(values.source || 'src'));
         const locMap = await countLinesOfCode(sourceFiles);
 
         // 4. Calculate metrics
@@ -73,7 +73,7 @@ Options:
             locMap,
             complexityMap,
             DEFAULT_THRESHOLDS,
-            values.source as string
+            values.source
         );
 
         // 5. Generate metrics and report
@@ -89,7 +89,7 @@ Options:
                 fanOut: f.fanOut
             };
             return acc;
-        }, {} as Record<string, any>);
+        }, {} as Record<string, unknown>);
 
         const reportContent = renderMarkdownReport(analysisResult, DEFAULT_THRESHOLDS);
 
@@ -98,8 +98,9 @@ Options:
         console.log('✅ Complexity Report Updated and Metrics Exported!');
         return 0;
 
-    } catch (e: any) {
-        console.error(`Error analyzing project: ${e.message}`);
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        console.error(`Error analyzing project: ${message}`);
         return 1;
     }
 }

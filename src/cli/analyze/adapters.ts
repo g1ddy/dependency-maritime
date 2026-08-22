@@ -7,10 +7,11 @@ export async function readDependencyGraph(graphPath: string): Promise<Dependency
     try {
         const absolutePath = path.resolve(process.cwd(), graphPath);
         const data = await fs.readFile(absolutePath, 'utf8');
-        const parsed = JSON.parse(data);
+        const parsed = JSON.parse(data) as { modules?: DependencyCruiserModule[] };
         return parsed.modules || [];
-    } catch (e: any) {
-        throw new Error(`Failed to read or parse dependency graph at ${graphPath}: ${e.message}`);
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        throw new Error(`Failed to read or parse dependency graph at ${graphPath}: ${message}`);
     }
 }
 
@@ -28,17 +29,21 @@ export function runEslintComplexityScan(sourcePath: string): EslintResult[] {
         });
 
         return JSON.parse(output) as EslintResult[];
-    } catch (e: any) {
+    } catch (e: unknown) {
         // ESLint returns exit code 1 if there are warnings (which we expect for complexity > 0)
-        if (e.stdout) {
+        const execError = e as { stdout?: Buffer | string; message?: string };
+        if (execError.stdout) {
             try {
-                return JSON.parse(e.stdout) as EslintResult[];
-            } catch (parseError) {
-                 throw new Error(`Failed to parse ESLint output: ${e.stdout.substring(0, 200)}...`);
+                const stdoutStr = typeof execError.stdout === 'string' ? execError.stdout : execError.stdout.toString('utf8');
+                return JSON.parse(stdoutStr) as EslintResult[];
+            } catch {
+                 const stdoutStr = typeof execError.stdout === 'string' ? execError.stdout : execError.stdout.toString('utf8');
+                 throw new Error(`Failed to parse ESLint output: ${stdoutStr.substring(0, 200)}...`);
             }
         }
 
-        throw new Error(`Failed to run ESLint: ${e.message}`);
+        const message = e instanceof Error ? e.message : String(e);
+        throw new Error(`Failed to run ESLint: ${message}`);
     }
 }
 
@@ -51,7 +56,7 @@ export async function countLinesOfCode(sourceFiles: string[]): Promise<Record<st
             const absolutePath = path.resolve(cwd, file);
             const content = await fs.readFile(absolutePath, 'utf8');
             locMap[file] = content.split('\n').length;
-        } catch (e) {
+        } catch {
             // File not found or unreadable, treat as 0 LOC
             locMap[file] = 0;
         }
@@ -62,7 +67,7 @@ export async function countLinesOfCode(sourceFiles: string[]): Promise<Record<st
 
 export async function writeOutputFiles(
     metricsPath: string,
-    metricsData: any,
+    metricsData: unknown,
     reportPath: string,
     reportData: string
 ): Promise<void> {

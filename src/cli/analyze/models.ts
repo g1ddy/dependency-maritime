@@ -35,6 +35,6 @@ export interface EslintResult {
 
 export interface DependencyCruiserModule {
     source: string;
-    dependencies: any[];
-    dependents: any[];
+    dependencies: unknown[];
+    dependents: unknown[];
 }

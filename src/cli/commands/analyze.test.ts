@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { runAnalyzeCommand } from './analyze';
 import * as adapters from '../analyze/adapters';
-import * as fs from 'fs/promises';
 
 describe('runAnalyzeCommand', () => {
     beforeEach(() => {
