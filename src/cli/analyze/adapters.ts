@@ -1,0 +1,93 @@
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { execFileSync } from 'child_process';
+import type { DependencyCruiserModule, EslintResult } from './models';
+
+export async function readDependencyGraph(graphPath: string): Promise<DependencyCruiserModule[]> {
+    try {
+        const absolutePath = path.resolve(process.cwd(), graphPath);
+        const data = await fs.readFile(absolutePath, 'utf8');
+        const parsed = JSON.parse(data) as { modules?: DependencyCruiserModule[] };
+        return parsed.modules || [];
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        throw new Error(`Failed to read or parse dependency graph at ${graphPath}: ${message}`);
+    }
+}
+
+export function runEslintComplexityScan(sourcePath: string): EslintResult[] {
+    try {
+        // Replace backslashes with forward slashes for cross-platform compatibility with globbing
+        const target = path.resolve(process.cwd(), sourcePath).replace(/\\/g, '/');
+        const globPattern = `${target}/**/*.{ts,tsx}`;
+
+        const output = execFileSync('npx', [
+            '--no-install',
+            'eslint',
+            globPattern,
+            '--format', 'json',
+            '--rule', 'complexity: ["warn", 0]',
+            '--parser', '@typescript-eslint/parser'
+        ], {
+            encoding: 'utf8',
+            maxBuffer: 10 * 1024 * 1024,
+            stdio: ['ignore', 'pipe', 'pipe']
+        });
+
+        return JSON.parse(output) as EslintResult[];
+    } catch (e: unknown) {
+        // ESLint returns exit code 1 if there are warnings (which we expect for complexity > 0)
+        const execError = e as { stdout?: Buffer | string; message?: string };
+        if (execError.stdout) {
+            try {
+                const stdoutStr = typeof execError.stdout === 'string' ? execError.stdout : execError.stdout.toString('utf8');
+                return JSON.parse(stdoutStr) as EslintResult[];
+            } catch {
+                 const stdoutStr = typeof execError.stdout === 'string' ? execError.stdout : execError.stdout.toString('utf8');
+                 throw new Error(`Failed to parse ESLint output: ${stdoutStr.substring(0, 200)}...`);
+            }
+        }
+
+        const message = e instanceof Error ? e.message : String(e);
+        throw new Error(`Failed to run ESLint: ${message}`);
+    }
+}
+
+export async function countLinesOfCode(sourceFiles: string[]): Promise<Record<string, number>> {
+    const locMap: Record<string, number> = {};
+    const cwd = process.cwd();
+
+    for (const file of sourceFiles) {
+        try {
+            const absolutePath = path.resolve(cwd, file);
+            const content = await fs.readFile(absolutePath, 'utf8');
+            locMap[file] = content.split('\n').length;
+        } catch {
+            // File not found or unreadable, treat as 0 LOC
+            locMap[file] = 0;
+        }
+    }
+
+    return locMap;
+}
+
+export async function writeOutputFiles(
+    metricsPath: string,
+    metricsData: unknown,
+    reportPath: string,
+    reportData: string
+): Promise<void> {
+    const cwd = process.cwd();
+
+    const absMetricsPath = path.resolve(cwd, metricsPath);
+    const absReportPath = path.resolve(cwd, reportPath);
+
+    // Ensure parent directories exist
+    await fs.mkdir(path.dirname(absMetricsPath), { recursive: true });
+    await fs.mkdir(path.dirname(absReportPath), { recursive: true });
+
+    await Promise.all([
+        fs.writeFile(absMetricsPath, JSON.stringify(metricsData, null, 2)),
+        fs.writeFile(absReportPath, reportData)
+    ]);
+}

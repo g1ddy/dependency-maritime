@@ -51,12 +51,11 @@ npx eslint src --format json --rule 'complexity: ["warn", 10]' --parser @typescr
 
 Following the "AI to Rules" refactor and "Split Coach" initiative, here are the current metrics.
 
-
 ## 🚨 Automated Complexity Report
 
-**Last Updated:** 2026-04-06
+**Last Updated:** 2026-08-22
 
-### 🏥 Repository Health Score: **89.0 / 100**
+### 🏥 Repository Health Score: **88.0 / 100**
 
 *   **Formula**: 100 - Penalties for Files exceeding thresholds (LOC > 300, Complexity > 10, Fan-Out > 15).
 *   **Total Files Scanned**: 47
@@ -66,15 +65,15 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/features/visualization/store.ts` | **110.7** | 649 | 7 | 10 | 0.59 |
+| `src/features/visualization/store.ts` | **112.5** | 667 | 7 | 10 | 0.59 |
 | `src/features/visualization/components/NodeInspectorPanel.tsx` | **99.5** | 240 | 22 | 7 | 0.88 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **85.3** | 222 | 17 | 6 | 0.86 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **86** | 229 | 17 | 6 | 0.86 |
 | `src/features/visualization/components/GraphOverlay.tsx` | **83.8** | 275 | 8 | 11 | 0.92 |
 | `src/features/visualization/logic/transformer.ts` | **74** | 270 | 13 | 3 | 0.75 |
 | `src/features/visualization/components/AppNode.tsx` | **69** | 100 | 19 | 3 | 0.75 |
 | `src/components/layout/Header.tsx` | **63.6** | 149 | 11 | 5 | 0.83 |
 | `src/features/visualization/logic/metrics.ts` | **58.9** | 189 | 14 | 1 | 0.5 |
-| `src/features/relationships/components/RelationshipOverlay.tsx` | **56.3** | 173 | 9 | 3 | 0.75 |
+| `src/features/relationships/components/RelationshipOverlay.tsx` | **56.9** | 179 | 9 | 3 | 0.75 |
 | `src/components/DataSourceDialog.tsx` | **55** | 117 | 11 | 4 | 0.67 |
 
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
@@ -82,11 +81,11 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 | :--- | :--- | :--- |
 | `src/features/visualization/components/NodeInspectorPanel.tsx` | **22** | 240 |
 | `src/features/visualization/components/AppNode.tsx` | **19** | 100 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **17** | 222 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **17** | 229 |
 | `src/features/visualization/logic/metrics.ts` | **14** | 189 |
-| `src/features/visualization/logic/layout.ts` | **13** | 153 |
-| `src/features/visualization/logic/transformer.ts` | **13** | 270 |
 | `src/features/visualization/components/GroupNode.tsx` | **13** | 72 |
-| `src/components/layout/Header.tsx` | **11** | 149 |
+| `src/features/visualization/logic/layout.ts` | **13** | 151 |
+| `src/features/visualization/logic/transformer.ts` | **13** | 270 |
+| `src/components/FileUploadZone.tsx` | **12** | 117 |
 | `src/components/DataSourceDialog.tsx` | **11** | 117 |
-| `src/components/FileUploadZone.tsx` | **11** | 91 |
+| `src/components/layout/Header.tsx` | **11** | 149 |

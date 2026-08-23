@@ -95,8 +95,8 @@ The UI should eventually accept either the graph JSON by itself or the complete 
 
 The repository has several useful pieces today, but they are coupled to this repository's paths and documentation file:
 
-1. **Extract headless analysis.** Move metric calculation and Markdown rendering from the current CommonJS script into tested TypeScript functions that accept explicit inputs and return data rather than writing fixed paths.
-2. **Create a CLI entry point.** Add `analyze`, `compare`, and `validate` commands with documented exit codes. `analyze` produces the artifact set; `compare` renders before/after deltas; `validate` checks schemas without running analysis.
+1. ~~**Extract headless analysis.** Move metric calculation and Markdown rendering from the current CommonJS script into tested TypeScript functions that accept explicit inputs and return data rather than writing fixed paths.~~ *(Completed)*
+2. ~~**Create a CLI entry point.**~~ Add `compare` and `validate` commands with documented exit codes. The `analyze` command was added and produces the artifact set; `compare` renders before/after deltas; `validate` checks schemas without running analysis. *(Partially completed - `analyze` command exists)*
 3. **Define versioned schemas.** Add Zod schemas for the artifact manifest, report model, and optional baseline. Continue using the official dependency-cruiser result as the graph contract.
 4. **Implement baseline comparison.** Support a committed baseline or a downloaded CI artifact and report absolute and percentage changes for LOC, fan-in, fan-out, instability, and complexity.
 5. **Add configurable policy gates.** Read thresholds from a checked-in configuration file and optionally fail only on regressions. Avoid making an arbitrary aggregate health score the sole build gate.
@@ -106,12 +106,12 @@ The repository has several useful pieces today, but they are coupled to this rep
 
 ## Suggested Delivery Order
 
-| Increment | Deliverable | Why first |
-| :--- | :--- | :--- |
-| 1 | Tested analyzer/report library plus `maritime analyze` | Establishes the portable source of truth. |
-| 2 | Versioned artifact manifest and UI bundle upload | Connects external builds to the existing UI. |
-| 3 | `maritime compare` and regression policy | Produces the before/after refactoring evidence shown in complexity baselines. |
-| 4 | Reusable GitHub workflow | Makes adoption easy without coupling the product to GitHub. |
-| 5 | npm publication and automated releases | Makes versions reproducible for external consumers. |
+| Increment | Deliverable | Why first | Status |
+| :--- | :--- | :--- | :--- |
+| 1 | Tested analyzer/report library plus `maritime analyze` | Establishes the portable source of truth. | ✅ Complete |
+| 2 | Versioned artifact manifest and UI bundle upload | Connects external builds to the existing UI. | ⏳ Pending |
+| 3 | `maritime compare` and regression policy | Produces the before/after refactoring evidence shown in complexity baselines. | ⏳ Pending |
+| 4 | Reusable GitHub workflow | Makes adoption easy without coupling the product to GitHub. | ⏳ Pending |
+| 5 | npm publication and automated releases | Makes versions reproducible for external consumers. | ⏳ Pending |
 
 This sequence delivers build-process value before adding more visualization features and does not require the full UI to run in CI.
