@@ -55,7 +55,7 @@ describe('adapters', () => {
     });
 
     describe('runEslintComplexityScan', () => {
-        it('should return mapped results on success', async () => {
+        it('should return mapped results on success with explicit source files', async () => {
             vi.mocked(fs.access).mockResolvedValue(undefined);
             const mockResults = [{
                 filePath: `${process.cwd()}/src/a.ts`,
@@ -73,6 +73,40 @@ describe('adapters', () => {
             expect(result).toHaveLength(1);
             expect(result[0].filePath).toBe(`${process.cwd()}/src/a.ts`);
             expect(result[0].messages[0].ruleId).toBe('complexity');
+            expect(fs.access).toHaveBeenCalledWith(`${process.cwd()}/src/a.ts`);
+        });
+
+        it('should perform glob scan without calling fs.access when sourceFiles is omitted', async () => {
+            const mockResults = [{
+                filePath: `${process.cwd()}/src/a.ts`,
+                messages: []
+            }];
+
+            vi.mocked(ESLint).mockImplementation(function() {
+                return {
+                    isPathIgnored: vi.fn().mockResolvedValue(false),
+                    lintFiles: vi.fn().mockResolvedValue(mockResults)
+                } as unknown as ESLint;
+            });
+
+            const result = await runEslintComplexityScan('src');
+            expect(result).toHaveLength(1);
+            expect(result[0].filePath).toBe(`${process.cwd()}/src/a.ts`);
+            expect(fs.access).not.toHaveBeenCalled();
+        });
+
+        it('should rethrow unexpected operational errors from isPathIgnored or lintFiles', async () => {
+            vi.mocked(fs.access).mockResolvedValue(undefined);
+            vi.mocked(ESLint).mockImplementation(function() {
+                return {
+                    isPathIgnored: vi.fn().mockRejectedValue(new Error('Invalid flat config syntax')),
+                    lintFiles: vi.fn()
+                } as unknown as ESLint;
+            });
+
+            await expect(runEslintComplexityScan('src', ['src/a.ts'])).rejects.toThrow(
+                'Failed to run ESLint: Invalid flat config syntax'
+            );
         });
 
         it('should identify ignored files when isPathIgnored returns true', async () => {

@@ -48,9 +48,10 @@ export async function runEslintComplexityScan(
     const target = path.resolve(cwd, sourcePath).replace(/\\/g, '/');
     const globPattern = `${target}/**/*.{ts,tsx}`;
 
+    const hasExplicitFiles = Boolean(sourceFiles && sourceFiles.length > 0);
     let targets: string[];
-    if (sourceFiles && sourceFiles.length > 0) {
-        targets = sourceFiles.map(f => path.resolve(cwd, f).replace(/\\/g, '/'));
+    if (hasExplicitFiles) {
+        targets = sourceFiles!.map(f => path.resolve(cwd, f).replace(/\\/g, '/'));
     } else {
         targets = [globPattern];
     }
@@ -69,72 +70,74 @@ export async function runEslintComplexityScan(
         const ignoredResults: EslintResult[] = [];
 
         for (const t of targets) {
-            try {
-                // Check if file exists on disk
-                await fs.access(t);
-            } catch {
-                // Stale path (file no longer exists on disk), represent as unmeasured/ignored
-                ignoredResults.push({
-                    filePath: t,
-                    ignored: true,
-                    messages: []
-                });
-                continue;
-            }
-
-            try {
-                // Check if ESLint flat config ignores this path
-                const isIgnored = await eslint.isPathIgnored(t);
-                if (isIgnored) {
+            if (hasExplicitFiles) {
+                try {
+                    // Check if file exists on disk (only for explicit file targets, not glob patterns)
+                    await fs.access(t);
+                } catch {
+                    // Stale path (file no longer exists on disk), represent as unmeasured/ignored
                     ignoredResults.push({
                         filePath: t,
                         ignored: true,
                         messages: []
                     });
-                } else {
-                    unignoredTargets.push(t);
+                    continue;
                 }
-            } catch {
-                // If ESLint fails to evaluate isPathIgnored for this file, treat as ignored/unmeasured
+            }
+
+            // Check if ESLint flat config ignores this path
+            const isIgnored = await eslint.isPathIgnored(t);
+            if (isIgnored) {
                 ignoredResults.push({
                     filePath: t,
                     ignored: true,
                     messages: []
                 });
+            } else {
+                unignoredTargets.push(t);
             }
         }
 
         const lintResults: EslintResult[] = [];
         if (unignoredTargets.length > 0) {
-            for (const targetFile of unignoredTargets) {
-                try {
-                    const rawResults = await eslint.lintFiles([targetFile]);
-                    for (const result of rawResults) {
-                        lintResults.push({
-                            filePath: result.filePath,
-                            ignored: Boolean((result as { ignored?: boolean }).ignored),
-                            messages: result.messages.map(msg => ({
-                                ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
-                                message: msg.message
-                            }))
-                        });
+            if (hasExplicitFiles) {
+                for (const targetFile of unignoredTargets) {
+                    try {
+                        const rawResults = await eslint.lintFiles([targetFile]);
+                        for (const result of rawResults) {
+                            lintResults.push({
+                                filePath: result.filePath,
+                                ignored: Boolean((result as { ignored?: boolean }).ignored),
+                                messages: result.messages.map(msg => ({
+                                    ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
+                                    message: msg.message
+                                }))
+                            });
+                        }
+                    } catch (err: unknown) {
+                        const message = err instanceof Error ? err.message : String(err);
+                        if (message.includes('No files matching') || message.includes('are ignored') || message.includes('All files matched')) {
+                            ignoredResults.push({
+                                filePath: targetFile,
+                                ignored: true,
+                                messages: []
+                            });
+                        } else {
+                            throw err;
+                        }
                     }
-                } catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err);
-                    if (message.includes('No files matching') || message.includes('are ignored')) {
-                        ignoredResults.push({
-                            filePath: targetFile,
-                            ignored: true,
-                            messages: []
-                        });
-                    } else {
-                        // Unhandled error during linting
-                        ignoredResults.push({
-                            filePath: targetFile,
-                            ignored: true,
-                            messages: []
-                        });
-                    }
+                }
+            } else {
+                const rawResults = await eslint.lintFiles(unignoredTargets);
+                for (const result of rawResults) {
+                    lintResults.push({
+                        filePath: result.filePath,
+                        ignored: Boolean((result as { ignored?: boolean }).ignored),
+                        messages: result.messages.map(msg => ({
+                            ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
+                            message: msg.message
+                        }))
+                    });
                 }
             }
         }
