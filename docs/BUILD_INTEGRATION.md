@@ -91,27 +91,48 @@ Add a versioned envelope so the UI and CI can reject incompatible artifact sets:
 
 The UI should eventually accept either the graph JSON by itself or the complete artifact directory packaged as a `.zip`. A complete bundle enables the UI to show cyclomatic complexity and historical deltas that are not part of dependency-cruiser's graph schema.
 
-## Remaining Implementation Work
+## Implementation Checklist
 
-The repository has several useful pieces today, but they are coupled to this repository's paths and documentation file:
+Dependency Maritime should generalize the **frontend refactoring-analysis pipeline**, not the React UI. The reusable product is a headless TypeScript analyzer that produces versioned artifacts and refactoring deltas; the UI and CI workflows remain adapters around that contract.
 
-1. ~~**Extract headless analysis.** Move metric calculation and Markdown rendering from the current CommonJS script into tested TypeScript functions that accept explicit inputs and return data rather than writing fixed paths.~~ *(Completed)*
-2. ~~**Create a CLI entry point.**~~ Add `compare` and `validate` commands with documented exit codes. The `analyze` command was added and produces the artifact set; `compare` renders before/after deltas; `validate` checks schemas without running analysis. *(Partially completed - `analyze` command exists)*
-3. **Define versioned schemas.** Add Zod schemas for the artifact manifest, report model, and optional baseline. Continue using the official dependency-cruiser result as the graph contract.
-4. **Implement baseline comparison.** Support a committed baseline or a downloaded CI artifact and report absolute and percentage changes for LOC, fan-in, fan-out, instability, and complexity.
-5. **Add configurable policy gates.** Read thresholds from a checked-in configuration file and optionally fail only on regressions. Avoid making an arbitrary aggregate health score the sole build gate.
-6. **Add bundle upload to the UI.** Preserve raw graph upload, then add `.zip` ingestion so graph and complexity metrics are loaded together.
-7. **Publish and release.** Add package exports, a `bin` entry, semantic versioning, provenance, changelog/release automation, and compatibility tests against supported Node and dependency-cruiser versions.
-8. **Add reusable CI adapters.** Implement GitHub Actions only after the CLI contract is tested; other CI systems can call the same binary directly.
+### Current implementation
+
+- [x] Extract metric calculation and Markdown rendering from the legacy CommonJS script into tested, side-effect-free TypeScript functions.
+- [x] Add a `maritime analyze` command with explicit input and output paths.
+- [x] Preserve the legacy `calculate:complexity` npm script through a compatibility shim.
+- [x] Add unit coverage for calculations, ESLint-report parsing, Markdown rendering, and command orchestration.
+- [ ] Validate dependency-cruiser graph structure before analysis. Invalid JSON or an unexpected graph shape must fail rather than produce an empty, healthy-looking report.
+- [ ] Make ESLint invocation portable across supported platforms, including Windows, without using shell interpolation.
+- [ ] Define and document command exit codes, including validation and analysis failures.
+- [ ] Make the CLI package boundary real: add public exports, a `bin` entry, and a releaseable package layout. Do not publish the React application as the analyzer package.
+- [ ] Add compatibility tests for supported Node, dependency-cruiser, and ESLint versions.
+
+### Artifact and comparison roadmap
+
+- [ ] Define Zod schemas for the versioned artifact manifest, report model, and optional baseline. Continue using dependency-cruiser's official `ICruiseResult` as the graph contract.
+- [ ] Generate `manifest.json` with schema version, tool version, source root, generation time, and artifact file names.
+- [ ] Add `maritime validate` to validate artifacts without running analysis.
+- [ ] Add `maritime compare --baseline` to report absolute and percentage deltas for LOC, fan-in, fan-out, instability, and complexity.
+- [ ] Add configurable policy gates that can fail on regressions. Keep the aggregate health score informational rather than the sole quality gate.
+- [ ] Support a checked-in baseline and a downloaded CI baseline artifact.
+- [ ] Add UI bundle upload: preserve raw graph upload, then accept a `.zip` artifact bundle so complexity metrics and comparison data load with the graph.
+- [ ] Add a reusable GitHub Actions workflow only after the CLI/artifact contract is stable; other CI systems should call the same binary directly.
+- [ ] Publish and release the analyzer with semantic versioning, provenance, changelog/release automation, and a compatibility policy.
+
+### Cross-repository adoption
+
+- [ ] Validate the CLI against at least two additional TypeScript repositories with meaningfully different layouts before publishing.
+- [ ] Keep the first public contract focused on TypeScript frontend repositories: dependency-cruiser for dependency graphs and ESLint for complexity. A non-JavaScript adapter is out of scope for this roadmap.
+- [ ] Use baseline comparisons to demonstrate refactoring outcomes in real pull requests before expanding the metric model or UI.
 
 ## Suggested Delivery Order
 
-| Increment | Deliverable | Why first | Status |
-| :--- | :--- | :--- | :--- |
-| 1 | Tested analyzer/report library plus `maritime analyze` | Establishes the portable source of truth. | ✅ Complete |
-| 2 | Versioned artifact manifest and UI bundle upload | Connects external builds to the existing UI. | ⏳ Pending |
-| 3 | `maritime compare` and regression policy | Produces the before/after refactoring evidence shown in complexity baselines. | ⏳ Pending |
-| 4 | Reusable GitHub workflow | Makes adoption easy without coupling the product to GitHub. | ⏳ Pending |
-| 5 | npm publication and automated releases | Makes versions reproducible for external consumers. | ⏳ Pending |
+- [x] **Increment 1 — Tested analyzer/report library and `maritime analyze`:** establishes the extraction seam and preserves the existing workflow.
+- [ ] **Increment 1.1 — Correctness and portability hardening:** validate graph input, make ESLint launch cross-platform, and document exit codes.
+- [ ] **Increment 2 — Versioned artifact manifest and UI bundle upload:** connects external builds to the UI through an explicit contract.
+- [ ] **Increment 3 — Baseline comparison and regression policy:** produces useful before/after refactoring evidence.
+- [ ] **Increment 4 — Cross-repository validation:** prove the CLI in distinct TypeScript repositories and stabilize the public API.
+- [ ] **Increment 5 — Reusable GitHub workflow:** make adoption concise without embedding metric logic in YAML.
+- [ ] **Increment 6 — Publication and release automation:** publish reproducible, versioned analyzer releases.
 
-This sequence delivers build-process value before adding more visualization features and does not require the full UI to run in CI.
+This order keeps the current work focused: first make the analyzer trustworthy and portable, then prove it across repositories, then make it convenient to consume.
