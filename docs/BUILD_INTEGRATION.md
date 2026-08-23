@@ -19,6 +19,7 @@ The first public CLI contract is intentionally modern and frontend-specific:
 - ESLint 9+ with a flat `eslint.config.js`, `eslint.config.mjs`, `eslint.config.cjs`, or supported TypeScript flat config.
 - dependency-cruiser output matching the supported `ICruiseResult` contract.
 - Legacy `.eslintrc.*` and `eslintConfig` package metadata are unsupported. The CLI must fail with an actionable validation error that explains the flat-config requirement; it must not attempt a legacy compatibility mode.
+- ESLint is required at runtime. The published CLI must declare it as a non-optional peer (or runtime dependency) and resolve it reliably in an isolated consumer installation.
 
 ESLint 10 is the planned runtime target once its flat-config behavior is covered by the CLI integration suite. It no longer supports legacy `eslintrc`, which aligns with this contract.
 
@@ -34,7 +35,7 @@ npx @dependency-maritime/cli analyze \
   --report artifacts/complexity-report.md
 ```
 
-The CLI is the correct abstraction because it works in GitHub Actions, GitLab CI, Jenkins, local pre-push checks, and AI-agent workflows. It must be compiled to runnable Node ESM and expose a `bin` entry; consumers must not need `tsx` or this repository's source tree. The current `analyze` command consumes a validated dependency-cruiser graph. A higher-level graph-generation command or option can follow once the multi-root/config contract is established. Keep calculation and formatting in importable, side-effect-free library functions.
+The CLI is the correct abstraction because it works in GitHub Actions, GitLab CI, Jenkins, local pre-push checks, and AI-agent workflows. It must be compiled to runnable Node ESM and expose a `bin` entry; consumers must not need `tsx` or this repository's source tree. Publish it from a CLI-specific package manifest with only CLI runtime dependencies, correct NodeNext-resolvable declarations, and a regenerated lockfile. The current `analyze` command consumes a validated dependency-cruiser graph. A higher-level graph-generation command or option can follow once the multi-root/config contract is established. Keep calculation and formatting in importable, side-effect-free library functions.
 
 The package should expose a small programmatic API in addition to the binary:
 
@@ -127,11 +128,11 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 - [ ] Restrict complexity measurement and unmeasured-file checks to supported TypeScript implementation files (`.ts` and `.tsx`); declaration and test-file exclusions are explicit, and an explicit empty graph-file selection must remain empty rather than falling back to a source glob.
 - [x] Render measured and unmeasured counts accurately in the Markdown report, including a skipped-file list.
 - [x] Log the raw and normalized source root(s) alongside the working directory, graph path, and ESLint config mode.
-- [ ] Support multiple source roots or an explicit local-module include pattern. Repositories with `app/`, `src/`, `worker/`, or other split layouts must not require an implicit whole-repository scan.
+- [x] Support explicit multiple source roots through repeatable `--source` options.
 - [ ] Make graph scoping explicit so npm packages and Node built-ins cannot contaminate local-file reports.
 - [ ] Add a graph-generation command or option that can use a repository-supplied dependency-cruiser config. Retain `--graph` as the low-level artifact-input path.
-- [ ] Make the CLI package boundary real: compile Node ESM, add public exports and a `bin` entry, and remove the consumer dependency on `tsx` or the React application's source tree.
-- [ ] Verify an `npm pack` tarball installed into a clean fixture repository before publishing.
+- [ ] Finalize the CLI package boundary. Compiled Node ESM, a `maritime` binary, exports, and binary smoke tests exist; finish a CLI-specific manifest, a non-optional ESLint runtime contract, NodeNext-resolvable declarations, and lockfile consistency.
+- [ ] Verify an `npm pack` tarball in an isolated clean fixture—including `npm ci --omit=dev --omit=peer`, programmatic NodeNext type-checking, and no UI dependency installation—before publishing.
 
 ### Integration coverage
 
@@ -140,7 +141,10 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 - [x] Add a legacy-`eslintrc` fixture that asserts the intentional, helpful rejection.
 - [x] Add fixtures for a missing graph path, a non-TypeScript graph file, and a missing flat config.
 - [ ] Add fixtures for an ESLint fatal parsing/configuration result and an explicitly empty supported-file selection.
+- [x] Add a multi-root CLI fixture with repeatable `--source` options.
 - [ ] Add a multi-root Next/Vite-style fixture.
+- [ ] Add an isolated NodeNext TypeScript fixture that type-checks the advertised programmatic exports.
+- [ ] Assert lockfile/package metadata consistency and an omit-dev/omit-peer install without UI dependencies.
 - [ ] Run the integration suite on supported Node 20, 22, and 24 versions.
 - [ ] Validate supported dependency-cruiser versions and representative configuration layouts before publishing.
 
@@ -173,7 +177,7 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 - [x] **Increment 1 — Tested analyzer/report library and `maritime analyze`:** establishes the extraction seam and preserves the existing workflow.
 - [x] **Increment 1.1 — Correctness and portability hardening:** validate graph input, replace the shell runner, and document the command contract.
 - [ ] **Increment 1.2 — Modern support boundary and measurement integrity:** the Node/ESLint 9+ contract, source-root diagnostics, stale-path handling, and Markdown coverage are complete. Finish fatal-ESLint-result handling and preserve explicit empty graph-file selections before closing this increment.
-- [ ] **Increment 2 — Distributable CLI:** compile Node ESM, add the binary/package exports, support explicit working directories and multi-root analysis, and test an `npm pack` installation.
+- [ ] **Increment 2 — Distributable CLI:** compiled ESM, `maritime`, public exports, multi-source analysis, and basic packed-binary smoke coverage are complete. Finish CLI-specific package isolation, the ESLint runtime contract, declaration generation, lockfile regeneration, and isolated install/type checks.
 - [ ] **Increment 3 — Graph integration and fixture matrix:** support repository dependency-cruiser configuration, protect local graph scope, and verify the supported Node/ESLint/dependency-cruiser matrix.
 - [ ] **Increment 3.1 — ESLint 10 compatibility:** upgrade the analyzer runtime after the distributable CLI's integration suite makes the compatibility contract verifiable.
 - [ ] **Increment 4 — Versioned artifact manifest and UI bundle upload:** connect external builds to the UI through an explicit contract.
