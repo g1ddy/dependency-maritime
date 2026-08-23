@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { createRequire } from 'node:module';
 import { ValidationError } from './models';
 
 const LEGACY_CONFIG_FILES = [
@@ -76,6 +77,28 @@ export function validateEslintEnvironment(
     nodeVersionStr?: string
 ): { mode: string } {
     validateNodeVersion(nodeVersionStr);
+
+    const absCwd = path.resolve(cwd);
+    const req = createRequire(path.join(absCwd, 'package.json'));
+    let eslintModule: { ESLint?: { version?: string } };
+    try {
+        const eslintPath = req.resolve('eslint');
+        eslintModule = req(eslintPath) as { ESLint?: { version?: string } };
+    } catch {
+        throw new ValidationError(
+            `ESLint is not installed in ${absCwd}. Maritime requires ESLint 9+ as a peer dependency.`
+        );
+    }
+
+    const eslintVersion = eslintModule.ESLint?.version;
+    if (eslintVersion) {
+        const major = parseInt(eslintVersion.split('.')[0], 10);
+        if (isNaN(major) || major < 9) {
+            throw new ValidationError(
+                `Unsupported ESLint version (v${eslintVersion}). Maritime requires ESLint >=9.0.0.`
+            );
+        }
+    }
 
     const detected = detectEslintConfig(cwd);
     if (detected.isLegacy) {

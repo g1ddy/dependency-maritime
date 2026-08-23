@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import { execSync } from 'child_process';
 
 describe('CLI npm pack clean-install smoke tests', () => {
@@ -58,7 +59,7 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(forbidden).toEqual([]);
     }, 30000);
 
-    it('clean-install Catan Hex Mastery fixture: analyzes project via maritime binary entry point', () => {
+    it('clean-install Catan Hex Mastery fixture: analyzes project via maritime binary entry point and verifies light dependency tree', () => {
         const catanDir = path.join(tmpRoot, 'catan-hex-mastery');
         fs.mkdirSync(path.join(catanDir, 'src', 'board'), { recursive: true });
         fs.mkdirSync(path.join(catanDir, 'src', 'game'), { recursive: true });
@@ -124,8 +125,18 @@ describe('CLI npm pack clean-install smoke tests', () => {
 
         fs.writeFileSync(path.join(catanDir, 'dependency-graph.json'), JSON.stringify(graphData, null, 2));
 
-        // Install packed CLI tarball into clean fixture
-        execSync(`npm install "${tarballPath}" --no-save`, { cwd: catanDir, stdio: 'pipe' });
+        // Install packed CLI tarball and eslint peer dependency into clean fixture
+        execSync(`npm install "${tarballPath}" eslint@^9.0.0 --no-save`, { cwd: catanDir, stdio: 'pipe' });
+
+        // Verify installed package brings zod runtime dependency but NOT React, Vite, D3, or UI dependencies
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', 'zod'))).toBe(true);
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', 'react'))).toBe(false);
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', 'react-dom'))).toBe(false);
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', 'vite'))).toBe(false);
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', 'd3'))).toBe(false);
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', '@xyflow/react'))).toBe(false);
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', 'tailwindcss'))).toBe(false);
+        expect(fs.existsSync(path.join(catanDir, 'node_modules', 'lucide-react'))).toBe(false);
 
         // Verify --help command works
         const helpOutput = execSync('npx maritime analyze --help', { cwd: catanDir, encoding: 'utf8' });
@@ -166,7 +177,10 @@ describe('CLI npm pack clean-install smoke tests', () => {
             JSON.stringify({
                 name: 'crawler-command-interface',
                 version: '1.0.0',
-                type: 'module'
+                type: 'module',
+                devDependencies: {
+                    eslint: '^9.0.0'
+                }
             }, null, 2)
         );
 
@@ -195,8 +209,8 @@ describe('CLI npm pack clean-install smoke tests', () => {
 
         fs.writeFileSync(path.join(crawlerDir, 'dependency-graph.json'), JSON.stringify(graphData, null, 2));
 
-        // Install packed CLI tarball into clean fixture
-        execSync(`npm install "${tarballPath}" --no-save`, { cwd: crawlerDir, stdio: 'pipe' });
+        // Install packed CLI tarball and eslint into clean fixture
+        execSync(`npm install "${tarballPath}" eslint@^9.0.0 --no-save`, { cwd: crawlerDir, stdio: 'pipe' });
 
         // Run multi-source analysis
         const analyzeOutput = execSync('npx maritime analyze --source src --source lib --graph dependency-graph.json --metrics metrics.json --report report.md', {
@@ -228,5 +242,139 @@ describe('CLI npm pack clean-install smoke tests', () => {
         execSync('node run-prog.js', { cwd: crawlerDir, stdio: 'pipe' });
         expect(fs.existsSync(path.join(crawlerDir, 'prog-metrics.json'))).toBe(true);
         expect(fs.existsSync(path.join(crawlerDir, 'prog-report.md'))).toBe(true);
+    }, 60000);
+
+    it('missing ESLint peer dependency fails with exit code 2 and an actionable error', () => {
+        const noEslintDir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-no-eslint-'));
+        try {
+            fs.mkdirSync(path.join(noEslintDir, 'src'), { recursive: true });
+
+            fs.writeFileSync(
+                path.join(noEslintDir, 'package.json'),
+                JSON.stringify({
+                    name: 'no-eslint-fixture',
+                    version: '1.0.0',
+                    type: 'module'
+                }, null, 2)
+            );
+
+            fs.writeFileSync(
+                path.join(noEslintDir, 'eslint.config.js'),
+                'export default [];\n'
+            );
+
+            fs.writeFileSync(
+                path.join(noEslintDir, 'src', 'index.ts'),
+                'export const x = 1;\n'
+            );
+
+            const graphData = {
+                modules: [{ source: 'src/index.ts', valid: true, dependencies: [], dependents: [] }],
+                summary: { error: 0, ignore: 0, info: 0, totalCruised: 1, violations: [], warn: 0, optionsUsed: {} }
+            };
+
+            fs.writeFileSync(path.join(noEslintDir, 'dependency-graph.json'), JSON.stringify(graphData, null, 2));
+
+            // Install packed CLI without peer dependencies
+            execSync(`npm install "${tarballPath}" --no-save --omit=peer`, { cwd: noEslintDir, stdio: 'pipe' });
+
+            // Ensure eslint is deleted if npm auto-installed it
+            const installedEslint = path.join(noEslintDir, 'node_modules', 'eslint');
+            if (fs.existsSync(installedEslint)) {
+                fs.rmSync(installedEslint, { recursive: true, force: true });
+            }
+
+            let output = '';
+            let exitCode = 0;
+            try {
+                execSync('npx maritime analyze --graph dependency-graph.json --metrics metrics.json --report report.md', {
+                    cwd: noEslintDir,
+                    encoding: 'utf8',
+                    stdio: 'pipe'
+                });
+            } catch (err: unknown) {
+                const execErr = err as { status?: number; stdout?: string; stderr?: string };
+                exitCode = execErr.status ?? 1;
+                output = (execErr.stdout || '') + (execErr.stderr || '');
+            }
+
+            expect(exitCode).toBe(2);
+            expect(output).toContain('ESLint is not installed');
+            expect(output).toContain('requires ESLint 9+ as a peer dependency');
+        } finally {
+            if (fs.existsSync(noEslintDir)) {
+                fs.rmSync(noEslintDir, { recursive: true, force: true });
+            }
+        }
+    }, 60000);
+
+    it('unsupported ESLint version (<9.0.0) fails with exit code 2 and an actionable error', () => {
+        const unsupportedEslintDir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-unsupported-eslint-'));
+        try {
+            fs.mkdirSync(path.join(unsupportedEslintDir, 'src'), { recursive: true });
+
+            fs.writeFileSync(
+                path.join(unsupportedEslintDir, 'package.json'),
+                JSON.stringify({
+                    name: 'unsupported-eslint-fixture',
+                    version: '1.0.0',
+                    type: 'module'
+                }, null, 2)
+            );
+
+            fs.writeFileSync(
+                path.join(unsupportedEslintDir, 'eslint.config.js'),
+                'export default [];\n'
+            );
+
+            fs.writeFileSync(
+                path.join(unsupportedEslintDir, 'src', 'index.ts'),
+                'export const x = 1;\n'
+            );
+
+            const graphData = {
+                modules: [{ source: 'src/index.ts', valid: true, dependencies: [], dependents: [] }],
+                summary: { error: 0, ignore: 0, info: 0, totalCruised: 1, violations: [], warn: 0, optionsUsed: {} }
+            };
+
+            fs.writeFileSync(path.join(unsupportedEslintDir, 'dependency-graph.json'), JSON.stringify(graphData, null, 2));
+
+            // Install packed CLI
+            execSync(`npm install "${tarballPath}" --no-save --omit=peer`, { cwd: unsupportedEslintDir, stdio: 'pipe' });
+
+            // Mock ESLint version 8.57.0 in node_modules
+            const eslintDir = path.join(unsupportedEslintDir, 'node_modules', 'eslint');
+            fs.mkdirSync(eslintDir, { recursive: true });
+            fs.writeFileSync(
+                path.join(eslintDir, 'package.json'),
+                JSON.stringify({ name: 'eslint', version: '8.57.0', main: 'index.js' })
+            );
+            fs.writeFileSync(
+                path.join(eslintDir, 'index.js'),
+                'module.exports = { ESLint: class { static version = "8.57.0"; } };'
+            );
+
+            let output = '';
+            let exitCode = 0;
+            try {
+                execSync('npx maritime analyze --graph dependency-graph.json --metrics metrics.json --report report.md', {
+                    cwd: unsupportedEslintDir,
+                    encoding: 'utf8',
+                    stdio: 'pipe'
+                });
+            } catch (err: unknown) {
+                const execErr = err as { status?: number; stdout?: string; stderr?: string };
+                exitCode = execErr.status ?? 1;
+                output = (execErr.stdout || '') + (execErr.stderr || '');
+            }
+
+            expect(exitCode).toBe(2);
+            expect(output).toContain('Unsupported ESLint version (v8.57.0)');
+            expect(output).toContain('requires ESLint >=9.0.0');
+        } finally {
+            if (fs.existsSync(unsupportedEslintDir)) {
+                fs.rmSync(unsupportedEslintDir, { recursive: true, force: true });
+            }
+        }
     }, 60000);
 });
