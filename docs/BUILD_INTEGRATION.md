@@ -93,7 +93,7 @@ The UI should eventually accept either the graph JSON by itself or the complete 
 
 ## Implementation Checklist
 
-Dependency Maritime should generalize the **refactoring-analysis pipeline**, not the React UI. The reusable product is a headless analyzer that produces versioned artifacts and refactoring deltas; the UI and CI workflows remain adapters around that contract.
+Dependency Maritime should generalize the **frontend refactoring-analysis pipeline**, not the React UI. The reusable product is a headless TypeScript analyzer that produces versioned artifacts and refactoring deltas; the UI and CI workflows remain adapters around that contract.
 
 ### Current implementation
 
@@ -122,7 +122,7 @@ Dependency Maritime should generalize the **refactoring-analysis pipeline**, not
 ### Cross-repository adoption
 
 - [ ] Validate the CLI against at least two additional TypeScript repositories with meaningfully different layouts before publishing.
-- [ ] Keep analyzer-specific integrations behind adapters: dependency-cruiser and ESLint for TypeScript, with a future Roslyn/.NET adapter able to emit the same normalized per-file metric artifact.
+- [ ] Keep the first public contract focused on TypeScript frontend repositories: dependency-cruiser for dependency graphs and ESLint for complexity. A non-JavaScript adapter is out of scope for this roadmap.
 - [ ] Use baseline comparisons to demonstrate refactoring outcomes in real pull requests before expanding the metric model or UI.
 
 ## Suggested Delivery Order
