@@ -80,6 +80,22 @@ jobs:
     - name: Test
       run: npm test
 
+    - name: Package CLI
+      run: npm pack
+
+    - name: Inspect Package Tarball
+      run: |
+        TARBALL=$(ls dependency-maritime-cli-*.tgz | head -n1)
+        echo "Inspecting tarball: $TARBALL"
+        CONTENTS=$(tar -tzf "$TARBALL")
+        echo "$CONTENTS"
+        echo "$CONTENTS" | grep "package/dist/cli/main.js"
+        echo "$CONTENTS" | grep "package/dist/cli/index.js"
+        if echo "$CONTENTS" | grep -E "package/src/|package/tests/|\.test\.ts"; then
+          echo "Error: Unwanted source or test files found in tarball"
+          exit 1
+        fi
+
     - name: Create Release Tag
       if: env.NEW_TAG != ''
       run: |

@@ -63,6 +63,9 @@ const cspPlugin = (): Plugin => {
 export default defineConfig({
   base: "/dependency-maritime/",
   plugins: [react(), tailwindcss(), cspPlugin()],
+  build: {
+    emptyOutDir: false,
+  },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(version),
   },

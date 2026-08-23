@@ -42,17 +42,17 @@ export function calculateMetrics(
     locMap: Record<string, number>,
     complexityMap: Record<string, EslintFileComplexity | number>,
     thresholds: AnalysisThresholds,
-    sourcePrefix: string = 'src'
+    sourcePrefix: string | string[] = 'src'
 ): AnalysisResult {
-    // Source prefix is already expected to be normalized from CLI, but we ensure basic boundaries here.
-    const normalizedPrefix = sourcePrefix === '.' ? '' : sourcePrefix.replace(/\/+$/, '');
-    const prefixBoundary = normalizedPrefix ? `${normalizedPrefix}/` : '';
+    const rawPrefixes = Array.isArray(sourcePrefix) ? sourcePrefix : [sourcePrefix];
+    const normalizedPrefixes = rawPrefixes.map(p => (p === '.' ? '' : p.replace(/\/+$/, '')));
 
     const files: FileMetric[] = modules
         .filter(m => {
-            const isSource = normalizedPrefix === ''
-                ? true
-                : m.source === normalizedPrefix || m.source.startsWith(prefixBoundary);
+            const isSource = normalizedPrefixes.some(prefix => {
+                if (prefix === '') return true;
+                return m.source === prefix || m.source.startsWith(`${prefix}/`);
+            });
             return isSource && isSupportedTypeScriptFile(m.source);
         })
         .map(m => {

@@ -41,19 +41,19 @@ export async function readDependencyGraph(
 }
 
 export async function runEslintComplexityScan(
-    sourcePath: string,
+    sourcePath: string | string[],
     sourceFiles?: string[],
     cwd: string = process.cwd()
 ): Promise<EslintResult[]> {
-    const target = path.resolve(cwd, sourcePath).replace(/\\/g, '/');
-    const globPattern = `${target}/**/*.{ts,tsx}`;
+    const rawPaths = Array.isArray(sourcePath) ? sourcePath : [sourcePath];
+    const globPatterns = rawPaths.map(p => `${path.resolve(cwd, p).replace(/\\/g, '/') }/**/*.{ts,tsx}`);
 
     const hasExplicitFiles = Boolean(sourceFiles && sourceFiles.length > 0);
     let targets: string[];
     if (hasExplicitFiles) {
         targets = sourceFiles!.map(f => path.resolve(cwd, f).replace(/\\/g, '/'));
     } else {
-        targets = [globPattern];
+        targets = globPatterns;
     }
 
     try {

@@ -1,11 +1,36 @@
 {
-  "name": "dependency-maritime",
+  "name": "@dependency-maritime/cli",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "./dist/cli/index.js",
+  "types": "./dist/cli/index.d.ts",
+  "bin": {
+    "maritime": "./dist/cli/main.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/cli/index.d.ts",
+      "default": "./dist/cli/index.js"
+    }
+  },
+  "files": [
+    "dist/cli",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "eslint": ">=9.0.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build:cli": "esbuild src/cli/main.ts --bundle --platform=node --format=esm --packages=external --banner:js=\"#!/usr/bin/env node\" --outfile=dist/cli/main.js && esbuild src/cli/index.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/cli/index.js && tsc -p tsconfig.cli.json && node -e \"fs.copyFileSync('dist/cli/cli/index.d.ts', 'dist/cli/index.d.ts')\"",
+    "build": "npm run build:cli && tsc -b && vite build",
     "lint": "eslint .",
     "depcruise": "depcruise src --config config/.dependency-cruiser.cjs",
     "check:arch": "depcruise src --config config/.dependency-cruiser.cjs",

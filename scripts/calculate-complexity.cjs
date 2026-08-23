@@ -18,8 +18,12 @@ function main() {
             process.exit(1);
         }
 
-        // Run the new CLI tool using tsx since we haven't built the typescript yet for the CLI
-        const cmd = `npx --no-install tsx src/cli/main.ts analyze --source ${SRC_DIR} --graph ${DEP_GRAPH_JSON} --metrics ${METRICS_JSON_FILE} --report ${REPORT_TMP_FILE}`;
+        const distBin = path.join(__dirname, '..', 'dist', 'cli', 'main.js');
+        const runnerCmd = fs.existsSync(distBin)
+            ? `node ${distBin}`
+            : 'npx --no-install tsx src/cli/main.ts';
+
+        const cmd = `${runnerCmd} analyze --source ${SRC_DIR} --graph ${DEP_GRAPH_JSON} --metrics ${METRICS_JSON_FILE} --report ${REPORT_TMP_FILE}`;
         execSync(cmd, { stdio: 'inherit' });
 
         // Update the DOCS_FILE by appending the newly generated markdown report
