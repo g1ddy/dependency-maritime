@@ -14,6 +14,9 @@
       "default": "./dist/cli/index.js"
     }
   },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "files": [
     "dist/cli",
     "README.md",
@@ -21,11 +24,6 @@
   ],
   "peerDependencies": {
     "eslint": ">=9.0.0"
-  },
-  "peerDependenciesMeta": {
-    "eslint": {
-      "optional": true
-    }
   },
   "scripts": {
     "dev": "vite",
@@ -45,6 +43,11 @@
     "test:screenshots": "playwright test -c config/playwright.screenshots.config.ts"
   },
   "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.58.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.8",
@@ -53,51 +56,46 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/vite": "^4.1.18",
-    "@types/d3": "^7.4.3",
-    "@types/papaparse": "^5.5.2",
-    "@xyflow/react": "^12.10.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "d3": "^7.9.0",
-    "dagre": "^0.8.5",
-    "elkjs": "^0.11.0",
-    "graphology": "^0.26.0",
-    "graphology-metrics": "^2.4.0",
-    "lucide-react": "^0.563.0",
-    "papaparse": "^5.5.3",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "react-router-dom": "^7.13.0",
-    "tailwind-merge": "^3.4.0",
-    "tailwindcss-animate": "^1.0.7",
-    "web-worker": "^1.5.0",
-    "zod": "^4.3.6",
-    "zustand": "^5.0.10"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@playwright/test": "^1.58.0",
     "@testing-library/react": "^16.3.2",
+    "@types/d3": "^7.4.3",
     "@types/dagre": "^0.7.53",
     "@types/node": "^25.0.10",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.18",
+    "@xyflow/react": "^12.10.0",
     "autoprefixer": "^10.4.23",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "d3": "^7.9.0",
+    "dagre": "^0.8.5",
     "dependency-cruiser": "^17.3.7",
+    "elkjs": "^0.11.0",
     "eslint": "^9.39.2",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.26",
     "globals": "^17.1.0",
+    "graphology": "^0.26.0",
+    "graphology-metrics": "^2.4.0",
     "graphology-types": "^0.24.8",
     "jsdom": "^27.4.0",
+    "lucide-react": "^0.563.0",
+    "papaparse": "^5.5.3",
     "postcss": "^8.5.6",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.13.0",
+    "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
+    "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.23.12",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.53.1",
     "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "web-worker": "^1.5.0",
+    "zustand": "^5.0.10"
   }
 }

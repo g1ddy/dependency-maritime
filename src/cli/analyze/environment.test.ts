@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import { validateNodeVersion, detectEslintConfig, validateEslintEnvironment } from './environment';
 import { ValidationError } from './models';
 
@@ -97,6 +98,40 @@ describe('environment', () => {
             fs.writeFileSync(path.join(testDir, 'eslint.config.mjs'), 'export default [];');
             const result = validateEslintEnvironment(testDir, '20.19.0');
             expect(result.mode).toBe('Flat Config (eslint.config.mjs)');
+        });
+
+        it('should throw ValidationError if ESLint package is missing in target directory', () => {
+            const isolatedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-test-no-eslint-'));
+            try {
+                fs.writeFileSync(path.join(isolatedDir, 'eslint.config.js'), 'export default [];');
+                fs.writeFileSync(path.join(isolatedDir, 'package.json'), JSON.stringify({ name: 'dummy' }));
+
+                expect(() => validateEslintEnvironment(isolatedDir, '20.19.0')).toThrow(ValidationError);
+                expect(() => validateEslintEnvironment(isolatedDir, '20.19.0')).toThrow(/ESLint is not installed/);
+            } finally {
+                if (fs.existsSync(isolatedDir)) {
+                    fs.rmSync(isolatedDir, { recursive: true, force: true });
+                }
+            }
+        });
+
+        it('should throw ValidationError if ESLint version is unsupported (<9.0.0)', () => {
+            fs.writeFileSync(path.join(testDir, 'eslint.config.js'), 'export default [];');
+            fs.writeFileSync(path.join(testDir, 'package.json'), JSON.stringify({ name: 'dummy' }));
+
+            const eslintMockDir = path.join(testDir, 'node_modules', 'eslint');
+            fs.mkdirSync(eslintMockDir, { recursive: true });
+            fs.writeFileSync(
+                path.join(eslintMockDir, 'package.json'),
+                JSON.stringify({ name: 'eslint', version: '8.57.0', main: 'index.js' })
+            );
+            fs.writeFileSync(
+                path.join(eslintMockDir, 'index.js'),
+                'module.exports = { ESLint: class { static version = "8.57.0"; } };'
+            );
+
+            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(ValidationError);
+            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(/Unsupported ESLint version \(v8.57.0\)/);
         });
     });
 });

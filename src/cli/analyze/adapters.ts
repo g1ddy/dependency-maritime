@@ -1,6 +1,5 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ESLint } from 'eslint';
 import { CruiseResultSchema } from '../../schema/dependency-cruiser';
 import { ValidationError, type DependencyCruiserModule, type EslintResult } from './models';
 
@@ -45,6 +44,15 @@ export async function runEslintComplexityScan(
     sourceFiles?: string[],
     cwd: string = process.cwd()
 ): Promise<EslintResult[]> {
+    let eslintModule: typeof import('eslint');
+    try {
+        eslintModule = await import('eslint');
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new ValidationError(`ESLint is not installed in ${cwd}: ${message}. Maritime requires ESLint 9+ as a peer dependency.`);
+    }
+    const ESLint = eslintModule.ESLint;
+
     const rawPaths = Array.isArray(sourcePath) ? sourcePath : [sourcePath];
     const globPatterns = rawPaths.map(p => `${path.resolve(cwd, p).replace(/\\/g, '/') }/**/*.{ts,tsx}`);
 
