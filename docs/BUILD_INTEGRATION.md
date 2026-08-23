@@ -120,13 +120,12 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 
 - [x] Enforce the supported environment at startup: Node.js `>=20.19.0`, ESLint 9+ flat config, and supported dependency-cruiser output.
 - [x] Detect legacy `.eslintrc.*` or `eslintConfig` metadata and fail with an actionable exit-code-`2` message. Legacy configuration support is deliberately out of scope.
-- [ ] Reject a missing flat config at validation time with exit code `2`, rather than deferring to an ESLint runtime error.
-- [ ] Upgrade the analyzer's own ESLint runtime to v10 after the modern flat-config integration suite is in place.
+- [x] Reject a missing flat config at validation time with exit code `2`, rather than deferring to an ESLint runtime error.
 - [x] Track complexity measurement status. A graph TypeScript file skipped or ignored by ESLint is warned about, represented as unmeasured, and can fail the command with `--fail-on-unmeasured`.
-- [ ] Treat graph paths that no longer exist or cannot be linted as unmeasured rather than aborting with an ESLint file-match error.
-- [ ] Restrict complexity measurement and unmeasured-file checks to supported TypeScript implementation files (`.ts` and `.tsx`); keep declaration and test-file exclusions explicit.
-- [ ] Render measured and unmeasured counts accurately in the Markdown report, including the skipped-file list where useful.
-- [ ] Log the resolved source root(s) alongside the working directory, graph path, and ESLint config mode. `--cwd` is implemented, but source-root diagnostics remain pending.
+- [x] Treat graph paths that no longer exist or cannot be linted as unmeasured rather than aborting with an ESLint file-match error.
+- [x] Restrict complexity measurement and unmeasured-file checks to supported TypeScript implementation files (`.ts` and `.tsx`); declaration and test-file exclusions are explicit.
+- [x] Render measured and unmeasured counts accurately in the Markdown report, including a skipped-file list.
+- [x] Log the raw and normalized source root(s) alongside the working directory, graph path, and ESLint config mode.
 - [ ] Support multiple source roots or an explicit local-module include pattern. Repositories with `app/`, `src/`, `worker/`, or other split layouts must not require an implicit whole-repository scan.
 - [ ] Make graph scoping explicit so npm packages and Node built-ins cannot contaminate local-file reports.
 - [ ] Add a graph-generation command or option that can use a repository-supplied dependency-cruiser config. Retain `--graph` as the low-level artifact-input path.
@@ -138,12 +137,16 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 - [x] Add a flat-config fixture that exercises successful analysis.
 - [x] Add an ESLint-ignore fixture and assert that ignored TypeScript graph files are reported as unmeasured.
 - [x] Add a legacy-`eslintrc` fixture that asserts the intentional, helpful rejection.
-- [ ] Add fixtures for a missing graph path, a non-TypeScript graph file, and a missing flat config.
+- [x] Add fixtures for a missing graph path, a non-TypeScript graph file, and a missing flat config.
 - [ ] Add a multi-root Next/Vite-style fixture.
 - [ ] Run the integration suite on supported Node 20, 22, and 24 versions.
 - [ ] Validate supported dependency-cruiser versions and representative configuration layouts before publishing.
 
-### Artifact and comparison roadmap
+#### Forward compatibility
+
+- [ ] Upgrade the analyzer's own ESLint runtime to v10 after the distributed-CLI integration suite covers its flat-config behavior. This is intentionally post-MVP and does not block ESLint 9 package delivery.
+
+## Artifact and comparison roadmap
 
 - [ ] Define Zod schemas for the versioned artifact manifest, report model, and optional baseline. Continue using dependency-cruiser's official `ICruiseResult` as the graph contract.
 - [ ] Generate `manifest.json` with schema version, tool version, source root(s), generation time, and artifact file names.
@@ -167,9 +170,10 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 
 - [x] **Increment 1 — Tested analyzer/report library and `maritime analyze`:** establishes the extraction seam and preserves the existing workflow.
 - [x] **Increment 1.1 — Correctness and portability hardening:** validate graph input, replace the shell runner, and document the command contract.
-- [ ] **Increment 1.2 — Modern support boundary and measurement integrity:** Node/ESLint 9+ preflight, legacy rejection, `--cwd`, ignored-file reporting, and `--fail-on-unmeasured` are complete. Finish missing-config validation, supported-file filtering, stale graph-path handling, and accurate report coverage before closing this increment.
+- [x] **Increment 1.2 — Modern support boundary and measurement integrity:** enforce the Node/ESLint 9+ contract; diagnose source roots; represent ignored, stale, and unmatchable TypeScript files accurately; and report measurement coverage.
 - [ ] **Increment 2 — Distributable CLI:** compile Node ESM, add the binary/package exports, support explicit working directories and multi-root analysis, and test an `npm pack` installation.
 - [ ] **Increment 3 — Graph integration and fixture matrix:** support repository dependency-cruiser configuration, protect local graph scope, and verify the supported Node/ESLint/dependency-cruiser matrix.
+- [ ] **Increment 3.1 — ESLint 10 compatibility:** upgrade the analyzer runtime after the distributable CLI's integration suite makes the compatibility contract verifiable.
 - [ ] **Increment 4 — Versioned artifact manifest and UI bundle upload:** connect external builds to the UI through an explicit contract.
 - [ ] **Increment 5 — Baseline comparison and regression policy:** produce useful before/after refactoring evidence.
 - [ ] **Increment 6 — Reusable GitHub workflow and publication:** make adoption concise, then publish reproducible, versioned analyzer releases.
