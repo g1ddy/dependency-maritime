@@ -58,10 +58,11 @@ describe('environment', () => {
             expect(result.mode).toBe('Flat Config (eslint.config.js)');
         });
 
-        it('should fallback to default flat config if no config file present', () => {
+        it('should fallback to none detected if no config file present', () => {
             const result = detectEslintConfig(testDir);
             expect(result.isLegacy).toBe(false);
-            expect(result.mode).toBe('Flat Config (default)');
+            expect(result.hasFlatConfig).toBe(false);
+            expect(result.mode).toBe('None Detected');
         });
     });
 
@@ -85,6 +86,11 @@ describe('environment', () => {
             fs.writeFileSync(path.join(testDir, '.eslintrc.json'), '{}');
             expect(() => validateEslintEnvironment(testDir, '22.0.0')).toThrow(ValidationError);
             expect(() => validateEslintEnvironment(testDir, '22.0.0')).toThrow(/Legacy ESLint configuration detected \(\.eslintrc\.json\)/);
+        });
+
+        it('should throw ValidationError if no flat config is found', () => {
+            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(ValidationError);
+            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(/No ESLint flat configuration found/);
         });
 
         it('should succeed on valid environment and flat config', () => {

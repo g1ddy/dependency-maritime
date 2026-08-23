@@ -73,6 +73,103 @@ describe('analyze command integration fixtures', () => {
 
         const reportData = fs.readFileSync(path.join(dir, 'report.md'), 'utf8');
         expect(reportData).toContain('Automated Complexity Report');
+        expect(reportData).toContain('Total Graph Files**: 1');
+        expect(reportData).toContain('Measured Files**: 1');
+        expect(reportData).toContain('Unmeasured Files**: 0');
+
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('Source Root (raw): src')
+        );
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('Source Root (normalized): src')
+        );
+    });
+
+    it('missing flat config fixture: fails startup validation with exit code 2', async () => {
+        const dir = path.join(fixtureRoot, 'missing-flat-config');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const x = 1;');
+
+        const graphFile = createGraphJson(dir, ['src/index.ts']);
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--graph', graphFile,
+            '--metrics', 'metrics.json',
+            '--report', 'report.md'
+        ]);
+
+        expect(exitCode).toBe(2);
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining('No ESLint flat configuration found')
+        );
+    });
+
+    it('stale graph path fixture: missing file on disk represented as unmeasured and reported', async () => {
+        const dir = path.join(fixtureRoot, 'stale-graph-path');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'existing.ts'), 'export const a = 1;');
+
+        // graph contains existing.ts and deleted.ts (which does not exist on disk)
+        const graphFile = createGraphJson(dir, ['src/existing.ts', 'src/deleted.ts']);
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--graph', graphFile,
+            '--metrics', 'metrics.json',
+            '--report', 'report.md'
+        ]);
+
+        expect(exitCode).toBe(0);
+
+        const metricsData = JSON.parse(fs.readFileSync(path.join(dir, 'metrics.json'), 'utf8')) as Record<string, FileMetric>;
+        expect(metricsData['src/existing.ts'].scanned).toBe(true);
+        expect(metricsData['src/deleted.ts'].scanned).toBe(false);
+
+        const reportData = fs.readFileSync(path.join(dir, 'report.md'), 'utf8');
+        expect(reportData).toContain('Total Graph Files**: 2');
+        expect(reportData).toContain('Measured Files**: 1');
+        expect(reportData).toContain('Unmeasured Files**: 1');
+        expect(reportData).toContain('Skipped / Unmeasured Files (1)');
+        expect(reportData).toContain('- `src/deleted.ts`');
+    });
+
+    it('non-TypeScript modules in graph fixture: non-TS modules filtered out without false unmeasured failures', async () => {
+        const dir = path.join(fixtureRoot, 'non-ts-modules');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const x = 1;');
+        fs.writeFileSync(path.join(dir, 'src', 'styles.css'), 'body { color: red; }');
+        fs.writeFileSync(path.join(dir, 'src', 'data.json'), '{"key": "value"}');
+
+        const graphFile = createGraphJson(dir, ['src/index.ts', 'src/styles.css', 'src/data.json']);
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--graph', graphFile,
+            '--metrics', 'metrics.json',
+            '--report', 'report.md'
+        ]);
+
+        expect(exitCode).toBe(0);
+
+        const metricsData = JSON.parse(fs.readFileSync(path.join(dir, 'metrics.json'), 'utf8')) as Record<string, FileMetric>;
+        expect(metricsData['src/index.ts']).toBeDefined();
+        expect(metricsData['src/styles.css']).toBeUndefined();
+        expect(metricsData['src/data.json']).toBeUndefined();
+
+        const reportData = fs.readFileSync(path.join(dir, 'report.md'), 'utf8');
+        expect(reportData).toContain('Total Graph Files**: 1');
+        expect(reportData).toContain('Unmeasured Files**: 0');
     });
 
     it('legacy .eslintrc fixture: intentional exit code 2 and actionable message', async () => {

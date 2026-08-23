@@ -31,7 +31,9 @@ describe('render-markdown-report', () => {
         expect(markdown).toContain('## 🚨 Automated Complexity Report');
         expect(markdown).toContain('**Last Updated:** 2024-01-01');
         expect(markdown).toContain('### 🏥 Repository Health Score: **100.0 / 100**');
-        expect(markdown).toContain('*   **Total Files Scanned**: 1');
+        expect(markdown).toContain('*   **Total Graph Files**: 1');
+        expect(markdown).toContain('*   **Measured Files**: 1');
+        expect(markdown).toContain('*   **Unmeasured Files**: 0');
 
         // Check for threshold inclusion in explanation
         expect(markdown).toContain(`LOC > ${thresholds.loc}`);
@@ -59,5 +61,31 @@ describe('render-markdown-report', () => {
 
         const markdown = renderMarkdownReport(result, thresholds, reportDate);
         expect(markdown).toContain('| `src/\\_internal\\_/a.ts` | **34** | 100 | 5 | 5 | 0.5 |');
+    });
+
+    it('should render skipped/unmeasured section when skipped files exist', () => {
+        const thresholds: AnalysisThresholds = { loc: 300, complexity: 10, fanOut: 15 };
+        const result: AnalysisResult = {
+            files: [
+                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34, scanned: true },
+                { file: 'src/stale.ts', loc: 0, complexity: 0, fanIn: 0, fanOut: 0, instability: 0, score: 0, scanned: false }
+            ],
+            healthScore: 100,
+            topByScore: [
+                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34, scanned: true }
+            ],
+            topByComplexity: [
+                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34, scanned: true }
+            ],
+            skippedCount: 1,
+            unmeasuredFiles: ['src/stale.ts']
+        };
+
+        const markdown = renderMarkdownReport(result, thresholds, new Date('2024-01-01T00:00:00.000Z'));
+        expect(markdown).toContain('*   **Total Graph Files**: 2');
+        expect(markdown).toContain('*   **Measured Files**: 1');
+        expect(markdown).toContain('*   **Unmeasured Files**: 1');
+        expect(markdown).toContain('### ⚠️ Skipped / Unmeasured Files (1)');
+        expect(markdown).toContain('- `src/stale.ts`');
     });
 });

@@ -6,6 +6,7 @@ import { ESLint } from 'eslint';
 
 vi.mock('fs/promises', () => ({
     readFile: vi.fn(),
+    access: vi.fn(),
     mkdir: vi.fn(),
     writeFile: vi.fn()
 }));
@@ -55,8 +56,9 @@ describe('adapters', () => {
 
     describe('runEslintComplexityScan', () => {
         it('should return mapped results on success', async () => {
+            vi.mocked(fs.access).mockResolvedValue(undefined);
             const mockResults = [{
-                filePath: 'src/a.ts',
+                filePath: `${process.cwd()}/src/a.ts`,
                 messages: [{ ruleId: 'complexity', message: 'Too complex' }]
             }];
 
@@ -67,13 +69,14 @@ describe('adapters', () => {
                 } as unknown as ESLint;
             });
 
-            const result = await runEslintComplexityScan('src');
+            const result = await runEslintComplexityScan('src', ['src/a.ts']);
             expect(result).toHaveLength(1);
-            expect(result[0].filePath).toBe('src/a.ts');
+            expect(result[0].filePath).toBe(`${process.cwd()}/src/a.ts`);
             expect(result[0].messages[0].ruleId).toBe('complexity');
         });
 
         it('should identify ignored files when isPathIgnored returns true', async () => {
+            vi.mocked(fs.access).mockResolvedValue(undefined);
             vi.mocked(ESLint).mockImplementation(function() {
                 return {
                     isPathIgnored: vi.fn().mockResolvedValue(true),
@@ -86,15 +89,27 @@ describe('adapters', () => {
             expect(result[0].ignored).toBe(true);
         });
 
-        it('should throw Error if linting fails', async () => {
+        it('should treat stale/missing file paths as unmeasured/ignored', async () => {
+            vi.mocked(fs.access).mockRejectedValue(new Error('ENOENT'));
             vi.mocked(ESLint).mockImplementation(function() {
                 return {
-                    isPathIgnored: vi.fn().mockResolvedValue(false),
-                    lintFiles: vi.fn().mockRejectedValue(new Error('Failed execution'))
+                    isPathIgnored: vi.fn(),
+                    lintFiles: vi.fn()
                 } as unknown as ESLint;
             });
 
-            await expect(runEslintComplexityScan('src')).rejects.toThrow('Failed to run ESLint: Failed execution');
+            const result = await runEslintComplexityScan('src', ['src/deleted-file.ts']);
+            expect(result).toHaveLength(1);
+            expect(result[0].ignored).toBe(true);
+        });
+
+        it('should throw Error if initializing ESLint fails', async () => {
+            vi.mocked(fs.access).mockResolvedValue(undefined);
+            vi.mocked(ESLint).mockImplementation(function() {
+                throw new Error('Fatal ESLint init failure');
+            });
+
+            await expect(runEslintComplexityScan('src', ['src/a.ts'])).rejects.toThrow('Failed to run ESLint: Fatal ESLint init failure');
         });
     });
 });

@@ -38,12 +38,13 @@ export function validateNodeVersion(nodeVersionStr: string = process.versions.no
 export function detectEslintConfig(cwd: string = process.cwd()): {
     mode: string;
     isLegacy: boolean;
+    hasFlatConfig: boolean;
     legacyFile?: string;
 } {
     for (const legacyFile of LEGACY_CONFIG_FILES) {
         const fullPath = path.join(cwd, legacyFile);
         if (fs.existsSync(fullPath)) {
-            return { mode: 'Legacy', isLegacy: true, legacyFile };
+            return { mode: 'Legacy', isLegacy: true, hasFlatConfig: false, legacyFile };
         }
     }
 
@@ -53,7 +54,7 @@ export function detectEslintConfig(cwd: string = process.cwd()): {
             const content = fs.readFileSync(pkgPath, 'utf8');
             const parsed = JSON.parse(content) as Record<string, unknown>;
             if (parsed && typeof parsed === 'object' && 'eslintConfig' in parsed && parsed.eslintConfig !== undefined) {
-                return { mode: 'Legacy', isLegacy: true, legacyFile: 'package.json (eslintConfig)' };
+                return { mode: 'Legacy', isLegacy: true, hasFlatConfig: false, legacyFile: 'package.json (eslintConfig)' };
             }
         } catch {
             // Ignore package.json parse errors here; handled elsewhere if malformed
@@ -63,11 +64,11 @@ export function detectEslintConfig(cwd: string = process.cwd()): {
     for (const flatFile of FLAT_CONFIG_FILES) {
         const fullPath = path.join(cwd, flatFile);
         if (fs.existsSync(fullPath)) {
-            return { mode: `Flat Config (${flatFile})`, isLegacy: false };
+            return { mode: `Flat Config (${flatFile})`, isLegacy: false, hasFlatConfig: true };
         }
     }
 
-    return { mode: 'Flat Config (default)', isLegacy: false };
+    return { mode: 'None Detected', isLegacy: false, hasFlatConfig: false };
 }
 
 export function validateEslintEnvironment(
@@ -80,6 +81,12 @@ export function validateEslintEnvironment(
     if (detected.isLegacy) {
         throw new ValidationError(
             `Legacy ESLint configuration detected (${detected.legacyFile}). Maritime requires ESLint 9+ flat configuration (eslint.config.*).`
+        );
+    }
+
+    if (!detected.hasFlatConfig) {
+        throw new ValidationError(
+            `No ESLint flat configuration found in ${cwd}. Maritime requires ESLint 9+ flat configuration (eslint.config.*).`
         );
     }
 

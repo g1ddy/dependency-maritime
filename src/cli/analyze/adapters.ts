@@ -69,30 +69,74 @@ export async function runEslintComplexityScan(
         const ignoredResults: EslintResult[] = [];
 
         for (const t of targets) {
-            // Check if ESLint flat config ignores this path
-            const isIgnored = await eslint.isPathIgnored(t);
-            if (isIgnored) {
+            try {
+                // Check if file exists on disk
+                await fs.access(t);
+            } catch {
+                // Stale path (file no longer exists on disk), represent as unmeasured/ignored
                 ignoredResults.push({
                     filePath: t,
                     ignored: true,
                     messages: []
                 });
-            } else {
-                unignoredTargets.push(t);
+                continue;
+            }
+
+            try {
+                // Check if ESLint flat config ignores this path
+                const isIgnored = await eslint.isPathIgnored(t);
+                if (isIgnored) {
+                    ignoredResults.push({
+                        filePath: t,
+                        ignored: true,
+                        messages: []
+                    });
+                } else {
+                    unignoredTargets.push(t);
+                }
+            } catch {
+                // If ESLint fails to evaluate isPathIgnored for this file, treat as ignored/unmeasured
+                ignoredResults.push({
+                    filePath: t,
+                    ignored: true,
+                    messages: []
+                });
             }
         }
 
         let lintResults: EslintResult[] = [];
         if (unignoredTargets.length > 0) {
-            const rawResults = await eslint.lintFiles(unignoredTargets);
-            lintResults = rawResults.map(result => ({
-                filePath: result.filePath,
-                ignored: Boolean((result as { ignored?: boolean }).ignored),
-                messages: result.messages.map(msg => ({
-                    ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
-                    message: msg.message
-                }))
-            }));
+            for (const targetFile of unignoredTargets) {
+                try {
+                    const rawResults = await eslint.lintFiles([targetFile]);
+                    for (const result of rawResults) {
+                        lintResults.push({
+                            filePath: result.filePath,
+                            ignored: Boolean((result as { ignored?: boolean }).ignored),
+                            messages: result.messages.map(msg => ({
+                                ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
+                                message: msg.message
+                            }))
+                        });
+                    }
+                } catch (err: unknown) {
+                    const message = err instanceof Error ? err.message : String(err);
+                    if (message.includes('No files matching') || message.includes('are ignored')) {
+                        ignoredResults.push({
+                            filePath: targetFile,
+                            ignored: true,
+                            messages: []
+                        });
+                    } else {
+                        // Unhandled error during linting
+                        ignoredResults.push({
+                            filePath: targetFile,
+                            ignored: true,
+                            messages: []
+                        });
+                    }
+                }
+            }
         }
 
         return [...lintResults, ...ignoredResults];
