@@ -104,7 +104,7 @@ export async function runEslintComplexityScan(
             }
         }
 
-        let lintResults: EslintResult[] = [];
+        const lintResults: EslintResult[] = [];
         if (unignoredTargets.length > 0) {
             for (const targetFile of unignoredTargets) {
                 try {
