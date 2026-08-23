@@ -1,5 +1,19 @@
 import type { FileMetric, AnalysisThresholds, AnalysisResult, DependencyCruiserModule, EslintFileComplexity } from './models';
 
+export function isSupportedTypeScriptFile(filepath: string): boolean {
+    const lower = filepath.toLowerCase();
+    if (!lower.endsWith('.ts') && !lower.endsWith('.tsx')) {
+        return false;
+    }
+    if (lower.endsWith('.d.ts')) {
+        return false;
+    }
+    if (lower.includes('.test.') || lower.includes('.spec.')) {
+        return false;
+    }
+    return true;
+}
+
 export function calculateInstability(fanIn: number, fanOut: number): number {
     if (fanIn + fanOut === 0) {
         return 0;
@@ -39,7 +53,7 @@ export function calculateMetrics(
             const isSource = normalizedPrefix === ''
                 ? true
                 : m.source === normalizedPrefix || m.source.startsWith(prefixBoundary);
-            return isSource && !m.source.includes('.test.') && !m.source.includes('.d.ts');
+            return isSource && isSupportedTypeScriptFile(m.source);
         })
         .map(m => {
             const loc = locMap[m.source] || 0;

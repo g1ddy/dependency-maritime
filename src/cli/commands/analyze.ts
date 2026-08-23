@@ -5,7 +5,7 @@ import {
     countLinesOfCode,
     writeOutputFiles
 } from '../analyze/adapters';
-import { calculateMetrics } from '../analyze/calculate-metrics';
+import { calculateMetrics, isSupportedTypeScriptFile } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import { validateEslintEnvironment } from '../analyze/environment';
@@ -78,6 +78,11 @@ Exit Codes:
     }
 
     const workingDir = values.cwd ? path.resolve(values.cwd) : process.cwd();
+    const rawSource = values.source || 'src';
+
+    // Convert to a repo-relative path, replacing backslashes with forward slashes
+    let normalizedSource = path.relative(workingDir, path.resolve(workingDir, rawSource)).replace(/\\/g, '/');
+    if (normalizedSource === '') normalizedSource = '.';
 
     try {
         console.log('📊 Starting Complexity Analysis...');
@@ -87,18 +92,14 @@ Exit Codes:
         const { mode: eslintConfigMode } = validateEslintEnvironment(workingDir);
 
         console.log(`   - Working Directory: ${workingDir}`);
+        console.log(`   - Source Root (raw): ${rawSource}`);
+        console.log(`   - Source Root (normalized): ${normalizedSource}`);
         console.log(`   - Graph Path: ${values.graph}`);
         console.log(`   - ESLint Config Mode: ${eslintConfigMode}`);
 
         // 2. Read input graph
         console.log('   - Reading Dependency Cruiser JSON...');
         const modules = await readDependencyGraph(values.graph, workingDir);
-
-        const rawSource = values.source || 'src';
-
-        // Convert to a repo-relative path, replacing backslashes with forward slashes
-        let normalizedSource = path.relative(workingDir, path.resolve(workingDir, rawSource)).replace(/\\/g, '/');
-        if (normalizedSource === '') normalizedSource = '.';
 
         const prefixBoundary = normalizedSource === '.' ? '' : `${normalizedSource}/`;
 
@@ -108,7 +109,7 @@ Exit Codes:
                 const isSource = normalizedSource === '.'
                     ? true
                     : src === normalizedSource || src.startsWith(prefixBoundary);
-                return isSource && !src.includes('.test.') && !src.includes('.d.ts');
+                return isSource && isSupportedTypeScriptFile(src);
             });
 
         // 3. ESLint for complexity

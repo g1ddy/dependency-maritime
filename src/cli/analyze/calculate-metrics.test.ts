@@ -78,9 +78,10 @@ describe('calculate-metrics', () => {
             { source: 'src/b.ts', dependencies: [{}], dependents: [] },
             { source: 'src/a.test.ts', dependencies: [], dependents: [] },
             { source: 'src/types.d.ts', dependencies: [], dependents: [] },
+            { source: 'src/styles.css', dependencies: [], dependents: [] },
+            { source: 'src/data.json', dependencies: [], dependents: [] },
             { source: 'other/c.ts', dependencies: [], dependents: [] },
-            { source: 'src-old/a.ts', dependencies: [], dependents: [] },
-            { source: 'src', dependencies: [], dependents: [] }
+            { source: 'src-old/a.ts', dependencies: [], dependents: [] }
         ];
 
         const locMap: Record<string, number> = {
@@ -88,24 +89,24 @@ describe('calculate-metrics', () => {
             'src/b.ts': 200,
             'src/a.test.ts': 50,
             'src/types.d.ts': 20,
+            'src/styles.css': 30,
+            'src/data.json': 40,
             'other/c.ts': 100,
-            'src-old/a.ts': 100,
-            'src': 10
+            'src-old/a.ts': 100
         };
 
         const complexityMap = {
             'src/a.ts': { complexity: 5, scanned: true },
-            'src/b.ts': { complexity: 15, scanned: true },
-            'src': { complexity: 1, scanned: true }
+            'src/b.ts': { complexity: 15, scanned: true }
         };
 
-        it('should filter out test files, .d.ts files, and non-source files correctly handling path boundaries', () => {
+        it('should filter out non-TypeScript files, test files, .d.ts files, and non-source files correctly handling path boundaries', () => {
             const result = calculateMetrics(modules, locMap, complexityMap, thresholds, 'src');
 
-            expect(result.files.length).toBe(3); // src/a.ts, src/b.ts, and src itself
-            expect(result.files.map(f => f.file)).toContain('src/a.ts');
-            expect(result.files.map(f => f.file)).toContain('src/b.ts');
-            expect(result.files.map(f => f.file)).toContain('src');
+            expect(result.files.length).toBe(2); // src/a.ts and src/b.ts
+            expect(result.files.map(f => f.file)).toEqual(['src/a.ts', 'src/b.ts']);
+            expect(result.files.map(f => f.file)).not.toContain('src/styles.css');
+            expect(result.files.map(f => f.file)).not.toContain('src/data.json');
             expect(result.files.map(f => f.file)).not.toContain('src-old/a.ts');
         });
 
