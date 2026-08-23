@@ -126,7 +126,7 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 - [ ] Treat graph paths that no longer exist or cannot be linted as unmeasured rather than aborting with an ESLint file-match error.
 - [ ] Restrict complexity measurement and unmeasured-file checks to supported TypeScript implementation files (`.ts` and `.tsx`); keep declaration and test-file exclusions explicit.
 - [ ] Render measured and unmeasured counts accurately in the Markdown report, including the skipped-file list where useful.
-- [x] Add an explicit `--cwd` option and log the resolved working directory, source roots, ESLint config mode, and graph path for diagnosability.
+- [ ] Log the resolved source root(s) alongside the working directory, graph path, and ESLint config mode. `--cwd` is implemented, but source-root diagnostics remain pending.
 - [ ] Support multiple source roots or an explicit local-module include pattern. Repositories with `app/`, `src/`, `worker/`, or other split layouts must not require an implicit whole-repository scan.
 - [ ] Make graph scoping explicit so npm packages and Node built-ins cannot contaminate local-file reports.
 - [ ] Add a graph-generation command or option that can use a repository-supplied dependency-cruiser config. Retain `--graph` as the low-level artifact-input path.
