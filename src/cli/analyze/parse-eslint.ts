@@ -1,10 +1,20 @@
 import * as path from 'path';
-import type { EslintResult } from './models';
+import type { EslintResult, EslintFileComplexity } from './models';
 
-export function parseEslintComplexityReport(eslintResults: EslintResult[], cwd: string): Record<string, number> {
-    const complexityMap: Record<string, number> = {};
+export function parseEslintComplexityReport(
+    eslintResults: EslintResult[],
+    cwd: string
+): Record<string, EslintFileComplexity> {
+    const complexityMap: Record<string, EslintFileComplexity> = {};
 
     for (const file of eslintResults) {
+        const relPath = path.relative(cwd, file.filePath).replace(/\\/g, '/');
+
+        if (file.ignored) {
+            complexityMap[relPath] = { complexity: 0, scanned: false };
+            continue;
+        }
+
         let maxC = 0;
         for (const msg of file.messages) {
             if (msg.ruleId === 'complexity') {
@@ -18,12 +28,10 @@ export function parseEslintComplexityReport(eslintResults: EslintResult[], cwd: 
             }
         }
 
-        if (maxC > 0) {
-            // Use path.relative to get the relative path to CWD, avoiding hardcoded process.cwd() for purity
-            // Path module handles cross-platform logic, but replacing backslashes ensures consistent output format
-            const relPath = path.relative(cwd, file.filePath).replace(/\\/g, '/');
-            complexityMap[relPath] = maxC;
-        }
+        complexityMap[relPath] = {
+            complexity: maxC > 0 ? maxC : 1,
+            scanned: true
+        };
     }
 
     return complexityMap;

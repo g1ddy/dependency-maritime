@@ -39,29 +39,29 @@ describe('calculate-metrics', () => {
 
         it('should return 100 for files within thresholds', () => {
             const files: FileMetric[] = [
-                { file: 'a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0 }
+                { file: 'a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0, scanned: true }
             ];
             expect(calculateHealthScore(files, thresholds)).toBe(100);
         });
 
         it('should deduct 1 point for each threshold exceeded', () => {
             const files: FileMetric[] = [
-                { file: 'a.ts', loc: 301, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0 },
-                { file: 'b.ts', loc: 100, complexity: 11, fanIn: 1, fanOut: 5, instability: 0.5, score: 0 },
-                { file: 'c.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 16, instability: 0.5, score: 0 }
+                { file: 'a.ts', loc: 301, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0, scanned: true },
+                { file: 'b.ts', loc: 100, complexity: 11, fanIn: 1, fanOut: 5, instability: 0.5, score: 0, scanned: true },
+                { file: 'c.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 16, instability: 0.5, score: 0, scanned: true }
             ];
             expect(calculateHealthScore(files, thresholds)).toBe(97);
         });
 
         it('should not deduct points if equal to threshold', () => {
             const files: FileMetric[] = [
-                { file: 'a.ts', loc: 300, complexity: 10, fanIn: 1, fanOut: 15, instability: 0.5, score: 0 }
+                { file: 'a.ts', loc: 300, complexity: 10, fanIn: 1, fanOut: 15, instability: 0.5, score: 0, scanned: true }
             ];
             expect(calculateHealthScore(files, thresholds)).toBe(100);
         });
 
         it('should clamp health score between 0 and 100', () => {
-            const files: FileMetric[] = Array(150).fill({ file: 'a.ts', loc: 400, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0 }) as FileMetric[];
+            const files: FileMetric[] = Array(150).fill({ file: 'a.ts', loc: 400, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 0, scanned: true }) as FileMetric[];
             expect(calculateHealthScore(files, thresholds)).toBe(0);
         });
     });
@@ -93,14 +93,13 @@ describe('calculate-metrics', () => {
             'src': 10
         };
 
-        const complexityMap: Record<string, number> = {
-            'src/a.ts': 5,
-            'src/b.ts': 15,
-            'src': 1
+        const complexityMap = {
+            'src/a.ts': { complexity: 5, scanned: true },
+            'src/b.ts': { complexity: 15, scanned: true },
+            'src': { complexity: 1, scanned: true }
         };
 
         it('should filter out test files, .d.ts files, and non-source files correctly handling path boundaries', () => {
-            // Also tests with `src` as the exact prefix since normalization is handled prior to calculateMetrics
             const result = calculateMetrics(modules, locMap, complexityMap, thresholds, 'src');
 
             expect(result.files.length).toBe(3); // src/a.ts, src/b.ts, and src itself
@@ -113,14 +112,16 @@ describe('calculate-metrics', () => {
         it('should correctly sort files by score and complexity', () => {
              const result = calculateMetrics(modules, locMap, complexityMap, thresholds, 'src');
 
-             // b.ts should have higher score and complexity
              expect(result.topByScore[0].file).toBe('src/b.ts');
              expect(result.topByComplexity[0].file).toBe('src/b.ts');
         });
 
-        it('should handle missing complexity with default 1', () => {
+        it('should identify unmeasured files when missing from complexity map', () => {
              const result = calculateMetrics([{ source: 'src/a.ts', dependencies: [], dependents: [] }], {'src/a.ts': 100}, {}, thresholds, 'src');
-             expect(result.files[0].complexity).toBe(1);
+             expect(result.files[0].complexity).toBe(0);
+             expect(result.files[0].scanned).toBe(false);
+             expect(result.skippedCount).toBe(1);
+             expect(result.unmeasuredFiles).toEqual(['src/a.ts']);
         });
     });
 });

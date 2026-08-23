@@ -1,4 +1,4 @@
-import type { FileMetric, AnalysisThresholds, AnalysisResult, DependencyCruiserModule } from './models';
+import type { FileMetric, AnalysisThresholds, AnalysisResult, DependencyCruiserModule, EslintFileComplexity } from './models';
 
 export function calculateInstability(fanIn: number, fanOut: number): number {
     if (fanIn + fanOut === 0) {
@@ -26,7 +26,7 @@ export function calculateHealthScore(files: FileMetric[], thresholds: AnalysisTh
 export function calculateMetrics(
     modules: DependencyCruiserModule[],
     locMap: Record<string, number>,
-    complexityMap: Record<string, number>,
+    complexityMap: Record<string, EslintFileComplexity | number>,
     thresholds: AnalysisThresholds,
     sourcePrefix: string = 'src'
 ): AnalysisResult {
@@ -47,7 +47,20 @@ export function calculateMetrics(
             const fanIn = m.dependents.length;
 
             const instability = calculateInstability(fanIn, fanOut);
-            const complexity = complexityMap[m.source] || 1;
+
+            let complexity = 0;
+            let scanned = false;
+
+            const eslintData = complexityMap[m.source];
+            if (eslintData !== undefined) {
+                if (typeof eslintData === 'object' && eslintData !== null) {
+                    complexity = eslintData.complexity;
+                    scanned = eslintData.scanned;
+                } else if (typeof eslintData === 'number') {
+                    complexity = eslintData;
+                    scanned = true;
+                }
+            }
 
             const score = calculateScore(loc, complexity, fanOut, instability);
 
@@ -58,11 +71,15 @@ export function calculateMetrics(
                 fanIn,
                 instability: parseFloat(instability.toFixed(2)),
                 complexity,
-                score: parseFloat(score.toFixed(1))
+                score: parseFloat(score.toFixed(1)),
+                scanned
             };
         });
 
     const healthScore = calculateHealthScore(files, thresholds);
+
+    const unmeasuredFiles = files.filter(f => !f.scanned).map(f => f.file);
+    const skippedCount = unmeasuredFiles.length;
 
     // Create stable sorts to break ties by file name
     const topByScore = [...files].sort((a, b) => {
@@ -79,6 +96,8 @@ export function calculateMetrics(
         files,
         healthScore: parseFloat(healthScore.toFixed(1)),
         topByScore,
-        topByComplexity
+        topByComplexity,
+        skippedCount,
+        unmeasuredFiles
     };
 }
