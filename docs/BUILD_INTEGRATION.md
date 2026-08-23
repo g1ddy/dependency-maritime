@@ -121,9 +121,10 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 - [x] Enforce the supported environment at startup: Node.js `>=20.19.0`, ESLint 9+ flat config, and supported dependency-cruiser output.
 - [x] Detect legacy `.eslintrc.*` or `eslintConfig` metadata and fail with an actionable exit-code-`2` message. Legacy configuration support is deliberately out of scope.
 - [x] Reject a missing flat config at validation time with exit code `2`, rather than deferring to an ESLint runtime error.
-- [x] Track complexity measurement status. A graph TypeScript file skipped or ignored by ESLint is warned about, represented as unmeasured, and can fail the command with `--fail-on-unmeasured`.
+- [x] Track complexity measurement status for a graph TypeScript file skipped or ignored by ESLint; it is warned about, represented as unmeasured, and can fail the command with `--fail-on-unmeasured`.
+- [ ] Treat ESLint fatal parsing and configuration results as unmeasured rather than assigning a scanned complexity of `1`; `--fail-on-unmeasured` and Markdown coverage must reflect them.
 - [x] Treat graph paths that no longer exist or cannot be linted as unmeasured rather than aborting with an ESLint file-match error.
-- [x] Restrict complexity measurement and unmeasured-file checks to supported TypeScript implementation files (`.ts` and `.tsx`); declaration and test-file exclusions are explicit.
+- [ ] Restrict complexity measurement and unmeasured-file checks to supported TypeScript implementation files (`.ts` and `.tsx`); declaration and test-file exclusions are explicit, and an explicit empty graph-file selection must remain empty rather than falling back to a source glob.
 - [x] Render measured and unmeasured counts accurately in the Markdown report, including a skipped-file list.
 - [x] Log the raw and normalized source root(s) alongside the working directory, graph path, and ESLint config mode.
 - [ ] Support multiple source roots or an explicit local-module include pattern. Repositories with `app/`, `src/`, `worker/`, or other split layouts must not require an implicit whole-repository scan.
@@ -138,6 +139,7 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 - [x] Add an ESLint-ignore fixture and assert that ignored TypeScript graph files are reported as unmeasured.
 - [x] Add a legacy-`eslintrc` fixture that asserts the intentional, helpful rejection.
 - [x] Add fixtures for a missing graph path, a non-TypeScript graph file, and a missing flat config.
+- [ ] Add fixtures for an ESLint fatal parsing/configuration result and an explicitly empty supported-file selection.
 - [ ] Add a multi-root Next/Vite-style fixture.
 - [ ] Run the integration suite on supported Node 20, 22, and 24 versions.
 - [ ] Validate supported dependency-cruiser versions and representative configuration layouts before publishing.
@@ -170,7 +172,7 @@ Dependency Maritime should generalize the **frontend refactoring-analysis pipeli
 
 - [x] **Increment 1 — Tested analyzer/report library and `maritime analyze`:** establishes the extraction seam and preserves the existing workflow.
 - [x] **Increment 1.1 — Correctness and portability hardening:** validate graph input, replace the shell runner, and document the command contract.
-- [x] **Increment 1.2 — Modern support boundary and measurement integrity:** enforce the Node/ESLint 9+ contract; diagnose source roots; represent ignored, stale, and unmatchable TypeScript files accurately; and report measurement coverage.
+- [ ] **Increment 1.2 — Modern support boundary and measurement integrity:** the Node/ESLint 9+ contract, source-root diagnostics, stale-path handling, and Markdown coverage are complete. Finish fatal-ESLint-result handling and preserve explicit empty graph-file selections before closing this increment.
 - [ ] **Increment 2 — Distributable CLI:** compile Node ESM, add the binary/package exports, support explicit working directories and multi-root analysis, and test an `npm pack` installation.
 - [ ] **Increment 3 — Graph integration and fixture matrix:** support repository dependency-cruiser configuration, protect local graph scope, and verify the supported Node/ESLint/dependency-cruiser matrix.
 - [ ] **Increment 3.1 — ESLint 10 compatibility:** upgrade the analyzer runtime after the distributable CLI's integration suite makes the compatibility contract verifiable.
