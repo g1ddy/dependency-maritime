@@ -1,4 +1,13 @@
-/** @type {import('dependency-cruiser').IConfiguration} */
+/**
+ * Dependency Maritime's repository architecture policy.
+ *
+ * This configuration is intentionally specific to this repository. The distributed
+ * CLI must not assume that consumers use these source roots, boundaries, or this
+ * tsconfig. Graph generation should prefer a consumer-supplied dependency-cruiser
+ * configuration and otherwise use documented portable defaults.
+ *
+ * @type {import('dependency-cruiser').IConfiguration}
+ */
 module.exports = {
   forbidden: [
     {
