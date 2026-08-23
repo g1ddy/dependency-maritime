@@ -8,7 +8,7 @@ import {
 import { calculateMetrics } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
-import type { AnalysisThresholds } from '../analyze/models';
+import { ValidationError, type AnalysisThresholds } from '../analyze/models';
 import * as path from 'path';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
@@ -18,8 +18,16 @@ const DEFAULT_THRESHOLDS: AnalysisThresholds = {
 };
 
 export async function runAnalyzeCommand(args: string[]): Promise<number> {
+    let values: {
+        source?: string;
+        graph?: string;
+        metrics?: string;
+        report?: string;
+        help?: boolean;
+    };
+
     try {
-        const { values } = parseArgs({
+        const parsed = parseArgs({
             args,
             allowPositionals: true,
             options: {
@@ -30,24 +38,39 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
                 help: { type: 'boolean', short: 'h' }
             }
         });
+        values = parsed.values;
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        console.error(`Error parsing arguments: ${message}`);
+        return 2;
+    }
 
-        if (values.help) {
-            console.log(`
-Usage: maritime analyze [options]
+    if (values.help) {
+        console.log(`
+Usage: maritime analyze --graph <file> --metrics <file> --report <file> [--source <dir>]
 
 Options:
-  --source <dir>     Source directory to analyze (default: "src")
   --graph <file>     Input dependency-cruiser JSON
   --metrics <file>   Output JSON file for metrics
   --report <file>    Output Markdown file for the report
-            `);
-            return 0;
-        }
+  --source <dir>     Source directory to analyze (default: "src")
 
-        if (!values.graph || !values.metrics || !values.report) {
-            console.error('Error: --graph, --metrics, and --report are required for analyze command.');
-            return 1;
-        }
+Note: analyze consumes a dependency graph; it does not generate one.
+
+Exit Codes:
+  0 - Successful analysis
+  1 - Operational or runtime failure
+  2 - Invalid CLI arguments or invalid input artifact/schema
+        `);
+        return 0;
+    }
+
+    if (!values.graph || !values.metrics || !values.report) {
+        console.error('Error: --graph, --metrics, and --report are required.');
+        return 2;
+    }
+
+    try {
 
         console.log('📊 Starting Complexity Analysis...');
 
@@ -55,12 +78,13 @@ Options:
         console.log('   - Reading Dependency Cruiser JSON...');
         const modules = await readDependencyGraph(values.graph);
 
+        const rawSource = values.source || 'src';
+
         // 2. ESLint for complexity
         console.log('   - Running ESLint for Complexity...');
-        const eslintResults = runEslintComplexityScan(values.source);
+        const eslintResults = await runEslintComplexityScan(rawSource);
         const complexityMap = parseEslintComplexityReport(eslintResults, process.cwd());
 
-        const rawSource = values.source || 'src';
         // Convert to a repo-relative path, replacing backslashes with forward slashes
         // This handles absolute paths, './src', 'src/', etc., cleanly relative to cwd
         let normalizedSource = path.relative(process.cwd(), path.resolve(process.cwd(), rawSource)).replace(/\\/g, '/');
@@ -117,6 +141,10 @@ Options:
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         console.error(`Error analyzing project: ${message}`);
+
+        if (e instanceof ValidationError) {
+            return 2;
+        }
         return 1;
     }
 }

@@ -11,7 +11,7 @@ describe('runAnalyzeCommand', () => {
             { source: 'src/a.ts', dependencies: [], dependents: [] }
         ]);
 
-        vi.spyOn(adapters, 'runEslintComplexityScan').mockReturnValue([]);
+        vi.spyOn(adapters, 'runEslintComplexityScan').mockResolvedValue([]);
         vi.spyOn(adapters, 'countLinesOfCode').mockResolvedValue({ 'src/a.ts': 100 });
         vi.spyOn(adapters, 'writeOutputFiles').mockResolvedValue(undefined);
     });
@@ -26,9 +26,9 @@ describe('runAnalyzeCommand', () => {
         expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Usage: maritime analyze'));
     });
 
-    it('should return 1 if missing required arguments', async () => {
+    it('should return 2 if missing required arguments', async () => {
         const exitCode = await runAnalyzeCommand(['--source', 'src']);
-        expect(exitCode).toBe(1);
+        expect(exitCode).toBe(2);
         expect(console.error).toHaveBeenCalledWith(expect.stringContaining('are required'));
     });
 

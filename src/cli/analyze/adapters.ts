@@ -1,53 +1,67 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { execFileSync } from 'child_process';
-import type { DependencyCruiserModule, EslintResult } from './models';
+import { ESLint } from 'eslint';
+import { CruiseResultSchema } from '../../schema/dependency-cruiser';
+import { ValidationError, type DependencyCruiserModule, type EslintResult } from './models';
 
 export async function readDependencyGraph(graphPath: string): Promise<DependencyCruiserModule[]> {
+    const absolutePath = path.resolve(process.cwd(), graphPath);
+    let data: string;
+    let parsed: unknown;
+
     try {
-        const absolutePath = path.resolve(process.cwd(), graphPath);
-        const data = await fs.readFile(absolutePath, 'utf8');
-        const parsed = JSON.parse(data) as { modules?: DependencyCruiserModule[] };
-        return parsed.modules || [];
+        data = await fs.readFile(absolutePath, 'utf8');
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
-        throw new Error(`Failed to read or parse dependency graph at ${graphPath}: ${message}`);
+        throw new Error(`Failed to read dependency graph at ${graphPath}: ${message}`);
     }
+
+    try {
+        parsed = JSON.parse(data);
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        throw new ValidationError(`Invalid JSON in dependency graph at ${graphPath}: ${message}`);
+    }
+
+    const validationResult = CruiseResultSchema.safeParse(parsed);
+
+    if (!validationResult.success) {
+        throw new ValidationError(`Invalid dependency-cruiser output shape in ${graphPath}:\n${validationResult.error.message}`);
+    }
+
+    // Return using the validated structure, picking only what we need
+    return validationResult.data.modules.map(m => ({
+        source: m.source,
+        dependencies: m.dependencies,
+        dependents: m.dependents
+    }));
 }
 
-export function runEslintComplexityScan(sourcePath: string): EslintResult[] {
+export async function runEslintComplexityScan(sourcePath: string): Promise<EslintResult[]> {
     try {
         // Replace backslashes with forward slashes for cross-platform compatibility with globbing
         const target = path.resolve(process.cwd(), sourcePath).replace(/\\/g, '/');
         const globPattern = `${target}/**/*.{ts,tsx}`;
 
-        const output = execFileSync('npx', [
-            '--no-install',
-            'eslint',
-            globPattern,
-            '--format', 'json',
-            '--rule', 'complexity: ["warn", 0]',
-            '--parser', '@typescript-eslint/parser'
-        ], {
-            encoding: 'utf8',
-            maxBuffer: 10 * 1024 * 1024,
-            stdio: ['ignore', 'pipe', 'pipe']
+        const eslint = new ESLint({
+            overrideConfig: [{
+                rules: {
+                    'complexity': ['warn', 0]
+                }
+            }]
         });
 
-        return JSON.parse(output) as EslintResult[];
-    } catch (e: unknown) {
-        // ESLint returns exit code 1 if there are warnings (which we expect for complexity > 0)
-        const execError = e as { stdout?: Buffer | string; message?: string };
-        if (execError.stdout) {
-            try {
-                const stdoutStr = typeof execError.stdout === 'string' ? execError.stdout : execError.stdout.toString('utf8');
-                return JSON.parse(stdoutStr) as EslintResult[];
-            } catch {
-                 const stdoutStr = typeof execError.stdout === 'string' ? execError.stdout : execError.stdout.toString('utf8');
-                 throw new Error(`Failed to parse ESLint output: ${stdoutStr.substring(0, 200)}...`);
-            }
-        }
+        const results = await eslint.lintFiles([globPattern]);
 
+        // Map ESLint's API results to the EslintResult interface we defined
+        return results.map(result => ({
+            filePath: result.filePath,
+            messages: result.messages.map(msg => ({
+                ruleId: msg.ruleId || 'unknown',
+                message: msg.message
+            }))
+        }));
+    } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         throw new Error(`Failed to run ESLint: ${message}`);
     }
