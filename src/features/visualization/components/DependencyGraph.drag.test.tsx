@@ -24,11 +24,8 @@ vi.mock('@xyflow/react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@xyflow/react')>();
   return {
     ...actual,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ReactFlow: (props: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    ReactFlow: (props: ReactFlowMockProps) => {
       capturedReactFlowProps = props;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       return <div className="react-flow-mock">{props.children}</div>;
     },
     useReactFlow: () => ({
