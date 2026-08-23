@@ -3,68 +3,62 @@
 Dependency Maritime should support two independent workflows:
 
 1. **Analyze in CI without starting the UI.** A project produces machine-readable metrics and a Markdown summary that can be archived, compared, or added to a pull request.
-2. **Inspect interactively when needed.** The same project uploads its dependency-cruiser graph and metrics JSON to the hosted or locally running Dependency Maritime UI.
+2. **Inspect interactively when needed.** The same project uploads its dependency graph and metrics to the hosted or local Dependency Maritime UI.
 
-Keeping those workflows independent preserves the local-first, headless-logic architecture: analysis must not require React, a browser, or a running Dependency Maritime server.
+Analysis must not require React, a browser, or a running Dependency Maritime server. The reusable product is the headless TypeScript analyzer; the UI and CI integrations are adapters around its artifact contract.
 
-## Recommended Distribution
+## Distribution target
 
-The primary artifact should be a versioned **Node CLI package**, with a thin reusable **GitHub Actions workflow** as a convenience wrapper.
+The primary artifact is a versioned Node CLI package, `@dependency-maritime/cli`, exposing the `maritime` binary and a small programmatic API. A reusable GitHub Actions workflow should come later as a thin wrapper around public CLI commands.
 
 ### Supported environment
 
-The first public CLI contract is intentionally modern and frontend-specific:
+The first public contract is intentionally modern and frontend-specific:
 
 - Node.js `>=20.19.0`.
-- ESLint 9+ with a flat `eslint.config.js`, `eslint.config.mjs`, `eslint.config.cjs`, or supported TypeScript flat config.
-- dependency-cruiser output matching the supported `ICruiseResult` contract.
-- Legacy `.eslintrc.*` and `eslintConfig` package metadata are unsupported. The CLI must fail with an actionable validation error that explains the flat-config requirement; it must not attempt a legacy compatibility mode.
-- ESLint is required at runtime. The published CLI must declare it as a non-optional peer (or runtime dependency) and resolve it reliably in an isolated consumer installation.
+- ESLint 9+ with flat configuration.
+- TypeScript frontend repositories.
+- dependency-cruiser as the dependency-graph engine and `ICruiseResult` as the canonical graph exchange format.
+- Legacy `.eslintrc.*` and `eslintConfig` package metadata are unsupported.
 
-ESLint 10 is the planned runtime target once its flat-config behavior is covered by the CLI integration suite. It no longer supports legacy `eslintrc`, which aligns with this contract.
+ESLint is required at runtime and must resolve from a clean consumer installation. ESLint 10 remains a post-MVP compatibility target.
 
-### CLI package (source of truth)
+## CLI contract
 
-Publish a package such as `@dependency-maritime/cli` with a `maritime` binary:
+The low-level artifact-input path remains supported:
 
 ```bash
-npx @dependency-maritime/cli analyze \
+maritime analyze \
   --source src \
   --graph artifacts/dependency-graph.json \
   --metrics artifacts/complexity-metrics.json \
   --report artifacts/complexity-report.md
 ```
 
-The CLI is the correct abstraction because it works in GitHub Actions, GitLab CI, Jenkins, local pre-push checks, and AI-agent workflows. It must be compiled to runnable Node ESM and expose a `bin` entry; consumers must not need `tsx` or this repository's source tree. Publish it from a CLI-specific package manifest with only CLI runtime dependencies, correct NodeNext-resolvable declarations, and a regenerated lockfile. The current `analyze` command consumes a validated dependency-cruiser graph. A higher-level graph-generation command or option can follow once the multi-root/config contract is established. Keep calculation and formatting in importable, side-effect-free library functions.
+However, this is not sufficient as the primary distribution experience. A consumer should not need to separately install dependency-cruiser, reverse-engineer a graph command, and manually stage an input graph before Maritime can analyze the repository.
 
-The package should expose a small programmatic API in addition to the binary:
+Increment 3 therefore promotes graph generation into the normal analyzer workflow while retaining `--graph` for reproducible, advanced, and CI artifact-input use cases. The target consumer experience is conceptually:
+
+```bash
+maritime analyze --source app --output .maritime
+```
+
+which produces the dependency graph, metrics, and report itself. Graph generation must support repository-supplied dependency-cruiser configuration without assuming Dependency Maritime's own `src/`, `tsconfig.app.json`, or architectural rules.
+
+The package should also expose side-effect-free programmatic APIs such as:
 
 ```ts
 import { analyzeProject, renderMarkdownReport } from '@dependency-maritime/cli';
 ```
 
-Do not publish the React application as the analysis package. The UI has a different release cadence and dependency footprint. A monorepo can be considered later if the CLI and application genuinely diverge, as already anticipated in the design decisions.
+Do not publish the React application as the analysis package.
 
-### Reusable GitHub workflow (adapter)
+## Artifact contract
 
-After the CLI is stable, provide a reusable workflow that installs Node, runs the pinned CLI version, uploads the JSON and Markdown artifacts, and optionally writes the report to the GitHub Actions job summary. It may also compare a base artifact with the current result and comment a delta on pull requests.
-
-The workflow must remain a wrapper around public CLI commands rather than contain metric logic. Consumers then get a short integration while retaining portability:
-
-```yaml
-jobs:
-  maritime:
-    uses: dependency-maritime/dependency-maritime/.github/workflows/analyze.yml@v1
-    with:
-      source: src
-```
-
-## Artifact Contract
-
-Generate a directory that can be uploaded as one CI artifact:
+The eventual normal analysis output is one directory:
 
 ```text
-dependency-maritime/
+.maritime/
 ├── dependency-graph.json
 ├── complexity-metrics.json
 ├── complexity-report.md
@@ -73,115 +67,118 @@ dependency-maritime/
 
 ### `dependency-graph.json`
 
-Use dependency-cruiser's official `ICruiseResult` JSON as the canonical relationship exchange format. The application already validates this shape and can upload it directly.
+Use dependency-cruiser's official `ICruiseResult` JSON as the canonical relationship exchange format. Graph scope must represent local project files without npm packages or Node built-ins contaminating local-file metrics.
 
 ### `complexity-metrics.json`
 
-Use a path-keyed map for per-file `complexity`, `loc`, `instability`, `fanIn`, and `fanOut`. Each TypeScript file must also distinguish a measured complexity value from a file skipped or ignored by ESLint; never silently substitute a default complexity of `1` for an unmeasured file. Keep this separate from dependency-cruiser output so dependency-cruiser compatibility is not lost and additional analyzers can evolve independently.
+Use a path-keyed map for per-file `complexity`, `loc`, `instability`, `fanIn`, and `fanOut`. Each supported TypeScript implementation file must distinguish measured complexity from skipped, ignored, stale, or fatally unmeasured ESLint results.
 
 ### `complexity-report.md`
 
-Markdown is the human-facing artifact. It should contain the health score, hotspot tables, threshold violations, and—when a baseline is supplied—before/after deltas. This is the output intended for job summaries, pull-request comments, and project documentation.
+The human-facing report contains health information, hotspots, threshold violations, measurement coverage, and eventually baseline deltas.
 
 ### `manifest.json`
 
-Add a versioned envelope so the UI and CI can reject incompatible artifact sets:
+A later increment adds a versioned envelope containing schema version, tool version, source roots, generation time, and artifact filenames so CI and the UI can reject incompatible bundles.
 
-```json
-{
-  "schemaVersion": 1,
-  "generatedAt": "2026-08-21T00:00:00.000Z",
-  "toolVersion": "1.0.0",
-  "sourceRoot": "src",
-  "files": {
-    "graph": "dependency-graph.json",
-    "metrics": "complexity-metrics.json",
-    "report": "complexity-report.md"
-  }
-}
-```
+## Current implementation status
 
-The UI should eventually accept either the graph JSON by itself or the complete artifact directory packaged as a `.zip`. A complete bundle enables the UI to show cyclomatic complexity and historical deltas that are not part of dependency-cruiser's graph schema.
+### Analyzer and correctness
 
-## Implementation Checklist
-
-Dependency Maritime should generalize the **frontend refactoring-analysis pipeline**, not the React UI. The reusable product is a headless TypeScript analyzer that produces versioned artifacts and refactoring deltas; the UI and CI workflows remain adapters around that contract.
-
-### Current implementation
-
-- [x] Extract metric calculation and Markdown rendering from the legacy CommonJS script into tested, side-effect-free TypeScript functions.
-- [x] Add a `maritime analyze` command with explicit input and output paths.
-- [x] Preserve the legacy `calculate:complexity` npm script through a compatibility shim.
-- [x] Add unit coverage for calculations, ESLint-report parsing, Markdown rendering, command orchestration, graph validation, and ESLint API failures.
-- [x] Validate dependency-cruiser graph structure before analysis. Invalid JSON or an unexpected graph shape fails with exit code `2`.
+- [x] Extract metric calculation and Markdown rendering into tested TypeScript functions.
+- [x] Add `maritime analyze` with explicit graph/input/output paths.
+- [x] Validate dependency-cruiser graph structure and use explicit exit codes.
 - [x] Replace shell-based ESLint invocation with the ESLint Node API.
-- [x] Define and document the current CLI arguments and exit codes.
+- [x] Enforce Node `>=20.19.0`, ESLint 9+ flat config, and reject legacy ESLint configuration.
+- [x] Track skipped/ignored/stale graph files as unmeasured and support `--fail-on-unmeasured`.
+- [x] Support repeatable `--source` roots and log raw/normalized roots.
+- [ ] Treat ESLint fatal parsing/configuration results as unmeasured rather than scanned complexity `1`.
+- [ ] Restrict measurement and unmeasured checks to the explicit supported implementation-file contract and preserve an explicitly empty graph selection.
 
-### Modern CLI readiness
+### Distributable package boundary
 
-- [x] Enforce the supported environment at startup: Node.js `>=20.19.0`, ESLint 9+ flat config, and supported dependency-cruiser output.
-- [x] Detect legacy `.eslintrc.*` or `eslintConfig` metadata and fail with an actionable exit-code-`2` message. Legacy configuration support is deliberately out of scope.
-- [x] Reject a missing flat config at validation time with exit code `2`, rather than deferring to an ESLint runtime error.
-- [x] Track complexity measurement status for a graph TypeScript file skipped or ignored by ESLint; it is warned about, represented as unmeasured, and can fail the command with `--fail-on-unmeasured`.
-- [ ] Treat ESLint fatal parsing and configuration results as unmeasured rather than assigning a scanned complexity of `1`; `--fail-on-unmeasured` and Markdown coverage must reflect them.
-- [x] Treat graph paths that no longer exist or cannot be linted as unmeasured rather than aborting with an ESLint file-match error.
-- [ ] Restrict complexity measurement and unmeasured-file checks to supported TypeScript implementation files (`.ts` and `.tsx`); declaration and test-file exclusions are explicit, and an explicit empty graph-file selection must remain empty rather than falling back to a source glob.
-- [x] Render measured and unmeasured counts accurately in the Markdown report, including a skipped-file list.
-- [x] Log the raw and normalized source root(s) alongside the working directory, graph path, and ESLint config mode.
-- [x] Support explicit multiple source roots through repeatable `--source` options.
-- [ ] Make graph scoping explicit so npm packages and Node built-ins cannot contaminate local-file reports.
-- [ ] Add a graph-generation command or option that can use a repository-supplied dependency-cruiser config. Retain `--graph` as the low-level artifact-input path.
-- [ ] Finalize the CLI package boundary. Compiled Node ESM, a `maritime` binary, exports, and binary smoke tests exist; finish a CLI-specific manifest, a non-optional ESLint runtime contract, NodeNext-resolvable declarations, and lockfile consistency.
-- [ ] Verify an `npm pack` tarball in an isolated clean fixture—including `npm ci --omit=dev --omit=peer`, programmatic NodeNext type-checking, and no UI dependency installation—before publishing.
+PRs #207 and #210 established the package boundary needed for external consumption:
 
-### Integration coverage
+- [x] Compile runnable Node ESM and expose the `maritime` binary.
+- [x] Expose programmatic exports with NodeNext-resolvable declarations.
+- [x] Stage a CLI-specific package manifest rather than publishing the React application's dependency surface.
+- [x] Keep UI-only React/Radix/D3/ELK/Tailwind dependencies out of the consumer runtime dependency set.
+- [x] Make ESLint 9+ a required peer/runtime contract.
+- [x] Add clean-install packed-tarball smoke coverage and consumer type checking.
+- [x] Regenerate package metadata/lockfile for the package boundary.
 
-- [x] Add a flat-config fixture that exercises successful analysis.
-- [x] Add an ESLint-ignore fixture and assert that ignored TypeScript graph files are reported as unmeasured.
-- [x] Add a legacy-`eslintrc` fixture that asserts the intentional, helpful rejection.
-- [x] Add fixtures for a missing graph path, a non-TypeScript graph file, and a missing flat config.
-- [ ] Add fixtures for an ESLint fatal parsing/configuration result and an explicitly empty supported-file selection.
-- [x] Add a multi-root CLI fixture with repeatable `--source` options.
+This means the **package boundary is ready for external validation**, not that the product is ready for public release. The package remains private/version `0.0.0`, graph generation is still manual, and the real-consumer workflow has not yet been proven end-to-end from a packed CLI against representative repositories.
+
+## Increment 3 — Real-consumer graph integration
+
+This is the next release-blocking milestone.
+
+### Graph generation
+
+- [ ] Add a graph-generation path to `maritime analyze` (or a cohesive public command) so ordinary consumers do not need to manually invoke dependency-cruiser.
+- [ ] Retain `--graph` as the low-level pre-generated artifact path.
+- [ ] Discover or explicitly accept a repository-supplied dependency-cruiser config.
+- [ ] Define portable fallback graph-generation behavior when no consumer config exists.
+- [ ] Ensure Dependency Maritime's own `config/.dependency-cruiser.cjs` remains repository-specific architecture policy and never becomes an implicit consumer default.
+- [ ] Protect graph scope so external packages and Node built-ins do not contaminate local metrics.
+- [ ] Define dependency-cruiser packaging/version ownership: a normal Maritime install must contain everything needed for graph generation.
+
+### Real-consumer proof
+
+The acceptance test must use the **packed CLI**, not imports from the Maritime checkout and not fixtures nested beneath its `node_modules` tree.
+
+- [ ] Pack the CLI from a clean Maritime build.
+- [ ] Install that tarball into a clean checkout/fixture representing Crawler Command Interface.
+- [ ] Analyze Crawler's `app/` source root using its ESLint 9 flat config and repository conventions.
+- [ ] Produce a dependency graph, complexity metrics, and Markdown report without copying Maritime-specific config into Crawler.
+- [ ] Assert meaningful coverage and verify representative Crawler modules appear in the graph/metrics.
+- [ ] Repeat the same packed-consumer workflow against Catan Hex Mastery.
+- [ ] Prove both consumers use the same public Maritime invocation except for legitimate repository-specific source/config options.
+
+Crawler is intentionally a strong compatibility target: Node 22, TypeScript 5.9, ESLint 9 flat config, Next/Vite/Vinext tooling, an `app/` source root, and mixed UI/domain code. Passing an internal Crawler-shaped fixture is not equivalent to passing this consumer contract.
+
+### Compatibility matrix
+
+- [ ] Add integration coverage on supported Node 20, 22, and 24 versions.
+- [ ] Validate supported dependency-cruiser versions/configuration layouts.
 - [ ] Add a multi-root Next/Vite-style fixture.
-- [ ] Add an isolated NodeNext TypeScript fixture that type-checks the advertised programmatic exports.
-- [ ] Assert lockfile/package metadata consistency and an omit-dev/omit-peer install without UI dependencies.
-- [ ] Run the integration suite on supported Node 20, 22, and 24 versions.
-- [ ] Validate supported dependency-cruiser versions and representative configuration layouts before publishing.
+- [ ] Add fixtures for fatal ESLint results and explicitly empty supported-file selections.
+- [ ] Validate the packaged CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories before public publishing.
 
-#### Forward compatibility
+## Later roadmap
 
-- [ ] Upgrade the analyzer's own ESLint runtime to v10 after the distributed-CLI integration suite covers its flat-config behavior. This is intentionally post-MVP and does not block ESLint 9 package delivery.
+### Increment 4 — Versioned artifact manifest and UI bundle upload
 
-## Artifact and comparison roadmap
+- [ ] Define Zod schemas for the manifest/report model.
+- [ ] Generate `manifest.json` with schema/tool versions, source roots, generation time, and filenames.
+- [ ] Add `maritime validate`.
+- [ ] Preserve raw graph upload and add complete `.zip` bundle upload to the UI.
 
-- [ ] Define Zod schemas for the versioned artifact manifest, report model, and optional baseline. Continue using dependency-cruiser's official `ICruiseResult` as the graph contract.
-- [ ] Generate `manifest.json` with schema version, tool version, source root(s), generation time, and artifact file names.
-- [ ] Add `maritime validate` to validate artifacts without running analysis.
-- [ ] Add `maritime compare --baseline` to report absolute and percentage deltas for LOC, fan-in, fan-out, instability, and complexity.
-- [ ] Add configurable policy gates that can fail on regressions. Keep the aggregate health score informational rather than the sole quality gate.
-- [ ] Support a checked-in baseline and a downloaded CI baseline artifact.
-- [ ] Add UI bundle upload: preserve raw graph upload, then accept a `.zip` artifact bundle so complexity metrics and comparison data load with the graph.
-- [ ] Add a reusable GitHub Actions workflow only after the CLI/artifact contract is stable; other CI systems should call the same binary directly.
-- [ ] Publish and release the analyzer with semantic versioning, provenance, changelog/release automation, and a compatibility policy.
+### Increment 5 — Baseline comparison and regression policy
 
-### Cross-repository adoption
+- [ ] Add `maritime compare --baseline` with absolute and percentage deltas.
+- [ ] Add configurable regression policy gates.
+- [ ] Support checked-in and downloaded CI baselines.
+- [ ] Demonstrate before/after refactoring evidence in real pull requests.
 
-- [x] Validate the current analyzer against a multi-root frontend repository with ESLint 9 flat config (Crawler Command Interface).
-- [x] Validate the analyzer against Catan Hex Mastery after its ESLint 9 flat-config migration.
-- [ ] Validate the packaged CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories before publishing.
-- [ ] Keep the public contract focused on TypeScript frontend repositories: dependency-cruiser for dependency graphs and ESLint for complexity. A non-JavaScript adapter is out of scope for this roadmap.
-- [ ] Use baseline comparisons to demonstrate refactoring outcomes in real pull requests before expanding the metric model or UI.
+### Increment 6 — CI adapter and public release
 
-## Suggested Delivery Order
+- [ ] Add a reusable GitHub Actions workflow only after the CLI/artifact contract is stable.
+- [ ] Remove the private/pre-release package state when release criteria are satisfied.
+- [ ] Publish with semantic versioning, provenance, changelog/release automation, and a compatibility policy.
 
-- [x] **Increment 1 — Tested analyzer/report library and `maritime analyze`:** establishes the extraction seam and preserves the existing workflow.
-- [x] **Increment 1.1 — Correctness and portability hardening:** validate graph input, replace the shell runner, and document the command contract.
-- [ ] **Increment 1.2 — Modern support boundary and measurement integrity:** the Node/ESLint 9+ contract, source-root diagnostics, stale-path handling, and Markdown coverage are complete. Finish fatal-ESLint-result handling and preserve explicit empty graph-file selections before closing this increment.
-- [ ] **Increment 2 — Distributable CLI:** compiled ESM, `maritime`, public exports, multi-source analysis, and basic packed-binary smoke coverage are complete. Finish CLI-specific package isolation, the ESLint runtime contract, declaration generation, lockfile regeneration, and isolated install/type checks.
-- [ ] **Increment 3 — Graph integration and fixture matrix:** support repository dependency-cruiser configuration, protect local graph scope, and verify the supported Node/ESLint/dependency-cruiser matrix.
-- [ ] **Increment 3.1 — ESLint 10 compatibility:** upgrade the analyzer runtime after the distributable CLI's integration suite makes the compatibility contract verifiable.
-- [ ] **Increment 4 — Versioned artifact manifest and UI bundle upload:** connect external builds to the UI through an explicit contract.
-- [ ] **Increment 5 — Baseline comparison and regression policy:** produce useful before/after refactoring evidence.
-- [ ] **Increment 6 — Reusable GitHub workflow and publication:** make adoption concise, then publish reproducible, versioned analyzer releases.
+### Increment 6.1 — ESLint 10 compatibility
 
-This order makes the CLI trustworthy and distributable before introducing higher-level CI or UI conveniences.
+- [ ] Upgrade/validate ESLint 10 after the distributed integration suite can verify its flat-config behavior.
+
+## Release gate
+
+Do not describe Maritime as publicly distribution-ready merely because `npm pack` succeeds. Public release requires all of the following:
+
+1. A clean consumer can install the packed/published CLI without UI dependencies.
+2. The normal CLI path can generate its own dependency graph or deliberately consume a supplied one.
+3. Crawler Command Interface and Catan Hex Mastery pass end-to-end through the packed CLI from outside the Maritime repository tree.
+4. Local graph scoping and measurement integrity are enforced.
+5. The supported Node/ESLint/dependency-cruiser compatibility matrix passes.
+
+Only after those gates should the roadmap advance to the artifact manifest, baseline comparison, reusable CI wrapper, and public package release.
