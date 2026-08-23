@@ -4,22 +4,25 @@ import { ESLint } from 'eslint';
 import { CruiseResultSchema } from '../../schema/dependency-cruiser';
 import { ValidationError, type DependencyCruiserModule, type EslintResult } from './models';
 
-export async function readDependencyGraph(graphPath: string): Promise<DependencyCruiserModule[]> {
-    const absolutePath = path.resolve(process.cwd(), graphPath);
+export async function readDependencyGraph(
+    graphPath: string,
+    cwd: string = process.cwd()
+): Promise<DependencyCruiserModule[]> {
+    const absolutePath = path.resolve(cwd, graphPath);
     let data: string;
     let parsed: unknown;
 
     try {
         data = await fs.readFile(absolutePath, 'utf8');
-    } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         throw new Error(`Failed to read dependency graph at ${graphPath}: ${message}`);
     }
 
     try {
         parsed = JSON.parse(data);
-    } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         throw new ValidationError(`Invalid JSON in dependency graph at ${graphPath}: ${message}`);
     }
 
@@ -37,13 +40,24 @@ export async function readDependencyGraph(graphPath: string): Promise<Dependency
     }));
 }
 
-export async function runEslintComplexityScan(sourcePath: string): Promise<EslintResult[]> {
-    try {
-        // Replace backslashes with forward slashes for cross-platform compatibility with globbing
-        const target = path.resolve(process.cwd(), sourcePath).replace(/\\/g, '/');
-        const globPattern = `${target}/**/*.{ts,tsx}`;
+export async function runEslintComplexityScan(
+    sourcePath: string,
+    sourceFiles?: string[],
+    cwd: string = process.cwd()
+): Promise<EslintResult[]> {
+    const target = path.resolve(cwd, sourcePath).replace(/\\/g, '/');
+    const globPattern = `${target}/**/*.{ts,tsx}`;
 
+    let targets: string[];
+    if (sourceFiles && sourceFiles.length > 0) {
+        targets = sourceFiles.map(f => path.resolve(cwd, f).replace(/\\/g, '/'));
+    } else {
+        targets = [globPattern];
+    }
+
+    try {
         const eslint = new ESLint({
+            cwd,
             overrideConfig: [{
                 rules: {
                     'complexity': ['warn', 0]
@@ -51,25 +65,57 @@ export async function runEslintComplexityScan(sourcePath: string): Promise<Eslin
             }]
         });
 
-        const results = await eslint.lintFiles([globPattern]);
+        const unignoredTargets: string[] = [];
+        const ignoredResults: EslintResult[] = [];
 
-        // Map ESLint's API results to the EslintResult interface we defined
-        return results.map(result => ({
-            filePath: result.filePath,
-            messages: result.messages.map(msg => ({
-                ruleId: msg.ruleId || 'unknown',
-                message: msg.message
-            }))
-        }));
-    } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
+        for (const t of targets) {
+            // Check if ESLint flat config ignores this path
+            const isIgnored = await eslint.isPathIgnored(t);
+            if (isIgnored) {
+                ignoredResults.push({
+                    filePath: t,
+                    ignored: true,
+                    messages: []
+                });
+            } else {
+                unignoredTargets.push(t);
+            }
+        }
+
+        let lintResults: EslintResult[] = [];
+        if (unignoredTargets.length > 0) {
+            const rawResults = await eslint.lintFiles(unignoredTargets);
+            lintResults = rawResults.map(result => ({
+                filePath: result.filePath,
+                ignored: Boolean((result as { ignored?: boolean }).ignored),
+                messages: result.messages.map(msg => ({
+                    ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
+                    message: msg.message
+                }))
+            }));
+        }
+
+        return [...lintResults, ...ignoredResults];
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+
+        if (message.includes('All files matched') && message.includes('are ignored')) {
+            return targets.map(t => ({
+                filePath: t,
+                ignored: true,
+                messages: []
+            }));
+        }
+
         throw new Error(`Failed to run ESLint: ${message}`);
     }
 }
 
-export async function countLinesOfCode(sourceFiles: string[]): Promise<Record<string, number>> {
+export async function countLinesOfCode(
+    sourceFiles: string[],
+    cwd: string = process.cwd()
+): Promise<Record<string, number>> {
     const locMap: Record<string, number> = {};
-    const cwd = process.cwd();
 
     for (const file of sourceFiles) {
         try {
@@ -89,10 +135,9 @@ export async function writeOutputFiles(
     metricsPath: string,
     metricsData: unknown,
     reportPath: string,
-    reportData: string
+    reportData: string,
+    cwd: string = process.cwd()
 ): Promise<void> {
-    const cwd = process.cwd();
-
     const absMetricsPath = path.resolve(cwd, metricsPath);
     const absReportPath = path.resolve(cwd, reportPath);
 

@@ -4,7 +4,7 @@ import type { EslintResult } from './models';
 
 describe('parse-eslint', () => {
     describe('parseEslintComplexityReport', () => {
-        it('should extract max complexity from ESLint JSON output', () => {
+        it('should extract max complexity and scanned status from ESLint output', () => {
             const eslintResults: EslintResult[] = [
                 {
                     filePath: '/path/to/project/src/a.ts',
@@ -18,31 +18,36 @@ describe('parse-eslint', () => {
                     messages: [
                         { ruleId: 'no-unused-vars', message: "Var unused." }
                     ]
+                },
+                {
+                    filePath: '/path/to/project/build/sites-vite-plugin.ts',
+                    ignored: true,
+                    messages: []
                 }
             ];
 
             const result = parseEslintComplexityReport(eslintResults, '/path/to/project');
 
-            // Normalize path to relative path
-            expect(result['src/a.ts']).toBe(15);
-            expect(result['src/b.ts']).toBeUndefined();
+            expect(result['src/a.ts']).toEqual({ complexity: 15, scanned: true });
+            expect(result['src/b.ts']).toEqual({ complexity: 1, scanned: true });
+            expect(result['build/sites-vite-plugin.ts']).toEqual({ complexity: 0, scanned: false });
         });
 
-        it('should handle invalid or empty ESLint output', () => {
+        it('should handle empty ESLint output', () => {
             expect(parseEslintComplexityReport([], '/path/to/project')).toEqual({});
         });
 
-        it('should safely ignore non-complexity rule messages', () => {
-             const eslintResults: EslintResult[] = [
+        it('should report base complexity 1 and scanned: true when no complexity messages are generated', () => {
+            const eslintResults: EslintResult[] = [
                 {
                     filePath: '/project/src/a.ts',
                     messages: [
-                        { ruleId: 'other-rule', message: "Function 'X' has a complexity of 10. Maximum allowed is 0." },
+                        { ruleId: 'other-rule', message: "Some other error." }
                     ]
                 }
             ];
             const result = parseEslintComplexityReport(eslintResults, '/project');
-            expect(result['src/a.ts']).toBeUndefined();
+            expect(result['src/a.ts']).toEqual({ complexity: 1, scanned: true });
         });
     });
 });

@@ -8,6 +8,7 @@ import {
 import { calculateMetrics } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
+import { validateEslintEnvironment } from '../analyze/environment';
 import { ValidationError, type AnalysisThresholds } from '../analyze/models';
 import * as path from 'path';
 
@@ -23,6 +24,8 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
         graph?: string;
         metrics?: string;
         report?: string;
+        cwd?: string;
+        'fail-on-unmeasured'?: boolean;
         help?: boolean;
     };
 
@@ -35,6 +38,8 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
                 graph: { type: 'string' },
                 metrics: { type: 'string' },
                 report: { type: 'string' },
+                cwd: { type: 'string' },
+                'fail-on-unmeasured': { type: 'boolean', default: false },
                 help: { type: 'boolean', short: 'h' }
             }
         });
@@ -47,20 +52,22 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
 
     if (values.help) {
         console.log(`
-Usage: maritime analyze --graph <file> --metrics <file> --report <file> [--source <dir>]
+Usage: maritime analyze --graph <file> --metrics <file> --report <file> [--source <dir>] [--cwd <dir>] [--fail-on-unmeasured]
 
 Options:
-  --graph <file>     Input dependency-cruiser JSON
-  --metrics <file>   Output JSON file for metrics
-  --report <file>    Output Markdown file for the report
-  --source <dir>     Source directory to analyze (default: "src")
+  --graph <file>            Input dependency-cruiser JSON
+  --metrics <file>          Output JSON file for metrics
+  --report <file>           Output Markdown file for the report
+  --source <dir>            Source directory to analyze (default: "src")
+  --cwd <dir>               Working directory root for resolution
+  --fail-on-unmeasured      Fail if any graph source file is skipped/unmeasured by ESLint
 
 Note: analyze consumes a dependency graph; it does not generate one.
 
 Exit Codes:
   0 - Successful analysis
   1 - Operational or runtime failure
-  2 - Invalid CLI arguments or invalid input artifact/schema
+  2 - Invalid CLI arguments, environment, or invalid input artifact/schema
         `);
         return 0;
     }
@@ -70,43 +77,50 @@ Exit Codes:
         return 2;
     }
 
-    try {
+    const workingDir = values.cwd ? path.resolve(values.cwd) : process.cwd();
 
+    try {
         console.log('📊 Starting Complexity Analysis...');
 
-        // 1. Read input graph
+        // 1. Validate environment & ESLint flat config baseline
+        console.log('   - Validating Environment & Configuration...');
+        const { mode: eslintConfigMode } = validateEslintEnvironment(workingDir);
+
+        console.log(`   - Working Directory: ${workingDir}`);
+        console.log(`   - Graph Path: ${values.graph}`);
+        console.log(`   - ESLint Config Mode: ${eslintConfigMode}`);
+
+        // 2. Read input graph
         console.log('   - Reading Dependency Cruiser JSON...');
-        const modules = await readDependencyGraph(values.graph);
+        const modules = await readDependencyGraph(values.graph, workingDir);
 
         const rawSource = values.source || 'src';
 
-        // 2. ESLint for complexity
-        console.log('   - Running ESLint for Complexity...');
-        const eslintResults = await runEslintComplexityScan(rawSource);
-        const complexityMap = parseEslintComplexityReport(eslintResults, process.cwd());
-
         // Convert to a repo-relative path, replacing backslashes with forward slashes
-        // This handles absolute paths, './src', 'src/', etc., cleanly relative to cwd
-        let normalizedSource = path.relative(process.cwd(), path.resolve(process.cwd(), rawSource)).replace(/\\/g, '/');
+        let normalizedSource = path.relative(workingDir, path.resolve(workingDir, rawSource)).replace(/\\/g, '/');
         if (normalizedSource === '') normalizedSource = '.';
 
-        // 3. Count LOC
-        console.log('   - Counting Lines of Code...');
-
-        // Match paths similarly to calculate-metrics boundary logic
         const prefixBoundary = normalizedSource === '.' ? '' : `${normalizedSource}/`;
 
         const sourceFiles = modules
             .map(m => m.source)
             .filter(src => {
-                return normalizedSource === '.'
+                const isSource = normalizedSource === '.'
                     ? true
                     : src === normalizedSource || src.startsWith(prefixBoundary);
+                return isSource && !src.includes('.test.') && !src.includes('.d.ts');
             });
 
-        const locMap = await countLinesOfCode(sourceFiles);
+        // 3. ESLint for complexity
+        console.log('   - Running ESLint for Complexity...');
+        const eslintResults = await runEslintComplexityScan(rawSource, sourceFiles, workingDir);
+        const complexityMap = parseEslintComplexityReport(eslintResults, workingDir);
 
-        // 4. Calculate metrics
+        // 4. Count LOC
+        console.log('   - Counting Lines of Code...');
+        const locMap = await countLinesOfCode(sourceFiles, workingDir);
+
+        // 5. Calculate metrics
         console.log('   - Aggregating Metrics...');
         const analysisResult = calculateMetrics(
             modules,
@@ -116,24 +130,37 @@ Exit Codes:
             normalizedSource
         );
 
-        // 5. Generate metrics and report
+        console.log(`   - Skipped / Unmeasured Source Files: ${analysisResult.skippedCount}`);
+
+        if (analysisResult.skippedCount > 0) {
+            console.warn(`⚠️ Warning: ${analysisResult.skippedCount} graph source file(s) were skipped or ignored by ESLint and could not be measured:`);
+            analysisResult.unmeasuredFiles.forEach(f => console.warn(`   - ${f}`));
+
+            if (values['fail-on-unmeasured']) {
+                throw new ValidationError(
+                    `Analysis failed because ${analysisResult.skippedCount} graph source file(s) were not scanned by ESLint (--fail-on-unmeasured).`
+                );
+            }
+        }
+
+        // 6. Generate metrics and report
         console.log('   - Generating Outputs...');
 
-        // Match the previous script's output format: simple Record<string, FileMetric> for --metrics
         const metricsMap = analysisResult.files.reduce((acc, f) => {
             acc[f.file] = {
                 complexity: f.complexity,
                 loc: f.loc,
                 instability: f.instability,
                 fanIn: f.fanIn,
-                fanOut: f.fanOut
+                fanOut: f.fanOut,
+                scanned: f.scanned
             };
             return acc;
         }, {} as Record<string, unknown>);
 
         const reportContent = renderMarkdownReport(analysisResult, DEFAULT_THRESHOLDS);
 
-        await writeOutputFiles(values.metrics, metricsMap, values.report, reportContent);
+        await writeOutputFiles(values.metrics, metricsMap, values.report, reportContent, workingDir);
 
         console.log('✅ Complexity Report Updated and Metrics Exported!');
         return 0;

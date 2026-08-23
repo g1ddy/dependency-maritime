@@ -6,6 +6,7 @@ export const ComplexityMetricSchema = z.object({
   instability: z.number().optional(),
   fanIn: z.number().optional(),
   fanOut: z.number().optional(),
+  scanned: z.boolean().optional(),
 });
 
 export const ComplexityMetricsMapSchema = z.record(z.string(), ComplexityMetricSchema);

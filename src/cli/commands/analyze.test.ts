@@ -5,13 +5,16 @@ import * as adapters from '../analyze/adapters';
 describe('runAnalyzeCommand', () => {
     beforeEach(() => {
         vi.spyOn(console, 'log').mockImplementation(() => {});
+        vi.spyOn(console, 'warn').mockImplementation(() => {});
         vi.spyOn(console, 'error').mockImplementation(() => {});
 
         vi.spyOn(adapters, 'readDependencyGraph').mockResolvedValue([
             { source: 'src/a.ts', dependencies: [], dependents: [] }
         ]);
 
-        vi.spyOn(adapters, 'runEslintComplexityScan').mockResolvedValue([]);
+        vi.spyOn(adapters, 'runEslintComplexityScan').mockResolvedValue([
+            { filePath: `${process.cwd()}/src/a.ts`, messages: [] }
+        ]);
         vi.spyOn(adapters, 'countLinesOfCode').mockResolvedValue({ 'src/a.ts': 100 });
         vi.spyOn(adapters, 'writeOutputFiles').mockResolvedValue(undefined);
     });
@@ -41,7 +44,7 @@ describe('runAnalyzeCommand', () => {
         ]);
 
         expect(exitCode).toBe(0);
-        expect(adapters.readDependencyGraph).toHaveBeenCalledWith('graph.json');
+        expect(adapters.readDependencyGraph).toHaveBeenCalledWith('graph.json', expect.any(String));
         expect(adapters.writeOutputFiles).toHaveBeenCalled();
     });
 });

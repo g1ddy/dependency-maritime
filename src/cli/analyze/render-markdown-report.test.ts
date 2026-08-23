@@ -12,15 +12,17 @@ describe('render-markdown-report', () => {
 
         const result: AnalysisResult = {
             files: [
-                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34 }
+                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34, scanned: true }
             ],
             healthScore: 100,
             topByScore: [
-                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34 }
+                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34, scanned: true }
             ],
             topByComplexity: [
-                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34 }
-            ]
+                { file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34, scanned: true }
+            ],
+            skippedCount: 0,
+            unmeasuredFiles: []
         };
 
         const reportDate = new Date('2024-01-01T00:00:00.000Z');
@@ -46,9 +48,11 @@ describe('render-markdown-report', () => {
             files: [],
             healthScore: 100,
             topByScore: [
-                { file: 'src/_internal_/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34 }
+                { file: 'src/_internal_/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 5, instability: 0.5, score: 34, scanned: true }
             ],
-            topByComplexity: []
+            topByComplexity: [],
+            skippedCount: 0,
+            unmeasuredFiles: []
         };
         const thresholds: AnalysisThresholds = { loc: 300, complexity: 10, fanOut: 15 };
         const reportDate = new Date('2024-01-01T00:00:00.000Z');

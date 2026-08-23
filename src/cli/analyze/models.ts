@@ -6,6 +6,7 @@ export interface FileMetric {
     fanOut: number;
     instability: number;
     score: number;
+    scanned: boolean;
 }
 
 export interface AnalysisThresholds {
@@ -21,6 +22,8 @@ export interface AnalysisResult {
     healthScore: number;
     topByScore: FileMetric[];
     topByComplexity: FileMetric[];
+    skippedCount: number;
+    unmeasuredFiles: string[];
 }
 
 export interface EslintMessage {
@@ -31,6 +34,12 @@ export interface EslintMessage {
 export interface EslintResult {
     filePath: string;
     messages: EslintMessage[];
+    ignored?: boolean;
+}
+
+export interface EslintFileComplexity {
+    complexity: number;
+    scanned: boolean;
 }
 
 export interface DependencyCruiserModule {

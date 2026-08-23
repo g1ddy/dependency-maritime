@@ -62,6 +62,7 @@ describe('adapters', () => {
 
             vi.mocked(ESLint).mockImplementation(function() {
                 return {
+                    isPathIgnored: vi.fn().mockResolvedValue(false),
                     lintFiles: vi.fn().mockResolvedValue(mockResults)
                 } as unknown as ESLint;
             });
@@ -72,9 +73,23 @@ describe('adapters', () => {
             expect(result[0].messages[0].ruleId).toBe('complexity');
         });
 
+        it('should identify ignored files when isPathIgnored returns true', async () => {
+            vi.mocked(ESLint).mockImplementation(function() {
+                return {
+                    isPathIgnored: vi.fn().mockResolvedValue(true),
+                    lintFiles: vi.fn().mockResolvedValue([])
+                } as unknown as ESLint;
+            });
+
+            const result = await runEslintComplexityScan('src', ['build/sites-vite-plugin.ts']);
+            expect(result).toHaveLength(1);
+            expect(result[0].ignored).toBe(true);
+        });
+
         it('should throw Error if linting fails', async () => {
             vi.mocked(ESLint).mockImplementation(function() {
                 return {
+                    isPathIgnored: vi.fn().mockResolvedValue(false),
                     lintFiles: vi.fn().mockRejectedValue(new Error('Failed execution'))
                 } as unknown as ESLint;
             });
