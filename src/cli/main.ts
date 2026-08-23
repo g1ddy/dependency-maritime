@@ -23,9 +23,18 @@ async function main() {
 }
 
 import { fileURLToPath } from 'node:url';
+import * as fs from 'node:fs';
 
-// Detect if we are the main module in ESM or CJS
-const isMain = fileURLToPath(import.meta.url) === process.argv[1] || (typeof require !== 'undefined' && require.main === module);
+let isMain = false;
+if (process.argv[1]) {
+    try {
+        const currentPath = fileURLToPath(import.meta.url);
+        const execPath = process.argv[1];
+        isMain = currentPath === execPath || currentPath === fs.realpathSync(execPath);
+    } catch {
+        isMain = false;
+    }
+}
 
 if (isMain) {
     main().catch((err) => {

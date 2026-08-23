@@ -292,4 +292,44 @@ describe('analyze command integration fixtures', () => {
             expect.stringContaining('Analysis failed because 1 graph source file(s) were not scanned by ESLint')
         );
     });
+
+    it('multi-source root fixture: analyzes files across multiple source roots', async () => {
+        const dir = path.join(fixtureRoot, 'multi-source');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+        fs.mkdirSync(path.join(dir, 'lib'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'app.ts'), 'export const app = 1;');
+        fs.writeFileSync(path.join(dir, 'lib', 'util.ts'), 'export function util() { return 2; }');
+
+        const graphFile = createGraphJson(dir, ['src/app.ts', 'lib/util.ts']);
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--source', 'src',
+            '--source', 'lib',
+            '--graph', graphFile,
+            '--metrics', 'metrics.json',
+            '--report', 'report.md'
+        ]);
+
+        expect(exitCode).toBe(0);
+
+        const metricsData = JSON.parse(fs.readFileSync(path.join(dir, 'metrics.json'), 'utf8')) as Record<string, FileMetric>;
+        expect(metricsData['src/app.ts']).toBeDefined();
+        expect(metricsData['src/app.ts'].scanned).toBe(true);
+        expect(metricsData['lib/util.ts']).toBeDefined();
+        expect(metricsData['lib/util.ts'].scanned).toBe(true);
+
+        const reportData = fs.readFileSync(path.join(dir, 'report.md'), 'utf8');
+        expect(reportData).toContain('Total Graph Files**: 2');
+        expect(reportData).toContain('Measured Files**: 2');
+
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('Source Root (raw): src, lib')
+        );
+    });
 });

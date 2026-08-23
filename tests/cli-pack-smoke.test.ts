@@ -1,0 +1,232 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
+import { execSync } from 'child_process';
+
+describe('CLI npm pack clean-install smoke tests', () => {
+    const tmpRoot = path.join(process.cwd(), 'temp-pack-smoke');
+    let tarballPath: string = '';
+
+    beforeAll(() => {
+        if (fs.existsSync(tmpRoot)) {
+            fs.rmSync(tmpRoot, { recursive: true, force: true });
+        }
+        fs.mkdirSync(tmpRoot, { recursive: true });
+
+        // Ensure CLI is built
+        execSync('npm run build:cli', { cwd: process.cwd(), stdio: 'pipe' });
+
+        // Run npm pack
+        const packOutput = execSync('npm pack', { cwd: process.cwd(), encoding: 'utf8' }).trim();
+        const lines = packOutput.split('\n').map(l => l.trim()).filter(Boolean);
+        const tarballName = lines[lines.length - 1];
+        tarballPath = path.resolve(process.cwd(), tarballName);
+
+        expect(fs.existsSync(tarballPath)).toBe(true);
+    }, 60000);
+
+    afterAll(() => {
+        if (fs.existsSync(tmpRoot)) {
+            fs.rmSync(tmpRoot, { recursive: true, force: true });
+        }
+        if (tarballPath && fs.existsSync(tarballPath)) {
+            fs.unlinkSync(tarballPath);
+        }
+    });
+
+    it('package inspection: contains compiled CLI runtime and excludes source/test/UI files', () => {
+        const fileListStr = execSync(`tar -tzf "${tarballPath}"`, { encoding: 'utf8' });
+        const fileList = fileListStr.split('\n').map(f => f.trim()).filter(Boolean);
+
+        // Must contain compiled CLI files
+        expect(fileList).toContain('package/dist/cli/main.js');
+        expect(fileList).toContain('package/dist/cli/index.js');
+        expect(fileList).toContain('package/dist/cli/index.d.ts');
+        expect(fileList).toContain('package/package.json');
+
+        // Must NOT contain source files, tests, or web UI bundles
+        const forbidden = fileList.filter(f =>
+            f.startsWith('package/src/') ||
+            f.startsWith('package/tests/') ||
+            f.startsWith('package/.github/') ||
+            f.includes('index.html') ||
+            f.includes('vite.config') ||
+            f.endsWith('.test.ts') ||
+            f.endsWith('.test.tsx')
+        );
+
+        expect(forbidden).toEqual([]);
+    }, 30000);
+
+    it('clean-install Catan Hex Mastery fixture: analyzes project via maritime binary entry point', () => {
+        const catanDir = path.join(tmpRoot, 'catan-hex-mastery');
+        fs.mkdirSync(path.join(catanDir, 'src', 'board'), { recursive: true });
+        fs.mkdirSync(path.join(catanDir, 'src', 'game'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(catanDir, 'package.json'),
+            JSON.stringify({
+                name: 'catan-hex-mastery',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: {
+                    eslint: '^9.0.0'
+                }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(catanDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(catanDir, 'src', 'board', 'hex.ts'),
+            'export interface Hex { q: number; r: number; }\nexport function getNeighbors(h: Hex): Hex[] { return [{ q: h.q + 1, r: h.r }, { q: h.q - 1, r: h.r }]; }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(catanDir, 'src', 'game', 'engine.ts'),
+            'import { Hex, getNeighbors } from "../board/hex";\nexport function setupGame(h: Hex) { return getNeighbors(h); }\n'
+        );
+
+        const graphData = {
+            modules: [
+                {
+                    source: 'src/board/hex.ts',
+                    valid: true,
+                    dependencies: [],
+                    dependents: ['src/game/engine.ts']
+                },
+                {
+                    source: 'src/game/engine.ts',
+                    valid: true,
+                    dependencies: [
+                        {
+                            circular: false,
+                            coreModule: false,
+                            couldNotResolve: false,
+                            dependencyTypes: ['local'],
+                            dynamic: false,
+                            exoticallyRequired: false,
+                            followable: true,
+                            moduleSystem: 'es6',
+                            module: '../board/hex',
+                            resolved: 'src/board/hex.ts',
+                            valid: true
+                        }
+                    ],
+                    dependents: []
+                }
+            ],
+            summary: { error: 0, ignore: 0, info: 0, totalCruised: 2, violations: [], warn: 0, optionsUsed: {} }
+        };
+
+        fs.writeFileSync(path.join(catanDir, 'dependency-graph.json'), JSON.stringify(graphData, null, 2));
+
+        // Install packed CLI tarball into clean fixture
+        execSync(`npm install "${tarballPath}" --no-save`, { cwd: catanDir, stdio: 'pipe' });
+
+        // Verify --help command works
+        const helpOutput = execSync('npx maritime analyze --help', { cwd: catanDir, encoding: 'utf8' });
+        expect(helpOutput).toContain('Usage: maritime analyze');
+
+        // Run real analysis command
+        const analyzeOutput = execSync('npx maritime analyze --graph dependency-graph.json --metrics metrics.json --report report.md', {
+            cwd: catanDir,
+            encoding: 'utf8'
+        });
+
+        expect(analyzeOutput).toContain('Starting Complexity Analysis...');
+        expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported!');
+
+        // Check generated artifacts
+        expect(fs.existsSync(path.join(catanDir, 'metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(catanDir, 'report.md'))).toBe(true);
+
+        const metrics = JSON.parse(fs.readFileSync(path.join(catanDir, 'metrics.json'), 'utf8')) as Record<string, { scanned: boolean }>;
+        expect(metrics['src/board/hex.ts']).toBeDefined();
+        expect(metrics['src/board/hex.ts'].scanned).toBe(true);
+        expect(metrics['src/game/engine.ts']).toBeDefined();
+        expect(metrics['src/game/engine.ts'].scanned).toBe(true);
+
+        const report = fs.readFileSync(path.join(catanDir, 'report.md'), 'utf8');
+        expect(report).toContain('Automated Complexity Report');
+        expect(report).toContain('Total Graph Files**: 2');
+        expect(report).toContain('Measured Files**: 2');
+    }, 60000);
+
+    it('clean-install multi-root fixture repository: analyzes project with multi-source roots and programmatic API', () => {
+        const crawlerDir = path.join(tmpRoot, 'crawler-command-interface');
+        fs.mkdirSync(path.join(crawlerDir, 'src'), { recursive: true });
+        fs.mkdirSync(path.join(crawlerDir, 'lib'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(crawlerDir, 'package.json'),
+            JSON.stringify({
+                name: 'crawler-command-interface',
+                version: '1.0.0',
+                type: 'module'
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(crawlerDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(crawlerDir, 'src', 'crawler.ts'),
+            'export function crawl(url: string) { return url.length > 0 ? "ok" : "empty"; }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(crawlerDir, 'lib', 'parser.ts'),
+            'export function parseHtml(html: string) { return html.split("<"); }\n'
+        );
+
+        const graphData = {
+            modules: [
+                { source: 'src/crawler.ts', valid: true, dependencies: [], dependents: [] },
+                { source: 'lib/parser.ts', valid: true, dependencies: [], dependents: [] }
+            ],
+            summary: { error: 0, ignore: 0, info: 0, totalCruised: 2, violations: [], warn: 0, optionsUsed: {} }
+        };
+
+        fs.writeFileSync(path.join(crawlerDir, 'dependency-graph.json'), JSON.stringify(graphData, null, 2));
+
+        // Install packed CLI tarball into clean fixture
+        execSync(`npm install "${tarballPath}" --no-save`, { cwd: crawlerDir, stdio: 'pipe' });
+
+        // Run multi-source analysis
+        const analyzeOutput = execSync('npx maritime analyze --source src --source lib --graph dependency-graph.json --metrics metrics.json --report report.md', {
+            cwd: crawlerDir,
+            encoding: 'utf8'
+        });
+
+        expect(analyzeOutput).toContain('Source Root (raw): src, lib');
+        expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported!');
+
+        const metrics = JSON.parse(fs.readFileSync(path.join(crawlerDir, 'metrics.json'), 'utf8')) as Record<string, { scanned: boolean }>;
+        expect(metrics['src/crawler.ts']).toBeDefined();
+        expect(metrics['lib/parser.ts']).toBeDefined();
+
+        // Test Programmatic API export usage from installed package
+        const testScript = `
+            import { analyzeProject } from '@dependency-maritime/cli';
+            const code = await analyzeProject({
+                cwd: process.cwd(),
+                source: ['src', 'lib'],
+                graph: 'dependency-graph.json',
+                metrics: 'prog-metrics.json',
+                report: 'prog-report.md'
+            });
+            if (code !== 0) process.exit(code);
+        `;
+        fs.writeFileSync(path.join(crawlerDir, 'run-prog.js'), testScript);
+
+        execSync('node run-prog.js', { cwd: crawlerDir, stdio: 'pipe' });
+        expect(fs.existsSync(path.join(crawlerDir, 'prog-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(crawlerDir, 'prog-report.md'))).toBe(true);
+    }, 60000);
+});

@@ -53,12 +53,14 @@ Following the "AI to Rules" refactor and "Split Coach" initiative, here are the 
 
 ## 🚨 Automated Complexity Report
 
-**Last Updated:** 2026-08-22
+**Last Updated:** 2026-08-23
 
 ### 🏥 Repository Health Score: **88.0 / 100**
 
 *   **Formula**: 100 - Penalties for Files exceeding thresholds (LOC > 300, Complexity > 10, Fan-Out > 15).
-*   **Total Files Scanned**: 47
+*   **Total Graph Files**: 46
+*   **Measured Files**: 46
+*   **Unmeasured Files**: 0
 
 ### 🔥 Top 10 High-Complexity Files (Compound Score)
 _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_

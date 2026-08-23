@@ -20,7 +20,7 @@ const DEFAULT_THRESHOLDS: AnalysisThresholds = {
 
 export async function runAnalyzeCommand(args: string[]): Promise<number> {
     let values: {
-        source?: string;
+        source?: string[];
         graph?: string;
         metrics?: string;
         report?: string;
@@ -34,7 +34,7 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
             args,
             allowPositionals: true,
             options: {
-                source: { type: 'string', default: 'src' },
+                source: { type: 'string', multiple: true, default: ['src'] },
                 graph: { type: 'string' },
                 metrics: { type: 'string' },
                 report: { type: 'string' },
@@ -78,11 +78,16 @@ Exit Codes:
     }
 
     const workingDir = values.cwd ? path.resolve(values.cwd) : process.cwd();
-    const rawSource = values.source || 'src';
 
-    // Convert to a repo-relative path, replacing backslashes with forward slashes
-    let normalizedSource = path.relative(workingDir, path.resolve(workingDir, rawSource)).replace(/\\/g, '/');
-    if (normalizedSource === '') normalizedSource = '.';
+    const rawSources = (values.source && values.source.length > 0)
+        ? values.source.flatMap(s => s.split(',').map(item => item.trim())).filter(Boolean)
+        : ['src'];
+
+    const normalizedSources = rawSources.map(rawSrc => {
+        let norm = path.relative(workingDir, path.resolve(workingDir, rawSrc)).replace(/\\/g, '/');
+        if (norm === '') norm = '.';
+        return norm;
+    });
 
     try {
         console.log('📊 Starting Complexity Analysis...');
@@ -92,8 +97,8 @@ Exit Codes:
         const { mode: eslintConfigMode } = validateEslintEnvironment(workingDir);
 
         console.log(`   - Working Directory: ${workingDir}`);
-        console.log(`   - Source Root (raw): ${rawSource}`);
-        console.log(`   - Source Root (normalized): ${normalizedSource}`);
+        console.log(`   - Source Root (raw): ${rawSources.join(', ')}`);
+        console.log(`   - Source Root (normalized): ${normalizedSources.join(', ')}`);
         console.log(`   - Graph Path: ${values.graph}`);
         console.log(`   - ESLint Config Mode: ${eslintConfigMode}`);
 
@@ -101,20 +106,19 @@ Exit Codes:
         console.log('   - Reading Dependency Cruiser JSON...');
         const modules = await readDependencyGraph(values.graph, workingDir);
 
-        const prefixBoundary = normalizedSource === '.' ? '' : `${normalizedSource}/`;
-
         const sourceFiles = modules
             .map(m => m.source)
             .filter(src => {
-                const isSource = normalizedSource === '.'
-                    ? true
-                    : src === normalizedSource || src.startsWith(prefixBoundary);
+                const isSource = normalizedSources.some(norm => {
+                    if (norm === '.') return true;
+                    return src === norm || src.startsWith(`${norm}/`);
+                });
                 return isSource && isSupportedTypeScriptFile(src);
             });
 
         // 3. ESLint for complexity
         console.log('   - Running ESLint for Complexity...');
-        const eslintResults = await runEslintComplexityScan(rawSource, sourceFiles, workingDir);
+        const eslintResults = await runEslintComplexityScan(rawSources, sourceFiles, workingDir);
         const complexityMap = parseEslintComplexityReport(eslintResults, workingDir);
 
         // 4. Count LOC
@@ -128,7 +132,7 @@ Exit Codes:
             locMap,
             complexityMap,
             DEFAULT_THRESHOLDS,
-            normalizedSource
+            normalizedSources
         );
 
         console.log(`   - Skipped / Unmeasured Source Files: ${analysisResult.skippedCount}`);
