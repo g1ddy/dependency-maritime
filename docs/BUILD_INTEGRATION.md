@@ -107,7 +107,7 @@ PRs #207 and #210 established the package boundary needed for external consumpti
 - [x] Add clean-install packed-tarball smoke coverage and consumer type checking.
 - [x] Regenerate package metadata/lockfile for the package boundary.
 
-This means the **package boundary is ready for external validation**, not that the product is ready for public release. The package remains private/version `0.0.0`, graph generation is still manual, and the real-consumer workflow has not yet been proven end-to-end from a packed CLI against representative repositories.
+The package boundary and normal generated-graph path have now been proven against packed external consumers. The package remains private/version `0.0.0`; public release still requires the supported runtime/configuration matrix and the later release work described below.
 
 ## Increment 3 — Real-consumer graph integration
 
@@ -127,22 +127,24 @@ This is the next release-blocking milestone.
 
 The acceptance test must use the **packed CLI**, not imports from the Maritime checkout and not fixtures nested beneath its `node_modules` tree.
 
-- [ ] Pack the CLI from a clean Maritime build.
-- [ ] Install that tarball into a clean checkout/fixture representing Crawler Command Interface.
-- [ ] Analyze Crawler's `app/` source root using its ESLint 9 flat config and repository conventions.
-- [ ] Produce a dependency graph, complexity metrics, and Markdown report without copying Maritime-specific config into Crawler.
-- [ ] Assert meaningful coverage and verify representative Crawler modules appear in the graph/metrics.
-- [ ] Repeat the same packed-consumer workflow against Catan Hex Mastery.
-- [ ] Prove both consumers use the same public Maritime invocation except for legitimate repository-specific source/config options.
+- [x] Pack the CLI from a clean Maritime build.
+- [x] Install that tarball into a clean checkout/fixture representing Crawler Command Interface.
+- [x] Analyze Crawler's `app/` source root using its ESLint 9 flat config and repository conventions.
+- [x] Produce a dependency graph, complexity metrics, and Markdown report without copying Maritime-specific config into Crawler.
+- [x] Assert meaningful coverage and verify representative Crawler modules appear in the graph/metrics.
+- [x] Repeat the same packed-consumer workflow against Catan Hex Mastery.
+- [x] Prove both consumers use the same public Maritime invocation except for legitimate repository-specific source/config options.
 
-Crawler is intentionally a strong compatibility target: Node 22, TypeScript 5.9, ESLint 9 flat config, Next/Vite/Vinext tooling, an `app/` source root, and mixed UI/domain code. Passing an internal Crawler-shaped fixture is not equivalent to passing this consumer contract.
+Crawler and Catan have now both passed this packed-consumer proof. Catan's comparison output measured 112 of 112 supported implementation files, with no unmeasured files and a 91.0 health score; its older hand-rolled score is intentionally not a numeric regression target. Catan's consumer integration is tracked in [catan-hex-mastery#436](https://github.com/g1ddy/catan-hex-mastery/pull/436).
+
+Crawler remains a strong compatibility target: Node 22, TypeScript 5.9, ESLint 9 flat config, Next/Vite/Vinext tooling, an `app/` source root, and mixed UI/domain code. Passing an internal Crawler-shaped fixture is not equivalent to passing this consumer contract.
 
 ### Compatibility matrix
 
-- [ ] Add integration coverage on supported Node 20, 22, and 24 versions.
+- [ ] Add integration coverage on supported Node 20, 22, and 24 versions. (Implemented in PR #215; mark complete only after all matrix jobs pass and the PR merges.)
 - [ ] Validate supported dependency-cruiser versions/configuration layouts.
-- [ ] Add a multi-root Next/Vite-style fixture.
-- [ ] Add fixtures for fatal ESLint results and explicitly empty supported-file selections.
+- [ ] Add a multi-root Next/Vite-style fixture for generated-graph mode.
+- [x] Add fixtures for fatal ESLint results and explicitly empty supported-file selections.
 - [ ] Validate the packaged CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories before public publishing.
 
 ## Later roadmap
