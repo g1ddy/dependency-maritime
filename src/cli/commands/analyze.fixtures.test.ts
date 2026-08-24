@@ -439,6 +439,32 @@ describe('analyze command integration fixtures', () => {
         );
     });
 
+    it('explicit ESM --depcruise-config fixture: loads custom ESM .mjs configuration', async () => {
+        const dir = path.join(fixtureRoot, 'explicit-esm-depcruise-config');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const a = 1;');
+        fs.writeFileSync(
+            path.join(dir, 'dependency-cruiser.config.mjs'),
+            'export default { options: { doNotFollow: { path: "node_modules" } } };'
+        );
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--depcruise-config', 'dependency-cruiser.config.mjs',
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('Dependency-Cruiser Config Source: explicit')
+        );
+    });
+
     it('proves Maritime own config/.dependency-cruiser.cjs is not used as consumer fallback', async () => {
         const dir = path.join(fixtureRoot, 'no-depcruise-config-fallback');
         fs.mkdirSync(path.join(dir, 'app'), { recursive: true });

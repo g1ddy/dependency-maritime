@@ -149,7 +149,9 @@ Crawler remains a strong compatibility target: Node 22, TypeScript 5.9, ESLint 9
 
 The following work improves confidence before public publishing but does not block Increment 4's versioned artifact contract:
 
-- [ ] Validate explicit CJS and ESM dependency-cruiser configuration layouts and generated-graph multi-root behavior ([#217](https://github.com/g1ddy/dependency-maritime/issues/217)).
+- [x] Validate explicit CJS and ESM dependency-cruiser configuration layouts and generated-graph multi-root behavior ([#217](https://github.com/g1ddy/dependency-maritime/issues/217)).
+  - Clean-install packed CLI integration smoke coverage verifies explicit CJS (`config/dependency-cruiser.cjs`), explicit ESM (`dependency-cruiser.config.mjs`), and portable fallback graph generation.
+  - Multi-root generated-graph fixtures verify repeatable `--source` options with consumer dependency-cruiser configuration, ensuring local metrics include all selected roots (`app/`, `components/`, `lib/`), exclude unselected source trees (`outside/`), and succeed with `--fail-on-unmeasured`.
 - [ ] Validate the packaged CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories before public publishing.
 
 ## Later roadmap

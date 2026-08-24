@@ -167,7 +167,7 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(report).toContain('Measured Files**: 2');
     }, 60000);
 
-    it('clean-install generated-graph mode: generates dependency graph and analyzes project without pre-generated graph file', () => {
+    it('clean-install generated-graph fallback layout: generates graph with no consumer config using portable fallback', () => {
         const genDir = path.join(tmpRoot, 'generated-graph-smoke');
         fs.mkdirSync(path.join(genDir, 'app', 'domain'), { recursive: true });
 
@@ -208,6 +208,7 @@ describe('CLI npm pack clean-install smoke tests', () => {
         });
 
         expect(analyzeOutput).toContain('Generating Dependency Graph with dependency-cruiser...');
+        expect(analyzeOutput).toContain('Dependency-Cruiser Config Source: fallback');
         expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported!');
 
         // Check generated artifacts in .maritime directory
@@ -223,6 +224,212 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(metrics['app/domain/model.ts'].scanned).toBe(true);
         expect(metrics['app/main.ts']).toBeDefined();
         expect(metrics['app/main.ts'].scanned).toBe(true);
+    }, 60000);
+
+    it('clean-install explicit CJS dependency-cruiser config layout: generates graph using custom CJS config', () => {
+        const cjsDir = path.join(tmpRoot, 'explicit-cjs-smoke');
+        fs.mkdirSync(path.join(cjsDir, 'src'), { recursive: true });
+        fs.mkdirSync(path.join(cjsDir, 'config'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(cjsDir, 'package.json'),
+            JSON.stringify({
+                name: 'explicit-cjs-smoke',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: {
+                    eslint: '^9.0.0'
+                }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(cjsDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(cjsDir, 'config', 'dependency-cruiser.cjs'),
+            'module.exports = { options: { doNotFollow: { path: "node_modules" }, tsPreCompilationDeps: true } };\n'
+        );
+
+        fs.writeFileSync(
+            path.join(cjsDir, 'src', 'util.ts'),
+            'export function add(a, b) { return a + b; }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(cjsDir, 'src', 'index.ts'),
+            'import { add } from "./util";\nexport function calculate() { return add(1, 2); }\n'
+        );
+
+        execSync(`npm install "${tarballPath}" eslint@^9.0.0 --no-save`, { cwd: cjsDir, stdio: 'pipe' });
+
+        const analyzeOutput = execSync(
+            'npx maritime analyze --source src --output .maritime --depcruise-config config/dependency-cruiser.cjs',
+            { cwd: cjsDir, encoding: 'utf8' }
+        );
+
+        expect(analyzeOutput).toContain('Dependency-Cruiser Config Source: explicit');
+        expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported!');
+
+        expect(fs.existsSync(path.join(cjsDir, '.maritime', 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(cjsDir, '.maritime', 'complexity-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(cjsDir, '.maritime', 'complexity-report.md'))).toBe(true);
+
+        const metrics = JSON.parse(
+            fs.readFileSync(path.join(cjsDir, '.maritime', 'complexity-metrics.json'), 'utf8')
+        ) as Record<string, { scanned: boolean }>;
+
+        expect(metrics['src/index.ts']).toBeDefined();
+        expect(metrics['src/index.ts'].scanned).toBe(true);
+        expect(metrics['src/util.ts']).toBeDefined();
+        expect(metrics['src/util.ts'].scanned).toBe(true);
+    }, 60000);
+
+    it('clean-install explicit ESM dependency-cruiser config layout: generates graph using custom ESM config', () => {
+        const esmDir = path.join(tmpRoot, 'explicit-esm-smoke');
+        fs.mkdirSync(path.join(esmDir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(esmDir, 'package.json'),
+            JSON.stringify({
+                name: 'explicit-esm-smoke',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: {
+                    eslint: '^9.0.0'
+                }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(esmDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(esmDir, 'dependency-cruiser.config.mjs'),
+            'export default { options: { doNotFollow: { path: "node_modules" }, tsPreCompilationDeps: true } };\n'
+        );
+
+        fs.writeFileSync(
+            path.join(esmDir, 'src', 'service.ts'),
+            'export function fetchData() { return "data"; }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(esmDir, 'src', 'index.ts'),
+            'import { fetchData } from "./service";\nexport function run() { return fetchData(); }\n'
+        );
+
+        execSync(`npm install "${tarballPath}" eslint@^9.0.0 --no-save`, { cwd: esmDir, stdio: 'pipe' });
+
+        const analyzeOutput = execSync(
+            'npx maritime analyze --source src --output .maritime --depcruise-config dependency-cruiser.config.mjs',
+            { cwd: esmDir, encoding: 'utf8' }
+        );
+
+        expect(analyzeOutput).toContain('Dependency-Cruiser Config Source: explicit');
+        expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported!');
+
+        expect(fs.existsSync(path.join(esmDir, '.maritime', 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(esmDir, '.maritime', 'complexity-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(esmDir, '.maritime', 'complexity-report.md'))).toBe(true);
+
+        const metrics = JSON.parse(
+            fs.readFileSync(path.join(esmDir, '.maritime', 'complexity-metrics.json'), 'utf8')
+        ) as Record<string, { scanned: boolean }>;
+
+        expect(metrics['src/index.ts']).toBeDefined();
+        expect(metrics['src/index.ts'].scanned).toBe(true);
+        expect(metrics['src/service.ts']).toBeDefined();
+        expect(metrics['src/service.ts'].scanned).toBe(true);
+    }, 60000);
+
+    it('clean-install generated-graph multi-root fixture: includes selected roots, excludes unselected trees, and passes --fail-on-unmeasured', () => {
+        const multiRootDir = path.join(tmpRoot, 'generated-multi-root-smoke');
+        fs.mkdirSync(path.join(multiRootDir, 'app'), { recursive: true });
+        fs.mkdirSync(path.join(multiRootDir, 'components'), { recursive: true });
+        fs.mkdirSync(path.join(multiRootDir, 'lib'), { recursive: true });
+        fs.mkdirSync(path.join(multiRootDir, 'outside'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(multiRootDir, 'package.json'),
+            JSON.stringify({
+                name: 'generated-multi-root-smoke',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: {
+                    eslint: '^9.0.0'
+                }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(multiRootDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.mkdirSync(path.join(multiRootDir, 'config'), { recursive: true });
+        fs.writeFileSync(
+            path.join(multiRootDir, 'config', 'dependency-cruiser.cjs'),
+            'module.exports = { options: { doNotFollow: { path: "node_modules" }, tsPreCompilationDeps: true } };\n'
+        );
+
+        fs.writeFileSync(
+            path.join(multiRootDir, 'lib', 'math.ts'),
+            'export function square(n) { return n * n; }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(multiRootDir, 'components', 'card.tsx'),
+            'import { square } from "../lib/math";\nexport function Card(props) { return square(props.val); }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(multiRootDir, 'app', 'page.tsx'),
+            'import { Card } from "../components/card";\nexport default function Page() { return Card({ val: 4 }); }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(multiRootDir, 'outside', 'ignored.ts'),
+            'export const unselected = "this file is not in selected source roots";\n'
+        );
+
+        execSync(`npm install "${tarballPath}" eslint@^9.0.0 --no-save`, { cwd: multiRootDir, stdio: 'pipe' });
+
+        const analyzeOutput = execSync(
+            'npx maritime analyze --source app --source components --source lib --output .maritime --depcruise-config config/dependency-cruiser.cjs --fail-on-unmeasured',
+            { cwd: multiRootDir, encoding: 'utf8' }
+        );
+
+        expect(analyzeOutput).toContain('Source Root (raw): app, components, lib');
+        expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported!');
+
+        expect(fs.existsSync(path.join(multiRootDir, '.maritime', 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(multiRootDir, '.maritime', 'complexity-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(multiRootDir, '.maritime', 'complexity-report.md'))).toBe(true);
+
+        const metrics = JSON.parse(
+            fs.readFileSync(path.join(multiRootDir, '.maritime', 'complexity-metrics.json'), 'utf8')
+        ) as Record<string, { scanned: boolean }>;
+
+        // Files from selected roots must receive local metric records
+        expect(metrics['app/page.tsx']).toBeDefined();
+        expect(metrics['app/page.tsx'].scanned).toBe(true);
+        expect(metrics['components/card.tsx']).toBeDefined();
+        expect(metrics['components/card.tsx'].scanned).toBe(true);
+        expect(metrics['lib/math.ts']).toBeDefined();
+        expect(metrics['lib/math.ts'].scanned).toBe(true);
+
+        // Files outside selected roots must NOT become local metric records
+        expect(metrics['outside/ignored.ts']).toBeUndefined();
+
+        const report = fs.readFileSync(path.join(multiRootDir, '.maritime', 'complexity-report.md'), 'utf8');
+        expect(report).toContain('Total Graph Files**: 3');
+        expect(report).toContain('Measured Files**: 3');
+        expect(report).toContain('Unmeasured Files**: 0');
     }, 60000);
 
     it('clean-install multi-root fixture repository: analyzes project with multi-source roots and programmatic API', () => {
