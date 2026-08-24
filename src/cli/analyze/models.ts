@@ -29,6 +29,7 @@ export interface AnalysisResult {
 export interface EslintMessage {
     ruleId: string;
     message: string;
+    fatal?: boolean;
 }
 
 export interface EslintResult {

@@ -49,5 +49,18 @@ describe('parse-eslint', () => {
             const result = parseEslintComplexityReport(eslintResults, '/project');
             expect(result['src/a.ts']).toEqual({ complexity: 1, scanned: true });
         });
+
+        it('should mark files with fatal ESLint parsing or config errors as unmeasured (scanned: false, complexity: 0)', () => {
+            const eslintResults: EslintResult[] = [
+                {
+                    filePath: '/project/src/fatal.ts',
+                    messages: [
+                        { ruleId: 'unknown', message: 'Parsing error: Unexpected token', fatal: true }
+                    ]
+                }
+            ];
+            const result = parseEslintComplexityReport(eslintResults, '/project');
+            expect(result['src/fatal.ts']).toEqual({ complexity: 0, scanned: false });
+        });
     });
 });

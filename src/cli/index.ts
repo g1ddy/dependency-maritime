@@ -3,6 +3,8 @@ import { runAnalyzeCommand } from './commands/analyze';
 export { runAnalyzeCommand };
 export {
     readDependencyGraph,
+    resolveDepcruiseConfig,
+    generateDependencyGraph,
     runEslintComplexityScan,
     countLinesOfCode,
     writeOutputFiles
@@ -24,18 +26,31 @@ export {
 export * from './analyze/models';
 
 export async function analyzeProject(options: {
-    graph: string;
-    metrics: string;
-    report: string;
+    graph?: string;
+    metrics?: string;
+    report?: string;
+    output?: string;
+    depcruiseConfig?: string;
     source?: string | string[];
     cwd?: string;
     failOnUnmeasured?: boolean;
 }): Promise<number> {
-    const args: string[] = [
-        '--graph', options.graph,
-        '--metrics', options.metrics,
-        '--report', options.report
-    ];
+    const args: string[] = [];
+    if (options.graph) {
+        args.push('--graph', options.graph);
+    }
+    if (options.metrics) {
+        args.push('--metrics', options.metrics);
+    }
+    if (options.report) {
+        args.push('--report', options.report);
+    }
+    if (options.output) {
+        args.push('--output', options.output);
+    }
+    if (options.depcruiseConfig) {
+        args.push('--depcruise-config', options.depcruiseConfig);
+    }
     if (options.cwd) {
         args.push('--cwd', options.cwd);
     }

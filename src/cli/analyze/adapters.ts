@@ -1,7 +1,161 @@
 import * as fs from 'fs/promises';
+import { existsSync } from 'node:fs';
 import * as path from 'path';
 import { CruiseResultSchema } from '../../schema/dependency-cruiser';
 import { ValidationError, type DependencyCruiserModule, type EslintResult } from './models';
+
+export interface ResolvedDepcruiseConfig {
+    config: Record<string, unknown>;
+    configPath: string | null;
+    source: 'explicit' | 'discovered' | 'fallback';
+}
+
+export function getPortableFallbackConfig(cwd: string = process.cwd()): { options: Record<string, unknown> } {
+    const options: Record<string, unknown> = {
+        doNotFollow: {
+            path: 'node_modules'
+        },
+        tsPreCompilationDeps: true,
+        enhancedResolveOptions: {
+            exportsFields: ['exports'],
+            conditionNames: ['import', 'require', 'node', 'default']
+        }
+    };
+
+    const tsConfigApp = path.resolve(cwd, 'tsconfig.app.json');
+    const tsConfigDefault = path.resolve(cwd, 'tsconfig.json');
+
+    try {
+        if (existsSync(tsConfigApp)) {
+            options.tsConfig = { fileName: './tsconfig.app.json' };
+        } else if (existsSync(tsConfigDefault)) {
+            options.tsConfig = { fileName: './tsconfig.json' };
+        }
+    } catch {
+        // Ignore filesystem check errors
+    }
+
+    return { options };
+}
+
+export async function resolveDepcruiseConfig(
+    configPath?: string,
+    cwd: string = process.cwd()
+): Promise<ResolvedDepcruiseConfig> {
+    if (configPath) {
+        const absConfigPath = path.resolve(cwd, configPath);
+        if (!existsSync(absConfigPath)) {
+            throw new ValidationError(`Specified dependency-cruiser configuration file not found at ${configPath}`);
+        }
+        try {
+            const extractDepcruiseConfigModule = await import('dependency-cruiser/config-utl/extract-depcruise-config');
+            const extractDepcruiseConfig = extractDepcruiseConfigModule.default || extractDepcruiseConfigModule;
+            const config = await extractDepcruiseConfig(absConfigPath);
+            return {
+                config: config as Record<string, unknown>,
+                configPath: absConfigPath,
+                source: 'explicit'
+            };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            throw new ValidationError(`Failed to load specified dependency-cruiser configuration at ${configPath}: ${message}`);
+        }
+    }
+
+    const conventionalFiles = [
+        '.dependency-cruiser.cjs',
+        '.dependency-cruiser.js',
+        '.dependency-cruiser.mjs',
+        '.dependency-cruiser.json'
+    ];
+
+    for (const fileName of conventionalFiles) {
+        const candidate = path.resolve(cwd, fileName);
+        if (existsSync(candidate)) {
+            try {
+                const extractDepcruiseConfigModule = await import('dependency-cruiser/config-utl/extract-depcruise-config');
+                const extractDepcruiseConfig = extractDepcruiseConfigModule.default || extractDepcruiseConfigModule;
+                const config = await extractDepcruiseConfig(candidate);
+                return {
+                    config: config as Record<string, unknown>,
+                    configPath: candidate,
+                    source: 'discovered'
+                };
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
+                throw new ValidationError(`Failed to load discovered dependency-cruiser configuration at ${fileName}: ${message}`);
+            }
+        }
+    }
+
+    return {
+        config: getPortableFallbackConfig(cwd),
+        configPath: null,
+        source: 'fallback'
+    };
+}
+
+export interface GenerateDependencyGraphOptions {
+    sourceRoots: string[];
+    configPath?: string;
+    cwd?: string;
+}
+
+export interface GenerateDependencyGraphResult {
+    cruiseResult: unknown;
+    modules: DependencyCruiserModule[];
+    configSource: 'explicit' | 'discovered' | 'fallback';
+}
+
+export async function generateDependencyGraph(
+    options: GenerateDependencyGraphOptions
+): Promise<GenerateDependencyGraphResult> {
+    const cwd = options.cwd ? path.resolve(options.cwd) : process.cwd();
+    const resolvedConfig = await resolveDepcruiseConfig(options.configPath, cwd);
+
+    const prevCwd = process.cwd();
+    let cruiseResultRaw: unknown;
+
+    try {
+        process.chdir(cwd);
+
+        const { cruise } = await import('dependency-cruiser');
+        const rawOptions = (resolvedConfig.config.options as Record<string, unknown> | undefined) || {};
+        const cruiseOptions: Record<string, unknown> = { ...rawOptions };
+
+        if (resolvedConfig.config.forbidden || resolvedConfig.config.allowed || resolvedConfig.config.required) {
+            cruiseOptions.ruleSet = resolvedConfig.config;
+        }
+
+        const cruiseOutput = await cruise(options.sourceRoots, cruiseOptions);
+        cruiseResultRaw = cruiseOutput.output;
+    } catch (err: unknown) {
+        if (err instanceof ValidationError) {
+            throw err;
+        }
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(`Failed to generate dependency graph: ${message}`);
+    } finally {
+        process.chdir(prevCwd);
+    }
+
+    const validationResult = CruiseResultSchema.safeParse(cruiseResultRaw);
+    if (!validationResult.success) {
+        throw new ValidationError(`Generated dependency graph failed schema validation:\n${validationResult.error.message}`);
+    }
+
+    const modules: DependencyCruiserModule[] = validationResult.data.modules.map(m => ({
+        source: m.source,
+        dependencies: m.dependencies,
+        dependents: m.dependents
+    }));
+
+    return {
+        cruiseResult: validationResult.data,
+        modules,
+        configSource: resolvedConfig.source
+    };
+}
 
 export async function readDependencyGraph(
     graphPath: string,
@@ -56,10 +210,10 @@ export async function runEslintComplexityScan(
     const rawPaths = Array.isArray(sourcePath) ? sourcePath : [sourcePath];
     const globPatterns = rawPaths.map(p => `${path.resolve(cwd, p).replace(/\\/g, '/') }/**/*.{ts,tsx}`);
 
-    const hasExplicitFiles = Boolean(sourceFiles && sourceFiles.length > 0);
+    const hasExplicitFiles = sourceFiles !== undefined;
     let targets: string[];
     if (hasExplicitFiles) {
-        targets = sourceFiles!.map(f => path.resolve(cwd, f).replace(/\\/g, '/'));
+        targets = sourceFiles.map(f => path.resolve(cwd, f).replace(/\\/g, '/'));
     } else {
         targets = globPatterns;
     }
@@ -118,7 +272,8 @@ export async function runEslintComplexityScan(
                                 ignored: Boolean((result as { ignored?: boolean }).ignored),
                                 messages: result.messages.map(msg => ({
                                     ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
-                                    message: msg.message
+                                    message: msg.message,
+                                    fatal: Boolean((msg as { fatal?: boolean }).fatal)
                                 }))
                             });
                         }
@@ -143,7 +298,8 @@ export async function runEslintComplexityScan(
                         ignored: Boolean((result as { ignored?: boolean }).ignored),
                         messages: result.messages.map(msg => ({
                             ruleId: typeof msg.ruleId === 'string' ? msg.ruleId : 'unknown',
-                            message: msg.message
+                            message: msg.message,
+                            fatal: Boolean((msg as { fatal?: boolean }).fatal)
                         }))
                     });
                 }

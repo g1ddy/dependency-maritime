@@ -49,6 +49,9 @@ export function calculateMetrics(
 
     const files: FileMetric[] = modules
         .filter(m => {
+            if (m.source.startsWith('node_modules/') || m.source.startsWith('node:')) {
+                return false;
+            }
             const isSource = normalizedPrefixes.some(prefix => {
                 if (prefix === '') return true;
                 return m.source === prefix || m.source.startsWith(`${prefix}/`);

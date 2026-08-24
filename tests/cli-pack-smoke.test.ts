@@ -83,12 +83,12 @@ describe('CLI npm pack clean-install smoke tests', () => {
 
         fs.writeFileSync(
             path.join(catanDir, 'src', 'board', 'hex.ts'),
-            'export interface Hex { q: number; r: number; }\nexport function getNeighbors(h: Hex): Hex[] { return [{ q: h.q + 1, r: h.r }, { q: h.q - 1, r: h.r }]; }\n'
+            'export function getNeighbors(h) { return [{ q: h.q + 1, r: h.r }, { q: h.q - 1, r: h.r }]; }\n'
         );
 
         fs.writeFileSync(
             path.join(catanDir, 'src', 'game', 'engine.ts'),
-            'import { Hex, getNeighbors } from "../board/hex";\nexport function setupGame(h: Hex) { return getNeighbors(h); }\n'
+            'import { getNeighbors } from "../board/hex";\nexport function setupGame(h) { return getNeighbors(h); }\n'
         );
 
         const graphData = {
@@ -167,6 +167,64 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(report).toContain('Measured Files**: 2');
     }, 60000);
 
+    it('clean-install generated-graph mode: generates dependency graph and analyzes project without pre-generated graph file', () => {
+        const genDir = path.join(tmpRoot, 'generated-graph-smoke');
+        fs.mkdirSync(path.join(genDir, 'app', 'domain'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(genDir, 'package.json'),
+            JSON.stringify({
+                name: 'generated-graph-smoke',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: {
+                    eslint: '^9.0.0'
+                }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(genDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(genDir, 'app', 'domain', 'model.ts'),
+            'export function createUser(id) { return { id, name: "User" }; }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(genDir, 'app', 'main.ts'),
+            'import { createUser } from "./domain/model";\nexport function run() { return createUser("1"); }\n'
+        );
+
+        // Install packed CLI tarball and eslint
+        execSync(`npm install "${tarballPath}" eslint@^9.0.0 --no-save`, { cwd: genDir, stdio: 'pipe' });
+
+        // Run concise generated-graph command
+        const analyzeOutput = execSync('npx maritime analyze --source app --output .maritime', {
+            cwd: genDir,
+            encoding: 'utf8'
+        });
+
+        expect(analyzeOutput).toContain('Generating Dependency Graph with dependency-cruiser...');
+        expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported!');
+
+        // Check generated artifacts in .maritime directory
+        expect(fs.existsSync(path.join(genDir, '.maritime', 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(genDir, '.maritime', 'complexity-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(genDir, '.maritime', 'complexity-report.md'))).toBe(true);
+
+        const metrics = JSON.parse(
+            fs.readFileSync(path.join(genDir, '.maritime', 'complexity-metrics.json'), 'utf8')
+        ) as Record<string, { scanned: boolean }>;
+
+        expect(metrics['app/domain/model.ts']).toBeDefined();
+        expect(metrics['app/domain/model.ts'].scanned).toBe(true);
+        expect(metrics['app/main.ts']).toBeDefined();
+        expect(metrics['app/main.ts'].scanned).toBe(true);
+    }, 60000);
+
     it('clean-install multi-root fixture repository: analyzes project with multi-source roots and programmatic API', () => {
         const crawlerDir = path.join(tmpRoot, 'crawler-command-interface');
         fs.mkdirSync(path.join(crawlerDir, 'src'), { recursive: true });
@@ -191,7 +249,7 @@ describe('CLI npm pack clean-install smoke tests', () => {
 
         fs.writeFileSync(
             path.join(crawlerDir, 'src', 'crawler.ts'),
-            'export function crawl(url: string) { return url.length > 0 ? "ok" : "empty"; }\n'
+            'export function crawl(url) { return url.length > 0 ? "ok" : "empty"; }\n'
         );
 
         fs.writeFileSync(
