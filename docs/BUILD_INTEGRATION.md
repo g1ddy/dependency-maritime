@@ -111,7 +111,7 @@ The package boundary and normal generated-graph path have now been proven agains
 
 ## Increment 3 — Real-consumer graph integration
 
-This is the next release-blocking milestone.
+**Complete.** The packed CLI has passed representative external-consumer proof and the supported Node runtime matrix. Increment 4 may now begin; additional configuration-shape hardening is tracked separately in issue #217.
 
 ### Graph generation
 
@@ -141,10 +141,15 @@ Crawler remains a strong compatibility target: Node 22, TypeScript 5.9, ESLint 9
 
 ### Compatibility matrix
 
-- [ ] Add integration coverage on supported Node 20, 22, and 24 versions. (Implemented in PR #215; mark complete only after all matrix jobs pass and the PR merges.)
-- [ ] Validate supported dependency-cruiser versions/configuration layouts.
-- [ ] Add a multi-root Next/Vite-style fixture for generated-graph mode.
+- [x] Add integration coverage on supported Node 20, 22, and 24 versions.
+- [x] Validate the packaged dependency-cruiser runtime with representative consumer configuration and portable fallback graph generation.
 - [x] Add fixtures for fatal ESLint results and explicitly empty supported-file selections.
+
+### Post-Increment-3 compatibility hardening
+
+The following work improves confidence before public publishing but does not block Increment 4's versioned artifact contract:
+
+- [ ] Validate explicit CJS and ESM dependency-cruiser configuration layouts and generated-graph multi-root behavior ([#217](https://github.com/g1ddy/dependency-maritime/issues/217)).
 - [ ] Validate the packaged CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories before public publishing.
 
 ## Later roadmap
@@ -181,6 +186,6 @@ Do not describe Maritime as publicly distribution-ready merely because `npm pack
 2. The normal CLI path can generate its own dependency graph or deliberately consume a supplied one.
 3. Crawler Command Interface and Catan Hex Mastery pass end-to-end through the packed CLI from outside the Maritime repository tree.
 4. Local graph scoping and measurement integrity are enforced.
-5. The supported Node/ESLint/dependency-cruiser compatibility matrix passes.
+5. The required Node/ESLint/dependency-cruiser runtime compatibility matrix passes.
 
-Only after those gates should the roadmap advance to the artifact manifest, baseline comparison, reusable CI wrapper, and public package release.
+Increment 4 may proceed once these gates pass. The remaining configuration-shape hardening and additional-repository validation stay required before public package release.
