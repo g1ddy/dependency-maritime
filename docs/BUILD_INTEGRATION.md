@@ -141,7 +141,7 @@ Crawler remains a strong compatibility target: Node 22, TypeScript 5.9, ESLint 9
 
 ### Compatibility matrix
 
-- [ ] Add integration coverage on supported Node 20, 22, and 24 versions. (Implemented in PR #216; mark complete only after all matrix jobs pass and the PR merges.)
+- [ ] Add integration coverage on supported Node 20, 22, and 24 versions. (Implemented in PR #215; mark complete only after all matrix jobs pass and the PR merges.)
 - [ ] Validate supported dependency-cruiser versions/configuration layouts.
 - [ ] Add a multi-root Next/Vite-style fixture for generated-graph mode.
 - [x] Add fixtures for fatal ESLint results and explicitly empty supported-file selections.
