@@ -362,6 +362,31 @@ describe('analyze command integration fixtures', () => {
         expect(metricsData['app/main.ts'].scanned).toBe(true);
     });
 
+    it('malformed discovered dependency-cruiser config fixture: fails with exit code 2 and ValidationError', async () => {
+        const dir = path.join(fixtureRoot, 'malformed-discovered-depcruise-config');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const a = 1;');
+        fs.writeFileSync(
+            path.join(dir, '.dependency-cruiser.cjs'),
+            'module.exports = { options: { invalidSyntaxHere '
+        );
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(2);
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining('Failed to load discovered dependency-cruiser configuration at .dependency-cruiser.cjs')
+        );
+    });
+
     it('repository dependency-cruiser config fixture: honors repo .dependency-cruiser.cjs', async () => {
         const dir = path.join(fixtureRoot, 'repo-depcruise-config');
         fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
