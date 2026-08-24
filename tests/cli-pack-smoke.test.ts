@@ -387,6 +387,18 @@ describe('CLI npm pack clean-install smoke tests', () => {
             'import { square } from "../lib/math";\nexport function Card(props) { return square(props.val); }\n'
         );
 
+        // Keep these selected-root files unreferenced: they prove every --source root
+        // is passed to dependency-cruiser instead of being discovered only through app imports.
+        fs.writeFileSync(
+            path.join(multiRootDir, 'components', 'standalone.tsx'),
+            'export const standaloneComponent = "selected independently";\n'
+        );
+
+        fs.writeFileSync(
+            path.join(multiRootDir, 'lib', 'standalone.ts'),
+            'export const standaloneLibrary = "selected independently";\n'
+        );
+
         fs.writeFileSync(
             path.join(multiRootDir, 'app', 'page.tsx'),
             'import { Card } from "../components/card";\nexport default function Page() { return Card({ val: 4 }); }\n'
@@ -422,13 +434,17 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(metrics['components/card.tsx'].scanned).toBe(true);
         expect(metrics['lib/math.ts']).toBeDefined();
         expect(metrics['lib/math.ts'].scanned).toBe(true);
+        expect(metrics['components/standalone.tsx']).toBeDefined();
+        expect(metrics['components/standalone.tsx'].scanned).toBe(true);
+        expect(metrics['lib/standalone.ts']).toBeDefined();
+        expect(metrics['lib/standalone.ts'].scanned).toBe(true);
 
         // Files outside selected roots must NOT become local metric records
         expect(metrics['outside/ignored.ts']).toBeUndefined();
 
         const report = fs.readFileSync(path.join(multiRootDir, '.maritime', 'complexity-report.md'), 'utf8');
-        expect(report).toContain('Total Graph Files**: 3');
-        expect(report).toContain('Measured Files**: 3');
+        expect(report).toContain('Total Graph Files**: 5');
+        expect(report).toContain('Measured Files**: 5');
         expect(report).toContain('Unmeasured Files**: 0');
     }, 60000);
 
