@@ -9,6 +9,29 @@ permissions:
   contents: write
 
 jobs:
+  cli-package-compatibility:
+    name: CLI package compatibility (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20.19.0, 22.x, 24.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Verify packed CLI consumer contract
+      run: npm run test:cli-package
+
   build-and-test:
     runs-on: ubuntu-latest
 
