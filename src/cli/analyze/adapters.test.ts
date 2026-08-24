@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import * as fs from 'fs/promises';
-import { readDependencyGraph, runEslintComplexityScan } from './adapters';
+import { readDependencyGraph, runEslintComplexityScan, resolveDepcruiseConfig, getPortableFallbackConfig } from './adapters';
 import { ValidationError } from './models';
 import { ESLint } from 'eslint';
 
@@ -144,6 +144,32 @@ describe('adapters', () => {
             });
 
             await expect(runEslintComplexityScan('src', ['src/a.ts'])).rejects.toThrow('Failed to run ESLint: Fatal ESLint init failure');
+        });
+    });
+
+    describe('resolveDepcruiseConfig & getPortableFallbackConfig', () => {
+        it('should return fallback config when no explicit or conventional config exists', async () => {
+            const result = await resolveDepcruiseConfig(undefined, '/tmp/non-existent-dir-for-maritime-test');
+            expect(result.source).toBe('fallback');
+            expect(result.configPath).toBeNull();
+            expect(result.config.options).toBeDefined();
+        });
+
+        it('should throw ValidationError if explicit depcruiseConfig file does not exist', async () => {
+            await expect(resolveDepcruiseConfig('non-existent-config.cjs')).rejects.toThrow(ValidationError);
+        });
+
+        it('should load explicit depcruiseConfig file when provided', async () => {
+            const result = await resolveDepcruiseConfig('config/.dependency-cruiser.cjs');
+            expect(result.source).toBe('explicit');
+            expect(result.configPath).toContain('config/.dependency-cruiser.cjs');
+            expect(result.config.options).toBeDefined();
+        });
+
+        it('should generate portable fallback options with tsconfig detection', () => {
+            const fallback = getPortableFallbackConfig(process.cwd());
+            expect(fallback.options.doNotFollow).toEqual({ path: 'node_modules' });
+            expect(fallback.options.tsPreCompilationDeps).toBe(true);
         });
     });
 });

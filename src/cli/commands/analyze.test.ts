@@ -32,7 +32,7 @@ describe('runAnalyzeCommand', () => {
     it('should return 2 if missing required arguments', async () => {
         const exitCode = await runAnalyzeCommand(['--source', 'src']);
         expect(exitCode).toBe(2);
-        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('are required'));
+        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Either --output or both --metrics and --report must be specified'));
     });
 
     it('should run successfully and return 0 with valid arguments', async () => {

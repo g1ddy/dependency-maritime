@@ -53,7 +53,7 @@ describe('analyze command integration fixtures', () => {
         fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
 
         fs.writeFileSync(path.join(dir, 'eslint.config.js'), 'export default [{ files: ["**/*.ts", "**/*.tsx"] }];');
-        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const x = 1;\nfunction foo(a: number) { return a + 1; }\n');
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const x = 1;\nfunction foo(a) { return a + 1; }\n');
 
         const graphFile = createGraphJson(dir, ['src/index.ts']);
 
@@ -331,5 +331,218 @@ describe('analyze command integration fixtures', () => {
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining('Source Root (raw): src, lib')
         );
+    });
+
+    it('generated-graph workflow with --output: performs end-to-end graph generation and analysis', async () => {
+        const dir = path.join(fixtureRoot, 'generated-graph-output');
+        fs.mkdirSync(path.join(dir, 'app'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'app', 'main.ts'), 'export const main = "main";\n');
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--source', 'app',
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+
+        expect(fs.existsSync(path.join(dir, '.maritime', 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(dir, '.maritime', 'complexity-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(dir, '.maritime', 'complexity-report.md'))).toBe(true);
+
+        const metricsData = JSON.parse(
+            fs.readFileSync(path.join(dir, '.maritime', 'complexity-metrics.json'), 'utf8')
+        ) as Record<string, FileMetric>;
+        expect(metricsData['app/main.ts']).toBeDefined();
+        expect(metricsData['app/main.ts'].scanned).toBe(true);
+    });
+
+    it('repository dependency-cruiser config fixture: honors repo .dependency-cruiser.cjs', async () => {
+        const dir = path.join(fixtureRoot, 'repo-depcruise-config');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const a = 1;');
+        fs.writeFileSync(
+            path.join(dir, '.dependency-cruiser.cjs'),
+            'module.exports = { options: { doNotFollow: { path: "node_modules" } } };'
+        );
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('Dependency-Cruiser Config Source: discovered')
+        );
+    });
+
+    it('explicit --depcruise-config fixture: uses explicitly specified config', async () => {
+        const dir = path.join(fixtureRoot, 'explicit-depcruise-config');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+        fs.mkdirSync(path.join(dir, 'custom-config'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const a = 1;');
+        fs.writeFileSync(
+            path.join(dir, 'custom-config', 'my-dc.cjs'),
+            'module.exports = { options: { doNotFollow: { path: "node_modules" } } };'
+        );
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--depcruise-config', 'custom-config/my-dc.cjs',
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('Dependency-Cruiser Config Source: explicit')
+        );
+    });
+
+    it('proves Maritime own config/.dependency-cruiser.cjs is not used as consumer fallback', async () => {
+        const dir = path.join(fixtureRoot, 'no-depcruise-config-fallback');
+        fs.mkdirSync(path.join(dir, 'app'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'app', 'page.ts'), 'export const page = "home";');
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--source', 'app',
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('Dependency-Cruiser Config Source: fallback')
+        );
+    });
+
+    it('multi-root Next/Vite-style fixture with generated graph', async () => {
+        const dir = path.join(fixtureRoot, 'next-vite-multi-root');
+        fs.mkdirSync(path.join(dir, 'app'), { recursive: true });
+        fs.mkdirSync(path.join(dir, 'components'), { recursive: true });
+        fs.mkdirSync(path.join(dir, 'lib'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(
+            path.join(dir, 'lib', 'db.ts'),
+            'export function connect() { return "connected"; }\n'
+        );
+        fs.writeFileSync(
+            path.join(dir, 'components', 'button.tsx'),
+            'import { connect } from "../lib/db";\nexport function Button() { return connect(); }\n'
+        );
+        fs.writeFileSync(
+            path.join(dir, 'app', 'page.tsx'),
+            'import { Button } from "../components/button";\nexport default function Page() { return Button(); }\n'
+        );
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--source', 'app',
+            '--source', 'components',
+            '--source', 'lib',
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+
+        const metricsData = JSON.parse(
+            fs.readFileSync(path.join(dir, '.maritime', 'complexity-metrics.json'), 'utf8')
+        ) as Record<string, FileMetric>;
+
+        expect(metricsData['app/page.tsx']).toBeDefined();
+        expect(metricsData['components/button.tsx']).toBeDefined();
+        expect(metricsData['lib/db.ts']).toBeDefined();
+        expect(metricsData['app/page.tsx'].fanOut).toBe(1);
+    });
+
+    it('fatal ESLint parsing error fixture: fatal file is marked as unmeasured and fails --fail-on-unmeasured', async () => {
+        const dir = path.join(fixtureRoot, 'fatal-eslint-error');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        fs.writeFileSync(path.join(dir, 'src', 'good.ts'), 'export const good = 1;');
+        fs.writeFileSync(path.join(dir, 'src', 'syntax-error.ts'), 'export const bad = ;;; invalid syntax');
+
+        const graphFile = createGraphJson(dir, ['src/good.ts', 'src/syntax-error.ts']);
+
+        // 1. Run without --fail-on-unmeasured to verify metrics file generation and scanned: false marking
+        const normalExitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--graph', graphFile,
+            '--metrics', 'metrics.json',
+            '--report', 'report.md'
+        ]);
+
+        expect(normalExitCode).toBe(0);
+
+        const metricsData = JSON.parse(fs.readFileSync(path.join(dir, 'metrics.json'), 'utf8')) as Record<string, FileMetric>;
+        expect(metricsData['src/good.ts'].scanned).toBe(true);
+        expect(metricsData['src/syntax-error.ts'].scanned).toBe(false);
+        expect(metricsData['src/syntax-error.ts'].complexity).toBe(0);
+
+        // 2. Run with --fail-on-unmeasured to verify exit code 2 failure
+        const failExitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--graph', graphFile,
+            '--metrics', 'metrics.json',
+            '--report', 'report.md',
+            '--fail-on-unmeasured'
+        ]);
+
+        expect(failExitCode).toBe(2);
+    });
+
+    it('explicitly empty supported-file selection fixture: preserves empty selection without source-glob fallback', async () => {
+        const dir = path.join(fixtureRoot, 'empty-supported-file-selection');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(dir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];'
+        );
+        // On disk there is a .ts file, but graph only contains CSS
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const x = 1;');
+        fs.writeFileSync(path.join(dir, 'src', 'style.css'), 'body { background: black; }');
+
+        const graphFile = createGraphJson(dir, ['src/style.css']);
+
+        const exitCode = await runAnalyzeCommand([
+            '--cwd', dir,
+            '--graph', graphFile,
+            '--metrics', 'metrics.json',
+            '--report', 'report.md'
+        ]);
+
+        expect(exitCode).toBe(0);
+
+        const metricsData = JSON.parse(fs.readFileSync(path.join(dir, 'metrics.json'), 'utf8')) as Record<string, FileMetric>;
+        expect(Object.keys(metricsData)).toEqual([]);
     });
 });

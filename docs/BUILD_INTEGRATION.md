@@ -92,8 +92,8 @@ A later increment adds a versioned envelope containing schema version, tool vers
 - [x] Enforce Node `>=20.19.0`, ESLint 9+ flat config, and reject legacy ESLint configuration.
 - [x] Track skipped/ignored/stale graph files as unmeasured and support `--fail-on-unmeasured`.
 - [x] Support repeatable `--source` roots and log raw/normalized roots.
-- [ ] Treat ESLint fatal parsing/configuration results as unmeasured rather than scanned complexity `1`.
-- [ ] Restrict measurement and unmeasured checks to the explicit supported implementation-file contract and preserve an explicitly empty graph selection.
+- [x] Treat ESLint fatal parsing/configuration results as unmeasured rather than scanned complexity `1`.
+- [x] Restrict measurement and unmeasured checks to the explicit supported implementation-file contract and preserve an explicitly empty graph selection.
 
 ### Distributable package boundary
 
@@ -115,13 +115,13 @@ This is the next release-blocking milestone.
 
 ### Graph generation
 
-- [ ] Add a graph-generation path to `maritime analyze` (or a cohesive public command) so ordinary consumers do not need to manually invoke dependency-cruiser.
-- [ ] Retain `--graph` as the low-level pre-generated artifact path.
-- [ ] Discover or explicitly accept a repository-supplied dependency-cruiser config.
-- [ ] Define portable fallback graph-generation behavior when no consumer config exists.
-- [ ] Ensure Dependency Maritime's own `config/.dependency-cruiser.cjs` remains repository-specific architecture policy and never becomes an implicit consumer default.
-- [ ] Protect graph scope so external packages and Node built-ins do not contaminate local metrics.
-- [ ] Define dependency-cruiser packaging/version ownership: a normal Maritime install must contain everything needed for graph generation.
+- [x] Add a graph-generation path to `maritime analyze` (or a cohesive public command) so ordinary consumers do not need to manually invoke dependency-cruiser.
+- [x] Retain `--graph` as the low-level pre-generated artifact path.
+- [x] Discover or explicitly accept a repository-supplied dependency-cruiser config.
+- [x] Define portable fallback graph-generation behavior when no consumer config exists.
+- [x] Ensure Dependency Maritime's own `config/.dependency-cruiser.cjs` remains repository-specific architecture policy and never becomes an implicit consumer default.
+- [x] Protect graph scope so external packages and Node built-ins do not contaminate local metrics.
+- [x] Define dependency-cruiser packaging/version ownership: a normal Maritime install must contain everything needed for graph generation.
 
 ### Real-consumer proof
 

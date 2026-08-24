@@ -10,7 +10,7 @@ export function parseEslintComplexityReport(
     for (const file of eslintResults) {
         const relPath = path.relative(cwd, file.filePath).replace(/\\/g, '/');
 
-        if (file.ignored) {
+        if (file.ignored || file.messages.some(m => m.fatal === true)) {
             complexityMap[relPath] = { complexity: 0, scanned: false };
             continue;
         }

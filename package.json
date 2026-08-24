@@ -43,6 +43,7 @@
     "test:screenshots": "playwright test -c config/playwright.screenshots.config.ts"
   },
   "dependencies": {
+    "dependency-cruiser": "^17.3.7",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -71,7 +72,6 @@
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
     "dagre": "^0.8.5",
-    "dependency-cruiser": "^17.3.7",
     "elkjs": "^0.11.0",
     "eslint": "^9.39.2",
     "eslint-plugin-react-hooks": "^7.0.1",
