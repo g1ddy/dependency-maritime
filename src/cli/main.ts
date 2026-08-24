@@ -1,5 +1,6 @@
 import { parseArgs } from 'node:util';
 import { runAnalyzeCommand } from './commands/analyze';
+import { runValidateCommand } from './commands/validate';
 
 async function main() {
     const { positionals } = parseArgs({
@@ -11,13 +12,16 @@ async function main() {
     const command = positionals[0];
 
     if (command === 'analyze') {
-        // Pass only the args meant for the analyze command
         const args = process.argv.slice(3);
         const exitCode = await runAnalyzeCommand(args);
         process.exit(exitCode);
+    } else if (command === 'validate') {
+        const args = process.argv.slice(3);
+        const exitCode = await runValidateCommand(args);
+        process.exit(exitCode);
     } else {
         console.error(`Unknown command: ${command || '(none)'}`);
-        console.error('Available commands: analyze');
+        console.error('Available commands: analyze, validate');
         process.exit(1);
     }
 }

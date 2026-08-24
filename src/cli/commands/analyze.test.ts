@@ -35,7 +35,7 @@ describe('runAnalyzeCommand', () => {
         expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Either --output or both --metrics and --report must be specified'));
     });
 
-    it('should run successfully and return 0 with valid arguments', async () => {
+    it('should run successfully and return 0 with valid arguments and emit manifest data', async () => {
         const exitCode = await runAnalyzeCommand([
             '--source', 'src',
             '--graph', 'graph.json',
@@ -46,5 +46,12 @@ describe('runAnalyzeCommand', () => {
         expect(exitCode).toBe(0);
         expect(adapters.readDependencyGraph).toHaveBeenCalledWith('graph.json', expect.any(String));
         expect(adapters.writeOutputFiles).toHaveBeenCalled();
+        const calls = vi.mocked(adapters.writeOutputFiles).mock.calls;
+        expect(calls[0][4]).toBe('manifest.json');
+        const manifest = calls[0][5] as { schemaVersion: string; artifacts: { graph: string; metrics: string; report: string } };
+        expect(manifest.schemaVersion).toBe('1.0.0');
+        expect(manifest.artifacts.graph).toBe('graph.json');
+        expect(manifest.artifacts.metrics).toBe('metrics.json');
+        expect(manifest.artifacts.report).toBe('report.md');
     });
 });

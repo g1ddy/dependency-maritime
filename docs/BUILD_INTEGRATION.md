@@ -79,7 +79,46 @@ The human-facing report contains health information, hotspots, threshold violati
 
 ### `manifest.json`
 
-A later increment adds a versioned envelope containing schema version, tool version, source roots, generation time, and artifact filenames so CI and the UI can reject incompatible bundles.
+A versioned envelope containing schema version, tool version, source roots, generation time, summary metrics, and declared artifact filenames so CI and the UI can validate output directories:
+
+```json
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "0.0.0",
+  "generatedAt": "2025-01-01T00:00:00.000Z",
+  "sourceRoots": ["src"],
+  "artifacts": {
+    "graph": "dependency-graph.json",
+    "metrics": "complexity-metrics.json",
+    "report": "complexity-report.md"
+  },
+  "summary": {
+    "totalFiles": 42,
+    "healthScore": 95.5,
+    "scannedCount": 42,
+    "skippedCount": 0
+  }
+}
+```
+
+## Validation contract
+
+The `maritime validate` command validates a Maritime artifact output directory without executing repository analysis or importing UI dependencies:
+
+```bash
+maritime validate .maritime
+```
+
+It verifies:
+1. `manifest.json` exists and validates against `ArtifactManifestSchema` matching the supported `schemaVersion` (`1.0.0`).
+2. Artifact paths declared in `manifest.json` do not escape the artifact directory via path traversal (e.g., `../outside.json`).
+3. Declared artifact files (`graph`, `metrics`, `report`) exist within the directory.
+4. `dependency-graph.json` validates against `CruiseResultSchema` and `complexity-metrics.json` validates against `ComplexityMetricsMapSchema`.
+
+Exit codes:
+- `0`: Successful validation.
+- `1`: Operational or runtime failure.
+- `2`: Invalid CLI arguments, missing/malformed manifest, unsupported schema version, path escaping, or schema validation error.
 
 ## Current implementation status
 
@@ -158,9 +197,9 @@ The following work improves confidence before public publishing but does not blo
 
 ### Increment 4 — Versioned artifact manifest and UI bundle upload
 
-- [ ] Define Zod schemas for the manifest/report model.
-- [ ] Generate `manifest.json` with schema/tool versions, source roots, generation time, and filenames.
-- [ ] Add `maritime validate`.
+- [x] Define Zod schemas for the manifest/report model.
+- [x] Generate `manifest.json` with schema/tool versions, source roots, generation time, and filenames.
+- [x] Add `maritime validate`.
 - [ ] Preserve raw graph upload and add complete `.zip` bundle upload to the UI.
 
 ### Increment 5 — Baseline comparison and regression policy
