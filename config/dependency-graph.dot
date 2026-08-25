@@ -13,6 +13,48 @@ strict digraph "dependency-cruiser output"{
     "src/App.tsx" -> "src/features/visualization/components/NodeInspectorPanel.tsx"
     "src/App.tsx" -> "src/features/visualization/components/SettingsDialog.tsx"
     "src/App.tsx" -> "src/features/visualization/store.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/adapters.ts" [label=<adapters.ts> tooltip="adapters.ts" URL="src/cli/analyze/adapters.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/analyze/adapters.ts" -> "src/schema/dependency-cruiser.ts"
+    "src/cli/analyze/adapters.ts" -> "src/cli/analyze/models.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/calculate-metrics.ts" [label=<calculate-metrics.ts> tooltip="calculate-metrics.ts" URL="src/cli/analyze/calculate-metrics.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/analyze/calculate-metrics.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/environment.ts" [label=<environment.ts> tooltip="environment.ts" URL="src/cli/analyze/environment.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/analyze/environment.ts" -> "src/cli/analyze/models.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/models.ts" [label=<models.ts> tooltip="models.ts" URL="src/cli/analyze/models.ts" fillcolor="#ddfeff"] } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/parse-eslint.ts" [label=<parse-eslint.ts> tooltip="parse-eslint.ts" URL="src/cli/analyze/parse-eslint.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/analyze/parse-eslint.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/render-markdown-report.ts" [label=<render-markdown-report.ts> tooltip="render-markdown-report.ts" URL="src/cli/analyze/render-markdown-report.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/analyze/render-markdown-report.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/commands" {label="commands" "src/cli/commands/analyze.ts" [label=<analyze.ts> tooltip="analyze.ts" URL="src/cli/commands/analyze.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/commands/analyze.ts" -> "src/schema/manifest.ts"
+    "src/cli/commands/analyze.ts" -> "src/cli/analyze/adapters.ts"
+    "src/cli/commands/analyze.ts" -> "src/cli/analyze/calculate-metrics.ts"
+    "src/cli/commands/analyze.ts" -> "src/cli/analyze/environment.ts"
+    "src/cli/commands/analyze.ts" -> "src/cli/analyze/models.ts"
+    "src/cli/commands/analyze.ts" -> "src/cli/analyze/parse-eslint.ts"
+    "src/cli/commands/analyze.ts" -> "src/cli/analyze/render-markdown-report.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/commands" {label="commands" "src/cli/commands/validate.ts" [label=<validate.ts> tooltip="validate.ts" URL="src/cli/commands/validate.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/commands/validate.ts" -> "src/cli/analyze/models.ts"
+    "src/cli/commands/validate.ts" -> "src/cli/validate/validate.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" "src/cli/index.ts" [label=<index.ts> tooltip="index.ts" URL="src/cli/index.ts" fillcolor="#ddfeff"] } }
+    "src/cli/index.ts" -> "src/schema/manifest.ts" [arrowhead="inv"]
+    "src/cli/index.ts" -> "src/cli/analyze/adapters.ts" [arrowhead="inv"]
+    "src/cli/index.ts" -> "src/cli/analyze/calculate-metrics.ts" [arrowhead="inv"]
+    "src/cli/index.ts" -> "src/cli/analyze/environment.ts" [arrowhead="inv"]
+    "src/cli/index.ts" -> "src/cli/analyze/models.ts" [arrowhead="inv"]
+    "src/cli/index.ts" -> "src/cli/analyze/parse-eslint.ts" [arrowhead="inv"]
+    "src/cli/index.ts" -> "src/cli/analyze/render-markdown-report.ts" [arrowhead="inv"]
+    "src/cli/index.ts" -> "src/cli/commands/analyze.ts"
+    "src/cli/index.ts" -> "src/cli/commands/validate.ts"
+    "src/cli/index.ts" -> "src/cli/validate/validate.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" "src/cli/main.ts" [label=<main.ts> tooltip="main.ts" URL="src/cli/main.ts" fillcolor="#ddfeff"] } }
+    "src/cli/main.ts" -> "src/cli/commands/analyze.ts"
+    "src/cli/main.ts" -> "src/cli/commands/validate.ts"
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/validate" {label="validate" "src/cli/validate/validate.ts" [label=<validate.ts> tooltip="validate.ts" URL="src/cli/validate/validate.ts" fillcolor="#ddfeff"] } } }
+    "src/cli/validate/validate.ts" -> "src/schema/complexity-metrics.ts"
+    "src/cli/validate/validate.ts" -> "src/schema/dependency-cruiser.ts"
+    "src/cli/validate/validate.ts" -> "src/schema/manifest.ts"
+    "src/cli/validate/validate.ts" -> "src/cli/analyze/models.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/DataSourceDialog.tsx" [label=<DataSourceDialog.tsx> tooltip="DataSourceDialog.tsx" URL="src/components/DataSourceDialog.tsx" fillcolor="#bbfeff"] } }
     "src/components/DataSourceDialog.tsx" -> "src/components/FileUploadZone.tsx"
     "src/components/DataSourceDialog.tsx" -> "src/components/ui/button.tsx"
@@ -81,6 +123,7 @@ strict digraph "dependency-cruiser output"{
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DataSourceDialog.tsx" [label=<DataSourceDialog.tsx> tooltip="DataSourceDialog.tsx" URL="src/features/visualization/components/DataSourceDialog.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/DataSourceDialog.tsx" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/components/DataSourceDialog.tsx" -> "src/components/DataSourceDialog.tsx"
+    "src/features/visualization/components/DataSourceDialog.tsx" -> "src/schema/complexity-metrics.ts"
     "src/features/visualization/components/DataSourceDialog.tsx" -> "src/schema/dependency-cruiser.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DependencyGraph.tsx" [label=<DependencyGraph.tsx> tooltip="DependencyGraph.tsx" URL="src/features/visualization/components/DependencyGraph.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/store.ts"
@@ -123,6 +166,8 @@ strict digraph "dependency-cruiser output"{
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/styles.ts" [label=<styles.ts> tooltip="styles.ts" URL="src/features/visualization/components/styles.ts" fillcolor="#ddfeff"] } } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/filters.ts" [label=<filters.ts> tooltip="filters.ts" URL="src/features/visualization/logic/filters.ts" fillcolor="#ddfeff"] } } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/graph-utils.ts" [label=<graph-utils.ts> tooltip="graph-utils.ts" URL="src/features/visualization/logic/graph-utils.ts" fillcolor="#ddfeff"] } } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout-elk.bench.ts" [label=<layout-elk.bench.ts> tooltip="layout-elk.bench.ts" URL="src/features/visualization/logic/layout-elk.bench.ts" fillcolor="#ddfeff"] } } } }
+    "src/features/visualization/logic/layout-elk.bench.ts" -> "src/features/visualization/logic/layout-elk.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout-elk.ts" [label=<layout-elk.ts> tooltip="layout-elk.ts" URL="src/features/visualization/logic/layout-elk.ts" fillcolor="#ddfeff"] } } } }
     "src/features/visualization/logic/layout-elk.ts" -> "src/features/visualization/logic/layout.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout.ts" [label=<layout.ts> tooltip="layout.ts" URL="src/features/visualization/logic/layout.ts" fillcolor="#ddfeff"] } } } }
@@ -156,5 +201,6 @@ strict digraph "dependency-cruiser output"{
     "src/main.tsx" -> "src/components/ui/tooltip.tsx"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/complexity-metrics.ts" [label=<complexity-metrics.ts> tooltip="complexity-metrics.ts" URL="src/schema/complexity-metrics.ts" fillcolor="#ddfeff"] } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/dependency-cruiser.ts" [label=<dependency-cruiser.ts> tooltip="dependency-cruiser.ts" URL="src/schema/dependency-cruiser.ts" fillcolor="#ddfeff"] } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/manifest.ts" [label=<manifest.ts> tooltip="manifest.ts" URL="src/schema/manifest.ts" fillcolor="#ddfeff"] } }
     subgraph "cluster_src" {label="src" "src/vite-env.d.ts" [label=<vite-env.d.ts> tooltip="vite-env.d.ts" URL="src/vite-env.d.ts" fillcolor="#ccffcc"] }
 }

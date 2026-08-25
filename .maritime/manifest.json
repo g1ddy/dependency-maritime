@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "0.0.0",
+  "generatedAt": "2026-08-25T18:34:36.525Z",
+  "sourceRoots": [
+    "src"
+  ],
+  "artifacts": {
+    "graph": "dependency-graph.json",
+    "metrics": "complexity-metrics.json",
+    "report": "complexity-report.md"
+  },
+  "summary": {
+    "totalFiles": 59,
+    "healthScore": 82,
+    "scannedCount": 59,
+    "skippedCount": 0
+  }
+}

@@ -69,10 +69,12 @@ module.exports = {
     },
   ],
   options: {
+    includeOnly: '^src',
+    exclude: '(\\.test\\.ts|\\.test\\.tsx|\\.spec\\.ts|testUtils\\.ts)$',
     doNotFollow: {
       path: 'node_modules',
     },
-    tsPreCompilationDeps: true,
+    tsPreCompilationDeps: 'specify',
     tsConfig: {
       fileName: './tsconfig.app.json',
     },
