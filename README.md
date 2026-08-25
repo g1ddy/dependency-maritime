@@ -109,7 +109,9 @@ The project is being built in 4 phases:
 
 For more details, check out the documentation:
 *   [Architecture](./docs/ARCHITECTURE.md)
-*   [Phases & Roadmap](./docs/PHASES.md)
+*   [CLI and Artifact Contract](./docs/CLI.md)
+*   [Roadmap](./docs/ROADMAP.md)
+*   [Development Guide](./docs/DEVELOPMENT.md)
 *   [Design Decisions](./docs/DESIGN_DECISIONS.md)
 
 ## 🤝 Contributing
