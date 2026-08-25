@@ -5,13 +5,15 @@ import {
     generateDependencyGraph,
     runEslintComplexityScan,
     countLinesOfCode,
-    writeOutputFiles
+    writeOutputFiles,
+    getToolVersion
 } from '../analyze/adapters';
 import { calculateMetrics, isSupportedTypeScriptFile } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import { validateEslintEnvironment } from '../analyze/environment';
 import { ValidationError, type AnalysisThresholds, type DependencyCruiserModule } from '../analyze/models';
+import { MANIFEST_SCHEMA_VERSION, type ArtifactManifest } from '../../schema/manifest';
 import * as path from 'path';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
@@ -211,7 +213,43 @@ Exit Codes:
 
         const reportContent = renderMarkdownReport(analysisResult, DEFAULT_THRESHOLDS);
 
-        await writeOutputFiles(targetMetricsPath, metricsMap, targetReportPath, reportContent, workingDir);
+        const manifestDir = values.output
+            ? path.resolve(workingDir, values.output)
+            : path.dirname(path.resolve(workingDir, targetMetricsPath));
+
+        const targetManifestPath = path.relative(workingDir, path.join(manifestDir, 'manifest.json')).replace(/\\/g, '/');
+
+        const relGraph = path.relative(manifestDir, path.resolve(workingDir, targetGraphPath)).replace(/\\/g, '/');
+        const relMetrics = path.relative(manifestDir, path.resolve(workingDir, targetMetricsPath)).replace(/\\/g, '/');
+        const relReport = path.relative(manifestDir, path.resolve(workingDir, targetReportPath)).replace(/\\/g, '/');
+
+        const manifest: ArtifactManifest = {
+            schemaVersion: MANIFEST_SCHEMA_VERSION,
+            toolVersion: getToolVersion(),
+            generatedAt: new Date().toISOString(),
+            sourceRoots: normalizedSources,
+            artifacts: {
+                graph: relGraph,
+                metrics: relMetrics,
+                report: relReport
+            },
+            summary: {
+                totalFiles: analysisResult.files.length,
+                healthScore: analysisResult.healthScore,
+                scannedCount: analysisResult.files.filter(f => f.scanned).length,
+                skippedCount: analysisResult.skippedCount
+            }
+        };
+
+        await writeOutputFiles(
+            targetMetricsPath,
+            metricsMap,
+            targetReportPath,
+            reportContent,
+            targetManifestPath,
+            manifest,
+            workingDir
+        );
 
         console.log('✅ Complexity Report Updated and Metrics Exported!');
         return 0;

@@ -342,11 +342,30 @@ export async function countLinesOfCode(
     return locMap;
 }
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+export function getToolVersion(): string {
+    try {
+        const currentFile = fileURLToPath(import.meta.url);
+        const pkgPath = path.resolve(path.dirname(currentFile), '../../../package.json');
+        if (existsSync(pkgPath)) {
+            const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as { version?: unknown };
+            if (typeof pkg.version === 'string') return pkg.version;
+        }
+    } catch {
+        // Fallback
+    }
+    return '0.0.0';
+}
+
 export async function writeOutputFiles(
     metricsPath: string,
     metricsData: unknown,
     reportPath: string,
     reportData: string,
+    manifestPath?: string,
+    manifestData?: unknown,
     cwd: string = process.cwd()
 ): Promise<void> {
     const absMetricsPath = path.resolve(cwd, metricsPath);
@@ -356,8 +375,16 @@ export async function writeOutputFiles(
     await fs.mkdir(path.dirname(absMetricsPath), { recursive: true });
     await fs.mkdir(path.dirname(absReportPath), { recursive: true });
 
-    await Promise.all([
+    const promises: Promise<void>[] = [
         fs.writeFile(absMetricsPath, JSON.stringify(metricsData, null, 2)),
         fs.writeFile(absReportPath, reportData)
-    ]);
+    ];
+
+    if (manifestPath && manifestData !== undefined) {
+        const absManifestPath = path.resolve(cwd, manifestPath);
+        await fs.mkdir(path.dirname(absManifestPath), { recursive: true });
+        promises.push(fs.writeFile(absManifestPath, JSON.stringify(manifestData, null, 2)));
+    }
+
+    await Promise.all(promises);
 }

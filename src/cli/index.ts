@@ -1,6 +1,9 @@
 import { runAnalyzeCommand } from './commands/analyze';
+import { runValidateCommand } from './commands/validate';
+import { validateArtifacts } from './validate/validate';
 
-export { runAnalyzeCommand };
+export { runAnalyzeCommand, runValidateCommand, validateArtifacts };
+export * from '../schema/manifest';
 export {
     readDependencyGraph,
     resolveDepcruiseConfig,
@@ -64,4 +67,18 @@ export async function analyzeProject(options: {
         }
     }
     return runAnalyzeCommand(args);
+}
+
+export async function validateProject(options: {
+    artifactDir?: string;
+    cwd?: string;
+} = {}): Promise<number> {
+    const args: string[] = [];
+    if (options.artifactDir) {
+        args.push(options.artifactDir);
+    }
+    if (options.cwd) {
+        args.push('--cwd', options.cwd);
+    }
+    return runValidateCommand(args);
 }

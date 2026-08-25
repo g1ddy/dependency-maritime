@@ -215,6 +215,14 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(fs.existsSync(path.join(genDir, '.maritime', 'dependency-graph.json'))).toBe(true);
         expect(fs.existsSync(path.join(genDir, '.maritime', 'complexity-metrics.json'))).toBe(true);
         expect(fs.existsSync(path.join(genDir, '.maritime', 'complexity-report.md'))).toBe(true);
+        expect(fs.existsSync(path.join(genDir, '.maritime', 'manifest.json'))).toBe(true);
+
+        const validateOutput = execSync('npx maritime validate .maritime', {
+            cwd: genDir,
+            encoding: 'utf8'
+        });
+        expect(validateOutput).toContain('Artifact Directory Contract Validated!');
+        expect(validateOutput).toContain('Schema Version: 1.0.0');
 
         const metrics = JSON.parse(
             fs.readFileSync(path.join(genDir, '.maritime', 'complexity-metrics.json'), 'utf8')
