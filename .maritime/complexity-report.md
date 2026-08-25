@@ -14,16 +14,16 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/cli/analyze/adapters.ts` | **124.8** | 450 | 24 | 9 | 0.69 |
-| `src/cli/commands/analyze.ts` | **119.6** | 293 | 28 | 10 | 0.71 |
-| `src/features/visualization/store.ts` | **118.7** | 667 | 7 | 14 | 0.5 |
-| `src/cli/validate/validate.ts` | **104.2** | 132 | 32 | 6 | 0.75 |
-| `src/features/visualization/components/NodeInspectorPanel.tsx` | **102.4** | 240 | 22 | 9 | 0.82 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **96.9** | 229 | 17 | 12 | 0.8 |
-| `src/features/visualization/components/GraphOverlay.tsx` | **90.2** | 275 | 8 | 14 | 0.93 |
-| `src/features/visualization/components/AppNode.tsx` | **77.1** | 100 | 19 | 6 | 0.86 |
-| `src/features/visualization/logic/transformer.ts` | **75.5** | 270 | 13 | 5 | 0.63 |
+| `src/cli/commands/analyze.ts` | **114.9** | 293 | 28 | 7 | 0.78 |
+| `src/features/visualization/store.ts` | **112.5** | 667 | 7 | 10 | 0.59 |
+| `src/cli/analyze/adapters.ts` | **107** | 450 | 24 | 2 | 0.5 |
+| `src/features/visualization/components/NodeInspectorPanel.tsx` | **99.5** | 240 | 22 | 7 | 0.88 |
+| `src/cli/validate/validate.ts` | **98.5** | 132 | 32 | 4 | 0.67 |
+| `src/features/visualization/components/DependencyGraph.tsx` | **86** | 229 | 17 | 6 | 0.86 |
+| `src/features/visualization/components/GraphOverlay.tsx` | **83.8** | 275 | 8 | 11 | 0.92 |
+| `src/features/visualization/logic/transformer.ts` | **74** | 270 | 13 | 3 | 0.75 |
 | `src/cli/index.ts` | **70.5** | 85 | 11 | 10 | 1 |
+| `src/features/visualization/components/AppNode.tsx` | **69** | 100 | 19 | 3 | 0.75 |
 
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |

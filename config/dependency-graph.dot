@@ -3,50 +3,6 @@ strict digraph "dependency-cruiser output"{
     node [shape="box" style="rounded, filled" height="0.2" color="black" fillcolor="#ffffcc" fontcolor="black" fontname="Helvetica" fontsize="9"]
     edge [arrowhead="normal" arrowsize="0.6" penwidth="2.0" color="#00000033" fontname="Helvetica" fontsize="9"]
 
-    subgraph "cluster_config" {label="config" "config/complexity-metrics.json" [label=<complexity-metrics.json> tooltip="complexity-metrics.json" URL="config/complexity-metrics.json" fillcolor="#ffee44"] }
-    subgraph "cluster_config" {label="config" "config/dependency-graph.json" [label=<dependency-graph.json> tooltip="dependency-graph.json" URL="config/dependency-graph.json" fillcolor="#ffee44"] }
-    "fs" [label=<fs> tooltip="fs" URL="https://nodejs.org/api/fs.html" color="grey" fontcolor="grey"]
-    subgraph "cluster_fs" {label="fs" "fs/promises" [label=<promises> tooltip="promises" URL="https://nodejs.org/api/fs.html" color="grey" fontcolor="grey"] }
-    "module" [label=<module> tooltip="module" URL="https://nodejs.org/api/module.html" color="grey" fontcolor="grey"]
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@radix-ui" {label="@radix-ui" subgraph "cluster_node_modules/@radix-ui/react-dialog" {label="react-dialog" subgraph "cluster_node_modules/@radix-ui/react-dialog/dist" {label="dist" "node_modules/@radix-ui/react-dialog/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/@radix-ui/react-dialog" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@radix-ui" {label="@radix-ui" subgraph "cluster_node_modules/@radix-ui/react-dropdown-menu" {label="react-dropdown-menu" subgraph "cluster_node_modules/@radix-ui/react-dropdown-menu/dist" {label="dist" "node_modules/@radix-ui/react-dropdown-menu/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/@radix-ui/react-dropdown-menu" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@radix-ui" {label="@radix-ui" subgraph "cluster_node_modules/@radix-ui/react-label" {label="react-label" subgraph "cluster_node_modules/@radix-ui/react-label/dist" {label="dist" "node_modules/@radix-ui/react-label/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/@radix-ui/react-label" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@radix-ui" {label="@radix-ui" subgraph "cluster_node_modules/@radix-ui/react-separator" {label="react-separator" subgraph "cluster_node_modules/@radix-ui/react-separator/dist" {label="dist" "node_modules/@radix-ui/react-separator/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/@radix-ui/react-separator" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@radix-ui" {label="@radix-ui" subgraph "cluster_node_modules/@radix-ui/react-slot" {label="react-slot" subgraph "cluster_node_modules/@radix-ui/react-slot/dist" {label="dist" "node_modules/@radix-ui/react-slot/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/@radix-ui/react-slot" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@radix-ui" {label="@radix-ui" subgraph "cluster_node_modules/@radix-ui/react-switch" {label="react-switch" subgraph "cluster_node_modules/@radix-ui/react-switch/dist" {label="dist" "node_modules/@radix-ui/react-switch/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/@radix-ui/react-switch" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@radix-ui" {label="@radix-ui" subgraph "cluster_node_modules/@radix-ui/react-tooltip" {label="react-tooltip" subgraph "cluster_node_modules/@radix-ui/react-tooltip/dist" {label="dist" "node_modules/@radix-ui/react-tooltip/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/@radix-ui/react-tooltip" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@testing-library" {label="@testing-library" subgraph "cluster_node_modules/@testing-library/react" {label="react" subgraph "cluster_node_modules/@testing-library/react/dist" {label="dist" "node_modules/@testing-library/react/dist/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/@testing-library/react" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@xyflow" {label="@xyflow" subgraph "cluster_node_modules/@xyflow/react" {label="react" subgraph "cluster_node_modules/@xyflow/react/dist" {label="dist" "node_modules/@xyflow/react/dist/style.css" [label=<style.css> tooltip="style.css" URL="https://www.npmjs.com/package/@xyflow/react" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/@xyflow" {label="@xyflow" subgraph "cluster_node_modules/@xyflow/react" {label="react" subgraph "cluster_node_modules/@xyflow/react/dist" {label="dist" subgraph "cluster_node_modules/@xyflow/react/dist/umd" {label="umd" "node_modules/@xyflow/react/dist/umd/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/@xyflow/react" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/class-variance-authority" {label="class-variance-authority" subgraph "cluster_node_modules/class-variance-authority/dist" {label="dist" "node_modules/class-variance-authority/dist/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/class-variance-authority" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/clsx" {label="clsx" subgraph "cluster_node_modules/clsx/dist" {label="dist" "node_modules/clsx/dist/clsx.mjs" [label=<clsx.mjs> tooltip="clsx.mjs" URL="https://www.npmjs.com/package/clsx" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/d3" {label="d3" subgraph "cluster_node_modules/d3/src" {label="src" "node_modules/d3/src/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/d3" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/dagre" {label="dagre" "node_modules/dagre/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/dagre" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/dependency-cruiser" {label="dependency-cruiser" subgraph "cluster_node_modules/dependency-cruiser/src" {label="src" subgraph "cluster_node_modules/dependency-cruiser/src/config-utl" {label="config-utl" subgraph "cluster_node_modules/dependency-cruiser/src/config-utl/extract-depcruise-config" {label="extract-depcruise-config" "node_modules/dependency-cruiser/src/config-utl/extract-depcruise-config/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/dependency-cruiser" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/dependency-cruiser" {label="dependency-cruiser" subgraph "cluster_node_modules/dependency-cruiser/src" {label="src" subgraph "cluster_node_modules/dependency-cruiser/src/main" {label="main" "node_modules/dependency-cruiser/src/main/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/dependency-cruiser" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/elkjs" {label="elkjs" subgraph "cluster_node_modules/elkjs/lib" {label="lib" "node_modules/elkjs/lib/elk.bundled.js" [label=<elk.bundled.js> tooltip="elk.bundled.js" URL="https://www.npmjs.com/package/elkjs" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/elkjs" {label="elkjs" subgraph "cluster_node_modules/elkjs/lib" {label="lib" "node_modules/elkjs/lib/main.js" [label=<main.js> tooltip="main.js" URL="https://www.npmjs.com/package/elkjs" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/eslint" {label="eslint" subgraph "cluster_node_modules/eslint/lib" {label="lib" "node_modules/eslint/lib/api.js" [label=<api.js> tooltip="api.js" URL="https://www.npmjs.com/package/eslint" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/graphology-metrics" {label="graphology-metrics" subgraph "cluster_node_modules/graphology-metrics/centrality" {label="centrality" "node_modules/graphology-metrics/centrality/pagerank.js" [label=<pagerank.js> tooltip="pagerank.js" URL="https://www.npmjs.com/package/graphology-metrics" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/graphology" {label="graphology" subgraph "cluster_node_modules/graphology/dist" {label="dist" "node_modules/graphology/dist/graphology.cjs.js" [label=<graphology.cjs.js> tooltip="graphology.cjs.js" URL="https://www.npmjs.com/package/graphology" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/lucide-react" {label="lucide-react" subgraph "cluster_node_modules/lucide-react/dist" {label="dist" subgraph "cluster_node_modules/lucide-react/dist/cjs" {label="cjs" "node_modules/lucide-react/dist/cjs/lucide-react.js" [label=<lucide-react.js> tooltip="lucide-react.js" URL="https://www.npmjs.com/package/lucide-react" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/papaparse" {label="papaparse" "node_modules/papaparse/papaparse.js" [label=<papaparse.js> tooltip="papaparse.js" URL="https://www.npmjs.com/package/papaparse" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/react-dom" {label="react-dom" "node_modules/react-dom/client.js" [label=<client.js> tooltip="client.js" URL="https://www.npmjs.com/package/react-dom" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/react-router-dom" {label="react-router-dom" subgraph "cluster_node_modules/react-router-dom/dist" {label="dist" "node_modules/react-router-dom/dist/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/react-router-dom" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/react" {label="react" "node_modules/react/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/react" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/tailwind-merge" {label="tailwind-merge" subgraph "cluster_node_modules/tailwind-merge/dist" {label="dist" "node_modules/tailwind-merge/dist/bundle-cjs.js" [label=<bundle-cjs.js> tooltip="bundle-cjs.js" URL="https://www.npmjs.com/package/tailwind-merge" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/vitest" {label="vitest" subgraph "cluster_node_modules/vitest/dist" {label="dist" "node_modules/vitest/dist/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/vitest" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/zod" {label="zod" "node_modules/zod/index.js" [label=<index.js> tooltip="index.js" URL="https://www.npmjs.com/package/zod" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/zustand" {label="zustand" subgraph "cluster_node_modules/zustand/esm" {label="esm" "node_modules/zustand/esm/index.mjs" [label=<index.mjs> tooltip="index.mjs" URL="https://www.npmjs.com/package/zustand" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/zustand" {label="zustand" subgraph "cluster_node_modules/zustand/esm" {label="esm" "node_modules/zustand/esm/middleware.mjs" [label=<middleware.mjs> tooltip="middleware.mjs" URL="https://www.npmjs.com/package/zustand" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } }
-    subgraph "cluster_node_modules" {label="node_modules" subgraph "cluster_node_modules/zustand" {label="zustand" subgraph "cluster_node_modules/zustand/esm" {label="esm" subgraph "cluster_node_modules/zustand/esm/react" {label="react" "node_modules/zustand/esm/react/shallow.mjs" [label=<shallow.mjs> tooltip="shallow.mjs" URL="https://www.npmjs.com/package/zustand" shape="folder" fillcolor="#c40b0a1a" fontcolor="#c40b0a"] } } } }
-    "os" [label=<os> tooltip="os" URL="https://nodejs.org/api/os.html" color="grey" fontcolor="grey"]
-    "path" [label=<path> tooltip="path" URL="https://nodejs.org/api/path.html" color="grey" fontcolor="grey"]
-    subgraph "cluster_sample-data" {label="sample-data" "sample-data/class_visualization.csv" [label=<class_visualization.csv> tooltip="class_visualization.csv" URL="sample-data/class_visualization.csv" ] }
-    subgraph "cluster_sample-data" {label="sample-data" "sample-data/dependency-graph.json" [label=<dependency-graph.json> tooltip="dependency-graph.json" URL="sample-data/dependency-graph.json" fillcolor="#ffee44"] }
-    subgraph "cluster_src" {label="src" "src/App.test.tsx" [label=<App.test.tsx> tooltip="App.test.tsx" URL="src/App.test.tsx" fillcolor="#bbfeff"] }
-    "src/App.test.tsx" -> "src/App.tsx"
-    "src/App.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" "src/App.tsx" [label=<App.tsx> tooltip="App.tsx" URL="src/App.tsx" fillcolor="#bbfeff"] }
     "src/App.tsx" -> "src/components/layout/Header.tsx"
     "src/App.tsx" -> "src/features/relationships/index.tsx"
@@ -57,68 +13,18 @@ strict digraph "dependency-cruiser output"{
     "src/App.tsx" -> "src/features/visualization/components/NodeInspectorPanel.tsx"
     "src/App.tsx" -> "src/features/visualization/components/SettingsDialog.tsx"
     "src/App.tsx" -> "src/features/visualization/store.ts"
-    "src/App.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/App.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/App.tsx" -> "node_modules/react-router-dom/dist/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/adapters.test.ts" [label=<adapters.test.ts> tooltip="adapters.test.ts" URL="src/cli/analyze/adapters.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/analyze/adapters.test.ts" -> "src/cli/analyze/adapters.ts"
-    "src/cli/analyze/adapters.test.ts" -> "src/cli/analyze/models.ts"
-    "src/cli/analyze/adapters.test.ts" -> "node_modules/eslint/lib/api.js" [penwidth="1.0"]
-    "src/cli/analyze/adapters.test.ts" -> "fs/promises" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/adapters.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/adapters.ts" [label=<adapters.ts> tooltip="adapters.ts" URL="src/cli/analyze/adapters.ts" fillcolor="#ddfeff"] } } }
     "src/cli/analyze/adapters.ts" -> "src/schema/dependency-cruiser.ts"
     "src/cli/analyze/adapters.ts" -> "src/cli/analyze/models.ts"
-    "src/cli/analyze/adapters.ts" -> "node_modules/dependency-cruiser/src/main/index.mjs" [penwidth="1.0" style="dashed"]
-    "src/cli/analyze/adapters.ts" -> "node_modules/dependency-cruiser/src/config-utl/extract-depcruise-config/index.mjs" [penwidth="1.0" style="dashed"]
-    "src/cli/analyze/adapters.ts" -> "node_modules/eslint/lib/api.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/cli/analyze/adapters.ts" -> "fs" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/adapters.ts" -> "fs/promises" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/adapters.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/adapters.ts" -> "url" [style="dashed" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/calculate-metrics.test.ts" [label=<calculate-metrics.test.ts> tooltip="calculate-metrics.test.ts" URL="src/cli/analyze/calculate-metrics.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/analyze/calculate-metrics.test.ts" -> "src/cli/analyze/calculate-metrics.ts"
-    "src/cli/analyze/calculate-metrics.test.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/cli/analyze/calculate-metrics.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/calculate-metrics.ts" [label=<calculate-metrics.ts> tooltip="calculate-metrics.ts" URL="src/cli/analyze/calculate-metrics.ts" fillcolor="#ddfeff"] } } }
     "src/cli/analyze/calculate-metrics.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/environment.test.ts" [label=<environment.test.ts> tooltip="environment.test.ts" URL="src/cli/analyze/environment.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/analyze/environment.test.ts" -> "src/cli/analyze/environment.ts"
-    "src/cli/analyze/environment.test.ts" -> "src/cli/analyze/models.ts"
-    "src/cli/analyze/environment.test.ts" -> "fs" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/environment.test.ts" -> "os" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/environment.test.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/environment.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/environment.ts" [label=<environment.ts> tooltip="environment.ts" URL="src/cli/analyze/environment.ts" fillcolor="#ddfeff"] } } }
     "src/cli/analyze/environment.ts" -> "src/cli/analyze/models.ts"
-    "src/cli/analyze/environment.ts" -> "fs" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/environment.ts" -> "module" [style="dashed" penwidth="1.0"]
-    "src/cli/analyze/environment.ts" -> "path" [style="dashed" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/models.ts" [label=<models.ts> tooltip="models.ts" URL="src/cli/analyze/models.ts" fillcolor="#ddfeff"] } } }
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/parse-eslint.test.ts" [label=<parse-eslint.test.ts> tooltip="parse-eslint.test.ts" URL="src/cli/analyze/parse-eslint.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/analyze/parse-eslint.test.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/cli/analyze/parse-eslint.test.ts" -> "src/cli/analyze/parse-eslint.ts"
-    "src/cli/analyze/parse-eslint.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/parse-eslint.ts" [label=<parse-eslint.ts> tooltip="parse-eslint.ts" URL="src/cli/analyze/parse-eslint.ts" fillcolor="#ddfeff"] } } }
     "src/cli/analyze/parse-eslint.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/cli/analyze/parse-eslint.ts" -> "path" [style="dashed" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/render-markdown-report.test.ts" [label=<render-markdown-report.test.ts> tooltip="render-markdown-report.test.ts" URL="src/cli/analyze/render-markdown-report.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/analyze/render-markdown-report.test.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/cli/analyze/render-markdown-report.test.ts" -> "src/cli/analyze/render-markdown-report.ts"
-    "src/cli/analyze/render-markdown-report.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/analyze" {label="analyze" "src/cli/analyze/render-markdown-report.ts" [label=<render-markdown-report.ts> tooltip="render-markdown-report.ts" URL="src/cli/analyze/render-markdown-report.ts" fillcolor="#ddfeff"] } } }
     "src/cli/analyze/render-markdown-report.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/commands" {label="commands" "src/cli/commands/analyze.fixtures.test.ts" [label=<analyze.fixtures.test.ts> tooltip="analyze.fixtures.test.ts" URL="src/cli/commands/analyze.fixtures.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/commands/analyze.fixtures.test.ts" -> "src/cli/analyze/models.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/cli/commands/analyze.fixtures.test.ts" -> "src/cli/commands/analyze.ts"
-    "src/cli/commands/analyze.fixtures.test.ts" -> "fs" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/analyze.fixtures.test.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/analyze.fixtures.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/commands" {label="commands" "src/cli/commands/analyze.test.ts" [label=<analyze.test.ts> tooltip="analyze.test.ts" URL="src/cli/commands/analyze.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/commands/analyze.test.ts" -> "src/cli/analyze/adapters.ts"
-    "src/cli/commands/analyze.test.ts" -> "src/cli/commands/analyze.ts"
-    "src/cli/commands/analyze.test.ts" -> "fs/promises" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/analyze.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/commands" {label="commands" "src/cli/commands/analyze.ts" [label=<analyze.ts> tooltip="analyze.ts" URL="src/cli/commands/analyze.ts" fillcolor="#ddfeff"] } } }
     "src/cli/commands/analyze.ts" -> "src/schema/manifest.ts"
     "src/cli/commands/analyze.ts" -> "src/cli/analyze/adapters.ts"
@@ -127,20 +33,9 @@ strict digraph "dependency-cruiser output"{
     "src/cli/commands/analyze.ts" -> "src/cli/analyze/models.ts"
     "src/cli/commands/analyze.ts" -> "src/cli/analyze/parse-eslint.ts"
     "src/cli/commands/analyze.ts" -> "src/cli/analyze/render-markdown-report.ts"
-    "src/cli/commands/analyze.ts" -> "fs/promises" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/analyze.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/analyze.ts" -> "util" [style="dashed" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/commands" {label="commands" "src/cli/commands/validate.test.ts" [label=<validate.test.ts> tooltip="validate.test.ts" URL="src/cli/commands/validate.test.ts" fillcolor="#ddfeff"] } } }
-    "src/cli/commands/validate.test.ts" -> "src/cli/commands/validate.ts"
-    "src/cli/commands/validate.test.ts" -> "fs/promises" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/validate.test.ts" -> "os" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/validate.test.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/validate.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/commands" {label="commands" "src/cli/commands/validate.ts" [label=<validate.ts> tooltip="validate.ts" URL="src/cli/commands/validate.ts" fillcolor="#ddfeff"] } } }
     "src/cli/commands/validate.ts" -> "src/cli/analyze/models.ts"
     "src/cli/commands/validate.ts" -> "src/cli/validate/validate.ts"
-    "src/cli/commands/validate.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/cli/commands/validate.ts" -> "util" [style="dashed" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" "src/cli/index.ts" [label=<index.ts> tooltip="index.ts" URL="src/cli/index.ts" fillcolor="#ddfeff"] } }
     "src/cli/index.ts" -> "src/schema/manifest.ts" [arrowhead="inv"]
     "src/cli/index.ts" -> "src/cli/analyze/adapters.ts" [arrowhead="inv"]
@@ -155,216 +50,88 @@ strict digraph "dependency-cruiser output"{
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" "src/cli/main.ts" [label=<main.ts> tooltip="main.ts" URL="src/cli/main.ts" fillcolor="#ddfeff"] } }
     "src/cli/main.ts" -> "src/cli/commands/analyze.ts"
     "src/cli/main.ts" -> "src/cli/commands/validate.ts"
-    "src/cli/main.ts" -> "fs" [style="dashed" penwidth="1.0"]
-    "src/cli/main.ts" -> "url" [style="dashed" penwidth="1.0"]
-    "src/cli/main.ts" -> "util" [style="dashed" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/cli" {label="cli" subgraph "cluster_src/cli/validate" {label="validate" "src/cli/validate/validate.ts" [label=<validate.ts> tooltip="validate.ts" URL="src/cli/validate/validate.ts" fillcolor="#ddfeff"] } } }
     "src/cli/validate/validate.ts" -> "src/schema/complexity-metrics.ts"
     "src/cli/validate/validate.ts" -> "src/schema/dependency-cruiser.ts"
     "src/cli/validate/validate.ts" -> "src/schema/manifest.ts"
     "src/cli/validate/validate.ts" -> "src/cli/analyze/models.ts"
-    "src/cli/validate/validate.ts" -> "fs/promises" [style="dashed" penwidth="1.0"]
-    "src/cli/validate/validate.ts" -> "path" [style="dashed" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/DataSourceDialog.tsx" [label=<DataSourceDialog.tsx> tooltip="DataSourceDialog.tsx" URL="src/components/DataSourceDialog.tsx" fillcolor="#bbfeff"] } }
     "src/components/DataSourceDialog.tsx" -> "src/components/FileUploadZone.tsx"
     "src/components/DataSourceDialog.tsx" -> "src/components/ui/button.tsx"
     "src/components/DataSourceDialog.tsx" -> "src/components/ui/dialog.tsx"
     "src/components/DataSourceDialog.tsx" -> "src/lib/utils.ts"
-    "src/components/DataSourceDialog.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/components/DataSourceDialog.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/FileUploadZone.test.tsx" [label=<FileUploadZone.test.tsx> tooltip="FileUploadZone.test.tsx" URL="src/components/FileUploadZone.test.tsx" fillcolor="#bbfeff"] } }
-    "src/components/FileUploadZone.test.tsx" -> "src/components/FileUploadZone.tsx"
-    "src/components/FileUploadZone.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/components/FileUploadZone.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/FileUploadZone.tsx" [label=<FileUploadZone.tsx> tooltip="FileUploadZone.tsx" URL="src/components/FileUploadZone.tsx" fillcolor="#bbfeff"] } }
     "src/components/FileUploadZone.tsx" -> "src/lib/utils.ts"
-    "src/components/FileUploadZone.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/components/FileUploadZone.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/Header.test.tsx" [label=<Header.test.tsx> tooltip="Header.test.tsx" URL="src/components/layout/Header.test.tsx" fillcolor="#bbfeff"] } } }
-    "src/components/layout/Header.test.tsx" -> "src/components/layout/Header.tsx"
-    "src/components/layout/Header.test.tsx" -> "src/components/theme-provider.tsx"
-    "src/components/layout/Header.test.tsx" -> "src/components/ui/tooltip.tsx"
-    "src/components/layout/Header.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/components/layout/Header.test.tsx" -> "node_modules/react-router-dom/dist/index.js" [penwidth="1.0"]
-    "src/components/layout/Header.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/layout" {label="layout" "src/components/layout/Header.tsx" [label=<Header.tsx> tooltip="Header.tsx" URL="src/components/layout/Header.tsx" fillcolor="#bbfeff"] } } }
     "src/components/layout/Header.tsx" -> "src/components/mode-toggle.tsx"
     "src/components/layout/Header.tsx" -> "src/components/ui/button.tsx"
     "src/components/layout/Header.tsx" -> "src/components/ui/sheet.tsx"
     "src/components/layout/Header.tsx" -> "src/components/ui/tooltip.tsx"
     "src/components/layout/Header.tsx" -> "src/lib/utils.ts"
-    "src/components/layout/Header.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/components/layout/Header.tsx" -> "node_modules/react-router-dom/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/mode-toggle.tsx" [label=<mode-toggle.tsx> tooltip="mode-toggle.tsx" URL="src/components/mode-toggle.tsx" fillcolor="#bbfeff"] } }
     "src/components/mode-toggle.tsx" -> "src/components/theme-context.tsx"
     "src/components/mode-toggle.tsx" -> "src/components/ui/button.tsx"
     "src/components/mode-toggle.tsx" -> "src/components/ui/dropdown-menu.tsx"
-    "src/components/mode-toggle.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/theme-context.tsx" [label=<theme-context.tsx> tooltip="theme-context.tsx" URL="src/components/theme-context.tsx" fillcolor="#bbfeff"] } }
-    "src/components/theme-context.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/theme-provider.test.tsx" [label=<theme-provider.test.tsx> tooltip="theme-provider.test.tsx" URL="src/components/theme-provider.test.tsx" fillcolor="#bbfeff"] } }
-    "src/components/theme-provider.test.tsx" -> "src/components/theme-context.tsx"
-    "src/components/theme-provider.test.tsx" -> "src/components/theme-provider.tsx"
-    "src/components/theme-provider.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/components/theme-provider.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" "src/components/theme-provider.tsx" [label=<theme-provider.tsx> tooltip="theme-provider.tsx" URL="src/components/theme-provider.tsx" fillcolor="#bbfeff"] } }
     "src/components/theme-provider.tsx" -> "src/components/theme-context.tsx"
-    "src/components/theme-provider.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/badge.tsx" [label=<badge.tsx> tooltip="badge.tsx" URL="src/components/ui/badge.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/badge.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/badge.tsx" -> "node_modules/class-variance-authority/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/badge.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/button.test.tsx" [label=<button.test.tsx> tooltip="button.test.tsx" URL="src/components/ui/button.test.tsx" fillcolor="#bbfeff"] } } }
-    "src/components/ui/button.test.tsx" -> "src/components/ui/button.tsx"
-    "src/components/ui/button.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/components/ui/button.test.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/components/ui/button.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/button.tsx" [label=<button.tsx> tooltip="button.tsx" URL="src/components/ui/button.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/button.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/button.tsx" -> "node_modules/@radix-ui/react-slot/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/button.tsx" -> "node_modules/class-variance-authority/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/button.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/card.test.tsx" [label=<card.test.tsx> tooltip="card.test.tsx" URL="src/components/ui/card.test.tsx" fillcolor="#bbfeff"] } } }
-    "src/components/ui/card.test.tsx" -> "src/components/ui/card.tsx"
-    "src/components/ui/card.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/components/ui/card.test.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/components/ui/card.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/card.tsx" [label=<card.tsx> tooltip="card.tsx" URL="src/components/ui/card.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/card.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/card.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/dialog.tsx" [label=<dialog.tsx> tooltip="dialog.tsx" URL="src/components/ui/dialog.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/dialog.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/dialog.tsx" -> "node_modules/@radix-ui/react-dialog/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/dialog.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/components/ui/dialog.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/dropdown-menu.tsx" [label=<dropdown-menu.tsx> tooltip="dropdown-menu.tsx" URL="src/components/ui/dropdown-menu.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/dropdown-menu.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/dropdown-menu.tsx" -> "node_modules/@radix-ui/react-dropdown-menu/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/dropdown-menu.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/components/ui/dropdown-menu.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/input.test.tsx" [label=<input.test.tsx> tooltip="input.test.tsx" URL="src/components/ui/input.test.tsx" fillcolor="#bbfeff"] } } }
-    "src/components/ui/input.test.tsx" -> "src/components/ui/input.tsx"
-    "src/components/ui/input.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/components/ui/input.test.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/components/ui/input.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/input.tsx" [label=<input.tsx> tooltip="input.tsx" URL="src/components/ui/input.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/input.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/input.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/label.tsx" [label=<label.tsx> tooltip="label.tsx" URL="src/components/ui/label.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/label.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/label.tsx" -> "node_modules/@radix-ui/react-label/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/label.tsx" -> "node_modules/class-variance-authority/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/label.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/separator.tsx" [label=<separator.tsx> tooltip="separator.tsx" URL="src/components/ui/separator.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/separator.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/separator.tsx" -> "node_modules/@radix-ui/react-separator/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/separator.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/sheet.tsx" [label=<sheet.tsx> tooltip="sheet.tsx" URL="src/components/ui/sheet.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/sheet.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/sheet.tsx" -> "node_modules/@radix-ui/react-dialog/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/sheet.tsx" -> "node_modules/class-variance-authority/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/sheet.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/components/ui/sheet.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/switch.tsx" [label=<switch.tsx> tooltip="switch.tsx" URL="src/components/ui/switch.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/switch.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/switch.tsx" -> "node_modules/@radix-ui/react-switch/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/switch.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/components" {label="components" subgraph "cluster_src/components/ui" {label="ui" "src/components/ui/tooltip.tsx" [label=<tooltip.tsx> tooltip="tooltip.tsx" URL="src/components/ui/tooltip.tsx" fillcolor="#bbfeff"] } } }
     "src/components/ui/tooltip.tsx" -> "src/lib/utils.ts"
-    "src/components/ui/tooltip.tsx" -> "node_modules/@radix-ui/react-tooltip/dist/index.mjs" [penwidth="1.0"]
-    "src/components/ui/tooltip.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" subgraph "cluster_src/features/relationships/components" {label="components" "src/features/relationships/components/DataSourceDialog.test.tsx" [label=<DataSourceDialog.test.tsx> tooltip="DataSourceDialog.test.tsx" URL="src/features/relationships/components/DataSourceDialog.test.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/relationships/components/DataSourceDialog.test.tsx" -> "src/features/relationships/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/relationships/components/DataSourceDialog.test.tsx" -> "src/features/relationships/components/DataSourceDialog.tsx"
-    "src/features/relationships/components/DataSourceDialog.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/features/relationships/components/DataSourceDialog.test.tsx" -> "node_modules/papaparse/papaparse.js" [penwidth="1.0"]
-    "src/features/relationships/components/DataSourceDialog.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" subgraph "cluster_src/features/relationships/components" {label="components" "src/features/relationships/components/DataSourceDialog.tsx" [label=<DataSourceDialog.tsx> tooltip="DataSourceDialog.tsx" URL="src/features/relationships/components/DataSourceDialog.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/relationships/components/DataSourceDialog.tsx" -> "sample-data/class_visualization.csv"
     "src/features/relationships/components/DataSourceDialog.tsx" -> "src/features/relationships/store.ts"
     "src/features/relationships/components/DataSourceDialog.tsx" -> "src/features/relationships/types.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/relationships/components/DataSourceDialog.tsx" -> "src/components/DataSourceDialog.tsx"
-    "src/features/relationships/components/DataSourceDialog.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/features/relationships/components/DataSourceDialog.tsx" -> "node_modules/papaparse/papaparse.js" [penwidth="1.0"]
-    "src/features/relationships/components/DataSourceDialog.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" subgraph "cluster_src/features/relationships/components" {label="components" "src/features/relationships/components/RelationshipGraph.tsx" [label=<RelationshipGraph.tsx> tooltip="RelationshipGraph.tsx" URL="src/features/relationships/components/RelationshipGraph.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/relationships/components/RelationshipGraph.tsx" -> "src/features/relationships/store.ts"
     "src/features/relationships/components/RelationshipGraph.tsx" -> "src/features/relationships/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/relationships/components/RelationshipGraph.tsx" -> "node_modules/d3/src/index.js" [penwidth="1.0"]
-    "src/features/relationships/components/RelationshipGraph.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" subgraph "cluster_src/features/relationships/components" {label="components" "src/features/relationships/components/RelationshipOverlay.tsx" [label=<RelationshipOverlay.tsx> tooltip="RelationshipOverlay.tsx" URL="src/features/relationships/components/RelationshipOverlay.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/relationships/components/RelationshipOverlay.tsx" -> "src/features/relationships/store.ts"
     "src/features/relationships/components/RelationshipOverlay.tsx" -> "src/features/relationships/types.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/relationships/components/RelationshipOverlay.tsx" -> "src/components/ui/button.tsx"
-    "src/features/relationships/components/RelationshipOverlay.tsx" -> "node_modules/d3/src/index.js" [penwidth="1.0"]
-    "src/features/relationships/components/RelationshipOverlay.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/features/relationships/components/RelationshipOverlay.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" "src/features/relationships/index.tsx" [label=<index.tsx> tooltip="index.tsx" URL="src/features/relationships/index.tsx" fillcolor="#bbfeff"] } } }
-    "src/features/relationships/index.tsx" -> "sample-data/class_visualization.csv"
     "src/features/relationships/index.tsx" -> "src/features/relationships/components/RelationshipGraph.tsx"
     "src/features/relationships/index.tsx" -> "src/features/relationships/components/RelationshipOverlay.tsx"
     "src/features/relationships/index.tsx" -> "src/features/relationships/store.ts"
     "src/features/relationships/index.tsx" -> "src/features/relationships/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/relationships/index.tsx" -> "node_modules/papaparse/papaparse.js" [penwidth="1.0"]
-    "src/features/relationships/index.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" "src/features/relationships/store.test.ts" [label=<store.test.ts> tooltip="store.test.ts" URL="src/features/relationships/store.test.ts" fillcolor="#ddfeff"] } } }
-    "src/features/relationships/store.test.ts" -> "src/features/relationships/store.ts"
-    "src/features/relationships/store.test.ts" -> "src/features/relationships/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/relationships/store.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" "src/features/relationships/store.ts" [label=<store.ts> tooltip="store.ts" URL="src/features/relationships/store.ts" fillcolor="#ddfeff"] } } }
     "src/features/relationships/store.ts" -> "src/features/relationships/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/relationships/store.ts" -> "node_modules/zustand/esm/index.mjs" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/relationships" {label="relationships" "src/features/relationships/types.ts" [label=<types.ts> tooltip="types.ts" URL="src/features/relationships/types.ts" fillcolor="#ddfeff"] } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/AppNode.tsx" [label=<AppNode.tsx> tooltip="AppNode.tsx" URL="src/features/visualization/components/AppNode.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/AppNode.tsx" -> "src/features/visualization/store.ts"
     "src/features/visualization/components/AppNode.tsx" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/components/AppNode.tsx" -> "src/features/visualization/components/styles.ts"
-    "src/features/visualization/components/AppNode.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/AppNode.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/features/visualization/components/AppNode.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DataSourceDialog.test.tsx" [label=<DataSourceDialog.test.tsx> tooltip="DataSourceDialog.test.tsx" URL="src/features/visualization/components/DataSourceDialog.test.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/visualization/components/DataSourceDialog.test.tsx" -> "src/features/visualization/components/DataSourceDialog.tsx"
-    "src/features/visualization/components/DataSourceDialog.test.tsx" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/components/DataSourceDialog.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DataSourceDialog.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DataSourceDialog.tsx" [label=<DataSourceDialog.tsx> tooltip="DataSourceDialog.tsx" URL="src/features/visualization/components/DataSourceDialog.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/visualization/components/DataSourceDialog.tsx" -> "config/complexity-metrics.json" [style="dashed"]
-    "src/features/visualization/components/DataSourceDialog.tsx" -> "config/dependency-graph.json"
-    "src/features/visualization/components/DataSourceDialog.tsx" -> "sample-data/dependency-graph.json"
     "src/features/visualization/components/DataSourceDialog.tsx" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/components/DataSourceDialog.tsx" -> "src/components/DataSourceDialog.tsx"
     "src/features/visualization/components/DataSourceDialog.tsx" -> "src/schema/complexity-metrics.ts"
     "src/features/visualization/components/DataSourceDialog.tsx" -> "src/schema/dependency-cruiser.ts"
-    "src/features/visualization/components/DataSourceDialog.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/features/visualization/components/DataSourceDialog.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DataSourceDialog.tsx" -> "node_modules/zod/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DependencyGraph.drag.test.tsx" [label=<DependencyGraph.drag.test.tsx> tooltip="DependencyGraph.drag.test.tsx" URL="src/features/visualization/components/DependencyGraph.drag.test.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/visualization/components/DependencyGraph.drag.test.tsx" -> "src/features/visualization/store.ts"
-    "src/features/visualization/components/DependencyGraph.drag.test.tsx" -> "src/features/visualization/components/DependencyGraph.tsx"
-    "src/features/visualization/components/DependencyGraph.drag.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DependencyGraph.drag.test.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/components/DependencyGraph.drag.test.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/components/DependencyGraph.drag.test.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DependencyGraph.drag.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DependencyGraph.test.tsx" [label=<DependencyGraph.test.tsx> tooltip="DependencyGraph.test.tsx" URL="src/features/visualization/components/DependencyGraph.test.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/visualization/components/DependencyGraph.test.tsx" -> "src/features/visualization/store.ts"
-    "src/features/visualization/components/DependencyGraph.test.tsx" -> "src/features/visualization/components/DependencyGraph.tsx"
-    "src/features/visualization/components/DependencyGraph.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DependencyGraph.test.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DependencyGraph.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/DependencyGraph.tsx" [label=<DependencyGraph.tsx> tooltip="DependencyGraph.tsx" URL="src/features/visualization/components/DependencyGraph.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/visualization/components/DependencyGraph.tsx" -> "config/complexity-metrics.json"
-    "src/features/visualization/components/DependencyGraph.tsx" -> "config/dependency-graph.json"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/store.ts"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/components/AppNode.tsx"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/features/visualization/components/GroupNode.tsx"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/schema/complexity-metrics.ts"
     "src/features/visualization/components/DependencyGraph.tsx" -> "src/schema/dependency-cruiser.ts"
-    "src/features/visualization/components/DependencyGraph.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DependencyGraph.tsx" -> "node_modules/@xyflow/react/dist/style.css" [penwidth="1.0"]
-    "src/features/visualization/components/DependencyGraph.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/DependencyGraph.tsx" -> "node_modules/zustand/esm/react/shallow.mjs" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/GraphOverlay.tsx" [label=<GraphOverlay.tsx> tooltip="GraphOverlay.tsx" URL="src/features/visualization/components/GraphOverlay.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/features/visualization/logic/filters.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/features/visualization/store.ts"
@@ -377,23 +144,10 @@ strict digraph "dependency-cruiser output"{
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/switch.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/components/ui/tooltip.tsx"
     "src/features/visualization/components/GraphOverlay.tsx" -> "src/lib/utils.ts"
-    "src/features/visualization/components/GraphOverlay.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/features/visualization/components/GraphOverlay.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/GraphOverlay.tsx" -> "node_modules/zustand/esm/react/shallow.mjs" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/GroupNode.tsx" [label=<GroupNode.tsx> tooltip="GroupNode.tsx" URL="src/features/visualization/components/GroupNode.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/GroupNode.tsx" -> "src/features/visualization/store.ts"
     "src/features/visualization/components/GroupNode.tsx" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/components/GroupNode.tsx" -> "src/features/visualization/components/styles.ts"
-    "src/features/visualization/components/GroupNode.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/components/GroupNode.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/features/visualization/components/GroupNode.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/NodeInspectorPanel.test.tsx" [label=<NodeInspectorPanel.test.tsx> tooltip="NodeInspectorPanel.test.tsx" URL="src/features/visualization/components/NodeInspectorPanel.test.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/visualization/components/NodeInspectorPanel.test.tsx" -> "src/features/visualization/store.ts"
-    "src/features/visualization/components/NodeInspectorPanel.test.tsx" -> "src/features/visualization/components/NodeInspectorPanel.tsx"
-    "src/features/visualization/components/NodeInspectorPanel.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/NodeInspectorPanel.test.tsx" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/components/NodeInspectorPanel.test.tsx" -> "node_modules/graphology/dist/graphology.cjs.js" [penwidth="1.0"]
-    "src/features/visualization/components/NodeInspectorPanel.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/NodeInspectorPanel.tsx" [label=<NodeInspectorPanel.tsx> tooltip="NodeInspectorPanel.tsx" URL="src/features/visualization/components/NodeInspectorPanel.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/NodeInspectorPanel.tsx" -> "src/features/visualization/logic/graph-utils.ts"
     "src/features/visualization/components/NodeInspectorPanel.tsx" -> "src/features/visualization/store.ts"
@@ -402,13 +156,6 @@ strict digraph "dependency-cruiser output"{
     "src/features/visualization/components/NodeInspectorPanel.tsx" -> "src/components/ui/button.tsx"
     "src/features/visualization/components/NodeInspectorPanel.tsx" -> "src/components/ui/separator.tsx"
     "src/features/visualization/components/NodeInspectorPanel.tsx" -> "src/lib/utils.ts"
-    "src/features/visualization/components/NodeInspectorPanel.tsx" -> "node_modules/lucide-react/dist/cjs/lucide-react.js" [penwidth="1.0"]
-    "src/features/visualization/components/NodeInspectorPanel.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/SettingsDialog.test.tsx" [label=<SettingsDialog.test.tsx> tooltip="SettingsDialog.test.tsx" URL="src/features/visualization/components/SettingsDialog.test.tsx" fillcolor="#bbfeff"] } } } }
-    "src/features/visualization/components/SettingsDialog.test.tsx" -> "src/features/visualization/store.ts"
-    "src/features/visualization/components/SettingsDialog.test.tsx" -> "src/features/visualization/components/SettingsDialog.tsx"
-    "src/features/visualization/components/SettingsDialog.test.tsx" -> "node_modules/@testing-library/react/dist/index.js" [penwidth="1.0"]
-    "src/features/visualization/components/SettingsDialog.test.tsx" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/SettingsDialog.tsx" [label=<SettingsDialog.tsx> tooltip="SettingsDialog.tsx" URL="src/features/visualization/components/SettingsDialog.tsx" fillcolor="#bbfeff"] } } } }
     "src/features/visualization/components/SettingsDialog.tsx" -> "src/features/visualization/store.ts"
     "src/features/visualization/components/SettingsDialog.tsx" -> "src/components/ui/button.tsx"
@@ -417,82 +164,22 @@ strict digraph "dependency-cruiser output"{
     "src/features/visualization/components/SettingsDialog.tsx" -> "src/components/ui/label.tsx"
     "src/features/visualization/components/SettingsDialog.tsx" -> "src/components/ui/switch.tsx"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/components" {label="components" "src/features/visualization/components/styles.ts" [label=<styles.ts> tooltip="styles.ts" URL="src/features/visualization/components/styles.ts" fillcolor="#ddfeff"] } } } }
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/filters.test.ts" [label=<filters.test.ts> tooltip="filters.test.ts" URL="src/features/visualization/logic/filters.test.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/filters.test.ts" -> "src/features/visualization/logic/filters.ts"
-    "src/features/visualization/logic/filters.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/filters.ts" [label=<filters.ts> tooltip="filters.ts" URL="src/features/visualization/logic/filters.ts" fillcolor="#ddfeff"] } } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/graph-utils.ts" [label=<graph-utils.ts> tooltip="graph-utils.ts" URL="src/features/visualization/logic/graph-utils.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/graph-utils.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/logic/graph-utils.ts" -> "node_modules/graphology/dist/graphology.cjs.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout-elk.bench.ts" [label=<layout-elk.bench.ts> tooltip="layout-elk.bench.ts" URL="src/features/visualization/logic/layout-elk.bench.ts" fillcolor="#ddfeff"] } } } }
     "src/features/visualization/logic/layout-elk.bench.ts" -> "src/features/visualization/logic/layout-elk.ts"
-    "src/features/visualization/logic/layout-elk.bench.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/logic/layout-elk.bench.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout-elk.ts" [label=<layout-elk.ts> tooltip="layout-elk.ts" URL="src/features/visualization/logic/layout-elk.ts" fillcolor="#ddfeff"] } } } }
     "src/features/visualization/logic/layout-elk.ts" -> "src/features/visualization/logic/layout.ts"
-    "src/features/visualization/logic/layout-elk.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/features/visualization/logic/layout-elk.ts" -> "node_modules/elkjs/lib/main.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/logic/layout-elk.ts" -> "node_modules/elkjs/lib/elk.bundled.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout.test.ts" [label=<layout.test.ts> tooltip="layout.test.ts" URL="src/features/visualization/logic/layout.test.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/layout.test.ts" -> "src/features/visualization/logic/layout.ts"
-    "src/features/visualization/logic/layout.test.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/features/visualization/logic/layout.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout.ts" [label=<layout.ts> tooltip="layout.ts" URL="src/features/visualization/logic/layout.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/layout.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/features/visualization/logic/layout.ts" -> "node_modules/dagre/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/layout.worker.ts" [label=<layout.worker.ts> tooltip="layout.worker.ts" URL="src/features/visualization/logic/layout.worker.ts" fillcolor="#ddfeff"] } } } }
     "src/features/visualization/logic/layout.worker.ts" -> "src/features/visualization/logic/layout.ts"
-    "src/features/visualization/logic/layout.worker.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/metrics.aggregation.test.ts" [label=<metrics.aggregation.test.ts> tooltip="metrics.aggregation.test.ts" URL="src/features/visualization/logic/metrics.aggregation.test.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/metrics.aggregation.test.ts" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/logic/metrics.aggregation.test.ts" -> "src/features/visualization/logic/metrics.ts"
-    "src/features/visualization/logic/metrics.aggregation.test.ts" -> "node_modules/graphology/dist/graphology.cjs.js" [penwidth="1.0"]
-    "src/features/visualization/logic/metrics.aggregation.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/metrics.test.ts" [label=<metrics.test.ts> tooltip="metrics.test.ts" URL="src/features/visualization/logic/metrics.test.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/metrics.test.ts" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/logic/metrics.test.ts" -> "src/features/visualization/logic/metrics.ts"
-    "src/features/visualization/logic/metrics.test.ts" -> "node_modules/graphology/dist/graphology.cjs.js" [penwidth="1.0"]
-    "src/features/visualization/logic/metrics.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/metrics.ts" [label=<metrics.ts> tooltip="metrics.ts" URL="src/features/visualization/logic/metrics.ts" fillcolor="#ddfeff"] } } } }
     "src/features/visualization/logic/metrics.ts" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/logic/metrics.ts" -> "node_modules/graphology/dist/graphology.cjs.js" [penwidth="1.0"]
-    "src/features/visualization/logic/metrics.ts" -> "node_modules/graphology-metrics/centrality/pagerank.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/transformer.test.ts" [label=<transformer.test.ts> tooltip="transformer.test.ts" URL="src/features/visualization/logic/transformer.test.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/transformer.test.ts" -> "src/schema/dependency-cruiser.ts"
-    "src/features/visualization/logic/transformer.test.ts" -> "src/features/visualization/logic/transformer.ts"
-    "src/features/visualization/logic/transformer.test.ts" -> "fs" [style="dashed" penwidth="1.0"]
-    "src/features/visualization/logic/transformer.test.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/features/visualization/logic/transformer.test.ts" -> "url" [style="dashed" penwidth="1.0"]
-    "src/features/visualization/logic/transformer.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/transformer.ts" [label=<transformer.ts> tooltip="transformer.ts" URL="src/features/visualization/logic/transformer.ts" fillcolor="#ddfeff"] } } } }
     "src/features/visualization/logic/transformer.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/logic/transformer.ts" -> "src/features/visualization/logic/filters.ts"
     "src/features/visualization/logic/transformer.ts" -> "src/features/visualization/logic/uuid.ts"
-    "src/features/visualization/logic/transformer.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/logic/transformer.ts" -> "node_modules/graphology/dist/graphology.cjs.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/type-hiding.test.ts" [label=<type-hiding.test.ts> tooltip="type-hiding.test.ts" URL="src/features/visualization/logic/type-hiding.test.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/type-hiding.test.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/logic/type-hiding.test.ts" -> "src/features/visualization/logic/transformer.ts"
-    "src/features/visualization/logic/type-hiding.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/uuid.test.ts" [label=<uuid.test.ts> tooltip="uuid.test.ts" URL="src/features/visualization/logic/uuid.test.ts" fillcolor="#ddfeff"] } } } }
-    "src/features/visualization/logic/uuid.test.ts" -> "src/features/visualization/logic/uuid.ts"
-    "src/features/visualization/logic/uuid.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" subgraph "cluster_src/features/visualization/logic" {label="logic" "src/features/visualization/logic/uuid.ts" [label=<uuid.ts> tooltip="uuid.ts" URL="src/features/visualization/logic/uuid.ts" fillcolor="#ddfeff"] } } } }
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" "src/features/visualization/reparent-consistency.test.ts" [label=<reparent-consistency.test.ts> tooltip="reparent-consistency.test.ts" URL="src/features/visualization/reparent-consistency.test.ts" fillcolor="#ddfeff"] } } }
-    "src/features/visualization/reparent-consistency.test.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/reparent-consistency.test.ts" -> "src/features/visualization/store.ts"
-    "src/features/visualization/reparent-consistency.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" "src/features/visualization/reparent.test.ts" [label=<reparent.test.ts> tooltip="reparent.test.ts" URL="src/features/visualization/reparent.test.ts" fillcolor="#ddfeff"] } } }
-    "src/features/visualization/reparent.test.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/reparent.test.ts" -> "src/features/visualization/store.ts"
-    "src/features/visualization/reparent.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" "src/features/visualization/store.test.ts" [label=<store.test.ts> tooltip="store.test.ts" URL="src/features/visualization/store.test.ts" fillcolor="#ddfeff"] } } }
-    "src/features/visualization/store.test.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/store.test.ts" -> "src/features/visualization/logic/layout-elk.ts" [style="dashed"]
-    "src/features/visualization/store.test.ts" -> "src/features/visualization/logic/metrics.ts"
-    "src/features/visualization/store.test.ts" -> "src/features/visualization/store.ts"
-    "src/features/visualization/store.test.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
-    "src/features/visualization/store.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" "src/features/visualization/store.ts" [label=<store.ts> tooltip="store.ts" URL="src/features/visualization/store.ts" fillcolor="#ddfeff"] } } }
     "src/features/visualization/store.ts" -> "src/schema/dependency-cruiser.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/features/visualization/store.ts" -> "src/features/visualization/logic/filters.ts" [arrowhead="onormal" penwidth="1.0"]
@@ -504,43 +191,16 @@ strict digraph "dependency-cruiser output"{
     "src/features/visualization/store.ts" -> "src/features/visualization/logic/metrics.ts"
     "src/features/visualization/store.ts" -> "src/features/visualization/logic/transformer.ts"
     "src/features/visualization/store.ts" -> "src/features/visualization/types.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/features/visualization/store.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0"]
-    "src/features/visualization/store.ts" -> "node_modules/graphology/dist/graphology.cjs.js" [penwidth="1.0"]
-    "src/features/visualization/store.ts" -> "node_modules/zustand/esm/index.mjs" [penwidth="1.0"]
-    "src/features/visualization/store.ts" -> "node_modules/zustand/esm/middleware.mjs" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/features" {label="features" subgraph "cluster_src/features/visualization" {label="visualization" "src/features/visualization/types.ts" [label=<types.ts> tooltip="types.ts" URL="src/features/visualization/types.ts" fillcolor="#ddfeff"] } } }
-    "src/features/visualization/types.ts" -> "node_modules/@xyflow/react/dist/umd/index.js" [penwidth="1.0" arrowhead="onormal"]
     subgraph "cluster_src" {label="src" "src/index.css" [label=<index.css> tooltip="index.css" URL="src/index.css" ] }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/lib" {label="lib" "src/lib/utils.ts" [label=<utils.ts> tooltip="utils.ts" URL="src/lib/utils.ts" fillcolor="#ddfeff"] } }
-    "src/lib/utils.ts" -> "node_modules/clsx/dist/clsx.mjs" [penwidth="1.0"]
-    "src/lib/utils.ts" -> "node_modules/tailwind-merge/dist/bundle-cjs.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" "src/main.tsx" [label=<main.tsx> tooltip="main.tsx" URL="src/main.tsx" fillcolor="#bbfeff"] }
     "src/main.tsx" -> "src/App.tsx"
     "src/main.tsx" -> "src/index.css"
     "src/main.tsx" -> "src/components/theme-provider.tsx"
     "src/main.tsx" -> "src/components/ui/tooltip.tsx"
-    "src/main.tsx" -> "node_modules/react/index.js" [penwidth="1.0"]
-    "src/main.tsx" -> "node_modules/react-dom/client.js" [penwidth="1.0"]
-    "src/main.tsx" -> "node_modules/react-router-dom/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/complexity-metrics.ts" [label=<complexity-metrics.ts> tooltip="complexity-metrics.ts" URL="src/schema/complexity-metrics.ts" fillcolor="#ddfeff"] } }
-    "src/schema/complexity-metrics.ts" -> "node_modules/zod/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/dependency-cruiser.test.ts" [label=<dependency-cruiser.test.ts> tooltip="dependency-cruiser.test.ts" URL="src/schema/dependency-cruiser.test.ts" fillcolor="#ddfeff"] } }
-    "src/schema/dependency-cruiser.test.ts" -> "src/schema/dependency-cruiser.ts"
-    "src/schema/dependency-cruiser.test.ts" -> "fs" [style="dashed" penwidth="1.0"]
-    "src/schema/dependency-cruiser.test.ts" -> "path" [style="dashed" penwidth="1.0"]
-    "src/schema/dependency-cruiser.test.ts" -> "url" [style="dashed" penwidth="1.0"]
-    "src/schema/dependency-cruiser.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/dependency-cruiser.ts" [label=<dependency-cruiser.ts> tooltip="dependency-cruiser.ts" URL="src/schema/dependency-cruiser.ts" fillcolor="#ddfeff"] } }
-    "src/schema/dependency-cruiser.ts" -> "node_modules/dependency-cruiser/src/main/index.mjs" [penwidth="1.0" arrowhead="onormal"]
-    "src/schema/dependency-cruiser.ts" -> "node_modules/zod/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/manifest.test.ts" [label=<manifest.test.ts> tooltip="manifest.test.ts" URL="src/schema/manifest.test.ts" fillcolor="#ddfeff"] } }
-    "src/schema/manifest.test.ts" -> "src/schema/manifest.ts"
-    "src/schema/manifest.test.ts" -> "node_modules/vitest/dist/index.js" [penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/schema" {label="schema" "src/schema/manifest.ts" [label=<manifest.ts> tooltip="manifest.ts" URL="src/schema/manifest.ts" fillcolor="#ddfeff"] } }
-    "src/schema/manifest.ts" -> "node_modules/zod/index.js" [penwidth="1.0"]
-    subgraph "cluster_src" {label="src" "src/vite-env.d.ts" [label=<vite-env.d.ts> tooltip="vite-env.d.ts" URL="src/vite-env.d.ts" fillcolor="#ddfeff"] }
-    "src/vite-env.d.ts" -> "vite/client"
-    "url" [label=<url> tooltip="url" URL="https://nodejs.org/api/url.html" color="grey" fontcolor="grey"]
-    "util" [label=<util> tooltip="util" URL="https://nodejs.org/api/util.html" color="grey" fontcolor="grey"]
-    subgraph "cluster_vite" {label="vite" "vite/client" [label=<client> tooltip="client" ] }
+    subgraph "cluster_src" {label="src" "src/vite-env.d.ts" [label=<vite-env.d.ts> tooltip="vite-env.d.ts" URL="src/vite-env.d.ts" fillcolor="#ccffcc"] }
 }
