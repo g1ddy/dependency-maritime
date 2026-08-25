@@ -348,10 +348,22 @@ import { fileURLToPath } from 'node:url';
 export function getToolVersion(): string {
     try {
         const currentFile = fileURLToPath(import.meta.url);
-        const pkgPath = path.resolve(path.dirname(currentFile), '../../../package.json');
-        if (existsSync(pkgPath)) {
-            const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as { version?: unknown };
-            if (typeof pkg.version === 'string') return pkg.version;
+        let currDir = path.dirname(currentFile);
+        while (currDir) {
+            const pkgPath = path.join(currDir, 'package.json');
+            if (existsSync(pkgPath)) {
+                try {
+                    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as { name?: unknown; version?: unknown };
+                    if (pkg.name === '@dependency-maritime/cli' && typeof pkg.version === 'string') {
+                        return pkg.version;
+                    }
+                } catch {
+                    // Ignore parse errors and keep traversing up
+                }
+            }
+            const parent = path.dirname(currDir);
+            if (parent === currDir) break;
+            currDir = parent;
         }
     } catch {
         // Fallback
@@ -364,10 +376,57 @@ export async function writeOutputFiles(
     metricsData: unknown,
     reportPath: string,
     reportData: string,
+    cwd?: string
+): Promise<void>;
+export async function writeOutputFiles(
+    metricsPath: string,
+    metricsData: unknown,
+    reportPath: string,
+    reportData: string,
+    options?: { manifestPath?: string; manifestData?: unknown; cwd?: string }
+): Promise<void>;
+export async function writeOutputFiles(
+    metricsPath: string,
+    metricsData: unknown,
+    reportPath: string,
+    reportData: string,
     manifestPath?: string,
     manifestData?: unknown,
-    cwd: string = process.cwd()
+    cwd?: string
+): Promise<void>;
+export async function writeOutputFiles(
+    metricsPath: string,
+    metricsData: unknown,
+    reportPath: string,
+    reportData: string,
+    arg5?: string | { manifestPath?: string; manifestData?: unknown; cwd?: string },
+    arg6?: unknown,
+    arg7?: string
 ): Promise<void> {
+    let manifestPath: string | undefined;
+    let manifestData: unknown;
+    let cwd = process.cwd();
+
+    if (typeof arg5 === 'object' && arg5 !== null) {
+        manifestPath = arg5.manifestPath;
+        manifestData = arg5.manifestData;
+        if (arg5.cwd) {
+            cwd = arg5.cwd;
+        }
+    } else if (typeof arg5 === 'string') {
+        if (arg6 !== undefined) {
+            manifestPath = arg5;
+            manifestData = arg6;
+            if (typeof arg7 === 'string') {
+                cwd = arg7;
+            }
+        } else {
+            cwd = arg5;
+        }
+    } else if (typeof arg7 === 'string') {
+        cwd = arg7;
+    }
+
     const absMetricsPath = path.resolve(cwd, metricsPath);
     const absReportPath = path.resolve(cwd, reportPath);
 

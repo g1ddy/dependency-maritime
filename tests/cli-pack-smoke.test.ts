@@ -456,6 +456,132 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(report).toContain('Unmeasured Files**: 0');
     }, 60000);
 
+    it('clean-install supplied-graph outside output dir: stages graph into output dir, leaves original unchanged, and validates successfully', () => {
+        const suppliedDir = path.join(tmpRoot, 'supplied-outside-smoke');
+        const outsideDir = path.join(suppliedDir, 'outside');
+        fs.mkdirSync(path.join(suppliedDir, 'src'), { recursive: true });
+        fs.mkdirSync(outsideDir, { recursive: true });
+
+        fs.writeFileSync(
+            path.join(suppliedDir, 'package.json'),
+            JSON.stringify({
+                name: 'supplied-outside-smoke',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: {
+                    eslint: '^9.0.0'
+                }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(suppliedDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(suppliedDir, 'src', 'index.ts'),
+            'export const a = 1;\n'
+        );
+
+        const originalGraphData = JSON.stringify({
+            modules: [
+                { source: 'src/index.ts', valid: true, dependencies: [], dependents: [] }
+            ],
+            summary: { error: 0, ignore: 0, info: 0, totalCruised: 1, violations: [], warn: 0, optionsUsed: {} }
+        }, null, 2);
+
+        const outsideGraphPath = path.join(outsideDir, 'custom-graph.json');
+        fs.writeFileSync(outsideGraphPath, originalGraphData);
+
+        execSync(`npm install "${tarballPath}" eslint@^9.0.0 --no-save`, { cwd: suppliedDir, stdio: 'pipe' });
+
+        const analyzeOutput = execSync('npx maritime analyze --graph outside/custom-graph.json --output .maritime', {
+            cwd: suppliedDir,
+            encoding: 'utf8'
+        });
+
+        expect(analyzeOutput).toContain('Staging supplied graph into artifact directory...');
+
+        // Verify original graph file remains unchanged
+        expect(fs.existsSync(outsideGraphPath)).toBe(true);
+        expect(fs.readFileSync(outsideGraphPath, 'utf8')).toBe(originalGraphData);
+
+        // Verify staged graph exists inside .maritime
+        const stagedGraphPath = path.join(suppliedDir, '.maritime', 'custom-graph.json');
+        expect(fs.existsSync(stagedGraphPath)).toBe(true);
+
+        // Verify manifest contents
+        const manifest = JSON.parse(
+            fs.readFileSync(path.join(suppliedDir, '.maritime', 'manifest.json'), 'utf8')
+        ) as { toolVersion: string; artifacts: { graph: string } };
+
+        expect(manifest.artifacts.graph).toBe('custom-graph.json');
+        expect(manifest.artifacts.graph).not.toContain('..');
+
+        // Verify validate accepts .maritime
+        const validateOutput = execSync('npx maritime validate .maritime', {
+            cwd: suppliedDir,
+            encoding: 'utf8'
+        });
+        expect(validateOutput).toContain('Artifact Directory Contract Validated!');
+    }, 60000);
+
+    it('validate rejects a manifest with path-escaping artifact declaration', () => {
+        const escapeDir = path.join(tmpRoot, 'path-escape-smoke');
+        const maritimeDir = path.join(escapeDir, '.maritime');
+        fs.mkdirSync(maritimeDir, { recursive: true });
+
+        fs.writeFileSync(
+            path.join(escapeDir, 'package.json'),
+            JSON.stringify({
+                name: 'path-escape-smoke',
+                version: '1.0.0',
+                type: 'module'
+            }, null, 2)
+        );
+
+        const validGraph = JSON.stringify({
+            modules: [],
+            summary: { error: 0, ignore: 0, info: 0, totalCruised: 0, violations: [], warn: 0, optionsUsed: {} }
+        });
+
+        fs.writeFileSync(path.join(maritimeDir, 'complexity-metrics.json'), '{}');
+        fs.writeFileSync(path.join(maritimeDir, 'complexity-report.md'), '# Report');
+        fs.writeFileSync(path.join(escapeDir, 'outside-graph.json'), validGraph);
+
+        fs.writeFileSync(
+            path.join(maritimeDir, 'manifest.json'),
+            JSON.stringify({
+                schemaVersion: '1.0.0',
+                toolVersion: '0.0.0',
+                generatedAt: new Date().toISOString(),
+                sourceRoots: ['src'],
+                artifacts: {
+                    graph: '../outside-graph.json',
+                    metrics: 'complexity-metrics.json',
+                    report: 'complexity-report.md'
+                },
+                summary: { totalFiles: 0, healthScore: 100, scannedCount: 0, skippedCount: 0 }
+            }, null, 2)
+        );
+
+        execSync(`npm install "${tarballPath}" --no-save --omit=peer`, { cwd: escapeDir, stdio: 'pipe' });
+
+        let exitCode = 0;
+        let output = '';
+        try {
+            execSync('npx maritime validate .maritime', { cwd: escapeDir, encoding: 'utf8', stdio: 'pipe' });
+        } catch (err: unknown) {
+            const execErr = err as { status?: number; stdout?: string; stderr?: string };
+            exitCode = execErr.status ?? 1;
+            output = (execErr.stdout || '') + (execErr.stderr || '');
+        }
+
+        expect(exitCode).toBe(2);
+        expect(output).toContain('escapes the artifact directory');
+    }, 60000);
+
     it('clean-install multi-root fixture repository: analyzes project with multi-source roots and programmatic API', () => {
         const crawlerDir = path.join(tmpRoot, 'crawler-command-interface');
         fs.mkdirSync(path.join(crawlerDir, 'src'), { recursive: true });
