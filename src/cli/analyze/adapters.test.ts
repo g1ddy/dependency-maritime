@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import * as fs from 'fs/promises';
-import { readDependencyGraph, runEslintComplexityScan, resolveDepcruiseConfig, getPortableFallbackConfig } from './adapters';
+import { readDependencyGraph, runEslintComplexityScan, resolveDepcruiseConfig, getPortableFallbackConfig, getToolVersion, writeOutputFiles } from './adapters';
 import { ValidationError } from './models';
 import { ESLint } from 'eslint';
 
@@ -170,6 +170,39 @@ describe('adapters', () => {
             const fallback = getPortableFallbackConfig(process.cwd());
             expect(fallback.options.doNotFollow).toEqual({ path: 'node_modules' });
             expect(fallback.options.tsPreCompilationDeps).toBe(true);
+        });
+    });
+
+    describe('getToolVersion & writeOutputFiles', () => {
+        it('should return version string from getToolVersion', () => {
+            const version = getToolVersion();
+            expect(typeof version).toBe('string');
+            expect(version).not.toBe('');
+        });
+
+        it('should support 5-argument writeOutputFiles(metrics, data, report, data, cwd)', async () => {
+            vi.mocked(fs.mkdir).mockResolvedValue(undefined);
+            vi.mocked(fs.writeFile).mockResolvedValue(undefined);
+
+            await writeOutputFiles('metrics.json', { a: 1 }, 'report.md', 'summary', '/custom/cwd');
+
+            expect(fs.writeFile).toHaveBeenCalledTimes(2);
+            expect(fs.writeFile).toHaveBeenCalledWith('/custom/cwd/metrics.json', JSON.stringify({ a: 1 }, null, 2));
+            expect(fs.writeFile).toHaveBeenCalledWith('/custom/cwd/report.md', 'summary');
+        });
+
+        it('should support writeOutputFiles with options object', async () => {
+            vi.mocked(fs.mkdir).mockResolvedValue(undefined);
+            vi.mocked(fs.writeFile).mockResolvedValue(undefined);
+
+            await writeOutputFiles('metrics.json', { a: 1 }, 'report.md', 'summary', {
+                manifestPath: 'manifest.json',
+                manifestData: { v: '1.0' },
+                cwd: '/custom/cwd'
+            });
+
+            expect(fs.writeFile).toHaveBeenCalledTimes(3);
+            expect(fs.writeFile).toHaveBeenCalledWith('/custom/cwd/manifest.json', JSON.stringify({ v: '1.0' }, null, 2));
         });
     });
 });

@@ -1,6 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { runAnalyzeCommand } from './analyze';
 import * as adapters from '../analyze/adapters';
+import * as fsPromises from 'node:fs/promises';
+
+vi.mock('node:fs/promises', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('node:fs/promises')>();
+    return {
+        ...actual,
+        mkdir: vi.fn().mockResolvedValue(undefined),
+        copyFile: vi.fn().mockResolvedValue(undefined),
+        writeFile: vi.fn().mockResolvedValue(undefined)
+    };
+});
 
 describe('runAnalyzeCommand', () => {
     beforeEach(() => {
@@ -53,5 +64,19 @@ describe('runAnalyzeCommand', () => {
         expect(manifest.artifacts.graph).toBe('graph.json');
         expect(manifest.artifacts.metrics).toBe('metrics.json');
         expect(manifest.artifacts.report).toBe('report.md');
+    });
+
+    it('should stage supplied graph when supplied graph is outside output directory', async () => {
+        const exitCode = await runAnalyzeCommand([
+            '--source', 'src',
+            '--graph', '../outside-graph.json',
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+        expect(fsPromises.copyFile).toHaveBeenCalled();
+        const calls = vi.mocked(adapters.writeOutputFiles).mock.calls;
+        const manifest = calls[0][5] as { artifacts: { graph: string } };
+        expect(manifest.artifacts.graph).toBe('outside-graph.json');
     });
 });
