@@ -17,15 +17,16 @@ placing it in Zustand state.
 
 Read these documents before changing their corresponding areas:
 
-1. [Build integration roadmap](docs/BUILD_INTEGRATION.md) — public CLI contract, artifact
-   contract, compatibility support, release gates, and the current delivery order.
+1. [CLI and artifact contract](docs/CLI.md) — public commands, artifact contract, compatibility,
+   and release criteria.
 2. [Architecture](docs/ARCHITECTURE.md) — headless-logic/interactive-UI design and the intended
    data flow.
-3. [Design decisions](docs/DESIGN_DECISIONS.md) — repository structure, local-first behavior, and
+3. [Roadmap](docs/ROADMAP.md) — planned and completed product work.
+4. [Design decisions](docs/DESIGN_DECISIONS.md) — repository structure, local-first behavior, and
    performance choices.
-4. [Jules context](.jules/context.md) — canonical dependency-cruiser exchange shape and project
+5. [Jules context](.jules/context.md) — canonical dependency-cruiser exchange shape and project
    boundaries.
-5. [README](README.md) — user-facing setup and current usage.
+6. [README](README.md) — user-facing setup and current usage.
 
 ## Repository map
 
