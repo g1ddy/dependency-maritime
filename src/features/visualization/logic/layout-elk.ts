@@ -76,12 +76,28 @@ export async function applyElkLayout(
   // 5. Run Layout
   const layoutedGraph = await elk.layout(rootGraph);
 
-  // 6. Map positions back to React Flow nodes
+  // 6. Build an O(1) lookup map of the resulting ELK nodes
+  const layoutedElkNodes = new Map<string, ElkNode>();
+  const stack = [layoutedGraph];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current) continue;
+
+    layoutedElkNodes.set(current.id, current);
+
+    if (current.children) {
+      for (const child of current.children) {
+        stack.push(child);
+      }
+    }
+  }
+
+  // 7. Map positions back to React Flow nodes
   // ELK returns relative positions for children, which matches React Flow's expectation.
   // We need to flatten the results to update our flat nodes array.
 
   const nextNodes = nodes.map((originalNode) => {
-    const elkNode = findElkNode(layoutedGraph, originalNode.id);
+    const elkNode = layoutedElkNodes.get(originalNode.id);
 
     if (!elkNode) {
       return originalNode;
@@ -112,26 +128,4 @@ export async function applyElkLayout(
   });
 
   return { nodes: nextNodes, edges };
-}
-
-// Helper to find a node in the ELK tree (Iterative DFS)
-function findElkNode(root: ElkNode, id: string): ElkNode | undefined {
-  const stack = [root];
-
-  while (stack.length > 0) {
-    const current = stack.pop();
-    if (!current) continue;
-
-    if (current.id === id) {
-      return current;
-    }
-
-    if (current.children) {
-      for (const child of current.children) {
-        stack.push(child);
-      }
-    }
-  }
-
-  return undefined;
 }
