@@ -259,6 +259,9 @@ real CI consumer and makes the checked-in artifacts useful review evidence.
   second dependency graph.
 - [x] Commit the validated `.maritime/` artifacts (and any retained derived graph images) back
   to the refactor pull-request branch using the existing repository-owned automation pattern.
+- [x] Make Maritime’s built-in Project Graph consume the same `.maritime/` graph and metrics
+  artifacts; remove legacy duplicate `config/` graph/metric generation and stale embedded hotspot
+  snapshots.
 
 Acceptance criteria:
 
