@@ -32,8 +32,6 @@
     "lint": "eslint .",
     "depcruise": "depcruise src --config config/.dependency-cruiser.cjs",
     "check:arch": "depcruise src --config config/.dependency-cruiser.cjs",
-    "calculate:complexity": "node scripts/calculate-complexity.cjs",
-    "generate:json": "depcruise src --config config/dependency-graph.cjs --output-type json > config/dependency-graph.json",
     "generate:dot": "depcruise-fmt -T dot .maritime/dependency-graph.json > config/dependency-graph.dot",
     "generate:graph": "dot -T svg config/dependency-graph.dot > docs/images/dependency-graph.svg && dot -T png config/dependency-graph.dot > docs/images/dependency-graph.png",
     "preview": "vite preview",
