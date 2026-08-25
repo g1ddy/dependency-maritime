@@ -1,6 +1,6 @@
 import { bench, describe } from 'vitest';
-import { applyElkLayout } from './layout-elk';
 import type { Node, Edge } from '@xyflow/react';
+import { applyElkLayout } from './layout-elk';
 
 // Helper to generate a mock graph
 function generateMockGraph(nodeCount: number) {

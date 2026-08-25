@@ -27,5 +27,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts", "src/**/*.test.ts", "src/**/*.test.tsx", "tests/**/*.ts", "playwright.config.ts", "config/playwright.screenshots.config.ts"]
+  "include": ["vite.config.ts", "vitest.bench.config.ts", "src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.bench.ts", "tests/**/*.ts", "playwright.config.ts", "config/playwright.screenshots.config.ts"]
 }

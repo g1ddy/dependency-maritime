@@ -30,5 +30,5 @@
     }
   },
   "include": ["src", "src/vite-env.d.ts", "config/**/*.json"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "tests/"]
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.bench.ts", "tests/"]
 }
