@@ -120,6 +120,48 @@ Exit codes:
 - `1`: Operational or runtime failure.
 - `2`: Invalid CLI arguments, missing/malformed manifest, unsupported schema version, path escaping, or schema validation error.
 
+## CI contract checks and triggering contract
+
+Maritime enforces CI contract verification for all changes affecting the distributable CLI package and artifact contract.
+
+### Workflow triggers
+
+CLI contract checks are executed via a dedicated GitHub Actions workflow (`.github/workflows/cli-contract.yml`) and integrated into general CI (`.github/workflows/ci.yml`). Workflow dispatches are reliably triggered on `push` to `main` and `pull_request` whenever any of the following paths are modified:
+
+- `src/cli/**`
+- `src/schema/**`
+- `tests/cli-pack-smoke.test.ts`
+- `package.json`
+- `package-lock.json`
+- `tsconfig.cli.json`
+- `.github/workflows/**`
+
+Documentation-only PRs (modifying strictly `docs/**` or `*.md`) intentionally bypass the full 3-node compatibility matrix to avoid unnecessary build queues, while any pull request modifying CLI, schema, test, configuration, or workflow files is guaranteed to execute the contract checks.
+
+### Required execution contract
+
+The CLI contract check executes:
+
+1. `npm run build:cli`
+2. `npm run test:cli-package`
+
+across the supported Node.js compatibility matrix (`20.19.0`, `22.x`, `24.x`) with `fail-fast: false`.
+
+### Root-cause diagnosis and remediation (PR #221)
+
+PR #221 modified files in `src/cli/` and `src/schema/` but did not record a GitHub Actions workflow run. Investigation identified the following root causes:
+
+1. **Permission restrictions on fork PRs**: Top-level `permissions: contents: write` in `.github/workflows/ci.yml` prevented GitHub Actions from executing workflow dispatches for fork pull requests or restricted pull-request tokens.
+2. **Missing explicit build step**: Workflows lacked an explicit `npm run build:cli` step prior to running `npm run test:cli-package`, obscuring build status in workflow execution steps.
+3. **Automated commit suppression (`[skip ci]`)**: Automated commits pushed by external workflows with `[skip ci]` in the commit message suppressed workflow dispatch for pull request head commits.
+4. **Missing explicit path filter contract**: General workflows lacked explicit path trigger declarations targeting CLI-specific build and schema inputs.
+
+**Remediation applied**:
+- Created a dedicated `.github/workflows/cli-contract.yml` workflow with explicit path triggers and top-level `permissions: contents: read`.
+- Explicitly added `npm run build:cli` as a dedicated workflow step before `npm run test:cli-package`.
+- Configured `.github/workflows/ci.yml` to set top-level `permissions: contents: read` while restricting `contents: write` permissions strictly to the `build-and-test` release tagging step.
+- Configured `paths-ignore: ['docs/**', '*.md']` on `ci.yml` pull-request triggers to skip heavy matrix runs for doc-only changes without bypassing source or CLI changes.
+
 ## Current implementation status
 
 ### Analyzer and correctness
