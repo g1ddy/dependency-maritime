@@ -247,29 +247,29 @@ Before adding a reusable GitHub Action or browser bundle upload, Maritime should
 public CLI contract in the repository's existing refactor-metrics workflow. This provides a
 real CI consumer and makes the checked-in artifacts useful review evidence.
 
-- [ ] Update `.github/workflows/refactor_metrics.yml` to build the CLI and run its public
+- [x] Update `.github/workflows/refactor_metrics.yml` to build the CLI and run its public
   `maritime analyze` command against Maritime's own `src/` root, with
   `config/.dependency-cruiser.cjs` supplied explicitly and `--fail-on-unmeasured` required.
-- [ ] Emit the normal `.maritime/` artifact directory and run `maritime validate .maritime`
+- [x] Emit the normal `.maritime/` artifact directory and run `maritime validate .maritime`
   before committing any generated output.
-- [ ] Replace the workflow's separately-invoked dependency-cruiser and complexity commands
+- [x] Replace the workflow's separately-invoked dependency-cruiser and complexity commands
   with the Maritime CLI as the authoritative graph, metrics, and Markdown-report generator.
-- [ ] Continue generating Graphviz SVG/PNG only if committed visual diagrams remain useful;
+- [x] Continue generating Graphviz SVG/PNG only if committed visual diagrams remain useful;
   when retained, render them from `.maritime/dependency-graph.json` rather than generating a
   second dependency graph.
-- [ ] Commit the validated `.maritime/` artifacts (and any retained derived graph images) back
+- [x] Commit the validated `.maritime/` artifacts (and any retained derived graph images) back
   to the refactor pull-request branch using the existing repository-owned automation pattern.
 
 Acceptance criteria:
 
-- [ ] A `refactor`-labelled Maritime pull request produces and commits a validated `.maritime/`
+- [x] A `refactor`-labelled Maritime pull request produces and commits a validated `.maritime/`
   directory containing `manifest.json`, `dependency-graph.json`,
   `complexity-metrics.json`, and `complexity-report.md`.
-- [ ] The workflow invokes the built CLI, not direct analyzer imports or the legacy shell
+- [x] The workflow invokes the built CLI, not direct analyzer imports or the legacy shell
   commands for dependency-cruiser and ESLint.
-- [ ] The resulting artifacts describe Maritime's own selected source root and use its
+- [x] The resulting artifacts describe Maritime's own selected source root and use its
   repository-specific dependency-cruiser policy without making that policy a consumer default.
-- [ ] Failure to analyze or validate prevents generated artifacts from being committed.
+- [x] Failure to analyze or validate prevents generated artifacts from being committed.
 
 ### Increment 4 — Versioned artifact manifest
 
