@@ -131,13 +131,36 @@ Exit Codes:
         console.log(`   - Graph Path: ${targetGraphPath}`);
         console.log(`   - ESLint Config Mode: ${eslintConfigMode}`);
 
+        const manifestDir = values.output
+            ? path.resolve(workingDir, values.output)
+            : path.dirname(path.resolve(workingDir, targetMetricsPath));
+
         // 2. Read or generate graph
         let modules: DependencyCruiserModule[];
         const isGraphSupplied = values.graph !== undefined;
+        let effectiveGraphPath: string;
 
         if (isGraphSupplied) {
             console.log('   - Reading Supplied Dependency Cruiser JSON...');
             modules = await readDependencyGraph(values.graph!, workingDir);
+
+            const absGraphPath = path.resolve(workingDir, values.graph!);
+            const relGraphToManifest = path.relative(manifestDir, absGraphPath);
+            const isOutside = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
+
+            if (isOutside) {
+                console.log('   - Staging supplied graph into artifact directory...');
+                effectiveGraphPath = path.join(manifestDir, path.basename(absGraphPath));
+                try {
+                    await fsPromises.mkdir(manifestDir, { recursive: true });
+                    await fsPromises.copyFile(absGraphPath, effectiveGraphPath);
+                } catch (err: unknown) {
+                    const message = err instanceof Error ? err.message : String(err);
+                    throw new Error(`Failed to stage supplied dependency graph into artifact directory: ${message}`);
+                }
+            } else {
+                effectiveGraphPath = absGraphPath;
+            }
         } else {
             console.log('   - Generating Dependency Graph with dependency-cruiser...');
             const genResult = await generateDependencyGraph({
@@ -149,9 +172,9 @@ Exit Codes:
             modules = genResult.modules;
 
             // Write the generated graph to targetGraphPath
-            const absGraphPath = path.resolve(workingDir, targetGraphPath);
-            await fsPromises.mkdir(path.dirname(absGraphPath), { recursive: true });
-            await fsPromises.writeFile(absGraphPath, JSON.stringify(genResult.cruiseResult, null, 2));
+            effectiveGraphPath = path.resolve(workingDir, targetGraphPath);
+            await fsPromises.mkdir(path.dirname(effectiveGraphPath), { recursive: true });
+            await fsPromises.writeFile(effectiveGraphPath, JSON.stringify(genResult.cruiseResult, null, 2));
         }
 
         const sourceFiles = modules
@@ -213,15 +236,18 @@ Exit Codes:
 
         const reportContent = renderMarkdownReport(analysisResult, DEFAULT_THRESHOLDS);
 
-        const manifestDir = values.output
-            ? path.resolve(workingDir, values.output)
-            : path.dirname(path.resolve(workingDir, targetMetricsPath));
-
         const targetManifestPath = path.relative(workingDir, path.join(manifestDir, 'manifest.json')).replace(/\\/g, '/');
 
-        const relGraph = path.relative(manifestDir, path.resolve(workingDir, targetGraphPath)).replace(/\\/g, '/');
+        const relGraph = path.relative(manifestDir, effectiveGraphPath).replace(/\\/g, '/');
         const relMetrics = path.relative(manifestDir, path.resolve(workingDir, targetMetricsPath)).replace(/\\/g, '/');
         const relReport = path.relative(manifestDir, path.resolve(workingDir, targetReportPath)).replace(/\\/g, '/');
+
+        const artifactRelPaths = { graph: relGraph, metrics: relMetrics, report: relReport };
+        for (const [key, relPath] of Object.entries(artifactRelPaths)) {
+            if (relPath.startsWith('..') || path.isAbsolute(relPath)) {
+                throw new ValidationError(`Manifest artifact path for "${key}" escapes the artifact directory: "${relPath}"`);
+            }
+        }
 
         const manifest: ArtifactManifest = {
             schemaVersion: MANIFEST_SCHEMA_VERSION,

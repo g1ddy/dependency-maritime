@@ -55,7 +55,7 @@ Do not publish the React application as the analysis package.
 
 ## Artifact contract
 
-The eventual normal analysis output is one directory:
+The normal analysis output is a single self-contained artifact directory:
 
 ```text
 .maritime/
@@ -64,6 +64,10 @@ The eventual normal analysis output is one directory:
 ├── complexity-report.md
 └── manifest.json
 ```
+
+Every successful `maritime analyze` invocation produces an output directory where `manifest.json`, the dependency graph JSON, complexity metrics JSON, and Markdown report all reside within that directory. All manifest-declared artifact paths are relative to the artifact directory and must not contain path traversal (e.g., `..`) or absolute paths.
+
+When `--graph <file>` is supplied outside `--output <dir>`, the validated supplied graph is staged (copied) into the output directory and referenced in the manifest as a relative path inside that directory. The original caller graph file is never modified or removed. If staging cannot be completed, analysis fails with a non-zero exit code without emitting a manifest.
 
 ### `dependency-graph.json`
 
