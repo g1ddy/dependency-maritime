@@ -249,7 +249,7 @@ real CI consumer and makes the checked-in artifacts useful review evidence.
 
 - [ ] Update `.github/workflows/refactor_metrics.yml` to build the CLI and run its public
   `maritime analyze` command against Maritime's own `src/` root, with
-  `config/.dependency-cruiser.cjs` supplied explicitly.
+  `config/.dependency-cruiser.cjs` supplied explicitly and `--fail-on-unmeasured` required.
 - [ ] Emit the normal `.maritime/` artifact directory and run `maritime validate .maritime`
   before committing any generated output.
 - [ ] Replace the workflow's separately-invoked dependency-cruiser and complexity commands
