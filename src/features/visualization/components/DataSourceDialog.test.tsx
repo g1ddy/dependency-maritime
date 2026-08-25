@@ -57,7 +57,7 @@ vi.mock('../../../../sample-data/dependency-graph.json', () => ({
   default: mockSampleData
 }));
 
-vi.mock('../../../../config/dependency-graph.json', () => ({
+vi.mock('../../../../.maritime/dependency-graph.json', () => ({
   default: mockProjectData
 }));
 

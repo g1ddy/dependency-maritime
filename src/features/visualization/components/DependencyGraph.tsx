@@ -6,8 +6,8 @@ import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } fro
 import '@xyflow/react/dist/style.css';
 
 import { useGraphStore } from '../store';
-import graphData from '../../../../config/dependency-graph.json';
-import complexityMetrics from '../../../../config/complexity-metrics.json';
+import graphData from '../../../../.maritime/dependency-graph.json';
+import complexityMetrics from '../../../../.maritime/complexity-metrics.json';
 import { CruiseResultSchema, type ICruiseResult } from '@/schema/dependency-cruiser';
 import { ComplexityMetricsMapSchema } from '@/schema/complexity-metrics';
 import { AppNode } from './AppNode';

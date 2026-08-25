@@ -1,93 +1,47 @@
 # Code Complexity & Health Metrics
 
-To maintain a maintainable and scalable codebase, we track code complexity using a **Compound Complexity Score**. This document defines how we measure complexity and provides a baseline for future comparisons.
+Dependency Maritime produces the repository's authoritative complexity and hotspot evidence in the validated [`.maritime/`](../.maritime/) artifact directory.
 
-## 📊 The 5 Dimensions of Complexity
+- [Current complexity and hotspot report](../.maritime/complexity-report.md)
+- [Current per-file metrics](../.maritime/complexity-metrics.json)
+- [Current dependency graph](../.maritime/dependency-graph.json)
+- [Artifact manifest](../.maritime/manifest.json)
 
-We evaluate files based on these five dimensions:
+The refactor workflow rebuilds this bundle with the public CLI, requires complete measurement coverage, validates it, and then regenerates the DOT and graph images from the same graph artifact. Do not hand-edit or duplicate these generated values elsewhere in the repository.
 
-| Dimension | Metric | Tool | Warning Threshold |
+## Metrics
+
+| Dimension | Metric | Source | Warning threshold |
 | :--- | :--- | :--- | :--- |
-| **Length** | **LOC** (Lines of Code) | `wc -l` | > 300 LOC |
-| **Coupling** | **Fan-Out** (Dependencies) | `dependency-cruiser` | > 10 Imports |
-| **Stability** | **Instability (I)** | `dependency-cruiser` | 30% - 70% (The "Zone of Pain") |
-| **Logic** | **Cyclomatic Complexity** | `eslint` | > 10 |
-| **Testability** | **Test Coverage** | `jest` | < 80% |
+| Length | LOC | ESLint analysis | > 300 LOC |
+| Coupling | Fan-out | dependency-cruiser graph | > 15 local dependencies |
+| Stability | Instability | local graph metrics | context-dependent |
+| Logic | Cyclomatic complexity | ESLint analysis | > 10 |
+| Measurement coverage | scanned/unmeasured | Maritime artifact manifest/report | 0 unmeasured for authoritative CI |
 
 ### Definitions
-*   **Instability (I)**: Calculated as $I = \frac{C_{efferent}}{C_{afferent} + C_{efferent}}$, where:
-    *   $C_{efferent}$ (Fan-Out): Number of classes this file depends on.
-    *   $C_{afferent}$ (Fan-In): Number of classes that depend on this file.
-    *   $I=0$: Extremely stable (Foundation layer).
-    *   $I=1$: Extremely volatile (Top-level logic).
-    *   *Zone of Pain*: Middle values imply the file changes for many reasons AND breaks many things when it changes.
 
-## 🛠️ How to Measure
+**Instability** is calculated as $I = \frac{C_{efferent}}{C_{afferent} + C_{efferent}}$, where:
 
-### 1. Generate Metrics Report
-Use `dependency-cruiser` to generate a comprehensive metrics report including Fan-In, Fan-Out, and Instability.
+- **Fan-out** ($C_{efferent}$) is the number of local files a file depends on.
+- **Fan-in** ($C_{afferent}$) is the number of local files that depend on it.
+- $I = 0$ is a stable foundation layer; $I = 1$ is volatile top-level logic.
 
-```bash
-npx depcruise src --config config/dependency-cruiser.cjs --output-type metrics > complexity-report.txt
+The Markdown report ranks hotspots with the compound score:
+
+```text
+(LOC / 10) + (Complexity * 2) + (FanOut * 2) + (Instability * 20)
 ```
 
-### 2. Check Line Counts (LOC)
-Identify the largest files in the system.
+## Regenerating repository evidence
 
 ```bash
-find src -name "*.ts" -not -name "*.test.ts" | xargs wc -l | sort -n | tail -n 10
+npm run build:cli
+node dist/cli/main.js analyze --source src --output .maritime \
+  --depcruise-config config/.dependency-cruiser.cjs --fail-on-unmeasured
+node dist/cli/main.js validate .maritime
+npm run generate:dot
+npm run generate:graph
 ```
 
-### 3. Check Cyclomatic Complexity
-Run ESLint to find complex functions.
-
-```bash
-npx eslint src --format json --rule 'complexity: ["warn", 10]' --parser @typescript-eslint/parser
-```
-
----
-
-## 📉 Complexity Baseline (Oct 2023 Refactor)
-
-Following the "AI to Rules" refactor and "Split Coach" initiative, here are the current metrics.
-
-## 🚨 Automated Complexity Report
-
-**Last Updated:** 2026-08-23
-
-### 🏥 Repository Health Score: **88.0 / 100**
-
-*   **Formula**: 100 - Penalties for Files exceeding thresholds (LOC > 300, Complexity > 10, Fan-Out > 15).
-*   **Total Graph Files**: 46
-*   **Measured Files**: 46
-*   **Unmeasured Files**: 0
-
-### 🔥 Top 10 High-Complexity Files (Compound Score)
-_Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
-
-| File | Score | LOC | Complexity | Fan-Out | Instability |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/features/visualization/store.ts` | **112.5** | 667 | 7 | 10 | 0.59 |
-| `src/features/visualization/components/NodeInspectorPanel.tsx` | **99.5** | 240 | 22 | 7 | 0.88 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **86** | 229 | 17 | 6 | 0.86 |
-| `src/features/visualization/components/GraphOverlay.tsx` | **83.8** | 275 | 8 | 11 | 0.92 |
-| `src/features/visualization/logic/transformer.ts` | **74** | 270 | 13 | 3 | 0.75 |
-| `src/features/visualization/components/AppNode.tsx` | **69** | 100 | 19 | 3 | 0.75 |
-| `src/components/layout/Header.tsx` | **63.6** | 149 | 11 | 5 | 0.83 |
-| `src/features/visualization/logic/metrics.ts` | **58.9** | 189 | 14 | 1 | 0.5 |
-| `src/features/relationships/components/RelationshipOverlay.tsx` | **56.9** | 179 | 9 | 3 | 0.75 |
-| `src/components/DataSourceDialog.tsx` | **55** | 117 | 11 | 4 | 0.67 |
-
-### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
-| File | Max Complexity | LOC |
-| :--- | :--- | :--- |
-| `src/features/visualization/components/NodeInspectorPanel.tsx` | **22** | 240 |
-| `src/features/visualization/components/AppNode.tsx` | **19** | 100 |
-| `src/features/visualization/components/DependencyGraph.tsx` | **17** | 229 |
-| `src/features/visualization/logic/metrics.ts` | **14** | 189 |
-| `src/features/visualization/components/GroupNode.tsx` | **13** | 72 |
-| `src/features/visualization/logic/layout.ts` | **13** | 151 |
-| `src/features/visualization/logic/transformer.ts` | **13** | 270 |
-| `src/components/FileUploadZone.tsx` | **12** | 117 |
-| `src/components/DataSourceDialog.tsx` | **11** | 117 |
-| `src/components/layout/Header.tsx` | **11** | 149 |
+For the portable consumer contract and artifact validation rules, see [Build Integration and Report Artifacts](./BUILD_INTEGRATION.md).
