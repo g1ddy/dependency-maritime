@@ -241,11 +241,50 @@ The following work improves confidence before public publishing but does not blo
 
 ## Later roadmap
 
-### Increment 4 — Versioned artifact manifest and UI bundle upload
+### Immediate next step — Dogfood CLI artifact generation in refactor PRs
+
+Before adding a reusable GitHub Action or browser bundle upload, Maritime should use its own
+public CLI contract in the repository's existing refactor-metrics workflow. This provides a
+real CI consumer and makes the checked-in artifacts useful review evidence.
+
+- [ ] Update `.github/workflows/refactor_metrics.yml` to build the CLI and run its public
+  `maritime analyze` command against Maritime's own `src/` root, with
+  `config/.dependency-cruiser.cjs` supplied explicitly.
+- [ ] Emit the normal `.maritime/` artifact directory and run `maritime validate .maritime`
+  before committing any generated output.
+- [ ] Replace the workflow's separately-invoked dependency-cruiser and complexity commands
+  with the Maritime CLI as the authoritative graph, metrics, and Markdown-report generator.
+- [ ] Continue generating Graphviz SVG/PNG only if committed visual diagrams remain useful;
+  when retained, render them from `.maritime/dependency-graph.json` rather than generating a
+  second dependency graph.
+- [ ] Commit the validated `.maritime/` artifacts (and any retained derived graph images) back
+  to the refactor pull-request branch using the existing repository-owned automation pattern.
+
+Acceptance criteria:
+
+- [ ] A `refactor`-labelled Maritime pull request produces and commits a validated `.maritime/`
+  directory containing `manifest.json`, `dependency-graph.json`,
+  `complexity-metrics.json`, and `complexity-report.md`.
+- [ ] The workflow invokes the built CLI, not direct analyzer imports or the legacy shell
+  commands for dependency-cruiser and ESLint.
+- [ ] The resulting artifacts describe Maritime's own selected source root and use its
+  repository-specific dependency-cruiser policy without making that policy a consumer default.
+- [ ] Failure to analyze or validate prevents generated artifacts from being committed.
+
+### Increment 4 — Versioned artifact manifest
 
 - [x] Define Zod schemas for the manifest/report model.
 - [x] Generate `manifest.json` with schema/tool versions, source roots, generation time, and filenames.
 - [x] Add `maritime validate`.
+
+### Post-MVP — Artifact archive and UI bundle upload
+
+The UI continues to support raw dependency-cruiser JSON upload during the MVP. A complete
+Maritime artifact-directory archive and browser upload flow follow after the CLI has been
+dogfooded in CI and the MVP release path is stable.
+
+- [ ] Define a standard archive form for a `.maritime/` directory, without coupling archive
+  creation to normal analysis.
 - [ ] Preserve raw graph upload and add complete `.zip` bundle upload to the UI.
 
 ### Increment 5 — Baseline comparison and regression policy
@@ -275,4 +314,4 @@ Do not describe Maritime as publicly distribution-ready merely because `npm pack
 4. Local graph scoping and measurement integrity are enforced.
 5. The required Node/ESLint/dependency-cruiser runtime compatibility matrix passes.
 
-Increment 4 may proceed once these gates pass. The remaining configuration-shape hardening and additional-repository validation stay required before public package release.
+These gates are satisfied for the current CLI contract. The next delivery is the refactor-workflow dogfooding described above; archive/UI upload remains post-MVP, and ESLint 10 compatibility follows when it can be validated through the distributed suite.
