@@ -8,7 +8,7 @@ import { GenericDataSourceDialog, type DataSourcePreset } from '@/components/Dat
 
 // Import data sources
 import sampleData from '../../../../sample-data/dependency-graph.json';
-import projectData from '../../../../config/dependency-graph.json';
+import projectData from '../../../../.maritime/dependency-graph.json';
 
 interface DataSourceDialogProps {
   open: boolean;
@@ -119,7 +119,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     let metrics: ComplexityMetricsMap | undefined;
     try {
       // Dynamically import to prevent build failure if missing
-      const mod = await import('../../../../config/complexity-metrics.json');
+      const mod = await import('../../../../.maritime/complexity-metrics.json');
       // Handle both default export (traditional JSON module) and direct export
       const targetData = (mod && typeof mod === 'object' && 'default' in mod)
         ? (mod as { default: unknown }).default
