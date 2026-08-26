@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback, useRef } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } from '@xyflow/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -53,14 +53,12 @@ export function DependencyGraph() {
   })));
 
   const { getIntersectingNodes, getInternalNode, getNode, fitView } = useReactFlow();
-  const fitViewRef = useRef(fitView);
-  fitViewRef.current = fitView;
-  const layoutJustFinishedRef = useRef(false);
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
   useEffect(() => {
     if (disableAnimations) {
+      document.documentElement.classList.add('disable-animations');
       document.body.classList.add('disable-animations');
     } else {
       document.body.classList.remove('disable-animations');
@@ -82,11 +80,12 @@ export function DependencyGraph() {
   useEffect(() => {
     if (!loading && nodes.length > 0) {
       // Small delay to allow React Flow to render updated positions
+      const delay = disableAnimations ? 0 : 250;
       const t = setTimeout(() => {
         window.requestAnimationFrame(() => {
             void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 });
         });
-      }, 250);
+      }, delay);
       return () => clearTimeout(t);
     }
   }, [loading, nodes.length, fitView, disableAnimations]);
@@ -219,7 +218,7 @@ export function DependencyGraph() {
         minZoom={0.1}
       >
         <Background />
-        <Controls position="bottom-right" />
+        <Controls position="bottom-right" fitViewOptions={disableAnimations ? { duration: 0 } : undefined} />
         <MiniMap
           nodeColor={miniMapNodeColor}
           nodeStrokeColor="transparent"
