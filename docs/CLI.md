@@ -191,27 +191,21 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 
 ### Usage Examples
 
-#### Minimal Adoption
+In pre-release state, consumer repositories install the packed CLI tarball (e.g. `./dependency-maritime-cli-0.0.0.tgz`) or point `uses:` to the repository action path (`./action.yml`). Upon public npm/GitHub release, `cli-source` can specify the published version string.
+
+#### Minimal Adoption (Local Action & Packed CLI)
 
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  - name: Maritime Analyze & Validate
-    uses: dependency-maritime/cli@v1
-    with:
-      cli-source: '@dependency-maritime/cli'
-```
-
-#### Packed Tarball Adoption (Local / CI Artifact)
-
-```yaml
-steps:
-  - uses: actions/checkout@v4
+  - name: Build CLI Package
+    run: |
+      npm run build:cli
+      npm pack
   - name: Maritime Analyze & Validate
     uses: ./action.yml
     with:
       cli-source: './dependency-maritime-cli-0.0.0.tgz'
-      source-roots: 'src'
 ```
 
 #### Multiple Source Roots and Custom Config
@@ -220,9 +214,9 @@ steps:
 steps:
   - uses: actions/checkout@v4
   - name: Maritime Analyze & Validate
-    uses: dependency-maritime/cli@v1
+    uses: ./action.yml
     with:
-      cli-source: '@dependency-maritime/cli'
+      cli-source: './dependency-maritime-cli-0.0.0.tgz'
       source-roots: 'src lib'
       depcruise-config: 'config/.dependency-cruiser.cjs'
       output-dir: '.maritime'
