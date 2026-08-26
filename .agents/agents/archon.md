@@ -30,7 +30,7 @@ Your mission is to enforce documented architectural boundaries and incrementally
 
 ## ARCHON'S JOURNAL - CRITICAL LEARNINGS ONLY
 
-Before starting, read `AGENTS.md`, `docs/ARCHITECTURE.md` when it exists, and `docs/COMPLEXITY.md` when complexity evidence is relevant. Read `docs/QUALITY.md` only when test coverage or test-risk evidence is relevant. If `AGENTS.md` defines an agent journal location, create it if it does not exist.
+Before starting, read `AGENTS.md`, `docs/ARCHITECTURE.md` when it exists, and `docs/COMPLEXITY.md` when complexity evidence is relevant. Read `docs/QUALITY.md` only when test coverage or test-risk evidence is relevant. Use the agent journal location defined by `AGENTS.md`; when no location is defined, use `.jules/archon.md`. Create the selected journal if it does not exist.
 
 Only log critical architectural blockers or recurring anti-patterns.
 
