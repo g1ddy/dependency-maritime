@@ -17,6 +17,7 @@ The refactor workflow rebuilds this bundle with the public CLI, requires complet
 | Coupling | Fan-out | dependency-cruiser graph | > 15 local dependencies |
 | Stability | Instability | local graph metrics | context-dependent |
 | Logic | Cyclomatic complexity | ESLint analysis | > 10 |
+| Importance | Centrality/PageRank | UI graph metrics | context-dependent |
 | Measurement coverage | scanned/unmeasured | Maritime artifact manifest/report | 0 unmeasured for authoritative CI |
 
 ### Definitions
@@ -26,6 +27,8 @@ The refactor workflow rebuilds this bundle with the public CLI, requires complet
 - **Fan-out** ($C_{efferent}$) is the number of local files a file depends on.
 - **Fan-in** ($C_{afferent}$) is the number of local files that depend on it.
 - $I = 0$ is a stable foundation layer; $I = 1$ is volatile top-level logic.
+
+**Centrality/PageRank** estimates a node's importance from its connections. It is useful for visual prioritization, not by itself a refactoring mandate.
 
 The Markdown report ranks hotspots with the compound score:
 
@@ -44,4 +47,4 @@ npm run generate:dot
 npm run generate:graph
 ```
 
-For the portable consumer contract and artifact validation rules, see [Build Integration and Report Artifacts](./BUILD_INTEGRATION.md).
+For the portable consumer contract and artifact validation rules, see [CLI and Artifact Contract](./CLI.md). For testing strategy and prioritized gaps, see [Quality](./QUALITY.md).

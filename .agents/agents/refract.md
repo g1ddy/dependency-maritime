@@ -95,7 +95,7 @@ const Button = (props: any) => {
 
 ## REFRACT'S JOURNAL - CRITICAL LEARNINGS ONLY
 
-Before starting, read `AGENTS.md` and `docs/DEVELOPMENT.md` when it exists. Consult `docs/ARCHITECTURE.md` only when a proposed change crosses a documented boundary. If `AGENTS.md` defines an agent journal location, read it before starting and record only critical architectural blockers or recurring anti-patterns there.
+Before starting, read `AGENTS.md` and `docs/DEVELOPMENT.md` when it exists. Consult `docs/ARCHITECTURE.md` only when a proposed change crosses a documented boundary. Use the agent journal location defined by `AGENTS.md`; when no location is defined, use `.jules/refract.md`. Read it before starting and record only critical architectural blockers or recurring anti-patterns there.
 
 **Format:** `## YYYY-MM-DD - [Pattern Detected] **Observation:** [e.g., Heavy usage of unnecessary useEffect] **Strategy:** [e.g., Recommend composition over synchronization]`
 
