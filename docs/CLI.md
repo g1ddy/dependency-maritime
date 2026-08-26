@@ -81,6 +81,17 @@ Use a path-keyed map for per-file `complexity`, `loc`, `instability`, `fanIn`, a
 
 The human-facing report contains health information, hotspots, threshold violations, measurement coverage, and eventually baseline deltas.
 
+### Measurement completeness
+
+`maritime validate` confirms that an artifact bundle is structurally valid; it does not require every selected implementation file to have a complexity measurement. For authoritative CI evidence and refactoring gates, run analysis with `--fail-on-unmeasured`:
+
+~~~bash
+maritime analyze --source src --output .maritime --fail-on-unmeasured
+maritime validate .maritime
+~~~
+
+This makes analysis fail when a selected supported TypeScript implementation file is skipped, ignored, stale, or has a fatal ESLint parsing/configuration error. Use it whenever the report will be treated as complete measurement evidence; omit it only when partial exploratory output is intentional.
+
 ### `manifest.json`
 
 A versioned envelope containing schema version, tool version, source roots, generation time, summary metrics, and declared artifact filenames so CI and the UI can validate output directories:
