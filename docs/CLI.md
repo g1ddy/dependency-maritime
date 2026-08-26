@@ -180,8 +180,8 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 
 | Input | Description | Default | Required |
 | :--- | :--- | :--- | :--- |
+| `cli-source` | CLI source/version to install (e.g. packed tarball path `./dependency-maritime-cli-0.0.0.tgz` or published package name/version) | *None* | **Yes** |
 | `node-version` | Node.js version baseline to set up | `'20.19.0'` | No |
-| `cli-source` | CLI source/version (published package `@dependency-maritime/cli`, packed tarball path, or local path) | `'@dependency-maritime/cli'` | No |
 | `source-roots` | One or more source roots to analyze (space, newline, or comma separated) | `'src'` | No |
 | `depcruise-config` | Optional path to custom dependency-cruiser configuration file | `''` | No |
 | `output-dir` | Directory where `.maritime` output artifacts will be written | `'.maritime'` | No |
@@ -196,7 +196,22 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  - uses: dependency-maritime/cli@v1
+  - name: Maritime Analyze & Validate
+    uses: dependency-maritime/cli@v1
+    with:
+      cli-source: '@dependency-maritime/cli'
+```
+
+#### Packed Tarball Adoption (Local / CI Artifact)
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - name: Maritime Analyze & Validate
+    uses: ./action.yml
+    with:
+      cli-source: './dependency-maritime-cli-0.0.0.tgz'
+      source-roots: 'src'
 ```
 
 #### Multiple Source Roots and Custom Config
@@ -207,6 +222,7 @@ steps:
   - name: Maritime Analyze & Validate
     uses: dependency-maritime/cli@v1
     with:
+      cli-source: '@dependency-maritime/cli'
       source-roots: 'src lib'
       depcruise-config: 'config/.dependency-cruiser.cjs'
       output-dir: '.maritime'
@@ -215,10 +231,10 @@ steps:
       artifact-name: 'maritime-analysis'
 ```
 
-#### Consumer Workflow Implementations
+#### Consumer Verification Evidence
 
-- **Catan Hex Mastery (`.github/workflows/catan.yml`):** Runs the shared Maritime action to generate `.maritime` artifacts, retaining its separate legacy DOT/Graphviz documentation step.
-- **Crawler Command Interface (`.github/workflows/crawler.yml`):** Runs the shared Maritime action with multiple source roots (`src lib`), retaining its repository-specific triggers and baseline commit verification policy.
+- **Catan Hex Mastery:** Verified clean-install consumer fixture in `tests/cli-pack-smoke.test.ts` that packs the CLI tarball, executes analysis against `src/board` and `src/game`, and produces validated `.maritime` artifacts alongside legacy DOT/Graphviz metrics.
+- **Crawler Command Interface:** Verified clean-install consumer fixture in `tests/cli-pack-smoke.test.ts` that packs the CLI tarball and executes analysis across multiple source roots (`src` and `lib`) with custom configuration.
 
 ## Related documentation
 

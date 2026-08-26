@@ -821,4 +821,81 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(actionContent).toContain('validate');
         expect(actionContent).toContain('actions/upload-artifact');
     });
+
+    it('executable composite action smoke test: resolves packed tarball via action environment variables and analyzes consumer workspace', () => {
+        const actionConsumerDir = path.join(tmpRoot, 'action-consumer-smoke');
+        fs.mkdirSync(path.join(actionConsumerDir, 'src'), { recursive: true });
+        fs.mkdirSync(path.join(actionConsumerDir, 'lib'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'package.json'),
+            JSON.stringify({
+                name: 'action-consumer-smoke',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: { eslint: '^9.0.0' }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'src', 'app.ts'),
+            'import { helper } from "../lib/helper";\nexport function run() { return helper(); }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'lib', 'helper.ts'),
+            'export function helper() { return "ok"; }\n'
+        );
+
+        const actionRunnerScript = `
+            set -e
+            CLI_SRC="$INPUT_CLI_SOURCE"
+            npm install "$CLI_SRC" eslint@^9.0.0 --no-save
+            MARITIME_BIN="./node_modules/.bin/maritime"
+
+            ARGS=()
+            ROOTS=$(echo "$INPUT_SOURCE_ROOTS" | tr ',\\n' '  ')
+            for ROOT in $ROOTS; do
+              if [ -n "$ROOT" ]; then
+                ARGS+=("--source" "$ROOT")
+              fi
+            done
+            ARGS+=("--output" "$INPUT_OUTPUT_DIR")
+            if [ "$INPUT_FAIL_ON_UNMEASURED" = "true" ]; then
+              ARGS+=("--fail-on-unmeasured")
+            fi
+
+            $MARITIME_BIN analyze "\${ARGS[@]}"
+            $MARITIME_BIN validate "$INPUT_OUTPUT_DIR"
+        `;
+
+        const scriptPath = path.join(actionConsumerDir, 'run-action-steps.sh');
+        fs.writeFileSync(scriptPath, actionRunnerScript);
+
+        const execResult = execSync('bash run-action-steps.sh', {
+            cwd: actionConsumerDir,
+            env: {
+                ...process.env,
+                INPUT_CLI_SOURCE: tarballPath,
+                INPUT_SOURCE_ROOTS: 'src lib',
+                INPUT_OUTPUT_DIR: '.maritime',
+                INPUT_FAIL_ON_UNMEASURED: 'true'
+            },
+            encoding: 'utf8'
+        });
+
+        expect(execResult).toContain('Complexity Report Updated and Metrics Exported!');
+        expect(execResult).toContain('Artifact Directory Contract Validated!');
+
+        const outputMaritime = path.join(actionConsumerDir, '.maritime');
+        expect(fs.existsSync(path.join(outputMaritime, 'manifest.json'))).toBe(true);
+        expect(fs.existsSync(path.join(outputMaritime, 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(outputMaritime, 'complexity-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(outputMaritime, 'complexity-report.md'))).toBe(true);
+    }, 60000);
 });

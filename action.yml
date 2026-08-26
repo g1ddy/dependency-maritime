@@ -11,9 +11,8 @@ inputs:
     required: false
     default: '20.19.0'
   cli-source:
-    description: 'CLI source or version to install (e.g. published package "@dependency-maritime/cli", packed tarball path, or local CLI path).'
-    required: false
-    default: '@dependency-maritime/cli'
+    description: 'CLI source/version to install (e.g. packed tarball path "./dependency-maritime-cli-0.0.0.tgz" or published package name/version).'
+    required: true
   source-roots:
     description: 'One or more source roots to analyze (space, newline, or comma separated).'
     required: false
@@ -49,8 +48,10 @@ runs:
 
     - name: Install and Resolve Maritime CLI
       shell: bash
+      env:
+        INPUT_CLI_SOURCE: ${{ inputs.cli-source }}
       run: |
-        CLI_SRC="${{ inputs.cli-source }}"
+        CLI_SRC="$INPUT_CLI_SOURCE"
         echo "Resolving Maritime CLI from: $CLI_SRC"
 
         if [ "$CLI_SRC" = "." ] || [ -f "$CLI_SRC/dist/cli/main.js" ] || [ -f "$CLI_SRC/main.js" ]; then
@@ -81,22 +82,27 @@ runs:
 
     - name: Run Maritime Analyze
       shell: bash
+      env:
+        INPUT_SOURCE_ROOTS: ${{ inputs.source-roots }}
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+        INPUT_DEPCRUISE_CONFIG: ${{ inputs.depcruise-config }}
+        INPUT_FAIL_ON_UNMEASURED: ${{ inputs.fail-on-unmeasured }}
       run: |
         ARGS=()
-        ROOTS=$(echo "${{ inputs.source-roots }}" | tr ',\n' '  ')
+        ROOTS=$(echo "$INPUT_SOURCE_ROOTS" | tr ',\n' '  ')
         for ROOT in $ROOTS; do
           if [ -n "$ROOT" ]; then
             ARGS+=("--source" "$ROOT")
           fi
         done
 
-        ARGS+=("--output" "${{ inputs.output-dir }}")
+        ARGS+=("--output" "$INPUT_OUTPUT_DIR")
 
-        if [ -n "${{ inputs.depcruise-config }}" ]; then
-          ARGS+=("--depcruise-config" "${{ inputs.depcruise-config }}")
+        if [ -n "$INPUT_DEPCRUISE_CONFIG" ]; then
+          ARGS+=("--depcruise-config" "$INPUT_DEPCRUISE_CONFIG")
         fi
 
-        if [ "${{ inputs.fail-on-unmeasured }}" = "true" ]; then
+        if [ "$INPUT_FAIL_ON_UNMEASURED" = "true" ]; then
           ARGS+=("--fail-on-unmeasured")
         fi
 
@@ -105,9 +111,11 @@ runs:
 
     - name: Run Maritime Validate
       shell: bash
+      env:
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
       run: |
-        echo "Executing: $MARITIME_BIN validate ${{ inputs.output-dir }}"
-        $MARITIME_BIN validate "${{ inputs.output-dir }}"
+        echo "Executing: $MARITIME_BIN validate $INPUT_OUTPUT_DIR"
+        $MARITIME_BIN validate "$INPUT_OUTPUT_DIR"
 
     - name: Upload Maritime Artifact Directory
       if: ${{ inputs.upload-artifact == 'true' || inputs.upload-artifact == true }}
