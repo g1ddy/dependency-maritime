@@ -1,4 +1,4 @@
-# Project Phases
+# Project Roadmap
 
 ## Phase 1: The "Chartroom" (MVP)
 **Goal:** Load JSON and render a static graph that isn't a mess.
@@ -78,7 +78,7 @@
     *   Define a versioned artifact manifest and allow the UI to upload a complete analysis bundle.
     *   Add baseline comparison and configurable regression thresholds for build pipelines.
     *   Provide a reusable GitHub Actions workflow as a thin adapter over the CLI, not as the home of analysis logic.
-    *   See [Build Integration and Report Artifacts](./BUILD_INTEGRATION.md) for the proposed contract and delivery order.
+    *   See [CLI and Artifact Contract](./CLI.md) for the proposed contract and delivery order.
 
 ## Phase 3: The "Simulator" (Refactoring Playground)
 **Goal:** The killer feature—drag and drop architecture validation and planning.

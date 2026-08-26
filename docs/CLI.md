@@ -1,4 +1,4 @@
-# Build Integration and Report Artifacts
+# CLI and Artifact Contract
 
 Dependency Maritime should support two independent workflows:
 
