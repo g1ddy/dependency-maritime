@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } from '@xyflow/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -76,14 +76,19 @@ export function DependencyGraph() {
     setGraphData(parsedData, parsedMetrics);
   }, [setGraphData]);
 
-  // Re-fit view when layout finishes
+  const prevLoadingRef = useRef(loading);
+
+  // Re-fit view only when layout finishes (loading transitions from true to false)
   useEffect(() => {
-    if (!loading && nodes.length > 0) {
+    const wasLoading = prevLoadingRef.current;
+    prevLoadingRef.current = loading;
+
+    if (wasLoading && !loading && nodes.length > 0) {
       // Small delay to allow React Flow to render updated positions
       const delay = disableAnimations ? 0 : 250;
       const t = setTimeout(() => {
         window.requestAnimationFrame(() => {
-            void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 });
+          void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 });
         });
       }, delay);
       return () => clearTimeout(t);
