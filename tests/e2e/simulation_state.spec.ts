@@ -50,9 +50,15 @@ test.describe('Simulation State', () => {
     expect(groupDestBox).not.toBeNull();
 
     if (startBox && groupDestBox) {
-        // Calculate a safe drop position that is inside the group
-        const dropX = groupDestBox.x + 50;
-        const dropY = groupDestBox.y + 50;
+        // Calculate a safe drop position that is inside the group AND inside the viewport
+        const viewportSize = page.viewportSize();
+        if (!viewportSize) throw new Error('No viewport size');
+
+        const safeX = Math.max(0, groupDestBox.x) + 50;
+        const safeY = Math.max(0, groupDestBox.y) + 50;
+
+        const dropX = Math.min(safeX, groupDestBox.x + groupDestBox.width - 20);
+        const dropY = Math.min(safeY, groupDestBox.y + groupDestBox.height - 20);
 
         await page.mouse.move(startBox.x + startBox.width / 2, startBox.y + startBox.height / 2);
         await page.mouse.down();
