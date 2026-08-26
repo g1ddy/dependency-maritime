@@ -9,7 +9,7 @@ Analysis must not require React, a browser, or a running Dependency Maritime ser
 
 ## Distribution target
 
-The primary artifact is a versioned Node CLI package, `@dependency-maritime/cli`, exposing the `maritime` binary and a small programmatic API. A reusable GitHub Actions workflow should come later as a thin wrapper around public CLI commands.
+The primary artifact is a versioned Node CLI package, `@dependency-maritime/cli`, exposing the `maritime` binary and a small programmatic API. A reusable GitHub Actions integration (`action.yml`) provides a thin, UI-independent wrapper around public CLI commands.
 
 ### Supported environment
 
@@ -171,6 +171,65 @@ A public release requires all of the following:
 3. Representative external consumers pass end-to-end through the packed CLI outside the Maritime repository tree.
 4. Local graph scoping and measurement integrity are enforced.
 5. The required Node, ESLint, and dependency-cruiser runtime compatibility matrix passes.
+
+## GitHub Actions Integration
+
+Dependency Maritime provides an official composite action (`action.yml`) that wraps `maritime analyze` and `maritime validate` into a reusable GitHub Actions step without importing React or UI dependencies.
+
+### Action Inputs
+
+| Input | Description | Default | Required |
+| :--- | :--- | :--- | :--- |
+| `cli-source` | CLI source/version to install (e.g. packed tarball path `./dependency-maritime-cli-0.0.0.tgz` or published package name/version) | *None* | **Yes** |
+| `node-version` | Node.js version baseline to set up | `'20.19.0'` | No |
+| `source-roots` | One or more source roots to analyze (space, newline, or comma separated) | `'src'` | No |
+| `depcruise-config` | Optional path to custom dependency-cruiser configuration file | `''` | No |
+| `output-dir` | Directory where `.maritime` output artifacts will be written | `'.maritime'` | No |
+| `fail-on-unmeasured` | Strict measurement enforcement (fails if any implementation file is unmeasured) | `'true'` | No |
+| `upload-artifact` | Whether to upload the generated `.maritime` directory as a workflow artifact | `'true'` | No |
+| `artifact-name` | Name of the workflow artifact if `upload-artifact` is true | `'maritime-artifacts'` | No |
+
+### Usage Examples
+
+For an action checked out into the current repository, `uses:` points to the directory containing `action.yml` (for this repository root, `uses: ./`). In pre-release state, consumers must also provide an explicit packed CLI tarball or other resolvable CLI source. After public release, consumers can invoke the action by repository ref and set `cli-source` to the published package version.
+
+#### Minimal Adoption (Local Action & Packed CLI)
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - name: Build CLI Package
+    run: |
+      npm run build:cli
+      npm pack
+  - name: Maritime Analyze & Validate
+    uses: ./
+    with:
+      cli-source: './dependency-maritime-cli-0.0.0.tgz'
+```
+
+#### Multiple Source Roots and Custom Config
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - name: Maritime Analyze & Validate
+    uses: ./
+    with:
+      cli-source: './dependency-maritime-cli-0.0.0.tgz'
+      source-roots: 'src lib'
+      depcruise-config: 'config/.dependency-cruiser.cjs'
+      output-dir: '.maritime'
+      fail-on-unmeasured: 'true'
+      upload-artifact: 'true'
+      artifact-name: 'maritime-analysis'
+```
+
+#### Verification Evidence and Consumer Cutover
+
+The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds and smoke-tests the shared action contract; it does not itself migrate those repositories to consume the action.
+
+The executable action smoke test verifies that a packed Maritime tarball can be installed in a clean consumer workspace, analyzed across multiple source roots, validated, and emitted as the complete four-file `.maritime` bundle. Real-repository cutover remains a consumer-side follow-up so each repository can preserve its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
 
 ## Related documentation
 

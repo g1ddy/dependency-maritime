@@ -52,7 +52,7 @@ These are the unfinished delivery items previously tracked in [CLI.md](./CLI.md)
 
 ### Consumer confidence
 
-- [ ] Validate the packed CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories.
+- [x] Validate the packed CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories (Catan Hex Mastery and Crawler Command Interface) through their existing hand-rolled tarball workflows.
 
 ### Artifact archive and UI bundle upload
 
@@ -68,7 +68,9 @@ These are the unfinished delivery items previously tracked in [CLI.md](./CLI.md)
 
 ### CI adapter and public release
 
-- [ ] Add a reusable GitHub Actions workflow only after the CLI/artifact contract is stable.
+- [x] Add a reusable GitHub Actions composite action built on the packed/published CLI artifact contract.
+- [ ] Cut Catan Hex Mastery over from its hand-rolled Maritime orchestration to the shared action while preserving its Graphviz documentation and baseline-commit behavior.
+- [ ] Cut Crawler Command Interface over from its hand-rolled Maritime orchestration to the shared action while preserving its source-root, trigger, and baseline-commit behavior.
 - [ ] Remove the private/pre-release package state when release criteria are satisfied.
 - [ ] Publish with semantic versioning, provenance, changelog/release automation, and a compatibility policy.
 

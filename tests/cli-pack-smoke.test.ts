@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { execSync } from 'child_process';
+import * as yaml from 'js-yaml';
 
 describe('CLI npm pack clean-install smoke tests', () => {
     const tmpRoot = path.join(process.cwd(), 'temp-pack-smoke');
@@ -791,5 +792,120 @@ describe('CLI npm pack clean-install smoke tests', () => {
                 fs.rmSync(unsupportedEslintDir, { recursive: true, force: true });
             }
         }
+    }, 60000);
+
+    it('composite action integration contract: action.yml exists and declares supported consumer inputs', () => {
+        const actionPath = path.join(process.cwd(), 'action.yml');
+        expect(fs.existsSync(actionPath)).toBe(true);
+
+        const actionContent = fs.readFileSync(actionPath, 'utf8');
+
+        // Verify required inputs exist in action.yml
+        const requiredInputs = [
+            'node-version',
+            'cli-source',
+            'source-roots',
+            'depcruise-config',
+            'output-dir',
+            'fail-on-unmeasured',
+            'upload-artifact',
+            'artifact-name'
+        ];
+
+        for (const input of requiredInputs) {
+            expect(actionContent).toContain(`${input}:`);
+        }
+
+        // Verify steps call setup-node, analyze, validate, and upload-artifact
+        expect(actionContent).toContain('actions/setup-node');
+        expect(actionContent).toContain('analyze');
+        expect(actionContent).toContain('validate');
+        expect(actionContent).toContain('actions/upload-artifact');
+    });
+
+    it('executable composite action smoke test: parses action.yml and executes steps against clean consumer workspace', () => {
+        const actionConsumerDir = path.join(tmpRoot, 'action-consumer-smoke');
+        fs.mkdirSync(path.join(actionConsumerDir, 'src'), { recursive: true });
+        fs.mkdirSync(path.join(actionConsumerDir, 'lib'), { recursive: true });
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'package.json'),
+            JSON.stringify({
+                name: 'action-consumer-smoke',
+                version: '1.0.0',
+                type: 'module',
+                devDependencies: { eslint: '^9.0.0' }
+            }, null, 2)
+        );
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'eslint.config.js'),
+            'export default [{ files: ["**/*.ts", "**/*.tsx"] }];\n'
+        );
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'src', 'app.ts'),
+            'import { helper } from "../lib/helper";\nexport function run() { return helper(); }\n'
+        );
+
+        fs.writeFileSync(
+            path.join(actionConsumerDir, 'lib', 'helper.ts'),
+            'export function helper() { return "ok"; }\n'
+        );
+
+        // Read and parse actual run scripts from action.yml using js-yaml
+        const actionYaml = fs.readFileSync(path.join(process.cwd(), 'action.yml'), 'utf8');
+        /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+        const actionObj = (yaml as any).load(actionYaml) as {
+            runs: { steps: Array<{ run?: string }> };
+        };
+        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+
+        const runBlocks = actionObj.runs.steps
+            .map(step => step.run)
+            .filter((run): run is string => Boolean(run));
+
+        expect(runBlocks.length).toBeGreaterThanOrEqual(3);
+
+        const gEnvFile = path.join(actionConsumerDir, 'github_env');
+        fs.writeFileSync(gEnvFile, '');
+
+        // Execute step run blocks from action.yml in sequence simulating GitHub Actions runner GITHUB_ENV persistence
+        const fullScript = `
+            set -e
+            export GITHUB_ENV="${gEnvFile}"
+            ${runBlocks[0]}
+            set -a
+            [ -f "$GITHUB_ENV" ] && . "$GITHUB_ENV"
+            set +a
+            ${runBlocks[1]}
+            set -a
+            [ -f "$GITHUB_ENV" ] && . "$GITHUB_ENV"
+            set +a
+            ${runBlocks[2]}
+        `;
+        const scriptPath = path.join(actionConsumerDir, 'run-action-direct.sh');
+        fs.writeFileSync(scriptPath, fullScript);
+
+        const execResult = execSync('bash run-action-direct.sh', {
+            cwd: actionConsumerDir,
+            env: {
+                ...process.env,
+                INPUT_CLI_SOURCE: tarballPath,
+                INPUT_SOURCE_ROOTS: 'src lib',
+                INPUT_OUTPUT_DIR: '.maritime',
+                INPUT_FAIL_ON_UNMEASURED: 'true'
+            },
+            encoding: 'utf8'
+        });
+
+        expect(execResult).toContain('Complexity Report Updated and Metrics Exported!');
+        expect(execResult).toContain('Artifact Directory Contract Validated!');
+
+        const outputMaritime = path.join(actionConsumerDir, '.maritime');
+        expect(fs.existsSync(path.join(outputMaritime, 'manifest.json'))).toBe(true);
+        expect(fs.existsSync(path.join(outputMaritime, 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(outputMaritime, 'complexity-metrics.json'))).toBe(true);
+        expect(fs.existsSync(path.join(outputMaritime, 'complexity-report.md'))).toBe(true);
     }, 60000);
 });
