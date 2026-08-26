@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } from '@xyflow/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -53,6 +53,9 @@ export function DependencyGraph() {
   })));
 
   const { getIntersectingNodes, getInternalNode, getNode, fitView } = useReactFlow();
+  const fitViewRef = useRef(fitView);
+  fitViewRef.current = fitView;
+  const layoutJustFinishedRef = useRef(false);
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
