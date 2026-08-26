@@ -32,16 +32,15 @@ jobs:
       - name: Build CLI
         run: npm run build:cli
 
-      - name: Analyze Maritime Artifacts
-        run: |
-          node dist/cli/main.js analyze \
-            --source src \
-            --output .maritime \
-            --depcruise-config config/.dependency-cruiser.cjs \
-            --fail-on-unmeasured
-
-      - name: Validate Artifact Directory
-        run: node dist/cli/main.js validate .maritime
+      - name: Maritime Shared Integration
+        uses: ./
+        with:
+          cli-source: '.'
+          source-roots: 'src'
+          output-dir: '.maritime'
+          depcruise-config: 'config/.dependency-cruiser.cjs'
+          fail-on-unmeasured: 'true'
+          upload-artifact: 'false'
 
       - name: Generate Dependency Graph (DOT)
         run: npm run generate:dot

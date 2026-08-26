@@ -792,4 +792,33 @@ describe('CLI npm pack clean-install smoke tests', () => {
             }
         }
     }, 60000);
+
+    it('composite action integration contract: action.yml exists and declares supported consumer inputs', () => {
+        const actionPath = path.join(process.cwd(), 'action.yml');
+        expect(fs.existsSync(actionPath)).toBe(true);
+
+        const actionContent = fs.readFileSync(actionPath, 'utf8');
+
+        // Verify required inputs exist in action.yml
+        const requiredInputs = [
+            'node-version',
+            'cli-source',
+            'source-roots',
+            'depcruise-config',
+            'output-dir',
+            'fail-on-unmeasured',
+            'upload-artifact',
+            'artifact-name'
+        ];
+
+        for (const input of requiredInputs) {
+            expect(actionContent).toContain(`${input}:`);
+        }
+
+        // Verify steps call setup-node, analyze, validate, and upload-artifact
+        expect(actionContent).toContain('actions/setup-node');
+        expect(actionContent).toContain('analyze');
+        expect(actionContent).toContain('validate');
+        expect(actionContent).toContain('actions/upload-artifact');
+    });
 });

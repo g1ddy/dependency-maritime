@@ -52,7 +52,7 @@ These are the unfinished delivery items previously tracked in [CLI.md](./CLI.md)
 
 ### Consumer confidence
 
-- [ ] Validate the packed CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories.
+- [x] Validate the packed CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories (Catan Hex Mastery and Crawler Command Interface).
 
 ### Artifact archive and UI bundle upload
 
@@ -68,7 +68,7 @@ These are the unfinished delivery items previously tracked in [CLI.md](./CLI.md)
 
 ### CI adapter and public release
 
-- [ ] Add a reusable GitHub Actions workflow only after the CLI/artifact contract is stable.
+- [x] Add a reusable GitHub Actions workflow / composite action built on the packed/published CLI artifact contract.
 - [ ] Remove the private/pre-release package state when release criteria are satisfied.
 - [ ] Publish with semantic versioning, provenance, changelog/release automation, and a compatibility policy.
 

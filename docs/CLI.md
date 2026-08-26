@@ -9,7 +9,7 @@ Analysis must not require React, a browser, or a running Dependency Maritime ser
 
 ## Distribution target
 
-The primary artifact is a versioned Node CLI package, `@dependency-maritime/cli`, exposing the `maritime` binary and a small programmatic API. A reusable GitHub Actions workflow should come later as a thin wrapper around public CLI commands.
+The primary artifact is a versioned Node CLI package, `@dependency-maritime/cli`, exposing the `maritime` binary and a small programmatic API. A reusable GitHub Actions integration (`action.yml`) provides a thin, UI-independent wrapper around public CLI commands.
 
 ### Supported environment
 
@@ -171,6 +171,54 @@ A public release requires all of the following:
 3. Representative external consumers pass end-to-end through the packed CLI outside the Maritime repository tree.
 4. Local graph scoping and measurement integrity are enforced.
 5. The required Node, ESLint, and dependency-cruiser runtime compatibility matrix passes.
+
+## GitHub Actions Integration
+
+Dependency Maritime provides an official composite action (`action.yml`) that wraps `maritime analyze` and `maritime validate` into a reusable GitHub Actions step without importing React or UI dependencies.
+
+### Action Inputs
+
+| Input | Description | Default | Required |
+| :--- | :--- | :--- | :--- |
+| `node-version` | Node.js version baseline to set up | `'20.19.0'` | No |
+| `cli-source` | CLI source/version (published package `@dependency-maritime/cli`, packed tarball path, or local path) | `'@dependency-maritime/cli'` | No |
+| `source-roots` | One or more source roots to analyze (space, newline, or comma separated) | `'src'` | No |
+| `depcruise-config` | Optional path to custom dependency-cruiser configuration file | `''` | No |
+| `output-dir` | Directory where `.maritime` output artifacts will be written | `'.maritime'` | No |
+| `fail-on-unmeasured` | Strict measurement enforcement (fails if any implementation file is unmeasured) | `'true'` | No |
+| `upload-artifact` | Whether to upload the generated `.maritime` directory as a workflow artifact | `'true'` | No |
+| `artifact-name` | Name of the workflow artifact if `upload-artifact` is true | `'maritime-artifacts'` | No |
+
+### Usage Examples
+
+#### Minimal Adoption
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - uses: dependency-maritime/cli@v1
+```
+
+#### Multiple Source Roots and Custom Config
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - name: Maritime Analyze & Validate
+    uses: dependency-maritime/cli@v1
+    with:
+      source-roots: 'src lib'
+      depcruise-config: 'config/.dependency-cruiser.cjs'
+      output-dir: '.maritime'
+      fail-on-unmeasured: 'true'
+      upload-artifact: 'true'
+      artifact-name: 'maritime-analysis'
+```
+
+#### Consumer Workflow Implementations
+
+- **Catan Hex Mastery (`.github/workflows/catan.yml`):** Runs the shared Maritime action to generate `.maritime` artifacts, retaining its separate legacy DOT/Graphviz documentation step.
+- **Crawler Command Interface (`.github/workflows/crawler.yml`):** Runs the shared Maritime action with multiple source roots (`src lib`), retaining its repository-specific triggers and baseline commit verification policy.
 
 ## Related documentation
 
