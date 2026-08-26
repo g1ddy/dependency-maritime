@@ -191,7 +191,7 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 
 ### Usage Examples
 
-In pre-release state, consumer repositories install the packed CLI tarball (e.g. `./dependency-maritime-cli-0.0.0.tgz`) or point `uses:` to the repository action path (`./action.yml`). Upon public npm/GitHub release, `cli-source` can specify the published version string.
+For an action checked out into the current repository, `uses:` points to the directory containing `action.yml` (for this repository root, `uses: ./`). In pre-release state, consumers must also provide an explicit packed CLI tarball or other resolvable CLI source. After public release, consumers can invoke the action by repository ref and set `cli-source` to the published package version.
 
 #### Minimal Adoption (Local Action & Packed CLI)
 
@@ -203,7 +203,7 @@ steps:
       npm run build:cli
       npm pack
   - name: Maritime Analyze & Validate
-    uses: ./action.yml
+    uses: ./
     with:
       cli-source: './dependency-maritime-cli-0.0.0.tgz'
 ```
@@ -214,7 +214,7 @@ steps:
 steps:
   - uses: actions/checkout@v4
   - name: Maritime Analyze & Validate
-    uses: ./action.yml
+    uses: ./
     with:
       cli-source: './dependency-maritime-cli-0.0.0.tgz'
       source-roots: 'src lib'
@@ -225,10 +225,11 @@ steps:
       artifact-name: 'maritime-analysis'
 ```
 
-#### Consumer Verification Evidence
+#### Verification Evidence and Consumer Cutover
 
-- **Catan Hex Mastery:** Verified clean-install consumer fixture in `tests/cli-pack-smoke.test.ts` that packs the CLI tarball, executes analysis against `src/board` and `src/game`, and produces validated `.maritime` artifacts alongside legacy DOT/Graphviz metrics.
-- **Crawler Command Interface:** Verified clean-install consumer fixture in `tests/cli-pack-smoke.test.ts` that packs the CLI tarball and executes analysis across multiple source roots (`src` and `lib`) with custom configuration.
+The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds and smoke-tests the shared action contract; it does not itself migrate those repositories to consume the action.
+
+The executable action smoke test verifies that a packed Maritime tarball can be installed in a clean consumer workspace, analyzed across multiple source roots, validated, and emitted as the complete four-file `.maritime` bundle. Real-repository cutover remains a consumer-side follow-up so each repository can preserve its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
 
 ## Related documentation
 
