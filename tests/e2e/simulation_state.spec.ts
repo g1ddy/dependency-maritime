@@ -1,21 +1,16 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Simulation State', () => {
+  test.setTimeout(120_000);
   const APP_TSX_TEST_ID = 'node-App.tsx';
   const FEATURES_GROUP_TEST_ID = 'node-features';
 
   test.beforeEach(async ({ page }) => {
     // Navigate to the app with animations disabled
     await page.goto('http://localhost:5173/dependency-maritime/?disableAnimations=true');
-    // Wait for canvas to be present
-    await page.waitForSelector('.react-flow__renderer');
-    // Wait for at least one node to render
-    await page.waitForSelector('.react-flow__node');
-
-    // Fit view to ensure nodes are within viewport for consistent coordinates
-    const fitViewBtn = page.getByRole('button', { name: 'fit view' });
-    await expect(fitViewBtn).toBeVisible();
-    await fitViewBtn.click();
+    // Nodes render once before the asynchronous layout has positioned them. Waiting for
+    // an arbitrary node here races that layout (particularly in WebKit).
+    await expect(page.locator('[data-layout-ready="true"]')).toBeVisible({ timeout: 75_000 });
   });
 
   test('dragging a node into a new folder should update its fullPath in the simulation state', async ({ page }) => {
@@ -27,7 +22,9 @@ test.describe('Simulation State', () => {
 
     // 1. Verify Initial State
     // Click to select the node
-    await targetNode.click();
+    // The readiness marker makes the state deterministic; force avoids WebKit's lingering
+    // transform-stability heuristic on React Flow nodes.
+    await targetNode.click({ force: true });
 
     // Check Overlay for initial path
     const overlayPath = page.locator('.absolute.inset-0').getByText('src/App.tsx');
@@ -39,7 +36,8 @@ test.describe('Simulation State', () => {
     // The error showed "Close Inspector" button exists.
     const closeInspectorBtn = page.getByRole('button', { name: 'Close Inspector' });
     if (await closeInspectorBtn.isVisible()) {
-        await closeInspectorBtn.click();
+      await closeInspectorBtn.click({ force: true });
+      await expect(closeInspectorBtn).toBeHidden();
     }
 
     // 2. Perform Drag

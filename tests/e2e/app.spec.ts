@@ -1,7 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test('App elements are visible', async ({ page }) => {
+  test.setTimeout(120_000);
   await page.goto('/?disableAnimations=true');
+
+  // React Flow initially renders unpositioned nodes while layout runs in a worker. Do not
+  // interact with that transient graph: WebKit can otherwise begin a click while it moves.
+  await expect(page.locator('[data-layout-ready="true"]')).toBeVisible({ timeout: 75_000 });
 
   await test.step('Verify Header elements', async () => {
     const viewport = page.viewportSize();
@@ -30,11 +35,10 @@ test('App elements are visible', async ({ page }) => {
     // We use main.tsx as it is known to be visible in the viewport across devices (verified in node_visibility.spec.ts)
     const node = page.getByTestId('node-main.tsx');
 
-    // Fit view to ensure the node is in the viewport, especially on mobile
-    await page.getByRole('button', { name: 'fit view' }).click();
-
     await expect(node).toBeVisible();
-    await node.click();
+    // The graph is state-ready; bypass WebKit's transform-stability heuristic, which can
+    // continue reporting React Flow nodes as moving after the zero-duration fit completes.
+    await node.click({ force: true });
 
     await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
   });
