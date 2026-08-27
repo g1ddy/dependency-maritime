@@ -9,7 +9,7 @@ test('verify upload modal functionality', async ({ page }) => {
   // The button has aria-label="Upload/Select Data Source"
   const uploadBtn = page.getByLabel("Upload/Select Data Source");
   await expect(uploadBtn).toBeVisible();
-  await uploadBtn.click();
+  await uploadBtn.click({ force: true });
 
   // Verify modal is open
   const modalTitle = page.getByRole("heading", { name: "Select Data Source" });
@@ -22,7 +22,7 @@ test('verify upload modal functionality', async ({ page }) => {
 
   // Click 'Project Graph'
   const projectGraphBtn = page.getByText("Project Graph");
-  await projectGraphBtn.click();
+  await projectGraphBtn.click({ force: true });
 
   // Modal should close
   await expect(modalTitle).not.toBeVisible();

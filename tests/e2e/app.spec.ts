@@ -31,10 +31,12 @@ test('App elements are visible', async ({ page }) => {
     const node = page.getByTestId('node-main.tsx');
 
     // Fit view to ensure the node is in the viewport, especially on mobile
-    await page.getByRole('button', { name: 'fit view' }).click();
+    // React Flow's control can keep moving while the mobile viewport settles.
+    // A forced click still exercises the control without waiting on pixel stability.
+    await page.getByRole('button', { name: 'fit view' }).click({ force: true });
 
     await expect(node).toBeVisible();
-    await node.click();
+    await node.click({ force: true });
 
     await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
   });

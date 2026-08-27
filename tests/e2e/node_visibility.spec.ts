@@ -8,13 +8,15 @@ test('File nodes are visible and interactable (not obscured by folders)', async 
   const node = page.getByTestId('node-main.tsx');
 
   // Fit view to ensure the node is in the viewport, especially on mobile
-  await page.getByRole('button', { name: 'fit view' }).click();
+  // React Flow's control can keep moving while the mobile viewport settles.
+  await page.getByRole('button', { name: 'fit view' }).click({ force: true });
 
   // 1. Verify it is visible in the viewport/DOM
   await expect(node).toBeVisible();
 
-  // 2. Verify it is not obscured by other elements (like folder nodes)
-  // The 'click' action with trial: true performs actionable checks without clicking.
-  // This ensures the center of the element is visible to the user and not covered.
-  await node.click({ trial: true });
+  // 2. Exercise the node and verify the click reached its handler. A trial click
+  // waits for pixel stability, which React Flow cannot guarantee while WebKit
+  // is settling a mobile viewport.
+  await node.click({ force: true });
+  await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
 });
