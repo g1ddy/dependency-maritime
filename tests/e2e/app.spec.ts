@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test('App elements are visible', async ({ page }) => {
+  test.setTimeout(120_000);
   await page.goto('/?disableAnimations=true');
+  await expect(page.locator('[data-interaction-ready="true"]')).toBeVisible({ timeout: 75_000 });
 
   await test.step('Verify Header elements', async () => {
     const viewport = page.viewportSize();
@@ -26,17 +28,10 @@ test('App elements are visible', async ({ page }) => {
   await test.step('Verify GraphOverlay controls', async () => {
     await expect(page.getByTestId('refactor-graph-btn')).toBeVisible();
 
-    // Select a node to make the isolate module toggle visible
-    // We use main.tsx as it is known to be visible in the viewport across devices (verified in node_visibility.spec.ts)
+    // Select a node only after the graph layout and post-layout fitView are complete.
     const node = page.getByTestId('node-main.tsx');
-
-    // Fit view to ensure the node is in the viewport, especially on mobile
-    // React Flow's control can keep moving while the mobile viewport settles.
-    // A forced click still exercises the control without waiting on pixel stability.
-    await page.getByRole('button', { name: 'fit view' }).click({ force: true });
-
     await expect(node).toBeVisible();
-    await node.click({ force: true });
+    await node.click();
 
     await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
   });
