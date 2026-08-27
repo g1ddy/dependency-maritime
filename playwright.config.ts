@@ -8,9 +8,6 @@ export default defineConfig({
   // write to shared output paths. Keep them out of the browser-compatibility
   // suite so `test:e2e` does not regenerate each image three times.
   testIgnore: 'generate-screenshots.spec.ts',
-  // WebKit can spend most of Playwright's 30-second default starting the
-  // dependency graph on constrained single-worker CI runners.
-  timeout: 60 * 1000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
