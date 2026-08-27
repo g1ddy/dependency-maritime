@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } from '@xyflow/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -53,6 +53,8 @@ export function DependencyGraph() {
   })));
 
   const { getIntersectingNodes, getInternalNode, getNode, fitView } = useReactFlow();
+  const [interactionReady, setInteractionReady] = useState(false);
+  const prevLoadingRef = useRef(loading);
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
 
@@ -75,17 +77,40 @@ export function DependencyGraph() {
     setGraphData(parsedData, parsedMetrics);
   }, [setGraphData]);
 
-  // Re-fit view when layout finishes
+  // Re-fit view only when layout finishes, and expose readiness only after fitView completes.
   useEffect(() => {
-    if (!loading && nodes.length > 0) {
-      // Small delay to allow React Flow to render updated positions
-      const t = setTimeout(() => {
-        window.requestAnimationFrame(() => {
-            void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 });
-        });
-      }, 250);
-      return () => clearTimeout(t);
+    const wasLoading = prevLoadingRef.current;
+    prevLoadingRef.current = loading;
+
+    if (loading || nodes.length === 0) {
+      setInteractionReady(false);
+      return;
     }
+
+    if (!wasLoading) {
+      return;
+    }
+
+    let cancelled = false;
+    let animationFrame: number | undefined;
+    const delay = disableAnimations ? 0 : 250;
+    const timer = window.setTimeout(() => {
+      animationFrame = window.requestAnimationFrame(() => {
+        void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 }).then(() => {
+          if (!cancelled) {
+            setInteractionReady(true);
+          }
+        });
+      });
+    }, delay);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      if (animationFrame !== undefined) {
+        window.cancelAnimationFrame(animationFrame);
+      }
+    };
   }, [loading, nodes.length, fitView, disableAnimations]);
 
   const onNodeDragStop = useCallback(
@@ -196,11 +221,11 @@ export function DependencyGraph() {
     selectNode(null);
   }, [selectNode]);
 
-  // data-layout-ready is used by E2E tests to verify layout completion
   return (
     <div
         className="absolute inset-0 w-full h-full"
         data-layout-ready={!loading && nodes.length > 0}
+        data-interaction-ready={interactionReady}
     >
       <ReactFlow
         nodes={nodes}
@@ -216,7 +241,7 @@ export function DependencyGraph() {
         minZoom={0.1}
       >
         <Background />
-        <Controls position="bottom-right" />
+        <Controls position="bottom-right" fitViewOptions={disableAnimations ? { duration: 0 } : undefined} />
         <MiniMap
           nodeColor={miniMapNodeColor}
           nodeStrokeColor="transparent"
