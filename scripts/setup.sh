@@ -1,26 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
-# Install Node.js dependencies
-npm install
+bash scripts/maintenance.sh
 
-# Install Playwright browsers (Chromium and others if needed)
-# Installing WebKit is required for Mobile Safari tests
-npx playwright install chromium webkit
+node -v
+npm -v
 
-# Install system dependencies required for browsers
-# This handles libraries like libgtk, libgstreamer, etc.
-npx playwright install-deps
-
-# Install Graphviz for dependency graph generation
-if command -v apt-get &> /dev/null; then
-  echo "Installing Graphviz..."
-  sudo apt-get update
-  sudo apt-get install -y graphviz
-elif command -v brew &> /dev/null; then
-  echo "Installing Graphviz..."
-  brew install graphviz
-else
-  echo "Graphviz installation skipped (package manager not found)."
-  echo "Please install Graphviz manually to use dependency graph features."
+if [ ! -d "$HOME/.cache/ms-playwright" ]; then
+  echo "Playwright browsers not found!"
+  exit 1
 fi
+
+if ! command -v dot &> /dev/null; then
+  echo "Graphviz (dot) is missing!"
+  exit 1
+fi
+
+npm run test:unit -- list
