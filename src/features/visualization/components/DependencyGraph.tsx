@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback, useRef, useState } from 'react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow, type Node } from '@xyflow/react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -53,7 +53,7 @@ export function DependencyGraph() {
   })));
 
   const { getIntersectingNodes, getInternalNode, getNode, fitView } = useReactFlow();
-  const [interactionReady, setInteractionReady] = useState(false);
+  const graphContainerRef = useRef<HTMLDivElement>(null);
   const prevLoadingRef = useRef(loading);
 
   const nodeTypes = useMemo(() => ({ appNode: AppNode, groupNode: GroupNode }), []);
@@ -81,15 +81,22 @@ export function DependencyGraph() {
   useEffect(() => {
     const wasLoading = prevLoadingRef.current;
     prevLoadingRef.current = loading;
+    const graphContainer = graphContainerRef.current;
+
+    if (!graphContainer) {
+      return;
+    }
 
     if (loading || nodes.length === 0) {
-      setInteractionReady(false);
+      graphContainer.dataset.interactionReady = 'false';
       return;
     }
 
     if (!wasLoading) {
       return;
     }
+
+    graphContainer.dataset.interactionReady = 'false';
 
     let cancelled = false;
     let animationFrame: number | undefined;
@@ -98,7 +105,7 @@ export function DependencyGraph() {
       animationFrame = window.requestAnimationFrame(() => {
         void fitView({ duration: disableAnimations ? 0 : 400, padding: 0.2 }).then(() => {
           if (!cancelled) {
-            setInteractionReady(true);
+            graphContainer.dataset.interactionReady = 'true';
           }
         });
       });
@@ -223,9 +230,9 @@ export function DependencyGraph() {
 
   return (
     <div
+        ref={graphContainerRef}
         className="absolute inset-0 w-full h-full"
         data-layout-ready={!loading && nodes.length > 0}
-        data-interaction-ready={interactionReady}
     >
       <ReactFlow
         nodes={nodes}
