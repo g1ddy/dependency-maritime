@@ -217,9 +217,12 @@ export function DependencyGraph() {
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      // Only auto-open inspector on desktop (>= 768px)
-      const isDesktop = window.matchMedia?.('(min-width: 768px)').matches ?? true;
-      selectNode(node.id, isDesktop);
+      // Auto-open the inspector only for desktop-style pointer input. Wide touch
+      // tablets such as iPad can exceed the desktop breakpoint but should retain
+      // the mobile interaction model so the inspector does not cover the graph.
+      const hasDesktopWidth = window.matchMedia?.('(min-width: 768px)').matches ?? true;
+      const hasFinePointer = window.matchMedia?.('(pointer: fine)').matches ?? true;
+      selectNode(node.id, hasDesktopWidth && hasFinePointer);
     },
     [selectNode]
   );
