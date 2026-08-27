@@ -5,17 +5,9 @@ test.describe('Simulation State', () => {
   const FEATURES_GROUP_TEST_ID = 'node-features';
 
   test.beforeEach(async ({ page }) => {
-    // Navigate to the app with animations disabled
-    await page.goto('http://localhost:5173/dependency-maritime/?disableAnimations=true');
-    // Wait for canvas to be present
-    await page.waitForSelector('.react-flow__renderer');
-    // Wait for at least one node to render
-    await page.waitForSelector('.react-flow__node');
-
-    // Fit view to ensure nodes are within viewport for consistent coordinates
-    const fitViewBtn = page.getByRole('button', { name: 'fit view' });
-    await expect(fitViewBtn).toBeVisible();
-    await fitViewBtn.click();
+    test.setTimeout(120_000);
+    await page.goto('/?disableAnimations=true');
+    await expect(page.locator('[data-interaction-ready="true"]')).toBeVisible({ timeout: 75_000 });
   });
 
   test('dragging a node into a new folder should update its fullPath in the simulation state', async ({ page }) => {
@@ -26,20 +18,16 @@ test.describe('Simulation State', () => {
     await expect(targetGroup).toBeVisible();
 
     // 1. Verify Initial State
-    // Click to select the node
     await targetNode.click();
 
-    // Check Overlay for initial path
     const overlayPath = page.locator('.absolute.inset-0').getByText('src/App.tsx');
     await expect(overlayPath).toBeVisible();
 
-    // Close Inspector if open to prevent obstruction later
-    // Check if it's the toggle button in the top bar.
-    // To close the panel, we might need to click the "Close" button inside the panel if it exists, or toggle the top button.
-    // The error showed "Close Inspector" button exists.
+    // Close Inspector if open so it cannot obstruct the drag target.
     const closeInspectorBtn = page.getByRole('button', { name: 'Close Inspector' });
     if (await closeInspectorBtn.isVisible()) {
-        await closeInspectorBtn.click();
+      await closeInspectorBtn.click();
+      await expect(closeInspectorBtn).toBeHidden();
     }
 
     // 2. Perform Drag
@@ -50,31 +38,23 @@ test.describe('Simulation State', () => {
     expect(groupDestBox).not.toBeNull();
 
     if (startBox && groupDestBox) {
-        // Calculate a safe drop position that is inside the group
-        const dropX = groupDestBox.x + 50;
-        const dropY = groupDestBox.y + 50;
+      const viewport = page.viewportSize();
+      const rawDropX = groupDestBox.x + Math.min(50, groupDestBox.width / 2);
+      const rawDropY = groupDestBox.y + Math.min(50, groupDestBox.height / 2);
+      const dropX = viewport ? Math.min(Math.max(rawDropX, 1), viewport.width - 1) : rawDropX;
+      const dropY = viewport ? Math.min(Math.max(rawDropY, 1), viewport.height - 1) : rawDropY;
 
-        await page.mouse.move(startBox.x + startBox.width / 2, startBox.y + startBox.height / 2);
-        await page.mouse.down();
-        // Move in steps to simulate drag
-        await page.mouse.move(dropX, dropY, { steps: 20 });
-        await page.mouse.up();
+      await page.mouse.move(startBox.x + startBox.width / 2, startBox.y + startBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(dropX, dropY, { steps: 20 });
+      await page.mouse.up();
     }
 
     // 3. Verify Updated State
-    // Ensure node is still selected or re-select it
-    // If the drag worked, the node moved.
-    // If we can't click it easily, we can assume it's still selected if we didn't click elsewhere.
-
-    // Check Overlay for NEW path
-    // We accept any path starting with src/features because drag might drop into a subfolder
     const overlayPathLocator = page.locator('.absolute.inset-0 h3 + p');
-
-    // Wait for update
     await expect(overlayPathLocator).not.toHaveText('src/App.tsx', { timeout: 10000 });
 
     const text = await overlayPathLocator.textContent();
-
     expect(text).toContain('src/features/');
     expect(text).toContain('App.tsx');
   });

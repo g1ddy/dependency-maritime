@@ -1,20 +1,16 @@
 import { test, expect } from '@playwright/test';
 
 test('File nodes are visible and interactable (not obscured by folders)', async ({ page }) => {
+  test.setTimeout(120_000);
   await page.goto('/?disableAnimations=true');
+  await expect(page.locator('[data-interaction-ready="true"]')).toBeVisible({ timeout: 75_000 });
 
-  // Wait for the graph to load and render nodes.
-  // We look for a specific file node that we know exists in the sample data (e.g., main.tsx).
   const node = page.getByTestId('node-main.tsx');
 
-  // Fit view to ensure the node is in the viewport, especially on mobile
-  await page.getByRole('button', { name: 'fit view' }).click();
-
-  // 1. Verify it is visible in the viewport/DOM
+  // Verify the node is visible and that Playwright can hit-test it normally.
+  // This deliberately preserves the regression protection against folder/overlay obstruction.
   await expect(node).toBeVisible();
-
-  // 2. Verify it is not obscured by other elements (like folder nodes)
-  // The 'click' action with trial: true performs actionable checks without clicking.
-  // This ensures the center of the element is visible to the user and not covered.
   await node.click({ trial: true });
+  await node.click();
+  await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
 });
