@@ -11,7 +11,7 @@ inputs:
     required: false
     default: '20.19.0'
   cli-source:
-    description: 'Optional CLI source override for development (for example, a packed tarball). The action otherwise installs its pinned compatible CLI version.'
+    description: 'Optional CLI source override for development (for example, a packed tarball). The action otherwise installs the CLI version derived from a cli-v* action tag, with the committed compatibility version as a branch/commit fallback.'
     required: false
     default: ''
   source-roots:
@@ -51,20 +51,28 @@ runs:
       shell: bash
       env:
         INPUT_CLI_SOURCE: ${{ inputs.cli-source }}
+        ACTION_REF: ${{ github.action_ref }}
       run: |
         set -euo pipefail
 
-        # Keep this exact version coupled to this action revision. Do not replace
-        # it with a tag or range: an existing action ref must remain reproducible.
-        COMPATIBLE_CLI="@dependency-maritime/cli@0.1.0-beta.2"
-        CLI_SRC="${INPUT_CLI_SOURCE:-$COMPATIBLE_CLI}"
+        # Branch/commit refs cannot encode a package version, so retain the last
+        # known compatible package as a development fallback. Versioned action
+        # tags are authoritative: cli-vX.Y.Z[-pre] resolves to package X.Y.Z[-pre].
+        FALLBACK_CLI="@dependency-maritime/cli@0.1.0-beta.1"
 
-        # The package-contract test executes these shell blocks directly while
-        # npm is running test:cli-package. Permit its isolated tarball fixture only
-        # in that test lifecycle; normal GitHub Action consumers cannot select the
-        # CLI through this environment variable.
-        if [ "${npm_lifecycle_event:-}" = "test:cli-package" ] && [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
+        if [ -n "${INPUT_CLI_SOURCE:-}" ]; then
+          CLI_SRC="$INPUT_CLI_SOURCE"
+        elif [ "${npm_lifecycle_event:-}" = "test:cli-package" ] && [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
           CLI_SRC="$MARITIME_CLI_TEST_SOURCE"
+        elif [[ "${ACTION_REF:-}" == cli-v* ]]; then
+          CLI_VERSION="${ACTION_REF#cli-v}"
+          if ! npm view "@dependency-maritime/cli@$CLI_VERSION" version >/dev/null 2>&1; then
+            echo "Action ref $ACTION_REF does not resolve to a published @dependency-maritime/cli version." >&2
+            exit 1
+          fi
+          CLI_SRC="@dependency-maritime/cli@$CLI_VERSION"
+        else
+          CLI_SRC="$FALLBACK_CLI"
         fi
 
         echo "Resolving Maritime CLI from: $CLI_SRC"
