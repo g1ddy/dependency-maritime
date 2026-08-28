@@ -45,7 +45,7 @@
     "test": "vitest",
     "test:unit": "vitest",
     "test:bench": "vitest bench -c vitest.bench.config.ts",
-    "test:cli-package": "vitest run tests/cli-pack-smoke.test.ts",
+    "test:cli-package": "vitest run tests/cli-pack-smoke.test.ts tests/action-ref-resolution.test.ts",
     "test:e2e": "playwright test",
     "test:screenshots": "playwright test -c config/playwright.screenshots.config.ts"
   },
