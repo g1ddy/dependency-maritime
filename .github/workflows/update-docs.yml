@@ -10,6 +10,10 @@ on:
       - '!docs/COMPLEXITY.md'
       - 'README.md'
       - 'package.json'
+      - 'config/playwright.screenshots.config.ts'
+      - 'tests/e2e/generate-screenshots.spec.ts'
+      - 'tests/e2e/screenshot-assets.ts'
+      - '.github/workflows/update-docs.yml'
 
 jobs:
   update-docs:
@@ -38,15 +42,28 @@ jobs:
       - name: Build Project
         run: npm run build
 
+      - name: Reset canonical screenshots
+        run: npx tsx tests/e2e/screenshot-assets.ts --reset
+
       - name: Generate Screenshots
         # We use the dedicated config which handles the server (port 4174) and test discovery
-        run: |
-          npm run test:screenshots
+        run: npm run test:screenshots
         env:
           CI: true
 
+      - name: Verify canonical screenshot set
+        run: npx tsx tests/e2e/screenshot-assets.ts --verify
+
       - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "docs(assets): update screenshots [skip ci]"
-          file_pattern: 'docs/images/*.png'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- 'docs/images/screenshot-*.png'
+          if git diff --cached --quiet; then
+            echo "Documentation screenshots are already current."
+            exit 0
+          fi
+          git commit -m "docs(assets): update screenshots [skip ci]"
+          git push origin "HEAD:${{ github.head_ref }}"
