@@ -56,7 +56,7 @@ runs:
 
         # Keep this exact version coupled to this action revision. Do not replace
         # it with a tag or range: an existing action ref must remain reproducible.
-        COMPATIBLE_CLI="@dependency-maritime/cli@0.1.0-beta.1"
+        COMPATIBLE_CLI="@dependency-maritime/cli@0.1.0-beta.2"
         CLI_SRC="${INPUT_CLI_SOURCE:-$COMPATIBLE_CLI}"
 
         # The package-contract test executes these shell blocks directly while
