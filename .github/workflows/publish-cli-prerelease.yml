@@ -1,0 +1,34 @@
+name: Publish CLI prerelease
+
+on:
+  push:
+    tags:
+      - 'cli-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.0'
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+      - run: npm ci
+      - run: npm run build:cli
+      - run: npm run test:cli-package
+      - name: Verify tag matches package version
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          test "${GITHUB_REF_NAME#cli-v}" = "$(node -p "require('./package.json').version")"
+      - name: Publish immutable prerelease
+        run: npm publish --tag prerelease --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

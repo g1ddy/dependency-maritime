@@ -11,8 +11,9 @@ inputs:
     required: false
     default: '20.19.0'
   cli-source:
-    description: 'CLI source/version to install (e.g. packed tarball path "./dependency-maritime-cli-0.0.0.tgz" or published package name/version).'
-    required: true
+    description: 'Optional CLI source override for development (for example, a packed tarball). The action otherwise installs its pinned compatible CLI version.'
+    required: false
+    default: ''
   source-roots:
     description: 'One or more source roots to analyze (space, newline, or comma separated).'
     required: false
@@ -51,7 +52,10 @@ runs:
       env:
         INPUT_CLI_SOURCE: ${{ inputs.cli-source }}
       run: |
-        CLI_SRC="$INPUT_CLI_SOURCE"
+        # Keep this exact version coupled to this action revision. Do not replace
+        # it with a tag or range: an existing action ref must remain reproducible.
+        COMPATIBLE_CLI="@dependency-maritime/cli@0.1.0-beta.1"
+        CLI_SRC="${INPUT_CLI_SOURCE:-${MARITIME_CLI_TEST_SOURCE:-$COMPATIBLE_CLI}}"
         echo "Resolving Maritime CLI from: $CLI_SRC"
 
         if [ "$CLI_SRC" = "." ] || [ -f "$CLI_SRC/dist/cli/main.js" ] || [ -f "$CLI_SRC/main.js" ]; then
