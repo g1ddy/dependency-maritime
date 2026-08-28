@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - 'cli-v*'
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -24,7 +23,6 @@ jobs:
       - run: npm run build:cli
       - run: npm run test:cli-package
       - name: Verify tag matches package version
-        if: github.event_name == 'push'
         shell: bash
         run: |
           test "${GITHUB_REF_NAME#cli-v}" = "$(node -p "require('./package.json').version")"
