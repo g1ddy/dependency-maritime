@@ -5,15 +5,22 @@ on:
     types: [opened, synchronize, reopened]
     branches: [ main ]
     paths:
-      - 'docs/**'
-      - '!docs/images/**'
-      - '!docs/COMPLEXITY.md'
-      - 'README.md'
-      - 'package.json'
+      - 'src/**'
+      - '!src/cli/**'
+      - '!src/**/*.test.ts'
+      - '!src/**/*.test.tsx'
+      - '.maritime/dependency-graph.json'
+      - '.maritime/complexity-metrics.json'
+      - 'index.html'
+      - 'vite.config.ts'
       - 'config/playwright.screenshots.config.ts'
       - 'tests/e2e/generate-screenshots.spec.ts'
       - 'tests/e2e/screenshot-assets.ts'
       - '.github/workflows/update-docs.yml'
+
+concurrency:
+  group: documentation-screenshots-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   update-docs:
@@ -41,6 +48,8 @@ jobs:
 
       - name: Build Project
         run: npm run build
+        env:
+          VITE_APP_VERSION: DOCS
 
       - name: Reset canonical screenshots
         run: npx tsx tests/e2e/screenshot-assets.ts --reset
@@ -50,6 +59,7 @@ jobs:
         run: npm run test:screenshots
         env:
           CI: true
+          VITE_APP_VERSION: DOCS
 
       - name: Verify canonical screenshot set
         run: npx tsx tests/e2e/screenshot-assets.ts --verify

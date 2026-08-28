@@ -106,11 +106,11 @@ runs:
 
         ARGS+=("--output" "$INPUT_OUTPUT_DIR")
 
-        if [ -n "$INPUT_DEPCRUISE_CONFIG" ]; then
+        if [ -n "${INPUT_DEPCRUISE_CONFIG:-}" ]; then
           ARGS+=("--depcruise-config" "$INPUT_DEPCRUISE_CONFIG")
         fi
 
-        if [ "$INPUT_FAIL_ON_UNMEASURED" = "true" ]; then
+        if [ "${INPUT_FAIL_ON_UNMEASURED:-false}" = "true" ]; then
           ARGS+=("--fail-on-unmeasured")
         fi
 
