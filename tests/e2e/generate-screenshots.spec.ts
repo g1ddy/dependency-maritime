@@ -1,56 +1,46 @@
 import { test, expect } from '@playwright/test';
+import { assertUniqueScreenshotFilenames, screenshotPath } from './screenshot-assets';
 
 test.describe('Documentation Screenshots', () => {
+  test.beforeAll(() => {
+    assertUniqueScreenshotFilenames();
+  });
+
   test.beforeEach(async ({ page }) => {
-    // Navigate to the app
-    await page.goto('/');
-    // Wait for the graph to render (wait for at least one node)
-    await page.waitForSelector('[data-testid^="node-"]', { timeout: 10000 });
-    // Ensure we are fit to view
-    await page.getByRole('button', { name: 'fit view' }).click();
-    // Allow animations to settle
-    await page.waitForTimeout(1000);
+    await page.goto('/?disableAnimations=true');
+    await expect(page.locator('[data-interaction-ready="true"]')).toBeVisible({ timeout: 75_000 });
+    await expect(page.getByTestId('node-main.tsx')).toBeVisible();
   });
 
   test('dashboard view', async ({ page }) => {
-    // Capture the main dashboard
-    await page.screenshot({ path: 'docs/images/screenshot-dashboard.png', fullPage: true });
+    await expect(page.getByTestId('node-main.tsx')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Node Inspector' })).toBeHidden();
+    await expect(page.getByRole('heading', { name: 'Select Data Source' })).toBeHidden();
+
+    await page.screenshot({ path: screenshotPath('dashboard'), fullPage: true });
   });
 
   test('node inspector view', async ({ page }) => {
-    // Select a specific node to open the inspector
-    // We try to find main.tsx or fallback to the first available node
-    const mainNode = page.locator('[data-testid="node-main.tsx"]');
-    if (await mainNode.count() > 0) {
-        await mainNode.click({ force: true });
-    } else {
-        await page.locator('[data-testid^="node-"]').first().click({ force: true });
-    }
+    await page.getByTestId('node-main.tsx').click();
 
-    // Wait for inspector to appear by checking for the Panel Title
-    // On mobile, the inspector might not open automatically, so we check and toggle if needed
-    const inspectorTitle = page.getByText('Node Inspector');
-    if (!await inspectorTitle.isVisible()) {
-        await page.getByRole('button', { name: 'Inspector' }).click();
-    }
-    await expect(inspectorTitle).toBeVisible();
-
-    // Then verify content is loaded
+    await expect(page.getByRole('heading', { name: 'Node Inspector' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'main.tsx' })).toBeVisible();
     await expect(page.locator('h4', { hasText: 'Metrics' })).toBeVisible();
+    await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Select Data Source' })).toBeHidden();
 
-    await page.screenshot({ path: 'docs/images/screenshot-inspector.png', fullPage: true });
+    await page.screenshot({ path: screenshotPath('inspector'), fullPage: true });
   });
 
   test('data source dialog', async ({ page }) => {
-    // Click the upload icon to open data sources
-    await page.getByRole('button', { name: 'Upload/Select Data Source' }).click();
+    await page.getByLabel('Upload/Select Data Source').click();
 
-    // Wait for dialog
-    await expect(page.getByText('Select Data Source')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Select Data Source' })).toBeVisible();
+    await expect(page.getByText('Sample Data', { exact: true })).toBeVisible();
+    await expect(page.getByText('Project Graph', { exact: true })).toBeVisible();
+    await expect(page.getByText('Click to upload or drag and drop', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Node Inspector' })).toBeHidden();
 
-    // Capture specifically the dialog area if possible, or the whole page with overlay
-    // For docs, whole page with modal overlay is usually fine, or we can clip it.
-    // Let's take the whole page to show context.
-    await page.screenshot({ path: 'docs/images/screenshot-upload.png', fullPage: true });
+    await page.screenshot({ path: screenshotPath('upload'), fullPage: true });
   });
 });
