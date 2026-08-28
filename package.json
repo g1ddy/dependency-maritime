@@ -40,7 +40,7 @@
     "depcruise": "depcruise src --config config/.dependency-cruiser.cjs",
     "check:arch": "depcruise src --config config/.dependency-cruiser.cjs",
     "generate:dot": "depcruise-fmt -T dot .maritime/dependency-graph.json > config/dependency-graph.dot",
-    "generate:graph": "dot -T svg config/dependency-graph.dot > docs/images/dependency-graph.svg && dot -T png config/dependency-graph.png",
+    "generate:graph": "dot -T svg config/dependency-graph.dot > docs/images/dependency-graph.svg && dot -T png config/dependency-graph.dot > docs/images/dependency-graph.png",
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest",
