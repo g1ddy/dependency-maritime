@@ -13,31 +13,30 @@ jobs:
       - name: Create external consumer fixture
         shell: bash
         run: |
-          mkdir -p consumer/src consumer/lib
-          cat > consumer/package.json <<'EOF'
+          mkdir -p src lib
+          cat > package.json <<'EOF'
           {"name":"maritime-action-consumer","private":true,"type":"module","devDependencies":{"eslint":"^9.0.0"}}
           EOF
-          cat > consumer/eslint.config.js <<'EOF'
+          cat > eslint.config.js <<'EOF'
           export default [{ files: ['**/*.ts'] }];
           EOF
-          printf 'import { helper } from "../lib/helper";\nexport const run = () => helper();\n' > consumer/src/app.ts
-          printf 'export const helper = () => "ok";\n' > consumer/lib/helper.ts
+          printf 'import { helper } from "../lib/helper";\nexport const run = () => helper();\n' > src/app.ts
+          printf 'export const helper = () => "ok";\n' > lib/helper.ts
 
       - name: Install consumer dependencies
-        working-directory: consumer
         run: npm install
 
       - name: Analyze with published action and its default CLI
         uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.1
         with:
-          source-roots: 'consumer/src consumer/lib'
-          output-dir: 'consumer/.maritime'
+          source-roots: 'src lib'
+          output-dir: '.maritime'
           upload-artifact: 'false'
 
       - name: Verify canonical bundle
         shell: bash
         run: |
-          test -f consumer/.maritime/dependency-graph.json
-          test -f consumer/.maritime/complexity-metrics.json
-          test -f consumer/.maritime/complexity-report.md
-          test -f consumer/.maritime/manifest.json
+          test -f .maritime/dependency-graph.json
+          test -f .maritime/complexity-metrics.json
+          test -f .maritime/complexity-report.md
+          test -f .maritime/manifest.json
