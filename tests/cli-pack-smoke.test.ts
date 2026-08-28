@@ -821,6 +821,8 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(actionContent).toContain('analyze');
         expect(actionContent).toContain('validate');
         expect(actionContent).toContain('actions/upload-artifact');
+        expect(actionContent).toContain('@dependency-maritime/cli@0.1.0-beta.1');
+        expect(actionContent).toContain("default: ''");
     });
 
     it('executable composite action smoke test: parses action.yml and executes steps against clean consumer workspace', () => {
@@ -891,7 +893,11 @@ describe('CLI npm pack clean-install smoke tests', () => {
             cwd: actionConsumerDir,
             env: {
                 ...process.env,
-                INPUT_CLI_SOURCE: tarballPath,
+                // Exercise the no-input branch while redirecting this prerelease
+                // package name to the already-inspected artifact in the test's
+                // isolated npm environment. No consumer cli-source is supplied.
+                INPUT_CLI_SOURCE: '',
+                MARITIME_CLI_TEST_SOURCE: tarballPath,
                 INPUT_SOURCE_ROOTS: 'src lib',
                 INPUT_OUTPUT_DIR: '.maritime',
                 INPUT_FAIL_ON_UNMEASURED: 'true'

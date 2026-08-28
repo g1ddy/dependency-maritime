@@ -180,7 +180,7 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 
 | Input | Description | Default | Required |
 | :--- | :--- | :--- | :--- |
-| `cli-source` | CLI source/version to install (e.g. packed tarball path `./dependency-maritime-cli-0.0.0.tgz` or published package name/version) | *None* | **Yes** |
+| `cli-source` | Optional development override (for example a packed CLI tarball or another exact package version) | `''` | No |
 | `node-version` | Node.js version baseline to set up | `'20.19.0'` | No |
 | `source-roots` | One or more source roots to analyze (space, newline, or comma separated) | `'src'` | No |
 | `depcruise-config` | Optional path to custom dependency-cruiser configuration file | `''` | No |
@@ -191,21 +191,20 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 
 ### Usage Examples
 
-For an action checked out into the current repository, `uses:` points to the directory containing `action.yml` (for this repository root, `uses: ./`). In pre-release state, consumers must also provide an explicit packed CLI tarball or other resolvable CLI source. After public release, consumers can invoke the action by repository ref and set `cli-source` to the published package version.
+The action revision and CLI are deliberately coupled: this action installs the exact prerelease
+`@dependency-maritime/cli@0.1.0-beta.1`. It does not use `latest`, `prerelease`, or a semver range,
+so a pinned action ref cannot silently begin running a future incompatible CLI. Updating that exact
+version in `action.yml` is part of releasing a new action revision.
 
-#### Minimal Adoption (Local Action & Packed CLI)
+#### Normal consumer workflow
 
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  - name: Build CLI Package
-    run: |
-      npm run build:cli
-      npm pack
   - name: Maritime Analyze & Validate
-    uses: ./
+    uses: g1ddy/dependency-maritime@<pinned-ref>
     with:
-      cli-source: './dependency-maritime-cli-0.0.0.tgz'
+      source-roots: src
 ```
 
 #### Multiple Source Roots and Custom Config
@@ -214,9 +213,8 @@ steps:
 steps:
   - uses: actions/checkout@v4
   - name: Maritime Analyze & Validate
-    uses: ./
+    uses: g1ddy/dependency-maritime@<pinned-ref>
     with:
-      cli-source: './dependency-maritime-cli-0.0.0.tgz'
       source-roots: 'src lib'
       depcruise-config: 'config/.dependency-cruiser.cjs'
       output-dir: '.maritime'
@@ -225,11 +223,35 @@ steps:
       artifact-name: 'maritime-analysis'
 ```
 
+For Maritime development and unreleased compatibility checks only, set `cli-source` to an exact
+package specifier or a packed tarball. This override is not part of normal consumer setup:
+
+```yaml
+    uses: g1ddy/dependency-maritime@<pinned-ref>
+    with:
+      cli-source: './dependency-maritime-cli-0.1.0-beta.1.tgz'
+```
+
+The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. A
+`cli-vX.Y.Z` tag must match `package.json`; the workflow builds, exercises the packed-package
+contract, publishes the public package with npm provenance under the `prerelease` distribution tag,
+and then runs a clean external consumer job against the same immutable action tag. That consumer job
+does not check out, build, or pack Maritime and does not provide `cli-source`; it therefore proves
+the real registry-backed default acquisition path and verifies all four canonical `.maritime`
+artifacts. The action itself selects the full immutable CLI version rather than the distribution tag.
+
 #### Verification Evidence and Consumer Cutover
 
-The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds and smoke-tests the shared action contract; it does not itself migrate those repositories to consume the action.
+The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds the shared action contract and the release-time external consumer proof; it does not itself migrate those repositories to consume the action.
 
-The executable action smoke test verifies that a packed Maritime tarball can be installed in a clean consumer workspace, analyzed across multiple source roots, validated, and emitted as the complete four-file `.maritime` bundle. Real-repository cutover remains a consumer-side follow-up so each repository can preserve its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
+The package-contract smoke suite runs before publication and verifies package contents, runtime
+dependencies, supported Node versions, source-root behavior, validation, and action execution with a
+local prerelease tarball fixture. The true no-input action path is intentionally proven only after the
+prerelease is published: the tag-triggered release workflow invokes the action without `cli-source`
+and validates the complete four-file `.maritime` bundle. The standalone manually dispatched consumer
+smoke remains useful as a post-release diagnostic once the workflow exists on the default branch, but
+it is not the pre-merge acceptance proof. Real-repository cutover remains a consumer-side follow-up so
+each repository can preserve its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
 
 ## Related documentation
 

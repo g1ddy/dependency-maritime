@@ -11,8 +11,9 @@ inputs:
     required: false
     default: '20.19.0'
   cli-source:
-    description: 'CLI source/version to install (e.g. packed tarball path "./dependency-maritime-cli-0.0.0.tgz" or published package name/version).'
-    required: true
+    description: 'Optional CLI source override for development (for example, a packed tarball). The action otherwise installs its pinned compatible CLI version.'
+    required: false
+    default: ''
   source-roots:
     description: 'One or more source roots to analyze (space, newline, or comma separated).'
     required: false
@@ -51,7 +52,21 @@ runs:
       env:
         INPUT_CLI_SOURCE: ${{ inputs.cli-source }}
       run: |
-        CLI_SRC="$INPUT_CLI_SOURCE"
+        set -euo pipefail
+
+        # Keep this exact version coupled to this action revision. Do not replace
+        # it with a tag or range: an existing action ref must remain reproducible.
+        COMPATIBLE_CLI="@dependency-maritime/cli@0.1.0-beta.1"
+        CLI_SRC="${INPUT_CLI_SOURCE:-$COMPATIBLE_CLI}"
+
+        # The package-contract test executes these shell blocks directly while
+        # npm is running test:cli-package. Permit its isolated tarball fixture only
+        # in that test lifecycle; normal GitHub Action consumers cannot select the
+        # CLI through this environment variable.
+        if [ "${npm_lifecycle_event:-}" = "test:cli-package" ] && [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
+          CLI_SRC="$MARITIME_CLI_TEST_SOURCE"
+        fi
+
         echo "Resolving Maritime CLI from: $CLI_SRC"
 
         if [ "$CLI_SRC" = "." ] || [ -f "$CLI_SRC/dist/cli/main.js" ] || [ -f "$CLI_SRC/main.js" ]; then
@@ -62,23 +77,16 @@ runs:
           else
             MARITIME_BIN="node dist/cli/main.js"
           fi
-        elif [ -f "$CLI_SRC" ] || [[ "$CLI_SRC" == *.tgz ]]; then
-          npm install "$CLI_SRC" --no-save
-          if [ -f "./node_modules/.bin/maritime" ]; then
-            MARITIME_BIN="./node_modules/.bin/maritime"
-          else
-            MARITIME_BIN="npx maritime"
-          fi
         else
-          npm install "$CLI_SRC" --no-save || npm install -g "$CLI_SRC"
-          if [ -f "./node_modules/.bin/maritime" ]; then
-            MARITIME_BIN="./node_modules/.bin/maritime"
-          else
-            MARITIME_BIN="npx maritime"
+          npm install "$CLI_SRC" --no-save
+          if [ ! -x "./node_modules/.bin/maritime" ]; then
+            echo "Maritime CLI installation did not produce ./node_modules/.bin/maritime" >&2
+            exit 1
           fi
+          MARITIME_BIN="./node_modules/.bin/maritime"
         fi
 
-        echo "MARITIME_BIN=$MARITIME_BIN" >> $GITHUB_ENV
+        echo "MARITIME_BIN=$MARITIME_BIN" >> "$GITHUB_ENV"
 
     - name: Run Maritime Analyze
       shell: bash
