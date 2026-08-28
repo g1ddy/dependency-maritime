@@ -59,10 +59,11 @@ runs:
         COMPATIBLE_CLI="@dependency-maritime/cli@0.1.0-beta.1"
         CLI_SRC="${INPUT_CLI_SOURCE:-$COMPATIBLE_CLI}"
 
-        # The package smoke test executes these shell blocks outside GitHub Actions.
-        # Permit its isolated tarball injection there, but never let an environment
-        # variable override the pinned/default CLI in a real GitHub Actions run.
-        if [ "${GITHUB_ACTIONS:-false}" != "true" ] && [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
+        # The package-contract test executes these shell blocks directly while
+        # npm is running test:cli-package. Permit its isolated tarball fixture only
+        # in that test lifecycle; normal GitHub Action consumers cannot select the
+        # CLI through this environment variable.
+        if [ "${npm_lifecycle_event:-}" = "test:cli-package" ] && [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
           CLI_SRC="$MARITIME_CLI_TEST_SOURCE"
         fi
 
