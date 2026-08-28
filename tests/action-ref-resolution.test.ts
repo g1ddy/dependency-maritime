@@ -5,16 +5,49 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 import * as yaml from 'js-yaml';
 
+type ActionStep = {
+    name?: string;
+    run?: string;
+};
+
+type CompositeAction = {
+    runs: {
+        steps: ActionStep[];
+    };
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null;
+}
+
+function isActionStep(value: unknown): value is ActionStep {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    return (value.name === undefined || typeof value.name === 'string')
+        && (value.run === undefined || typeof value.run === 'string');
+}
+
+function isCompositeAction(value: unknown): value is CompositeAction {
+    if (!isRecord(value) || !isRecord(value.runs) || !Array.isArray(value.runs.steps)) {
+        return false;
+    }
+
+    return value.runs.steps.every(isActionStep);
+}
+
 describe('composite action release tag resolution', () => {
     it('derives the CLI package version from a cli-v action ref when cli-source is unset', () => {
         const actionYaml = fs.readFileSync(path.join(process.cwd(), 'action.yml'), 'utf8');
-        /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call */
-        const actionObj = (yaml as any).load(actionYaml) as {
-            runs: { steps: Array<{ name?: string; run?: string }> };
-        };
-        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call */
+        const parsedAction: unknown = yaml.load(actionYaml);
 
-        const installStep = actionObj.runs.steps.find(step => step.name === 'Install and Resolve Maritime CLI');
+        expect(isCompositeAction(parsedAction)).toBe(true);
+        if (!isCompositeAction(parsedAction)) {
+            throw new Error('action.yml does not match the expected composite action shape');
+        }
+
+        const installStep = parsedAction.runs.steps.find(step => step.name === 'Install and Resolve Maritime CLI');
         expect(installStep?.run).toBeDefined();
 
         const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-action-ref-'));
