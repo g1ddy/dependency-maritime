@@ -232,22 +232,26 @@ package specifier or a packed tarball. This override is not part of normal consu
       cli-source: './dependency-maritime-cli-0.1.0-beta.1.tgz'
 ```
 
-The prerelease is published from the `Publish CLI prerelease` workflow. A `cli-vX.Y.Z` tag must
-match `package.json`; the workflow builds, exercises the clean package contract, and publishes the
-public package with npm provenance under the non-floating `prerelease` distribution tag. The
-action itself still selects the full immutable version rather than that distribution tag.
+The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. A
+`cli-vX.Y.Z` tag must match `package.json`; the workflow builds, exercises the packed-package
+contract, publishes the public package with npm provenance under the `prerelease` distribution tag,
+and then runs a clean external consumer job against the same immutable action tag. That consumer job
+does not check out, build, or pack Maritime and does not provide `cli-source`; it therefore proves
+the real registry-backed default acquisition path and verifies all four canonical `.maritime`
+artifacts. The action itself selects the full immutable CLI version rather than the distribution tag.
 
 #### Verification Evidence and Consumer Cutover
 
-The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds and smoke-tests the shared action contract; it does not itself migrate those repositories to consume the action.
+The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds the shared action contract and the release-time external consumer proof; it does not itself migrate those repositories to consume the action.
 
-The executable action smoke test exercises the action's no-input acquisition branch in a clean
-consumer workspace, analyzes multiple source roots, validates the result, and checks the complete
-four-file `.maritime` bundle. Separate packed-tarball tests retain package-content and distribution
-coverage. The manually dispatched published-action smoke workflow provides the fully external check:
-it does not check out, install, build, or pack Maritime and does not set `cli-source`. Real-repository
-cutover remains a consumer-side follow-up so each repository can preserve
-its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
+The package-contract smoke suite runs before publication and verifies package contents, runtime
+dependencies, supported Node versions, source-root behavior, validation, and action execution with a
+local prerelease tarball fixture. The true no-input action path is intentionally proven only after the
+prerelease is published: the tag-triggered release workflow invokes the action without `cli-source`
+and validates the complete four-file `.maritime` bundle. The standalone manually dispatched consumer
+smoke remains useful as a post-release diagnostic once the workflow exists on the default branch, but
+it is not the pre-merge acceptance proof. Real-repository cutover remains a consumer-side follow-up so
+each repository can preserve its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
 
 ## Related documentation
 
