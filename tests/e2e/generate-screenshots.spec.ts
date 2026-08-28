@@ -23,9 +23,12 @@ test.describe('Documentation Screenshots', () => {
   test('node inspector view', async ({ page }) => {
     await page.getByTestId('node-main.tsx').click();
 
-    await expect(page.getByRole('heading', { name: 'Node Inspector' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'main.tsx' })).toBeVisible();
-    await expect(page.locator('h4', { hasText: 'Metrics' })).toBeVisible();
+    const inspectorTitle = page.getByRole('heading', { name: 'Node Inspector' });
+    await expect(inspectorTitle).toBeVisible();
+
+    const inspector = inspectorTitle.locator('..').locator('..');
+    await expect(inspector.getByRole('heading', { name: 'main.tsx' })).toBeVisible();
+    await expect(inspector.locator('h4', { hasText: 'Metrics' })).toBeVisible();
     await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Select Data Source' })).toBeHidden();
 
