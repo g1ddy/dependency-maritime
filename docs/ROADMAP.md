@@ -69,7 +69,7 @@ These are the unfinished delivery items previously tracked in [CLI.md](./CLI.md)
 ### CI adapter and public release
 
 - [x] Add a reusable GitHub Actions composite action built on the packed/published CLI artifact contract.
-- [x] Make CLI/action distribution self-contained for consumers with an exact prerelease CLI version selected by the action.
+- [ ] Publish the exact prerelease CLI selected by the action and pass the tag-triggered clean external consumer smoke test before declaring distribution self-contained.
 - [ ] Cut Catan Hex Mastery over from its hand-rolled Maritime orchestration to the shared action while preserving its Graphviz documentation and baseline-commit behavior.
 - [ ] Cut Crawler Command Interface over from its hand-rolled Maritime orchestration to the shared action while preserving its source-root, trigger, and baseline-commit behavior.
 - [ ] Remove the private/pre-release package state when release criteria are satisfied.
