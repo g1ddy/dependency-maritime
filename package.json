@@ -13,6 +13,10 @@
       "default": "./dist/cli/index.js"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/g1ddy/dependency-maritime.git"
+  },
   "engines": {
     "node": ">=20.19.0"
   },
