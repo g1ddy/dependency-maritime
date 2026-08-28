@@ -12,6 +12,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      cli-version: ${{ steps.version.outputs.cli-version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,12 +23,24 @@ jobs:
       - name: Use npm with Trusted Publishing support
         run: npm install --global npm@^11.5.1
       - run: npm ci
-      - run: npm run build:cli
-      - run: npm run test:cli-package
-      - name: Verify tag matches package version
+      - name: Resolve CLI version from tag
+        id: version
         shell: bash
         run: |
-          test "${GITHUB_REF_NAME#cli-v}" = "$(node -p "require('./package.json').version")"
+          set -euo pipefail
+          case "$GITHUB_REF_NAME" in
+            cli-v*) CLI_VERSION="${GITHUB_REF_NAME#cli-v}" ;;
+            *) echo "Unsupported CLI release tag: $GITHUB_REF_NAME" >&2; exit 1 ;;
+          esac
+
+          # npm validates SemVer and updates package.json + package-lock.json only
+          # in the release workspace. Version bumps are not committed to source.
+          npm version "$CLI_VERSION" --no-git-tag-version --allow-same-version
+          test "$(node -p "require('./package.json').version")" = "$CLI_VERSION"
+          echo "cli-version=$CLI_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Publishing @dependency-maritime/cli@$CLI_VERSION from $GITHUB_REF_NAME"
+      - run: npm run build:cli
+      - run: npm run test:cli-package
       - name: Publish immutable prerelease
         run: npm publish --tag prerelease --access public
 
@@ -34,6 +48,12 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout the exact released action revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          path: .action-source
+
       - name: Create clean external consumer fixture
         shell: bash
         run: |
@@ -50,9 +70,10 @@ jobs:
       - name: Install consumer dependencies
         run: npm install
 
-      - name: Analyze with published action and pinned default CLI
-        uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.1
+      - name: Analyze with released action and released CLI
+        uses: ./.action-source
         with:
+          cli-source: '@dependency-maritime/cli@${{ needs.publish.outputs.cli-version }}'
           source-roots: 'src lib'
           output-dir: '.maritime'
           upload-artifact: 'false'
