@@ -27,7 +27,10 @@ jobs:
         run: npm install
 
       - name: Analyze with published action and its default CLI
-        uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.3
+        # This manually dispatched diagnostic intentionally tracks the branch/SHA
+        # development fallback. Release acceptance runs from the pushed cli-v* tag
+        # in publish-cli-prerelease.yml instead of advancing this ref per release.
+        uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.1
         with:
           source-roots: 'src lib'
           output-dir: '.maritime'

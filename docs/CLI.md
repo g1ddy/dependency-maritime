@@ -193,10 +193,12 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 
 ### Usage Examples
 
-The action revision and CLI are deliberately coupled: this action installs the exact prerelease
-`@dependency-maritime/cli@0.1.0-beta.3`. It does not use `latest`, `prerelease`, or a semver range,
-so a pinned action ref cannot silently begin running a future incompatible CLI. Updating that exact
-version in `action.yml` is part of releasing a new action revision.
+Versioned action tags and development refs resolve differently. A `cli-vX.Y.Z[-pre]` tag is
+authoritative and makes the action install the matching exact `@dependency-maritime/cli@X.Y.Z[-pre]`
+version dynamically. A branch or commit SHA cannot encode a package version, so it retains the
+committed `@dependency-maritime/cli@0.1.0-beta.1` last-known-compatible development fallback. That
+fallback is not advanced for each release. Consumers pinning an unreleased action SHA may instead
+pair it explicitly with the compatible exact package through `cli-source`.
 
 #### Normal consumer workflow
 
@@ -234,13 +236,16 @@ package specifier or a packed tarball. This override is not part of normal consu
       cli-source: './dependency-maritime-cli-0.1.0-beta.3.tgz'
 ```
 
-The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. A
-`cli-vX.Y.Z` tag must match `package.json`; the workflow builds, exercises the packed-package
-contract, publishes the public package with npm provenance under the `prerelease` distribution tag,
-and then runs a clean external consumer job against the same immutable action tag. That consumer job
-does not check out, build, or pack Maritime and does not provide `cli-source`; it therefore proves
-the real registry-backed default acquisition path and verifies all four canonical `.maritime`
-artifacts. The action itself selects the full immutable CLI version rather than the distribution tag.
+The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. The
+`cli-vX.Y.Z[-pre]` tag is the release-version authority; the workflow stamps that version into
+`package.json` and `package-lock.json` only in its ephemeral release workspace, then builds,
+exercises the packed-package contract, and publishes with npm provenance under the `prerelease`
+distribution tag. For this feature, pushing `cli-v0.1.0-beta.3` therefore publishes beta.3 without
+committing a beta.3 package-version bump or changing the branch/SHA fallback. The workflow then
+checks out the exact released tag and runs a clean external consumer job without `cli-source`, so
+the tag-derived action resolution installs and exercises the just-published version while verifying
+all four canonical `.maritime` artifacts and the rendered graph. The action selects the full
+immutable CLI version rather than the distribution tag.
 
 #### Verification Evidence and Consumer Cutover
 
