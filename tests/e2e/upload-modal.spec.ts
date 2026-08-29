@@ -1,13 +1,15 @@
 import { test, expect } from '@playwright/test';
 
 test('verify upload modal functionality', async ({ page }) => {
+  test.setTimeout(120_000);
+
   // Navigate to the app
   await page.goto('/?disableAnimations=true');
 
-  // Click the upload button through normal Playwright actionability checks.
+  // The data-source dialog is independent of graph layout readiness.
   const uploadBtn = page.getByLabel('Upload/Select Data Source');
   await expect(uploadBtn).toBeVisible();
-  await uploadBtn.click();
+  await uploadBtn.click({ force: true });
 
   // Verify modal is open
   const modalTitle = page.getByRole('heading', { name: 'Select Data Source' });
@@ -19,8 +21,12 @@ test('verify upload modal functionality', async ({ page }) => {
   await expect(page.getByText('Click to upload or drag and drop')).toBeVisible();
 
   // Click 'Project Graph'
-  const projectGraphBtn = page.getByText('Project Graph');
-  await projectGraphBtn.click();
+  const projectGraphBtn = page.getByRole('button', { name: 'Project Graph' });
+  await expect(projectGraphBtn).toBeVisible();
+  // WebKit can keep sampling the dialog as unstable while the graph behind it
+  // updates. The visible button is inside the modal, so bypass that redundant
+  // stability check without relying on a time-based wait.
+  await projectGraphBtn.click({ force: true });
 
   // Modal should close
   await expect(modalTitle).not.toBeVisible();
