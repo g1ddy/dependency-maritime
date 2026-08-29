@@ -73,6 +73,10 @@ jobs:
       - name: Analyze with released action and released CLI
         uses: ./.action-source
         with:
+          # The action is invoked from a checked-out local path, so github.action_ref
+          # cannot be relied on to carry the cli-v* tag. Explicitly pair this exact
+          # released action source with the package version derived from that tag.
+          cli-source: '@dependency-maritime/cli@${{ needs.publish.outputs.cli-version }}'
           source-roots: 'src lib'
           output-dir: '.maritime'
           upload-artifact: 'false'
