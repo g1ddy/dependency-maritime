@@ -48,6 +48,21 @@ describe('composite action release tag resolution', () => {
         expect(actionYaml).toContain('@dependency-maritime/cli@0.1.0-beta.1');
     });
 
+    it('pairs the tag-triggered release smoke with the just-published CLI version', () => {
+        const workflow = fs.readFileSync(path.join(process.cwd(), '.github/workflows/publish-cli-prerelease.yml'), 'utf8');
+        expect(workflow).toContain("cli-source: '@dependency-maritime/cli@${{ needs.publish.outputs.cli-version }}'");
+        expect(workflow).toContain("render-graph: 'true'");
+        expect(workflow).toContain('test -f docs/images/dependency-graph.svg');
+    });
+
+    it('keeps the beta1 manual smoke within the beta1 action contract', () => {
+        const workflow = fs.readFileSync(path.join(process.cwd(), '.github/workflows/action-consumer-smoke.yml'), 'utf8');
+        expect(workflow).toContain('uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.1');
+        expect(workflow).not.toContain('render-graph:');
+        expect(workflow).not.toContain('graph-output:');
+        expect(workflow).not.toContain('dependency-graph.svg');
+    });
+
     it('derives the CLI package version from a cli-v action ref when cli-source is unset', () => {
         const actionYaml = fs.readFileSync(path.join(process.cwd(), 'action.yml'), 'utf8');
         const parsedAction: unknown = yaml.load(actionYaml);
