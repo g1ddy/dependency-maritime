@@ -1,6 +1,6 @@
 {
   "name": "@dependency-maritime/cli",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "type": "module",
   "main": "./dist/cli/index.js",
   "types": "./dist/cli/index.d.ts",
@@ -39,8 +39,7 @@
     "lint": "eslint .",
     "depcruise": "depcruise src --config config/.dependency-cruiser.cjs",
     "check:arch": "depcruise src --config config/.dependency-cruiser.cjs",
-    "generate:dot": "depcruise-fmt -T dot .maritime/dependency-graph.json > config/dependency-graph.dot",
-    "generate:graph": "dot -T svg config/dependency-graph.dot > docs/images/dependency-graph.svg && dot -T png config/dependency-graph.dot > docs/images/dependency-graph.png",
+    "generate:graph": "node dist/cli/main.js graph --input .maritime --output docs/images/dependency-graph.svg",
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest",

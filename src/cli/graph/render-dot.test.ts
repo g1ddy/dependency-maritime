@@ -1,0 +1,48 @@
+import { describe, expect, it } from 'vitest';
+import type { ICruiseResult, IDependency } from '../../schema/dependency-cruiser';
+import { externalPackageName, renderDependencyGraphToDot } from './render-dot';
+
+const dependency = (resolved: string, overrides: Partial<IDependency> = {}): IDependency => ({
+    circular: false, coreModule: false, couldNotResolve: false, dependencyTypes: ['local'],
+    dynamic: false, exoticallyRequired: false, followable: true, module: resolved,
+    moduleSystem: 'es6', resolved, valid: true, instability: 0, ...overrides
+});
+
+const graph = (): ICruiseResult => ({
+    modules: [
+        { source: 'app/domain/projection.ts', valid: true, dependents: [], dependencies: [dependency('app/domain/schema/timeline.ts')] },
+        { source: 'app/domain/schema/timeline.ts', valid: true, dependents: [], dependencies: [] },
+        { source: 'src/features/board/BoardLayer.tsx', valid: true, dependents: [], dependencies: [
+            dependency('node_modules/react/index.js', { module: 'react', dependencyTypes: ['npm'] }),
+            dependency('node_modules/@scope/pkg/dist/index.js', { module: '@scope/pkg', dependencyTypes: ['npm'], typeOnly: true })
+        ] },
+        { source: 'src/features/board/components/GameHex.tsx', valid: true, dependents: [], dependencies: [] },
+        { source: 'src/features/board/hooks/useBoardInteractions.ts', valid: true, dependents: [], dependencies: [] },
+        { source: 'tools/new-top-level.ts', valid: true, dependents: [], dependencies: [] },
+        { source: 'node_modules/react/index.js', valid: true, dependents: [], dependencies: [] }
+    ],
+    summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 7, violations: [], optionsUsed: {} }
+} as ICruiseResult);
+
+describe('renderDependencyGraphToDot', () => {
+    it('is deterministic and recursively renders roots, sibling files, and nested folders', () => {
+        const first = renderDependencyGraphToDot(graph());
+        expect(renderDependencyGraphToDot(graph())).toBe(first);
+        expect(first).toContain('"cluster:app/domain/schema"');
+        expect(first).toContain('"cluster:src/features/board/components"');
+        expect(first).toContain('"cluster:src/features/board/hooks"');
+        expect(first).toContain('"cluster:tools"');
+        expect(first).toContain('label="BoardLayer.tsx"');
+        expect(first).toContain('"local:app/domain/projection.ts" -> "local:app/domain/schema/timeline.ts"');
+    });
+
+    it('collapses unscoped and scoped packages and excludes node_modules folder clusters', () => {
+        const dot = renderDependencyGraphToDot(graph());
+        expect(dot).toContain('"external:react" [label="react"');
+        expect(dot).toContain('"external:@scope/pkg" [label="@scope/pkg"');
+        expect(dot).not.toContain('cluster:node_modules');
+        expect(dot).not.toContain('local:node_modules');
+        expect(dot).toContain('style="dashed"');
+        expect(externalPackageName('/repo/node_modules/@scope/pkg/lib/a.js')).toBe('@scope/pkg');
+    });
+});

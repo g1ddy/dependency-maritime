@@ -38,6 +38,14 @@ inputs:
     description: 'Name of the workflow artifact if upload-artifact is true.'
     required: false
     default: 'maritime-artifacts'
+  render-graph:
+    description: 'Whether to render the canonical dependency graph after successful analysis and validation.'
+    required: false
+    default: 'false'
+  graph-output:
+    description: 'Path for the derived Graphviz SVG when render-graph is true.'
+    required: false
+    default: 'docs/images/dependency-graph.svg'
 
 runs:
   using: 'composite'
@@ -58,7 +66,7 @@ runs:
         # Branch/commit refs cannot encode a package version, so retain the last
         # known compatible package as a development fallback. Versioned action
         # tags are authoritative: cli-vX.Y.Z[-pre] resolves to package X.Y.Z[-pre].
-        FALLBACK_CLI="@dependency-maritime/cli@0.1.0-beta.1"
+        FALLBACK_CLI="@dependency-maritime/cli@0.1.0-beta.2"
 
         if [ -n "${INPUT_CLI_SOURCE:-}" ]; then
           CLI_SRC="$INPUT_CLI_SOURCE"
@@ -133,9 +141,27 @@ runs:
         echo "Executing: $MARITIME_BIN validate $INPUT_OUTPUT_DIR"
         $MARITIME_BIN validate "$INPUT_OUTPUT_DIR"
 
+    - name: Install controlled Graphviz
+      if: ${{ inputs.render-graph == 'true' || inputs.render-graph == true }}
+      uses: ts-graphviz/setup-graphviz@b1de5da23ed0a6d14e0aeee8ed52fdd87af2363c # v2
+      with:
+        ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'
+
+    - name: Render Maritime Dependency Graph
+      if: ${{ inputs.render-graph == 'true' || inputs.render-graph == true }}
+      shell: bash
+      env:
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+        INPUT_GRAPH_OUTPUT: ${{ inputs.graph-output }}
+      run: |
+        echo "Executing: $MARITIME_BIN graph --input $INPUT_OUTPUT_DIR --output $INPUT_GRAPH_OUTPUT"
+        $MARITIME_BIN graph --input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT"
+
     - name: Upload Maritime Artifact Directory
       if: ${{ inputs.upload-artifact == 'true' || inputs.upload-artifact == true }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name }}
-        path: ${{ inputs.output-dir }}
+        path: |
+          ${{ inputs.output-dir }}
+          ${{ inputs.render-graph == 'true' && inputs.graph-output || '' }}

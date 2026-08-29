@@ -38,6 +38,15 @@ function isCompositeAction(value: unknown): value is CompositeAction {
 }
 
 describe('composite action release tag resolution', () => {
+    it('keeps rendering opt-in and resolves its input and output paths', () => {
+        const actionYaml = fs.readFileSync(path.join(process.cwd(), 'action.yml'), 'utf8');
+        const parsed = yaml.load(actionYaml) as { inputs: Record<string, { default?: string }> };
+        expect(parsed.inputs['render-graph']?.default).toBe('false');
+        expect(parsed.inputs['graph-output']?.default).toBe('docs/images/dependency-graph.svg');
+        expect(actionYaml).toContain('$MARITIME_BIN graph --input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT"');
+        expect(actionYaml).toContain("ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'");
+    });
+
     it('derives the CLI package version from a cli-v action ref when cli-source is unset', () => {
         const actionYaml = fs.readFileSync(path.join(process.cwd(), 'action.yml'), 'utf8');
         const parsedAction: unknown = yaml.load(actionYaml);

@@ -1,6 +1,7 @@
 import { parseArgs } from 'node:util';
 import { runAnalyzeCommand } from './commands/analyze';
 import { runValidateCommand } from './commands/validate';
+import { runGraphCommand } from './commands/graph';
 
 async function main() {
     const { positionals } = parseArgs({
@@ -19,9 +20,12 @@ async function main() {
         const args = process.argv.slice(3);
         const exitCode = await runValidateCommand(args);
         process.exit(exitCode);
+    } else if (command === 'graph') {
+        const exitCode = await runGraphCommand(process.argv.slice(3));
+        process.exit(exitCode);
     } else {
         console.error(`Unknown command: ${command || '(none)'}`);
-        console.error('Available commands: analyze, validate');
+        console.error('Available commands: analyze, validate, graph');
         process.exit(1);
     }
 }

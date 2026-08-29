@@ -192,7 +192,7 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 ### Usage Examples
 
 The action revision and CLI are deliberately coupled: this action installs the exact prerelease
-`@dependency-maritime/cli@0.1.0-beta.1`. It does not use `latest`, `prerelease`, or a semver range,
+`@dependency-maritime/cli@0.1.0-beta.2`. It does not use `latest`, `prerelease`, or a semver range,
 so a pinned action ref cannot silently begin running a future incompatible CLI. Updating that exact
 version in `action.yml` is part of releasing a new action revision.
 
@@ -229,7 +229,7 @@ package specifier or a packed tarball. This override is not part of normal consu
 ```yaml
     uses: g1ddy/dependency-maritime@<pinned-ref>
     with:
-      cli-source: './dependency-maritime-cli-0.1.0-beta.1.tgz'
+      cli-source: './dependency-maritime-cli-0.1.0-beta.2.tgz'
 ```
 
 The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. A
@@ -259,3 +259,46 @@ each repository can preserve its own trigger, baseline-commit, dependency-cruise
 - [Architecture](./ARCHITECTURE.md) — the boundary between the headless analyzer and the UI.
 - [Complexity and Health Metrics](./COMPLEXITY.md) — metric definitions and repository evidence.
 - [Development Guide](./DEVELOPMENT.md) — local setup and verification.
+
+## Supported graph rendering
+
+Render a presentation directly from existing canonical evidence:
+
+```bash
+maritime graph --input .maritime --output docs/images/dependency-graph.svg
+maritime graph --input .maritime/dependency-graph.json --output docs/images/dependency-graph.svg
+```
+
+`maritime graph` validates and reads `dependency-graph.json`; it never runs dependency-cruiser or a
+second structural scan. The JSON remains canonical machine-readable evidence, while SVG (or explicit
+DOT debug output) is derived presentation and must not be hand-edited. The exported pure
+`renderDependencyGraphToDot(graph)` function recursively derives directory clusters, preserves
+unfamiliar local paths, collapses `node_modules` paths to package nodes, deterministically sorts all
+output, and retains available dependency-kind, type-only, circular, and validity edge semantics.
+
+SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the npm package. The CLI
+reports an actionable error when it is missing. Maritime normalizes Graphviz's generator-version
+comment, but byte-for-byte SVG stability still depends on keeping the Graphviz version fixed.
+
+The composite action adds two optional inputs:
+
+| Input | Description | Default |
+| :--- | :--- | :--- |
+| `render-graph` | Render after successful analysis and validation | `'false'` |
+| `graph-output` | Derived SVG destination | `'docs/images/dependency-graph.svg'` |
+
+```yaml
+- uses: g1ddy/dependency-maritime@<pinned-ref>
+  with:
+    source-roots: 'app src'
+    output-dir: '.maritime'
+    render-graph: 'true'
+    graph-output: 'docs/images/dependency-graph.svg'
+```
+
+Rendering is opt-in. When enabled, the action provisions controlled Graphviz
+`2.42.2-9ubuntu0.1`, renders the newly generated graph, and includes the requested presentation in
+artifact upload behavior. It never commits consumer files. Generic test fixtures validate Maritime's
+own usage, Crawler Command Interface's deterministic external-package use case, and Catan Hex
+Mastery's recursive feature/component/hook hierarchy. Consumer repository migrations remain
+follow-up work.
