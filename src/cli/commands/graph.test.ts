@@ -41,7 +41,9 @@ describe('graph command', () => {
             summary: { totalFiles: 0, healthScore: 100, scannedCount: 0, skippedCount: 0 }
         }));
         expect(await runGraphCommand(['--cwd', dir, '--input', '.maritime', '--output', 'graph.dot'])).toBe(0);
-        expect(fs.readFileSync(path.join(dir, 'graph.dot'), 'utf8')).toContain('digraph "dependency-graph"');
+        const dot = fs.readFileSync(path.join(dir, 'graph.dot'), 'utf8');
+        expect(dot).toContain('digraph "dependency-graph"');
+        expect(dot).toContain('newrank="true"');
     });
 
     it('reports a missing Graphviz executable with an actionable error', async () => {
