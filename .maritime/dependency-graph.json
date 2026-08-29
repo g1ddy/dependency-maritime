@@ -1063,6 +1063,8 @@
         "src/features/visualization/store.ts",
         "src/features/visualization/logic/transformer.ts",
         "src/cli/analyze/adapters.ts",
+        "src/cli/commands/graph.ts",
+        "src/cli/graph/render-dot.ts",
         "src/cli/validate/validate.ts"
       ],
       "orphan": false
@@ -2398,8 +2400,8 @@
         "src/cli/analyze/parse-eslint.ts",
         "src/cli/analyze/render-markdown-report.ts",
         "src/cli/commands/analyze.ts",
-        "src/cli/commands/validate.ts",
         "src/cli/validate/validate.ts",
+        "src/cli/commands/validate.ts",
         "src/cli/index.ts"
       ],
       "orphan": false
@@ -2675,7 +2677,7 @@
       "orphan": false
     },
     {
-      "source": "src/cli/commands/validate.ts",
+      "source": "src/cli/commands/graph.ts",
       "valid": true,
       "dependencies": [
         {
@@ -2690,8 +2692,44 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "../analyze/models",
-          "resolved": "src/cli/analyze/models.ts",
+          "module": "../../schema/dependency-cruiser",
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../graph/render-dot",
+          "resolved": "src/cli/graph/render-dot.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../graph/render-graphviz",
+          "resolved": "src/cli/graph/render-graphviz.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2718,6 +2756,47 @@
       "dependents": [
         "src/cli/index.ts",
         "src/cli/main.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/graph/render-dot.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../../schema/dependency-cruiser",
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/commands/graph.ts",
+        "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/graph/render-graphviz.ts",
+      "valid": true,
+      "dependencies": [],
+      "dependents": [
+        "src/cli/commands/graph.ts",
+        "src/cli/index.ts"
       ],
       "orphan": false
     },
@@ -2799,8 +2878,56 @@
         }
       ],
       "dependents": [
+        "src/cli/commands/graph.ts",
         "src/cli/commands/validate.ts",
         "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/commands/validate.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../analyze/models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../validate/validate",
+          "resolved": "src/cli/validate/validate.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/index.ts",
+        "src/cli/main.ts"
       ],
       "orphan": false
     },
@@ -2964,8 +3091,62 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
+          "module": "./commands/graph",
+          "resolved": "src/cli/commands/graph.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
           "module": "./commands/validate",
           "resolved": "src/cli/commands/validate.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./graph/render-dot",
+          "resolved": "src/cli/graph/render-dot.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./graph/render-graphviz",
+          "resolved": "src/cli/graph/render-graphviz.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -3010,6 +3191,24 @@
           "moduleSystem": "es6",
           "module": "./commands/analyze",
           "resolved": "src/cli/commands/analyze.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./commands/graph",
+          "resolved": "src/cli/commands/graph.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -3225,12 +3424,12 @@
     "error": 0,
     "ignore": 0,
     "info": 0,
-    "totalCruised": 61,
-    "totalDependenciesCruised": 139,
+    "totalCruised": 64,
+    "totalDependenciesCruised": 148,
     "violations": [],
     "warn": 0,
     "optionsUsed": {
-      "baseDir": "/app",
+      "baseDir": "/home/runner/work/dependency-maritime/dependency-maritime",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "detectProcessBuiltinModuleCalls": false,

@@ -169,15 +169,15 @@
   },
   "src/schema/dependency-cruiser.ts": {
     "complexity": 1,
-    "loc": 105,
+    "loc": 110,
     "instability": 0,
-    "fanIn": 6,
+    "fanIn": 8,
     "fanOut": 0,
     "scanned": true
   },
   "src/features/visualization/components/DependencyGraph.tsx": {
     "complexity": 17,
-    "loc": 229,
+    "loc": 264,
     "instability": 0.86,
     "fanIn": 1,
     "fanOut": 6,
@@ -407,6 +407,38 @@
     "fanOut": 0,
     "scanned": true
   },
+  "src/cli/commands/graph.ts": {
+    "complexity": 12,
+    "loc": 61,
+    "instability": 0.67,
+    "fanIn": 2,
+    "fanOut": 4,
+    "scanned": true
+  },
+  "src/cli/graph/render-dot.ts": {
+    "complexity": 17,
+    "loc": 142,
+    "instability": 0.33,
+    "fanIn": 2,
+    "fanOut": 1,
+    "scanned": true
+  },
+  "src/cli/graph/render-graphviz.ts": {
+    "complexity": 3,
+    "loc": 37,
+    "instability": 0,
+    "fanIn": 2,
+    "fanOut": 0,
+    "scanned": true
+  },
+  "src/cli/validate/validate.ts": {
+    "complexity": 32,
+    "loc": 132,
+    "instability": 0.57,
+    "fanIn": 3,
+    "fanOut": 4,
+    "scanned": true
+  },
   "src/cli/commands/validate.ts": {
     "complexity": 9,
     "loc": 83,
@@ -415,28 +447,20 @@
     "fanOut": 2,
     "scanned": true
   },
-  "src/cli/validate/validate.ts": {
-    "complexity": 32,
-    "loc": 132,
-    "instability": 0.67,
-    "fanIn": 2,
-    "fanOut": 4,
-    "scanned": true
-  },
   "src/cli/index.ts": {
     "complexity": 11,
-    "loc": 85,
+    "loc": 88,
     "instability": 1,
     "fanIn": 0,
-    "fanOut": 10,
+    "fanOut": 13,
     "scanned": true
   },
   "src/cli/main.ts": {
-    "complexity": 4,
-    "loc": 49,
+    "complexity": 5,
+    "loc": 53,
     "instability": 1,
     "fanIn": 0,
-    "fanOut": 2,
+    "fanOut": 3,
     "scanned": true
   },
   "src/components/theme-provider.tsx": {
