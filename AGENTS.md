@@ -44,8 +44,8 @@ Read these documents before changing their corresponding areas:
   coverage.
 - `.github/workflows/cli-contract.yml` — build/package contract matrix.
 - `.github/workflows/ci.yml` — general CI and release-tagging path.
-- `.github/workflows/refactor_metrics.yml` — dogfoods the public CLI for refactor PRs, validates
-  `.maritime/`, and regenerates repository graph images from its graph artifact.
+- `.github/workflows/update-maritime-evidence.yml` — dogfoods the public CLI for refactor PRs, validates
+  `.maritime/`, and renders repository graph SVG presentation from its graph artifact.
 - `docs/images/` and existing graph image files — generated build artifacts. Regenerate them
   through the workflow/tooling; do not hand-edit image binaries.
 
@@ -102,7 +102,7 @@ node dist/cli/main.js validate .maritime
 - **dependency-cruiser changes:** preserve local-file scoping and consumer-config ownership.
   External packages and Node built-ins must not contaminate local metrics.
 - **Generated artifacts/workflows:** `.maritime/` is the sole canonical repository evidence bundle.
-  The UI Project Graph, Markdown hotspot report, DOT file, and generated graph images must derive from it.
+  The UI Project Graph, Markdown hotspot report, and generated SVG graph presentation must derive from it.
   Refactor evidence must run analysis with `--fail-on-unmeasured` and then run `maritime validate` before
   any automated commit.
 - **Roadmap changes:** mark only verified work complete. Keep browser ZIP archive upload and ESLint

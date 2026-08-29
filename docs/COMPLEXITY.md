@@ -7,7 +7,7 @@ Dependency Maritime produces the repository's authoritative complexity and hotsp
 - [Current dependency graph](../.maritime/dependency-graph.json)
 - [Artifact manifest](../.maritime/manifest.json)
 
-The refactor workflow rebuilds this bundle with the public CLI, requires complete measurement coverage, validates it, and then regenerates the DOT and graph images from the same graph artifact. Do not hand-edit or duplicate these generated values elsewhere in the repository.
+The repository-evidence workflow rebuilds this bundle with the public CLI, requires complete measurement coverage, validates it, and then renders the dependency graph SVG presentation (`docs/images/dependency-graph.svg`) from the same graph artifact. Do not hand-edit or duplicate these generated values elsewhere in the repository.
 
 ## Metrics
 
@@ -43,7 +43,6 @@ npm run build:cli
 node dist/cli/main.js analyze --source src --output .maritime \
   --depcruise-config config/.dependency-cruiser.cjs --fail-on-unmeasured
 node dist/cli/main.js validate .maritime
-npm run generate:dot
 npm run generate:graph
 ```
 

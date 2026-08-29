@@ -136,7 +136,7 @@ With Graphviz `dot` installed, render without performing a second analysis:
 maritime graph --input .maritime --output docs/images/dependency-graph.svg
 ```
 
-`.maritime/dependency-graph.json` is canonical evidence; SVG and DOT outputs are derived
+`.maritime/dependency-graph.json` is canonical evidence; SVG (and transient DOT) outputs are derived
 presentations. The composite Action's reproducible committed-SVG contract is limited to its pinned
 Ubuntu Graphviz path; other runners must provide and pin `dot` themselves because layout can vary
 between Graphviz versions.
