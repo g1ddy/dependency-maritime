@@ -1,8 +1,11 @@
 import { runAnalyzeCommand } from './commands/analyze';
 import { runValidateCommand } from './commands/validate';
+import { runGraphCommand } from './commands/graph';
 import { validateArtifacts } from './validate/validate';
 
-export { runAnalyzeCommand, runValidateCommand, validateArtifacts };
+export { runAnalyzeCommand, runValidateCommand, runGraphCommand, validateArtifacts };
+export { renderDependencyGraphToDot, inferGraphvizFormat } from './graph/render-dot';
+export { renderDotWithGraphviz, normalizeGraphvizSvg } from './graph/render-graphviz';
 export * from '../schema/manifest';
 export {
     readDependencyGraph,

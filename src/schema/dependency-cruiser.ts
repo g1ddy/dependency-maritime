@@ -102,3 +102,8 @@ export const CruiseResultSchema = z.object({
     optionsUsed: z.unknown(),
   }).passthrough(),
 }).passthrough();
+
+/** Canonical graph types guaranteed after Maritime schema validation. */
+export type MaritimeDependency = z.infer<typeof DependencySchema>;
+export type MaritimeModule = z.infer<typeof ModuleSchema>;
+export type MaritimeCruiseResult = z.infer<typeof CruiseResultSchema>;

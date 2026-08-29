@@ -26,7 +26,10 @@ jobs:
       - name: Install consumer dependencies
         run: npm install
 
-      - name: Analyze with published action and its default CLI
+      - name: Analyze with published development fallback
+        # This manually dispatched diagnostic intentionally exercises the stable
+        # development fallback action. Graph rendering is release-tested by the
+        # tag-triggered publish-cli-prerelease workflow once a graph-capable tag exists.
         uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.1
         with:
           source-roots: 'src lib'

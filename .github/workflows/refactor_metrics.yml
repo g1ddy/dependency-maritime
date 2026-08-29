@@ -26,9 +26,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Install Graphviz
-        uses: ts-graphviz/setup-graphviz@v2
-
       - name: Build CLI
         run: npm run build:cli
 
@@ -41,15 +38,11 @@ jobs:
           depcruise-config: 'config/.dependency-cruiser.cjs'
           fail-on-unmeasured: 'true'
           upload-artifact: 'false'
-
-      - name: Generate Dependency Graph (DOT)
-        run: npm run generate:dot
-
-      - name: Generate Graph Images
-        run: npm run generate:graph
+          render-graph: 'true'
+          graph-output: 'docs/images/dependency-graph.svg'
 
       - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "docs(metrics): update dependency graph and complexity report [skip ci]"
-          file_pattern: '.maritime/ docs/images/*.png docs/images/*.svg config/dependency-graph.dot'
+          file_pattern: '.maritime/ docs/images/dependency-graph.svg'

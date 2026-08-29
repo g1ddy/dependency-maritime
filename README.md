@@ -127,3 +127,16 @@ This project uses **npm** for package management. Please ensure you lock files a
 ## 📝 License
 
 Distributed under the MIT License.
+
+### Render existing graph evidence
+
+With Graphviz `dot` installed, render without performing a second analysis:
+
+```bash
+maritime graph --input .maritime --output docs/images/dependency-graph.svg
+```
+
+`.maritime/dependency-graph.json` is canonical evidence; SVG and DOT outputs are derived
+presentations. The composite Action's reproducible committed-SVG contract is limited to its pinned
+Ubuntu Graphviz path; other runners must provide and pin `dot` themselves because layout can vary
+between Graphviz versions.

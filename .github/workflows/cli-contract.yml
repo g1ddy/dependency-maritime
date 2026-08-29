@@ -7,6 +7,8 @@ on:
       - 'src/cli/**'
       - 'src/schema/**'
       - 'tests/cli-pack-smoke.test.ts'
+      - 'tests/action-ref-resolution.test.ts'
+      - 'action.yml'
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig.cli.json'
@@ -17,6 +19,8 @@ on:
       - 'src/cli/**'
       - 'src/schema/**'
       - 'tests/cli-pack-smoke.test.ts'
+      - 'tests/action-ref-resolution.test.ts'
+      - 'action.yml'
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig.cli.json'
@@ -51,3 +55,28 @@ jobs:
 
     - name: Verify packed CLI consumer contract
       run: npm run test:cli-package
+
+  composite-action-render:
+    name: Composite Action graph render smoke
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20.19.0'
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build:cli
+    - name: Exercise local composite Action render path
+      uses: ./
+      with:
+        cli-source: '.'
+        source-roots: 'src'
+        output-dir: '.maritime-action-smoke'
+        depcruise-config: 'config/.dependency-cruiser.cjs'
+        fail-on-unmeasured: 'true'
+        upload-artifact: 'false'
+        render-graph: 'true'
+        graph-output: 'docs/action-smoke/dependency-graph.svg'
+    - name: Verify rendered presentation exists
+      run: test -s docs/action-smoke/dependency-graph.svg

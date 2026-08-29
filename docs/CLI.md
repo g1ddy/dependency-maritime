@@ -188,13 +188,17 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 | `fail-on-unmeasured` | Strict measurement enforcement (fails if any implementation file is unmeasured) | `'true'` | No |
 | `upload-artifact` | Whether to upload the generated `.maritime` directory as a workflow artifact | `'true'` | No |
 | `artifact-name` | Name of the workflow artifact if `upload-artifact` is true | `'maritime-artifacts'` | No |
+| `render-graph` | Render the validated graph on the supported Ubuntu rendering path | `'false'` | No |
+| `graph-output` | Destination for the derived SVG | `'docs/images/dependency-graph.svg'` | No |
 
 ### Usage Examples
 
-The action revision and CLI are deliberately coupled: this action installs the exact prerelease
-`@dependency-maritime/cli@0.1.0-beta.1`. It does not use `latest`, `prerelease`, or a semver range,
-so a pinned action ref cannot silently begin running a future incompatible CLI. Updating that exact
-version in `action.yml` is part of releasing a new action revision.
+Versioned action tags and development refs resolve differently. A `cli-vX.Y.Z[-pre]` tag is
+authoritative and makes the action install the matching exact `@dependency-maritime/cli@X.Y.Z[-pre]`
+version dynamically. A branch or commit SHA cannot encode a package version, so it retains the
+committed `@dependency-maritime/cli@0.1.0-beta.1` last-known-compatible development fallback. That
+fallback is not advanced for each release. Consumers pinning an unreleased action SHA may instead
+pair it explicitly with the compatible exact package through `cli-source`.
 
 #### Normal consumer workflow
 
@@ -229,16 +233,19 @@ package specifier or a packed tarball. This override is not part of normal consu
 ```yaml
     uses: g1ddy/dependency-maritime@<pinned-ref>
     with:
-      cli-source: './dependency-maritime-cli-0.1.0-beta.1.tgz'
+      cli-source: './dependency-maritime-cli-0.1.0-beta.3.tgz'
 ```
 
-The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. A
-`cli-vX.Y.Z` tag must match `package.json`; the workflow builds, exercises the packed-package
-contract, publishes the public package with npm provenance under the `prerelease` distribution tag,
-and then runs a clean external consumer job against the same immutable action tag. That consumer job
-does not check out, build, or pack Maritime and does not provide `cli-source`; it therefore proves
-the real registry-backed default acquisition path and verifies all four canonical `.maritime`
-artifacts. The action itself selects the full immutable CLI version rather than the distribution tag.
+The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. The
+`cli-vX.Y.Z[-pre]` tag is the release-version authority; the workflow stamps that version into
+`package.json` and `package-lock.json` only in its ephemeral release workspace, then builds,
+exercises the packed-package contract, and publishes with npm provenance under the `prerelease`
+distribution tag. For this feature, pushing `cli-v0.1.0-beta.3` therefore publishes beta.3 without
+committing a beta.3 package-version bump or changing the branch/SHA fallback. The workflow then
+checks out the exact released tag and runs a clean external consumer job without `cli-source`, so
+the tag-derived action resolution installs and exercises the just-published version while verifying
+all four canonical `.maritime` artifacts and the rendered graph. The action selects the full
+immutable CLI version rather than the distribution tag.
 
 #### Verification Evidence and Consumer Cutover
 
@@ -259,3 +266,51 @@ each repository can preserve its own trigger, baseline-commit, dependency-cruise
 - [Architecture](./ARCHITECTURE.md) — the boundary between the headless analyzer and the UI.
 - [Complexity and Health Metrics](./COMPLEXITY.md) — metric definitions and repository evidence.
 - [Development Guide](./DEVELOPMENT.md) — local setup and verification.
+
+## Supported graph rendering
+
+Render a presentation directly from existing canonical evidence:
+
+```bash
+maritime graph --input .maritime --output docs/images/dependency-graph.svg
+maritime graph --input .maritime/dependency-graph.json --output docs/images/dependency-graph.svg
+```
+
+For an artifact-directory input, `maritime graph` validates the bundle and reads the graph path
+declared by `manifest.json`; an explicit JSON input is also supported. It never runs
+dependency-cruiser or a second structural scan. The JSON remains canonical machine-readable evidence, while SVG (or explicit
+DOT debug output) is derived presentation and must not be hand-edited. The exported pure
+`renderDependencyGraphToDot(graph)` function recursively derives directory clusters, preserves
+unfamiliar local paths, collapses `node_modules` paths to package nodes, deterministically sorts all
+output, and retains available dependency-kind, type-only, circular, and validity edge semantics.
+
+SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the npm package. The CLI
+reports an actionable error when it is missing. Maritime normalizes Graphviz's generator-version
+comment, but byte-for-byte SVG stability still depends on keeping the Graphviz version fixed.
+
+The composite action adds two optional inputs:
+
+| Input | Description | Default |
+| :--- | :--- | :--- |
+| `render-graph` | Render after successful analysis and validation | `'false'` |
+| `graph-output` | Derived SVG destination | `'docs/images/dependency-graph.svg'` |
+
+```yaml
+- uses: g1ddy/dependency-maritime@<pinned-ref>
+  with:
+    source-roots: 'app src'
+    output-dir: '.maritime'
+    render-graph: 'true'
+    graph-output: 'docs/images/dependency-graph.svg'
+```
+
+Rendering is opt-in. The supported reproducible path is `ubuntu-latest`, where the action requests
+Graphviz `2.42.2-9ubuntu0.1`; identical Graphviz selection and byte-for-byte committed SVG output are
+not guaranteed on macOS or Windows runners. The SHA-pinned `ts-graphviz/setup-graphviz@v2` step
+currently runs on GitHub's deprecated Node 20 Actions runtime (GitHub forces Node 24 and emits a
+warning), so this setup mechanism is not presented as a long-term cross-runner portability guarantee.
+The action renders the newly generated graph and includes the requested presentation in artifact
+upload behavior. It never commits consumer files. Generic test fixtures validate Maritime's
+own usage, Crawler Command Interface's deterministic external-package use case, and Catan Hex
+Mastery's recursive feature/component/hook hierarchy. Consumer repository migrations remain
+follow-up work.

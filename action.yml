@@ -38,6 +38,14 @@ inputs:
     description: 'Name of the workflow artifact if upload-artifact is true.'
     required: false
     default: 'maritime-artifacts'
+  render-graph:
+    description: 'Whether to render the canonical dependency graph after successful analysis and validation. Reproducible committed SVG output is supported on Ubuntu runners.'
+    required: false
+    default: 'false'
+  graph-output:
+    description: 'Path for the derived Graphviz SVG when render-graph is true.'
+    required: false
+    default: 'docs/images/dependency-graph.svg'
 
 runs:
   using: 'composite'
@@ -62,7 +70,7 @@ runs:
 
         if [ -n "${INPUT_CLI_SOURCE:-}" ]; then
           CLI_SRC="$INPUT_CLI_SOURCE"
-        elif [ "${npm_lifecycle_event:-}" = "test:cli-package" ] && [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
+        elif [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
           CLI_SRC="$MARITIME_CLI_TEST_SOURCE"
         elif [[ "${ACTION_REF:-}" == cli-v* ]]; then
           CLI_VERSION="${ACTION_REF#cli-v}"
@@ -133,9 +141,30 @@ runs:
         echo "Executing: $MARITIME_BIN validate $INPUT_OUTPUT_DIR"
         $MARITIME_BIN validate "$INPUT_OUTPUT_DIR"
 
+    - name: Install controlled Graphviz
+      if: ${{ inputs.render-graph == 'true' || inputs.render-graph == true }}
+      uses: ts-graphviz/setup-graphviz@b1de5da23ed0a6d14e0aeee8ed52fdd87af2363c # v2
+      with:
+        # Maritime's deterministic committed-SVG contract is the Ubuntu runner path.
+        # setup-graphviz v2 currently emits GitHub's deprecated Node 20 runtime warning;
+        # this pin is retained until an audited successor is available.
+        ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'
+
+    - name: Render Maritime Dependency Graph
+      if: ${{ inputs.render-graph == 'true' || inputs.render-graph == true }}
+      shell: bash
+      env:
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+        INPUT_GRAPH_OUTPUT: ${{ inputs.graph-output }}
+      run: |
+        echo "Executing: $MARITIME_BIN graph --input $INPUT_OUTPUT_DIR --output $INPUT_GRAPH_OUTPUT"
+        $MARITIME_BIN graph --input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT"
+
     - name: Upload Maritime Artifact Directory
       if: ${{ inputs.upload-artifact == 'true' || inputs.upload-artifact == true }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name }}
-        path: ${{ inputs.output-dir }}
+        path: |
+          ${{ inputs.output-dir }}
+          ${{ inputs.render-graph == 'true' && inputs.graph-output || '' }}

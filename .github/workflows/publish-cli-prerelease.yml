@@ -73,10 +73,15 @@ jobs:
       - name: Analyze with released action and released CLI
         uses: ./.action-source
         with:
+          # The action is invoked from a checked-out local path, so github.action_ref
+          # cannot be relied on to carry the cli-v* tag. Explicitly pair this exact
+          # released action source with the package version derived from that tag.
           cli-source: '@dependency-maritime/cli@${{ needs.publish.outputs.cli-version }}'
           source-roots: 'src lib'
           output-dir: '.maritime'
           upload-artifact: 'false'
+          render-graph: 'true'
+          graph-output: 'docs/images/dependency-graph.svg'
 
       - name: Verify canonical bundle
         shell: bash
@@ -85,3 +90,4 @@ jobs:
           test -f .maritime/complexity-metrics.json
           test -f .maritime/complexity-report.md
           test -f .maritime/manifest.json
+          test -f docs/images/dependency-graph.svg
