@@ -10,11 +10,38 @@ describe('graph command', () => {
 
     it('accepts an artifact directory and rejects malformed canonical evidence clearly', async () => {
         const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-graph-')); dirs.push(dir);
-        fs.mkdirSync(path.join(dir, '.maritime'));
-        fs.writeFileSync(path.join(dir, '.maritime', 'dependency-graph.json'), '{}');
+        const artifactDir = path.join(dir, '.maritime');
+        fs.mkdirSync(artifactDir);
+        fs.writeFileSync(path.join(artifactDir, 'dependency-graph.json'), '{}');
+        fs.writeFileSync(path.join(artifactDir, 'complexity-metrics.json'), '{}');
+        fs.writeFileSync(path.join(artifactDir, 'complexity-report.md'), '# Report');
+        fs.writeFileSync(path.join(artifactDir, 'manifest.json'), JSON.stringify({
+            schemaVersion: '1.0.0', toolVersion: 'test', generatedAt: '2026-01-01T00:00:00.000Z',
+            sourceRoots: ['src'], artifacts: { graph: 'dependency-graph.json', metrics: 'complexity-metrics.json', report: 'complexity-report.md' },
+            summary: { totalFiles: 0, healthScore: 100, scannedCount: 0, skippedCount: 0 }
+        }));
         const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         expect(await runGraphCommand(['--cwd', dir, '--input', '.maritime', '--output', 'graph.dot'])).toBe(2);
-        expect(error.mock.calls.flat().join(' ')).toContain('Invalid Maritime dependency graph');
+        expect(error.mock.calls.flat().join(' ')).toContain('Invalid dependency-cruiser graph schema');
+    });
+
+    it('renders the graph path declared by a validated artifact manifest', async () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-graph-')); dirs.push(dir);
+        const artifactDir = path.join(dir, '.maritime');
+        fs.mkdirSync(artifactDir);
+        const validGraph = { modules: [], summary: {
+            error: 0, ignore: 0, info: 0, totalCruised: 0, violations: [], warn: 0, optionsUsed: {}
+        }};
+        fs.writeFileSync(path.join(artifactDir, 'custom.json'), JSON.stringify(validGraph));
+        fs.writeFileSync(path.join(artifactDir, 'complexity-metrics.json'), '{}');
+        fs.writeFileSync(path.join(artifactDir, 'complexity-report.md'), '# Report');
+        fs.writeFileSync(path.join(artifactDir, 'manifest.json'), JSON.stringify({
+            schemaVersion: '1.0.0', toolVersion: 'test', generatedAt: '2026-01-01T00:00:00.000Z',
+            sourceRoots: ['src'], artifacts: { graph: 'custom.json', metrics: 'complexity-metrics.json', report: 'complexity-report.md' },
+            summary: { totalFiles: 0, healthScore: 100, scannedCount: 0, skippedCount: 0 }
+        }));
+        expect(await runGraphCommand(['--cwd', dir, '--input', '.maritime', '--output', 'graph.dot'])).toBe(0);
+        expect(fs.readFileSync(path.join(dir, 'graph.dot'), 'utf8')).toContain('digraph "dependency-graph"');
     });
 
     it('reports a missing Graphviz executable with an actionable error', async () => {

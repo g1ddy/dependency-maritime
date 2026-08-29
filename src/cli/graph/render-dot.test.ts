@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import type { ICruiseResult, IDependency } from '../../schema/dependency-cruiser';
+import type { MaritimeCruiseResult, MaritimeDependency } from '../../schema/dependency-cruiser';
 import { externalPackageName, renderDependencyGraphToDot } from './render-dot';
 
-const dependency = (resolved: string, overrides: Partial<IDependency> = {}): IDependency => ({
+const dependency = (resolved: string, overrides: Partial<MaritimeDependency> = {}): MaritimeDependency => ({
     circular: false, coreModule: false, couldNotResolve: false, dependencyTypes: ['local'],
     dynamic: false, exoticallyRequired: false, followable: true, module: resolved,
     moduleSystem: 'es6', resolved, valid: true, instability: 0, ...overrides
 });
 
-const graph = (): ICruiseResult => ({
+const graph = (): MaritimeCruiseResult => ({
     modules: [
         { source: 'app/domain/projection.ts', valid: true, dependents: [], dependencies: [dependency('app/domain/schema/timeline.ts')] },
         { source: 'app/domain/schema/timeline.ts', valid: true, dependents: [], dependencies: [] },
@@ -22,7 +22,7 @@ const graph = (): ICruiseResult => ({
         { source: 'node_modules/react/index.js', valid: true, dependents: [], dependencies: [] }
     ],
     summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 7, violations: [], optionsUsed: {} }
-} as ICruiseResult);
+});
 
 describe('renderDependencyGraphToDot', () => {
     it('is deterministic and recursively renders roots, sibling files, and nested folders', () => {
@@ -44,5 +44,19 @@ describe('renderDependencyGraphToDot', () => {
         expect(dot).not.toContain('local:node_modules');
         expect(dot).toContain('style="dashed"');
         expect(externalPackageName('/repo/node_modules/@scope/pkg/lib/a.js')).toBe('@scope/pkg');
+    });
+
+    it('keeps circular and invalid edge semantics visible without duplicate attributes', () => {
+        const fixture = graph();
+        fixture.modules[0].dependencies[0] = dependency('app/domain/schema/timeline.ts', {
+            circular: true,
+            valid: false
+        });
+        const edge = renderDependencyGraphToDot(fixture).split('\n').find(line => line.includes('projection.ts" ->'));
+        expect(edge).toContain('color="#d97706"');
+        expect(edge).toContain('xlabel="invalid"');
+        expect(edge).toContain('fontcolor="#dc2626"');
+        expect(edge?.match(/color=/g)).toHaveLength(2);
+        expect(edge?.match(/penwidth=/g)).toHaveLength(1);
     });
 });

@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import type { ICruiseResult, IDependency } from '../../schema/dependency-cruiser';
+import type { MaritimeCruiseResult, MaritimeDependency } from '../../schema/dependency-cruiser';
 
 type DirectoryNode = {
     directories: Map<string, DirectoryNode>;
@@ -57,18 +57,21 @@ function renderDirectory(directory: DirectoryNode, segments: string[], indent: s
     return lines;
 }
 
-function edgeAttributes(dependency: IDependency): string {
+function edgeAttributes(dependency: MaritimeDependency): string {
     const attributes: string[] = [];
     const dependencyTypes = [...dependency.dependencyTypes].sort();
     if (dependencyTypes.length > 0) attributes.push(`label=${dotQuote(dependencyTypes.join(', '))}`);
     if (dependency.typeOnly || dependency.preCompilationOnly) attributes.push('style="dashed"');
     if (dependency.circular) attributes.push('color="#d97706"', 'penwidth="2"');
-    if (!dependency.valid) attributes.push('color="#dc2626"', 'penwidth="2"');
+    if (!dependency.valid) {
+        if (dependency.circular) attributes.push('xlabel="invalid"', 'fontcolor="#dc2626"');
+        else attributes.push('color="#dc2626"', 'penwidth="2"');
+    }
     return attributes.length > 0 ? ` [${attributes.join(', ')}]` : '';
 }
 
 /** Pure, deterministic conversion of a validated dependency-cruiser result to Graphviz DOT. */
-export function renderDependencyGraphToDot(graph: ICruiseResult): string {
+export function renderDependencyGraphToDot(graph: MaritimeCruiseResult): string {
     const root: DirectoryNode = { directories: new Map(), files: [] };
     const localSources = new Set<string>();
     const externalPackages = new Set<string>();
@@ -80,7 +83,7 @@ export function renderDependencyGraphToDot(graph: ICruiseResult): string {
         addLocalModule(root, source);
     }
 
-    const edges: Array<{ from: string; to: string; dependency: IDependency }> = [];
+    const edges: Array<{ from: string; to: string; dependency: MaritimeDependency }> = [];
     for (const module of [...graph.modules].sort((a, b) => a.source.localeCompare(b.source))) {
         const source = normalizedPath(module.source);
         if (!localSources.has(source)) continue;

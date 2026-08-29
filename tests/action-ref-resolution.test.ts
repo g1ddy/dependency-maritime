@@ -45,6 +45,7 @@ describe('composite action release tag resolution', () => {
         expect(parsed.inputs['graph-output']?.default).toBe('docs/images/dependency-graph.svg');
         expect(actionYaml).toContain('$MARITIME_BIN graph --input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT"');
         expect(actionYaml).toContain("ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'");
+        expect(actionYaml).toContain('@dependency-maritime/cli@0.1.0-beta.3');
     });
 
     it('derives the CLI package version from a cli-v action ref when cli-source is unset', () => {

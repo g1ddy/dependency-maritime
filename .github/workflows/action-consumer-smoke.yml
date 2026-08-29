@@ -27,11 +27,13 @@ jobs:
         run: npm install
 
       - name: Analyze with published action and its default CLI
-        uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.2
+        uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.3
         with:
           source-roots: 'src lib'
           output-dir: '.maritime'
           upload-artifact: 'false'
+          render-graph: 'true'
+          graph-output: 'docs/images/dependency-graph.svg'
 
       - name: Verify canonical bundle
         shell: bash
@@ -40,3 +42,4 @@ jobs:
           test -f .maritime/complexity-metrics.json
           test -f .maritime/complexity-report.md
           test -f .maritime/manifest.json
+          test -f docs/images/dependency-graph.svg

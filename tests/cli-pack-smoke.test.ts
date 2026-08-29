@@ -828,7 +828,7 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(actionContent).toContain('analyze');
         expect(actionContent).toContain('validate');
         expect(actionContent).toContain('actions/upload-artifact');
-        expect(actionContent).toContain('@dependency-maritime/cli@0.1.0-beta.2');
+        expect(actionContent).toContain('@dependency-maritime/cli@0.1.0-beta.3');
         expect(actionContent).toContain("default: ''");
     });
 

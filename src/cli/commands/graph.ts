@@ -2,9 +2,9 @@ import { parseArgs } from 'node:util';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { CruiseResultSchema } from '../../schema/dependency-cruiser';
-import type { ICruiseResult } from '../../schema/dependency-cruiser';
 import { inferGraphvizFormat, renderDependencyGraphToDot } from '../graph/render-dot';
 import { renderDotWithGraphviz } from '../graph/render-graphviz';
+import { validateArtifacts } from '../validate/validate';
 
 export async function runGraphCommand(args: string[]): Promise<number> {
     let values: { input?: string; output?: string; cwd?: string; help?: boolean };
@@ -40,11 +40,13 @@ Options:
     const output = path.resolve(cwd, values.output);
     try {
         const stat = await fs.stat(input);
-        const graphPath = stat.isDirectory() ? path.join(input, 'dependency-graph.json') : input;
+        const graphPath = stat.isDirectory()
+            ? path.resolve(input, (await validateArtifacts({ artifactDir: input, cwd })).manifest.artifacts.graph)
+            : input;
         const parsed: unknown = JSON.parse(await fs.readFile(graphPath, 'utf8'));
         const result = CruiseResultSchema.safeParse(parsed);
         if (!result.success) throw new Error(`Invalid Maritime dependency graph: ${result.error.message}`);
-        const dot = renderDependencyGraphToDot(result.data as unknown as ICruiseResult);
+        const dot = renderDependencyGraphToDot(result.data);
         const format = inferGraphvizFormat(output);
         await fs.mkdir(path.dirname(output), { recursive: true });
         if (format === 'dot') await fs.writeFile(output, dot);

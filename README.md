@@ -137,4 +137,6 @@ maritime graph --input .maritime --output docs/images/dependency-graph.svg
 ```
 
 `.maritime/dependency-graph.json` is canonical evidence; SVG and DOT outputs are derived
-presentations. Pin Graphviz when committing SVG because layout can vary between versions.
+presentations. The composite Action's reproducible committed-SVG contract is limited to its pinned
+Ubuntu Graphviz path; other runners must provide and pin `dot` themselves because layout can vary
+between Graphviz versions.
