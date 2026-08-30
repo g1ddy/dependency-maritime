@@ -77,6 +77,14 @@ describe('renderDependencyGraphToDot', () => {
         expect(renderDependencyGraphToDot(graph(), { edgeLabels: 'none' })).not.toContain('[label="local"]');
     });
 
+    it('retains defaults when optional presentation values are explicitly undefined', () => {
+        expect(renderDependencyGraphToDot(graph(), {
+            externalPackages: undefined,
+            folderGrouping: undefined,
+            edgeLabels: undefined
+        })).toBe(renderDependencyGraphToDot(graph()));
+    });
+
     it('keeps circular and invalid edge semantics visible without duplicate attributes', () => {
         const fixture = graph();
         fixture.modules[0].dependencies[0] = dependency('app/domain/schema/timeline.ts', {

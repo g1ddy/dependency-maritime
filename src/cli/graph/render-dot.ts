@@ -91,7 +91,11 @@ function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMo
 
 /** Pure, deterministic conversion of a validated dependency-cruiser result to Graphviz DOT. */
 export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options: GraphPresentationOptions = {}): string {
-    const presentation = { ...DEFAULT_GRAPH_PRESENTATION, ...options };
+    const presentation = {
+        externalPackages: options.externalPackages ?? DEFAULT_GRAPH_PRESENTATION.externalPackages,
+        folderGrouping: options.folderGrouping ?? DEFAULT_GRAPH_PRESENTATION.folderGrouping,
+        edgeLabels: options.edgeLabels ?? DEFAULT_GRAPH_PRESENTATION.edgeLabels
+    };
     const root: DirectoryNode = { directories: new Map(), files: [] };
     const localSources = new Set<string>();
     const externalPackages = new Set<string>();
