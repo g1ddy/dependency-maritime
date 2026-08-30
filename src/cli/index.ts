@@ -4,7 +4,8 @@ import { runGraphCommand } from './commands/graph';
 import { validateArtifacts } from './validate/validate';
 
 export { runAnalyzeCommand, runValidateCommand, runGraphCommand, validateArtifacts };
-export { renderDependencyGraphToDot, inferGraphvizFormat } from './graph/render-dot';
+export { renderDependencyGraphToDot, inferGraphvizFormat, DEFAULT_GRAPH_PRESENTATION, EXTERNAL_PACKAGE_MODES, FOLDER_GROUPING_MODES, EDGE_LABEL_MODES } from './graph/render-dot';
+export type { GraphPresentationOptions, ExternalPackagesMode, FolderGroupingMode, EdgeLabelsMode } from './graph/render-dot';
 export { renderDotWithGraphviz, normalizeGraphvizSvg } from './graph/render-graphviz';
 export * from '../schema/manifest';
 export {

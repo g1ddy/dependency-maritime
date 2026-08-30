@@ -67,5 +67,8 @@ jobs:
         upload-artifact: 'false'
         render-graph: 'true'
         graph-output: 'docs/action-smoke/dependency-graph.svg'
+        external-packages: 'none'
+        folder-grouping: 'top-level'
+        edge-labels: 'none'
     - name: Verify rendered presentation exists
       run: test -s docs/action-smoke/dependency-graph.svg

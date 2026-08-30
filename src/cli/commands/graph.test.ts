@@ -59,4 +59,14 @@ describe('graph command', () => {
         } finally { process.env.PATH = oldPath; }
         expect(error.mock.calls.flat().join(' ')).toContain('Install Graphviz');
     });
+
+    it.each([
+        ['--external-packages', 'everything', 'none, summary, direct'],
+        ['--folder-grouping', 'deep', 'none, top-level, nested'],
+        ['--edge-labels', 'names', 'none, types']
+    ])('rejects invalid %s values clearly', async (flag, value, allowed) => {
+        const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        expect(await runGraphCommand(['--output', 'graph.dot', flag, value])).toBe(2);
+        expect(error.mock.calls.flat().join(' ')).toContain(`Expected one of: ${allowed}`);
+    });
 });

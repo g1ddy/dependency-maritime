@@ -134,9 +134,16 @@ With Graphviz `dot` installed, render without performing a second analysis:
 
 ```bash
 maritime graph --input .maritime --output docs/images/dependency-graph.svg
+maritime graph --input .maritime --output docs/images/architecture.svg \
+  --external-packages none --folder-grouping nested --edge-labels none
 ```
 
 `.maritime/dependency-graph.json` is canonical evidence; SVG (and transient DOT) outputs are derived
 presentations. The composite Action's reproducible committed-SVG contract is limited to its pinned
 Ubuntu Graphviz path; other runners must provide and pin `dot` themselves because layout can vary
 between Graphviz versions.
+
+The rendering flags are presentation-only: `--external-packages` accepts `none`, `summary`, or
+`direct`; `--folder-grouping` accepts `none`, `top-level`, or `nested`; and `--edge-labels` accepts
+`none` or `types`. Defaults (`direct`, `nested`, `types`) preserve existing output. The canonical
+`.maritime/dependency-graph.json` stays complete and is never rescanned or rewritten.
