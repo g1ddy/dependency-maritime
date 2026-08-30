@@ -6,10 +6,9 @@ test('verify upload modal functionality', async ({ page }) => {
   // Navigate to the app
   await page.goto('/?disableAnimations=true');
 
-  // The data-source dialog is independent of graph layout readiness.
   const uploadBtn = page.getByLabel('Upload/Select Data Source');
   await expect(uploadBtn).toBeVisible();
-  await uploadBtn.click({ force: true });
+  await uploadBtn.click();
 
   // Verify modal is open
   const modalTitle = page.getByRole('heading', { name: 'Select Data Source' });
@@ -23,10 +22,7 @@ test('verify upload modal functionality', async ({ page }) => {
   // Click 'Project Graph'
   const projectGraphBtn = page.getByRole('button', { name: 'Project Graph' });
   await expect(projectGraphBtn).toBeVisible();
-  // WebKit can keep sampling the dialog as unstable while the graph behind it
-  // updates. The visible button is inside the modal, so bypass that redundant
-  // stability check without relying on a time-based wait.
-  await projectGraphBtn.click({ force: true });
+  await projectGraphBtn.click();
 
   // Modal should close
   await expect(modalTitle).not.toBeVisible();
