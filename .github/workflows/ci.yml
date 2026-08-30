@@ -13,7 +13,13 @@ permissions:
   contents: read
 
 jobs:
+  cli-contract:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cli-contract.yml
+
   build-and-test:
+    needs: cli-contract
+    if: always() && (needs.cli-contract.result == 'success' || needs.cli-contract.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: write
