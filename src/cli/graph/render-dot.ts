@@ -112,7 +112,11 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult): string 
 
     const lines = [
         'digraph "dependency-graph" {',
-        '  graph [compound="true", rankdir="LR", fontname="Helvetica"];',
+        // Graphviz 2.42 can fail init_rank when the default cluster-local ranker
+        // encounters a large recursively nested directory hierarchy. newrank asks
+        // dot to compute one global ranking across clusters while preserving the
+        // cluster boxes and deterministic left-to-right presentation.
+        '  graph [compound="true", newrank="true", rankdir="LR", fontname="Helvetica"];',
         '  node [fontname="Helvetica", fontsize="10"];',
         '  edge [fontname="Helvetica", fontsize="8"];',
         ...renderDirectory(root, [], '  ')

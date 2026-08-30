@@ -47,7 +47,9 @@ jobs:
         run: npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        # The configured projects use Chromium (desktop/mobile) and WebKit
+        # (Mobile Safari). Avoid downloading unused Firefox binaries on every run.
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Build App
         run: npm run build

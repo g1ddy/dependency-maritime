@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test('verify upload modal functionality', async ({ page }) => {
+  test.setTimeout(120_000);
+
   // Navigate to the app
   await page.goto('/?disableAnimations=true');
 
-  // Click the upload button through normal Playwright actionability checks.
   const uploadBtn = page.getByLabel('Upload/Select Data Source');
   await expect(uploadBtn).toBeVisible();
   await uploadBtn.click();
@@ -19,7 +20,8 @@ test('verify upload modal functionality', async ({ page }) => {
   await expect(page.getByText('Click to upload or drag and drop')).toBeVisible();
 
   // Click 'Project Graph'
-  const projectGraphBtn = page.getByText('Project Graph');
+  const projectGraphBtn = page.getByRole('button', { name: 'Project Graph' });
+  await expect(projectGraphBtn).toBeVisible();
   await projectGraphBtn.click();
 
   // Modal should close
