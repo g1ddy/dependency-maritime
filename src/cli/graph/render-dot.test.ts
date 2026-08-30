@@ -46,6 +46,45 @@ describe('renderDependencyGraphToDot', () => {
         expect(externalPackageName('/repo/node_modules/@scope/pkg/lib/a.js')).toBe('@scope/pkg');
     });
 
+    it('supports none, summary, and direct external-package policies deterministically', () => {
+        const none = renderDependencyGraphToDot(graph(), { externalPackages: 'none' });
+        expect(none).not.toContain('external:');
+        const summary = renderDependencyGraphToDot(graph(), { externalPackages: 'summary' });
+        expect(summary.match(/\[label="External packages"/g)).toHaveLength(1);
+        expect(summary).toContain('-> "external:boundary"');
+        expect(summary).not.toContain('external:react');
+        const direct = renderDependencyGraphToDot(graph(), { externalPackages: 'direct' });
+        expect(direct).toContain('external:react');
+        expect(direct).toContain('external:@scope/pkg');
+        for (const externalPackages of ['none', 'summary', 'direct'] as const) {
+            expect(renderDependencyGraphToDot(graph(), { externalPackages })).toBe(renderDependencyGraphToDot(graph(), { externalPackages }));
+        }
+    });
+
+    it('supports flat, top-level, and nested local folder grouping', () => {
+        const flat = renderDependencyGraphToDot(graph(), { folderGrouping: 'none' });
+        expect(flat).not.toContain('subgraph "cluster:app');
+        const top = renderDependencyGraphToDot(graph(), { folderGrouping: 'top-level' });
+        expect(top).toContain('"cluster:app"');
+        expect(top).toContain('"cluster:src"');
+        expect(top).not.toContain('"cluster:app/domain"');
+        const nested = renderDependencyGraphToDot(graph(), { folderGrouping: 'nested' });
+        expect(nested).toContain('"cluster:app/domain/schema"');
+    });
+
+    it('defaults to type labels and can omit only dependency-type labels', () => {
+        expect(renderDependencyGraphToDot(graph())).toContain('[label="local"]');
+        expect(renderDependencyGraphToDot(graph(), { edgeLabels: 'none' })).not.toContain('[label="local"]');
+    });
+
+    it('retains defaults when optional presentation values are explicitly undefined', () => {
+        expect(renderDependencyGraphToDot(graph(), {
+            externalPackages: undefined,
+            folderGrouping: undefined,
+            edgeLabels: undefined
+        })).toBe(renderDependencyGraphToDot(graph()));
+    });
+
     it('keeps circular and invalid edge semantics visible without duplicate attributes', () => {
         const fixture = graph();
         fixture.modules[0].dependencies[0] = dependency('app/domain/schema/timeline.ts', {

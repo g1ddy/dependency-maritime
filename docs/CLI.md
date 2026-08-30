@@ -195,6 +195,9 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 | `artifact-name` | Name of the workflow artifact if `upload-artifact` is true | `'maritime-artifacts'` | No |
 | `render-graph` | Render the validated graph on the supported Ubuntu rendering path | `'false'` | No |
 | `graph-output` | Destination for the derived SVG | `'docs/images/dependency-graph.svg'` | No |
+| `external-packages` | External package presentation: `none`, `summary`, or `direct` | `'direct'` | No |
+| `folder-grouping` | Local module clustering: `none`, `top-level`, or `nested` | `'nested'` | No |
+| `edge-labels` | Dependency-type labels: `none` or `types` | `'types'` | No |
 
 ### Usage Examples
 
@@ -238,15 +241,14 @@ package specifier or a packed tarball. This override is not part of normal consu
 ```yaml
     uses: g1ddy/dependency-maritime@<pinned-ref>
     with:
-      cli-source: './dependency-maritime-cli-0.1.0-beta.3.tgz'
+      cli-source: './dependency-maritime-cli-0.1.0-beta.5.tgz'
 ```
 
 The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. The
 `cli-vX.Y.Z[-pre]` tag is the release-version authority; the workflow stamps that version into
 `package.json` and `package-lock.json` only in its ephemeral release workspace, then builds,
 exercises the packed-package contract, and publishes with npm provenance under the `prerelease`
-distribution tag. For this feature, pushing `cli-v0.1.0-beta.3` therefore publishes beta.3 without
-committing a beta.3 package-version bump or changing the branch/SHA fallback. The workflow then
+distribution tag. For this feature, pushing `cli-v0.1.0-beta.5` therefore publishes beta.5. The workflow then
 checks out the exact released tag and runs a clean external consumer job without `cli-source`, so
 the tag-derived action resolution installs and exercises the just-published version while verifying
 all four canonical `.maritime` artifacts and the rendered graph. The action selects the full
@@ -278,6 +280,8 @@ Render a presentation directly from existing canonical evidence:
 ```bash
 maritime graph --input .maritime --output docs/images/dependency-graph.svg
 maritime graph --input .maritime/dependency-graph.json --output docs/images/dependency-graph.svg
+maritime graph --input .maritime --output architecture.svg \
+  --external-packages none --folder-grouping nested --edge-labels none
 ```
 
 For an artifact-directory input, `maritime graph` validates the bundle and reads the graph path
@@ -288,16 +292,31 @@ DOT debug output) is derived presentation and must not be hand-edited. The expor
 unfamiliar local paths, collapses `node_modules` paths to package nodes, deterministically sorts all
 output, and retains available dependency-kind, type-only, circular, and validity edge semantics.
 
+The presentation switches compose independently:
+
+| CLI flag | Values | Default | Effect |
+| :--- | :--- | :--- | :--- |
+| `--external-packages` | `none`, `summary`, `direct` | `direct` | Omits third-party nodes, emits one external-boundary node, or emits one node per directly imported package. Scoped and unscoped imports collapse to package names in `direct` mode. |
+| `--folder-grouping` | `none`, `top-level`, `nested` | `nested` | Shows local modules flat, clusters only their first source-directory segment, or recursively derives directory clusters. |
+| `--edge-labels` | `none`, `types` | `types` | Omits dependency-type text or preserves it. Circular, invalid, and type-only edge styling is independent. |
+
+These policies affect only DOT/SVG presentation. They never modify
+`.maritime/dependency-graph.json` or invoke dependency-cruiser, so the complete JSON remains the
+canonical evidence. Omitting all three flags preserves the pre-beta.5 renderer policy exactly.
+
 SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the npm package. The CLI
 reports an actionable error when it is missing. Maritime normalizes Graphviz's generator-version
 comment, but byte-for-byte SVG stability still depends on keeping the Graphviz version fixed.
 
-The composite action adds two optional inputs:
+The composite action adds matching optional inputs:
 
 | Input | Description | Default |
 | :--- | :--- | :--- |
 | `render-graph` | Render after successful analysis and validation | `'false'` |
 | `graph-output` | Derived SVG destination | `'docs/images/dependency-graph.svg'` |
+| `external-packages` | `none`, `summary`, or `direct` | CLI default (`'direct'`) when omitted |
+| `folder-grouping` | `none`, `top-level`, or `nested` | CLI default (`'nested'`) when omitted |
+| `edge-labels` | `none` or `types` | CLI default (`'types'`) when omitted |
 
 ```yaml
 - uses: g1ddy/dependency-maritime@<pinned-ref>
@@ -306,7 +325,14 @@ The composite action adds two optional inputs:
     output-dir: '.maritime'
     render-graph: 'true'
     graph-output: 'docs/images/dependency-graph.svg'
+    external-packages: 'none'
+    folder-grouping: 'nested'
+    edge-labels: 'none'
 ```
+
+Use this local-architecture policy for the Catan Hex Mastery and Crawler Command Interface
+migrations. It retains nested source structure while removing third-party package density and
+dependency-type text, without repository-local renderers or package filters.
 
 Rendering is opt-in. The supported reproducible path is `ubuntu-latest`, where the action requests
 Graphviz `2.42.2-9ubuntu0.1`; identical Graphviz selection and byte-for-byte committed SVG output are

@@ -145,9 +145,11 @@ describe('CLI npm pack clean-install smoke tests', () => {
 
         const graphHelpOutput = execSync('npx maritime graph --help', { cwd: catanDir, encoding: 'utf8' });
         expect(graphHelpOutput).toContain('Usage: maritime graph');
-        execSync('npx maritime graph --input dependency-graph.json --output dependency-graph.dot', { cwd: catanDir });
+        execSync('npx maritime graph --input dependency-graph.json --output dependency-graph.dot --external-packages none --folder-grouping top-level --edge-labels none', { cwd: catanDir });
         const renderedDot = fs.readFileSync(path.join(catanDir, 'dependency-graph.dot'), 'utf8');
-        expect(renderedDot).toContain('cluster:src/board');
+        expect(renderedDot).toContain('cluster:src');
+        expect(renderedDot).not.toContain('cluster:src/board');
+        expect(renderedDot).not.toContain('external:');
         expect(renderedDot).toContain('local:src/game/engine.ts');
 
         // Run real analysis command
@@ -828,7 +830,7 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(actionContent).toContain('analyze');
         expect(actionContent).toContain('validate');
         expect(actionContent).toContain('actions/upload-artifact');
-        expect(actionContent).toContain('@dependency-maritime/cli@0.1.0-beta.1');
+        expect(actionContent).toContain('@dependency-maritime/cli@0.1.0-beta.4');
         expect(actionContent).toContain("default: ''");
     });
 

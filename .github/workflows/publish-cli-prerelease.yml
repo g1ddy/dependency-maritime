@@ -82,6 +82,9 @@ jobs:
           upload-artifact: 'false'
           render-graph: 'true'
           graph-output: 'docs/images/dependency-graph.svg'
+          external-packages: 'none'
+          folder-grouping: 'nested'
+          edge-labels: 'none'
 
       - name: Verify canonical bundle
         shell: bash

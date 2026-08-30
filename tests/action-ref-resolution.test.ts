@@ -43,9 +43,15 @@ describe('composite action release tag resolution', () => {
         const parsed = yaml.load(actionYaml) as { inputs: Record<string, { default?: string }> };
         expect(parsed.inputs['render-graph']?.default).toBe('false');
         expect(parsed.inputs['graph-output']?.default).toBe('docs/images/dependency-graph.svg');
-        expect(actionYaml).toContain('$MARITIME_BIN graph --input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT"');
+        expect(parsed.inputs['external-packages']?.default).toBe('');
+        expect(parsed.inputs['folder-grouping']?.default).toBe('');
+        expect(parsed.inputs['edge-labels']?.default).toBe('');
+        expect(actionYaml).toContain('$MARITIME_BIN graph "${GRAPH_ARGS[@]}"');
         expect(actionYaml).toContain("ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'");
-        expect(actionYaml).toContain('@dependency-maritime/cli@0.1.0-beta.1');
+        expect(actionYaml).toContain('@dependency-maritime/cli@0.1.0-beta.4');
+        expect(actionYaml).toContain('if [ -n "$INPUT_EXTERNAL_PACKAGES" ]; then');
+        expect(actionYaml).toContain('if [ -n "$INPUT_FOLDER_GROUPING" ]; then');
+        expect(actionYaml).toContain('if [ -n "$INPUT_EDGE_LABELS" ]; then');
     });
 
     it('pairs the tag-triggered release smoke with the just-published CLI version', () => {

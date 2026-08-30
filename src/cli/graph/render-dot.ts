@@ -6,6 +6,25 @@ type DirectoryNode = {
     files: Array<{ source: string; name: string }>;
 };
 
+export const EXTERNAL_PACKAGE_MODES = ['none', 'summary', 'direct'] as const;
+export const FOLDER_GROUPING_MODES = ['none', 'top-level', 'nested'] as const;
+export const EDGE_LABEL_MODES = ['none', 'types'] as const;
+
+export type ExternalPackagesMode = typeof EXTERNAL_PACKAGE_MODES[number];
+export type FolderGroupingMode = typeof FOLDER_GROUPING_MODES[number];
+export type EdgeLabelsMode = typeof EDGE_LABEL_MODES[number];
+export type GraphPresentationOptions = {
+    externalPackages?: ExternalPackagesMode;
+    folderGrouping?: FolderGroupingMode;
+    edgeLabels?: EdgeLabelsMode;
+};
+
+export const DEFAULT_GRAPH_PRESENTATION = {
+    externalPackages: 'direct',
+    folderGrouping: 'nested',
+    edgeLabels: 'types'
+} as const satisfies Required<GraphPresentationOptions>;
+
 const dotQuote = (value: string): string => JSON.stringify(value);
 const normalizedPath = (value: string): string => value.replaceAll('\\', '/').replace(/^\.\//, '');
 
@@ -57,10 +76,10 @@ function renderDirectory(directory: DirectoryNode, segments: string[], indent: s
     return lines;
 }
 
-function edgeAttributes(dependency: MaritimeDependency): string {
+function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode): string {
     const attributes: string[] = [];
     const dependencyTypes = [...dependency.dependencyTypes].sort();
-    if (dependencyTypes.length > 0) attributes.push(`label=${dotQuote(dependencyTypes.join(', '))}`);
+    if (edgeLabels === 'types' && dependencyTypes.length > 0) attributes.push(`label=${dotQuote(dependencyTypes.join(', '))}`);
     if (dependency.typeOnly || dependency.preCompilationOnly) attributes.push('style="dashed"');
     if (dependency.circular) attributes.push('color="#d97706"', 'penwidth="2"');
     if (!dependency.valid) {
@@ -71,7 +90,12 @@ function edgeAttributes(dependency: MaritimeDependency): string {
 }
 
 /** Pure, deterministic conversion of a validated dependency-cruiser result to Graphviz DOT. */
-export function renderDependencyGraphToDot(graph: MaritimeCruiseResult): string {
+export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options: GraphPresentationOptions = {}): string {
+    const presentation = {
+        externalPackages: options.externalPackages ?? DEFAULT_GRAPH_PRESENTATION.externalPackages,
+        folderGrouping: options.folderGrouping ?? DEFAULT_GRAPH_PRESENTATION.folderGrouping,
+        edgeLabels: options.edgeLabels ?? DEFAULT_GRAPH_PRESENTATION.edgeLabels
+    };
     const root: DirectoryNode = { directories: new Map(), files: [] };
     const localSources = new Set<string>();
     const externalPackages = new Set<string>();
@@ -80,7 +104,17 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult): string 
         const source = normalizedPath(module.source);
         if (isExternalPath(source) || module.coreModule) continue;
         localSources.add(source);
-        addLocalModule(root, source);
+        if (presentation.folderGrouping === 'nested') addLocalModule(root, source);
+        else if (presentation.folderGrouping === 'top-level') {
+            if (!source.includes('/')) {
+                root.files.push({ source, name: source });
+                continue;
+            }
+            const [topLevel] = source.split('/');
+            const directory: DirectoryNode = root.directories.get(topLevel) ?? { directories: new Map(), files: [] };
+            root.directories.set(topLevel, directory);
+            directory.files.push({ source, name: path.posix.basename(source) });
+        } else root.files.push({ source, name: path.posix.basename(source) });
     }
 
     const edges: Array<{ from: string; to: string; dependency: MaritimeDependency }> = [];
@@ -97,9 +131,9 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult): string 
                 const packageName = looksExternal
                     ? externalPackageName(isExternalPath(resolved) ? resolved : dependency.module)
                     : undefined;
-                if (packageName) {
+                if (packageName && presentation.externalPackages !== 'none') {
                     externalPackages.add(packageName);
-                    target = `external:${packageName}`;
+                    target = presentation.externalPackages === 'summary' ? 'external:boundary' : `external:${packageName}`;
                 }
             }
             if (target) edges.push({ from: `local:${source}`, to: target, dependency });
@@ -121,7 +155,9 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult): string 
         '  edge [fontname="Helvetica", fontsize="8"];',
         ...renderDirectory(root, [], '  ')
     ];
-    if (externalPackages.size > 0) {
+    if (presentation.externalPackages === 'summary' && externalPackages.size > 0) {
+        lines.push('  "external:boundary" [label="External packages", shape="component", style="filled,dashed", fillcolor="#e2e8f0", color="#64748b"];');
+    } else if (presentation.externalPackages === 'direct' && externalPackages.size > 0) {
         lines.push('  subgraph "cluster:external-packages" {', '    label="External packages";', '    style="dashed";', '    color="#64748b";');
         for (const packageName of [...externalPackages].sort()) {
             lines.push(`    ${dotQuote(`external:${packageName}`)} [label=${dotQuote(packageName)}, shape="component", style="filled", fillcolor="#e2e8f0"];`);
@@ -129,7 +165,7 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult): string 
         lines.push('  }');
     }
     for (const edge of edges) {
-        lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency)};`);
+        lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency, presentation.edgeLabels)};`);
     }
     lines.push('}', '');
     return lines.join('\n');

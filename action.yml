@@ -46,6 +46,18 @@ inputs:
     description: 'Path for the derived Graphviz SVG when render-graph is true.'
     required: false
     default: 'docs/images/dependency-graph.svg'
+  external-packages:
+    description: 'External package presentation: none, summary, or direct.'
+    required: false
+    default: ''
+  folder-grouping:
+    description: 'Local folder clustering: none, top-level, or nested.'
+    required: false
+    default: ''
+  edge-labels:
+    description: 'Dependency-type labels: none or types.'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -66,7 +78,7 @@ runs:
         # Branch/commit refs cannot encode a package version, so retain the last
         # known compatible package as a development fallback. Versioned action
         # tags are authoritative: cli-vX.Y.Z[-pre] resolves to package X.Y.Z[-pre].
-        FALLBACK_CLI="@dependency-maritime/cli@0.1.0-beta.1"
+        FALLBACK_CLI="@dependency-maritime/cli@0.1.0-beta.4"
 
         if [ -n "${INPUT_CLI_SOURCE:-}" ]; then
           CLI_SRC="$INPUT_CLI_SOURCE"
@@ -156,9 +168,25 @@ runs:
       env:
         INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
         INPUT_GRAPH_OUTPUT: ${{ inputs.graph-output }}
+        INPUT_EXTERNAL_PACKAGES: ${{ inputs.external-packages }}
+        INPUT_FOLDER_GROUPING: ${{ inputs.folder-grouping }}
+        INPUT_EDGE_LABELS: ${{ inputs.edge-labels }}
       run: |
-        echo "Executing: $MARITIME_BIN graph --input $INPUT_OUTPUT_DIR --output $INPUT_GRAPH_OUTPUT"
-        $MARITIME_BIN graph --input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT"
+        GRAPH_ARGS=(--input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT")
+        if [ -n "$INPUT_EXTERNAL_PACKAGES" ]; then
+          case "$INPUT_EXTERNAL_PACKAGES" in none|summary|direct) ;; *) echo "Invalid external-packages value '$INPUT_EXTERNAL_PACKAGES'. Expected: none, summary, or direct." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--external-packages "$INPUT_EXTERNAL_PACKAGES")
+        fi
+        if [ -n "$INPUT_FOLDER_GROUPING" ]; then
+          case "$INPUT_FOLDER_GROUPING" in none|top-level|nested) ;; *) echo "Invalid folder-grouping value '$INPUT_FOLDER_GROUPING'. Expected: none, top-level, or nested." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--folder-grouping "$INPUT_FOLDER_GROUPING")
+        fi
+        if [ -n "$INPUT_EDGE_LABELS" ]; then
+          case "$INPUT_EDGE_LABELS" in none|types) ;; *) echo "Invalid edge-labels value '$INPUT_EDGE_LABELS'. Expected: none or types." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--edge-labels "$INPUT_EDGE_LABELS")
+        fi
+        echo "Executing: $MARITIME_BIN graph ${GRAPH_ARGS[*]}"
+        $MARITIME_BIN graph "${GRAPH_ARGS[@]}"
 
     - name: Upload Maritime Artifact Directory
       if: ${{ inputs.upload-artifact == 'true' || inputs.upload-artifact == true }}
