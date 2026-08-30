@@ -310,8 +310,8 @@ describe('Visualization Store', () => {
       const store = useGraphStore.getState();
 
       // Trigger the mocked error by passing a special direction
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      await store.layoutGraph('TRIGGER_ERROR' as any);
+
+      await store.layoutGraph('TRIGGER_ERROR' as unknown as 'TB' | 'LR');
 
       const state = useGraphStore.getState();
       expect(state.loading).toBe(false);
