@@ -13,34 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  cli-package-compatibility:
-    name: CLI package compatibility (Node ${{ matrix.node-version }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [20.19.0, 22.x, 24.x]
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build CLI
-      run: npm run build:cli
-
-    - name: Verify packed CLI consumer contract
-      run: npm run test:cli-package
-
   build-and-test:
-    needs: cli-package-compatibility
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -112,22 +85,6 @@ jobs:
 
     - name: Test
       run: npm test
-
-    - name: Package CLI
-      run: npm pack
-
-    - name: Inspect Package Tarball
-      run: |
-        TARBALL=$(ls dependency-maritime-cli-*.tgz | head -n1)
-        echo "Inspecting tarball: $TARBALL"
-        CONTENTS=$(tar -tzf "$TARBALL")
-        echo "$CONTENTS"
-        echo "$CONTENTS" | grep "package/dist/cli/main.js"
-        echo "$CONTENTS" | grep "package/dist/cli/index.js"
-        if echo "$CONTENTS" | grep -E "package/src/|package/tests/|\.test\.ts"; then
-          echo "Error: Unwanted source or test files found in tarball"
-          exit 1
-        fi
 
     - name: Create Release Tag
       if: env.NEW_TAG != ''

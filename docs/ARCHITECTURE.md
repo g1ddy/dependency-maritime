@@ -87,7 +87,7 @@ visualization feature.
 
 - config/.dependency-cruiser.cjs is Maritime's dogfooding policy, not a consumer default.
 - .maritime/ is the canonical repository evidence bundle.
-- The Project Graph, Markdown report, DOT file, and graph images must derive from that one bundle.
+- The Project Graph, Markdown report, and derived SVG graph presentation (`docs/images/dependency-graph.svg`) must derive from that one bundle.
 - Generated evidence and images are outputs: regenerate them through the documented workflow, not
   by hand.
 
