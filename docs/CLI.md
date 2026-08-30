@@ -314,9 +314,9 @@ The composite action adds matching optional inputs:
 | :--- | :--- | :--- |
 | `render-graph` | Render after successful analysis and validation | `'false'` |
 | `graph-output` | Derived SVG destination | `'docs/images/dependency-graph.svg'` |
-| `external-packages` | `none`, `summary`, or `direct` | `'direct'` |
-| `folder-grouping` | `none`, `top-level`, or `nested` | `'nested'` |
-| `edge-labels` | `none` or `types` | `'types'` |
+| `external-packages` | `none`, `summary`, or `direct` | CLI default (`'direct'`) when omitted |
+| `folder-grouping` | `none`, `top-level`, or `nested` | CLI default (`'nested'`) when omitted |
+| `edge-labels` | `none` or `types` | CLI default (`'types'`) when omitted |
 
 ```yaml
 - uses: g1ddy/dependency-maritime@<pinned-ref>
