@@ -55,6 +55,16 @@ describe('composite action release tag resolution', () => {
         expect(workflow).toContain('test -f docs/images/dependency-graph.svg');
     });
 
+    it('gates main release tagging on the reusable CLI contract workflow', () => {
+        const ciWorkflow = fs.readFileSync(path.join(process.cwd(), '.github/workflows/ci.yml'), 'utf8');
+        const contractWorkflow = fs.readFileSync(path.join(process.cwd(), '.github/workflows/cli-contract.yml'), 'utf8');
+
+        expect(contractWorkflow).toContain('workflow_call:');
+        expect(ciWorkflow).toContain('uses: ./.github/workflows/cli-contract.yml');
+        expect(ciWorkflow).toContain('needs: cli-contract');
+        expect(ciWorkflow).toContain("needs.cli-contract.result == 'success'");
+    });
+
     it('derives the CLI package version from a cli-v action ref when cli-source is unset', () => {
         const actionYaml = fs.readFileSync(path.join(process.cwd(), 'action.yml'), 'utf8');
         const parsedAction: unknown = yaml.load(actionYaml);

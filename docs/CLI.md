@@ -141,7 +141,10 @@ Maritime enforces CI contract verification for all changes affecting the distrib
 
 ### Workflow triggers
 
-CLI contract checks are executed via a dedicated GitHub Actions workflow (`.github/workflows/cli-contract.yml`) and integrated into general CI (`.github/workflows/ci.yml`). Workflow dispatches are reliably triggered on `push` to `main` and `pull_request` whenever any of the following paths are modified:
+Pull requests that affect the contract execute the dedicated `.github/workflows/cli-contract.yml`
+workflow directly. On `main`, general CI calls that same workflow as a reusable release gate, so a
+release tag cannot be created until the compatibility matrix and render smoke both pass. Pull request
+contract checks are triggered whenever any of the following paths are modified:
 
 - `src/cli/**`
 - `src/schema/**`
@@ -155,12 +158,14 @@ Documentation-only PRs (modifying strictly `docs/**` or `*.md`) intentionally by
 
 ### Required execution contract
 
-The CLI contract check executes:
+The reusable CLI contract workflow executes:
 
 1. `npm run build:cli`
 2. `npm run test:cli-package`
 
 across the supported Node.js compatibility matrix (`20.19.0`, `22.x`, `24.x`) with `fail-fast: false`.
+It also runs the composite-action graph render smoke. Direct pull-request execution preserves the
+`CLI Contract Checks` workflow and job names used by required-check branch protection.
 
 ## Release requirements
 
@@ -251,14 +256,13 @@ immutable CLI version rather than the distribution tag.
 
 The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds the shared action contract and the release-time external consumer proof; it does not itself migrate those repositories to consume the action.
 
-The package-contract smoke suite runs before publication and verifies package contents, runtime
-dependencies, supported Node versions, source-root behavior, validation, and action execution with a
-local prerelease tarball fixture. The true no-input action path is intentionally proven only after the
-prerelease is published: the tag-triggered release workflow invokes the action without `cli-source`
-and validates the complete four-file `.maritime` bundle. The standalone manually dispatched consumer
-smoke remains useful as a post-release diagnostic once the workflow exists on the default branch, but
-it is not the pre-merge acceptance proof. Real-repository cutover remains a consumer-side follow-up so
-each repository can preserve its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
+The authoritative PR and `main` contract proof is `.github/workflows/cli-contract.yml`: it runs the
+Node 20.19, 22, and 24 packed-consumer matrix plus the composite-action render smoke. The authoritative
+`cli-v*` release proof is `.github/workflows/publish-cli-prerelease.yml`: after publication, it invokes
+the released action and package from a clean external consumer and validates the complete four-file
+`.maritime` bundle and rendered graph. There is no separate manually dispatched consumer-smoke
+workflow. Real-repository cutover remains a consumer-side follow-up so each repository can preserve
+its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
 
 ## Related documentation
 

@@ -1,18 +1,7 @@
 name: CLI Contract Checks
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'src/cli/**'
-      - 'src/schema/**'
-      - 'tests/cli-pack-smoke.test.ts'
-      - 'tests/action-ref-resolution.test.ts'
-      - 'action.yml'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig.cli.json'
-      - '.github/workflows/**'
+  workflow_call:
   pull_request:
     branches: [ "main" ]
     paths:
