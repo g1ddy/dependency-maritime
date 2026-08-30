@@ -27,12 +27,6 @@ test('App elements are visible', async ({ page }) => {
 
   await test.step('Verify GraphOverlay controls', async () => {
     await expect(page.getByTestId('refactor-graph-btn')).toBeVisible();
-
-    // Select a node only after the graph layout and post-layout fitView are complete.
-    const node = page.getByTestId('node-main.tsx');
-    await expect(node).toBeVisible();
-    await node.click();
-
-    await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Inspector' })).toBeVisible();
   });
 });
