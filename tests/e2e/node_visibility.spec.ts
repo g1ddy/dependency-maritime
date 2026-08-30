@@ -7,9 +7,10 @@ test('File nodes are visible and interactable (not obscured by folders)', async 
 
   const node = page.getByTestId('node-main.tsx');
 
-  // Verify the node is visible and is the topmost element at its center. Using
-  // Playwright's stability-based click here is unreliable in WebKit because
-  // React Flow continuously updates the node's transformed ancestor.
+  // Readiness is published after React Flow has completed its post-layout
+  // fitView. Keep this as a real browser action so the test exercises pointer
+  // targeting and React Flow's click handling, rather than only invoking the
+  // React handler with a synthetic event.
   await expect(node).toBeVisible();
   await expect(node).toHaveJSProperty('isConnected', true);
   const receivesPointerEvents = await node.evaluate((element) => {
@@ -23,10 +24,6 @@ test('File nodes are visible and interactable (not obscured by folders)', async 
   });
   expect(receivesPointerEvents).toBe(true);
 
-  await node.evaluate((element) => {
-    element
-      .closest('.react-flow__node')
-      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-  });
+  await node.click();
   await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
 });
