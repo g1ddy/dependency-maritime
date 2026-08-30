@@ -81,8 +81,35 @@ describe('renderDependencyGraphToDot', () => {
         expect(renderDependencyGraphToDot(graph(), {
             externalPackages: undefined,
             folderGrouping: undefined,
-            edgeLabels: undefined
+            edgeLabels: undefined,
+            layoutDirection: undefined,
+            rankConstraints: undefined,
+            layoutDensity: undefined
         })).toBe(renderDependencyGraphToDot(graph()));
+    });
+
+    it('supports layout direction and compact density without changing the default DOT policy', () => {
+        const defaults = renderDependencyGraphToDot(graph());
+        expect(defaults).toContain('rankdir="LR"');
+        expect(defaults).not.toContain('ranksep=');
+        const compactTopToBottom = renderDependencyGraphToDot(graph(), { layoutDirection: 'tb', layoutDensity: 'compact' });
+        expect(compactTopToBottom).toContain('rankdir="TB"');
+        expect(compactTopToBottom).toContain('ranksep="0.35", nodesep="0.2"');
+    });
+
+    it('keeps every dependency visible while releasing cross-folder rank constraints', () => {
+        const constrained = renderDependencyGraphToDot(graph(), { rankConstraints: 'all' });
+        const intraFolder = renderDependencyGraphToDot(graph(), { rankConstraints: 'intra-folder' });
+        const crossFolder = intraFolder.split('\n').find(line => line.includes('projection.ts" -> "local:app/domain/schema/timeline.ts'));
+        expect(crossFolder).not.toContain('constraint="false"');
+
+        const fixture = graph();
+        fixture.modules[0].dependencies.push(dependency('src/features/board/BoardLayer.tsx'));
+        const released = renderDependencyGraphToDot(fixture, { rankConstraints: 'intra-folder' }).split('\n')
+            .find(line => line.includes('projection.ts" -> "local:src/features/board/BoardLayer.tsx'));
+        expect(released).toContain('constraint="false"');
+        expect(released).toContain('label="local"');
+        expect(constrained).not.toContain('constraint="false"');
     });
 
     it('keeps circular and invalid edge semantics visible without duplicate attributes', () => {

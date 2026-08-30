@@ -46,12 +46,18 @@ describe('composite action release tag resolution', () => {
         expect(parsed.inputs['external-packages']?.default).toBe('');
         expect(parsed.inputs['folder-grouping']?.default).toBe('');
         expect(parsed.inputs['edge-labels']?.default).toBe('');
+        expect(parsed.inputs['layout-direction']?.default).toBe('');
+        expect(parsed.inputs['rank-constraints']?.default).toBe('');
+        expect(parsed.inputs['layout-density']?.default).toBe('');
         expect(actionYaml).toContain('$MARITIME_BIN graph "${GRAPH_ARGS[@]}"');
         expect(actionYaml).toContain("ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'");
         expect(actionYaml).toContain('@dependency-maritime/cli@0.1.0-beta.4');
         expect(actionYaml).toContain('if [ -n "$INPUT_EXTERNAL_PACKAGES" ]; then');
         expect(actionYaml).toContain('if [ -n "$INPUT_FOLDER_GROUPING" ]; then');
         expect(actionYaml).toContain('if [ -n "$INPUT_EDGE_LABELS" ]; then');
+        expect(actionYaml).toContain('if [ -n "$INPUT_LAYOUT_DIRECTION" ]; then');
+        expect(actionYaml).toContain('if [ -n "$INPUT_RANK_CONSTRAINTS" ]; then');
+        expect(actionYaml).toContain('if [ -n "$INPUT_LAYOUT_DENSITY" ]; then');
     });
 
     it('pairs the tag-triggered release smoke with the just-published CLI version', () => {

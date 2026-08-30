@@ -9,20 +9,32 @@ type DirectoryNode = {
 export const EXTERNAL_PACKAGE_MODES = ['none', 'summary', 'direct'] as const;
 export const FOLDER_GROUPING_MODES = ['none', 'top-level', 'nested'] as const;
 export const EDGE_LABEL_MODES = ['none', 'types'] as const;
+export const LAYOUT_DIRECTION_MODES = ['lr', 'tb'] as const;
+export const RANK_CONSTRAINT_MODES = ['all', 'intra-folder'] as const;
+export const LAYOUT_DENSITY_MODES = ['normal', 'compact'] as const;
 
 export type ExternalPackagesMode = typeof EXTERNAL_PACKAGE_MODES[number];
 export type FolderGroupingMode = typeof FOLDER_GROUPING_MODES[number];
 export type EdgeLabelsMode = typeof EDGE_LABEL_MODES[number];
+export type LayoutDirectionMode = typeof LAYOUT_DIRECTION_MODES[number];
+export type RankConstraintMode = typeof RANK_CONSTRAINT_MODES[number];
+export type LayoutDensityMode = typeof LAYOUT_DENSITY_MODES[number];
 export type GraphPresentationOptions = {
     externalPackages?: ExternalPackagesMode;
     folderGrouping?: FolderGroupingMode;
     edgeLabels?: EdgeLabelsMode;
+    layoutDirection?: LayoutDirectionMode;
+    rankConstraints?: RankConstraintMode;
+    layoutDensity?: LayoutDensityMode;
 };
 
 export const DEFAULT_GRAPH_PRESENTATION = {
     externalPackages: 'direct',
     folderGrouping: 'nested',
-    edgeLabels: 'types'
+    edgeLabels: 'types',
+    layoutDirection: 'lr',
+    rankConstraints: 'all',
+    layoutDensity: 'normal'
 } as const satisfies Required<GraphPresentationOptions>;
 
 const dotQuote = (value: string): string => JSON.stringify(value);
@@ -76,8 +88,14 @@ function renderDirectory(directory: DirectoryNode, segments: string[], indent: s
     return lines;
 }
 
-function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode): string {
+function topLevelFolder(source: string): string {
+    const [topLevel] = normalizedPath(source).split('/').filter(Boolean);
+    return topLevel ?? '.';
+}
+
+function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode, constrained: boolean): string {
     const attributes: string[] = [];
+    if (!constrained) attributes.push('constraint="false"');
     const dependencyTypes = [...dependency.dependencyTypes].sort();
     if (edgeLabels === 'types' && dependencyTypes.length > 0) attributes.push(`label=${dotQuote(dependencyTypes.join(', '))}`);
     if (dependency.typeOnly || dependency.preCompilationOnly) attributes.push('style="dashed"');
@@ -94,7 +112,10 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
     const presentation = {
         externalPackages: options.externalPackages ?? DEFAULT_GRAPH_PRESENTATION.externalPackages,
         folderGrouping: options.folderGrouping ?? DEFAULT_GRAPH_PRESENTATION.folderGrouping,
-        edgeLabels: options.edgeLabels ?? DEFAULT_GRAPH_PRESENTATION.edgeLabels
+        edgeLabels: options.edgeLabels ?? DEFAULT_GRAPH_PRESENTATION.edgeLabels,
+        layoutDirection: options.layoutDirection ?? DEFAULT_GRAPH_PRESENTATION.layoutDirection,
+        rankConstraints: options.rankConstraints ?? DEFAULT_GRAPH_PRESENTATION.rankConstraints,
+        layoutDensity: options.layoutDensity ?? DEFAULT_GRAPH_PRESENTATION.layoutDensity
     };
     const root: DirectoryNode = { directories: new Map(), files: [] };
     const localSources = new Set<string>();
@@ -117,7 +138,7 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         } else root.files.push({ source, name: path.posix.basename(source) });
     }
 
-    const edges: Array<{ from: string; to: string; dependency: MaritimeDependency }> = [];
+    const edges: Array<{ from: string; to: string; dependency: MaritimeDependency; constrained: boolean }> = [];
     for (const module of [...graph.modules].sort((a, b) => a.source.localeCompare(b.source))) {
         const source = normalizedPath(module.source);
         if (!localSources.has(source)) continue;
@@ -136,7 +157,12 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
                     target = presentation.externalPackages === 'summary' ? 'external:boundary' : `external:${packageName}`;
                 }
             }
-            if (target) edges.push({ from: `local:${source}`, to: target, dependency });
+            if (target) {
+                const constrained = !localSources.has(resolved)
+                    || presentation.rankConstraints === 'all'
+                    || topLevelFolder(source) === topLevelFolder(resolved);
+                edges.push({ from: `local:${source}`, to: target, dependency, constrained });
+            }
         }
     }
 
@@ -149,8 +175,8 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         // Graphviz 2.42 can fail init_rank when the default cluster-local ranker
         // encounters a large recursively nested directory hierarchy. newrank asks
         // dot to compute one global ranking across clusters while preserving the
-        // cluster boxes and deterministic left-to-right presentation.
-        '  graph [compound="true", newrank="true", rankdir="LR", fontname="Helvetica"];',
+        // cluster boxes and deterministic configured-direction presentation.
+        `  graph [compound="true", newrank="true", rankdir="${presentation.layoutDirection.toUpperCase()}", fontname="Helvetica"${presentation.layoutDensity === 'compact' ? ', ranksep="0.35", nodesep="0.2"' : ''}];`,
         '  node [fontname="Helvetica", fontsize="10"];',
         '  edge [fontname="Helvetica", fontsize="8"];',
         ...renderDirectory(root, [], '  ')
@@ -165,7 +191,7 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         lines.push('  }');
     }
     for (const edge of edges) {
-        lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency, presentation.edgeLabels)};`);
+        lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency, presentation.edgeLabels, edge.constrained)};`);
     }
     lines.push('}', '');
     return lines.join('\n');

@@ -59,10 +59,10 @@ The normal analysis output is a single self-contained artifact directory:
 
 ```text
 .maritime/
-├── dependency-graph.json
-├── complexity-metrics.json
-├── complexity-report.md
-└── manifest.json
+âââ dependency-graph.json
+âââ complexity-metrics.json
+âââ complexity-report.md
+âââ manifest.json
 ```
 
 Every successful `maritime analyze` invocation produces an output directory where `manifest.json`, the dependency graph JSON, complexity metrics JSON, and Markdown report all reside within that directory. All manifest-declared artifact paths are relative to the artifact directory and must not contain path traversal (e.g., `..`) or absolute paths.
@@ -268,10 +268,10 @@ its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
 
 ## Related documentation
 
-- [Roadmap](./ROADMAP.md) — unfinished CLI delivery work and UI work.
-- [Architecture](./ARCHITECTURE.md) — the boundary between the headless analyzer and the UI.
-- [Complexity and Health Metrics](./COMPLEXITY.md) — metric definitions and repository evidence.
-- [Development Guide](./DEVELOPMENT.md) — local setup and verification.
+- [Roadmap](./ROADMAP.md) â unfinished CLI delivery work and UI work.
+- [Architecture](./ARCHITECTURE.md) â the boundary between the headless analyzer and the UI.
+- [Complexity and Health Metrics](./COMPLEXITY.md) â metric definitions and repository evidence.
+- [Development Guide](./DEVELOPMENT.md) â local setup and verification.
 
 ## Supported graph rendering
 
@@ -299,10 +299,19 @@ The presentation switches compose independently:
 | `--external-packages` | `none`, `summary`, `direct` | `direct` | Omits third-party nodes, emits one external-boundary node, or emits one node per directly imported package. Scoped and unscoped imports collapse to package names in `direct` mode. |
 | `--folder-grouping` | `none`, `top-level`, `nested` | `nested` | Shows local modules flat, clusters only their first source-directory segment, or recursively derives directory clusters. |
 | `--edge-labels` | `none`, `types` | `types` | Omits dependency-type text or preserves it. Circular, invalid, and type-only edge styling is independent. |
+| `--layout-direction` | `lr`, `tb` | `lr` | Uses Graphviz left-to-right or top-to-bottom rank direction. |
+| `--rank-constraints` | `all`, `intra-folder` | `all` | Lets every local dependency affect rank placement, or limits that effect to edges whose modules share the same top-level source folder. Cross-folder edges remain visible with `constraint=false`. |
+| `--layout-density` | `normal`, `compact` | `normal` | Uses Graphviz's normal spacing or compact `ranksep=0.35` and `nodesep=0.2` spacing. |
 
 These policies affect only DOT/SVG presentation. They never modify
 `.maritime/dependency-graph.json` or invoke dependency-cruiser, so the complete JSON remains the
 canonical evidence. Omitting all three flags preserves the pre-beta.5 renderer policy exactly.
+
+The three layout switches also affect only DOT/SVG presentation. `folder-grouping: nested` creates
+recursive Graphviz cluster boxes for directories; it does not collapse file nodes into folder nodes.
+`newrank=true` remains enabled for all layout policies because it avoids Graphviz 2.42 rank failures
+with deeply nested clusters. Root-level modules are treated as belonging to the root (`.`) folder for
+the `intra-folder` rank-constraint policy.
 
 SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the npm package. The CLI
 reports an actionable error when it is missing. Maritime normalizes Graphviz's generator-version
@@ -317,6 +326,9 @@ The composite action adds matching optional inputs:
 | `external-packages` | `none`, `summary`, or `direct` | CLI default (`'direct'`) when omitted |
 | `folder-grouping` | `none`, `top-level`, or `nested` | CLI default (`'nested'`) when omitted |
 | `edge-labels` | `none` or `types` | CLI default (`'types'`) when omitted |
+| `layout-direction` | `lr` or `tb` | CLI default (`'lr'`) when omitted |
+| `rank-constraints` | `all` or `intra-folder` | CLI default (`'all'`) when omitted |
+| `layout-density` | `normal` or `compact` | CLI default (`'normal'`) when omitted |
 
 ```yaml
 - uses: g1ddy/dependency-maritime@<pinned-ref>
@@ -328,6 +340,9 @@ The composite action adds matching optional inputs:
     external-packages: 'none'
     folder-grouping: 'nested'
     edge-labels: 'none'
+    layout-direction: 'tb'
+    rank-constraints: 'intra-folder'
+    layout-density: 'compact'
 ```
 
 Use this local-architecture policy for the Catan Hex Mastery and Crawler Command Interface

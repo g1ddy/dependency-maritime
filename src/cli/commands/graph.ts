@@ -2,17 +2,18 @@ import { parseArgs } from 'node:util';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { CruiseResultSchema } from '../../schema/dependency-cruiser';
-import { EDGE_LABEL_MODES, EXTERNAL_PACKAGE_MODES, FOLDER_GROUPING_MODES, inferGraphvizFormat, renderDependencyGraphToDot, type EdgeLabelsMode, type ExternalPackagesMode, type FolderGroupingMode } from '../graph/render-dot';
+import { EDGE_LABEL_MODES, EXTERNAL_PACKAGE_MODES, FOLDER_GROUPING_MODES, LAYOUT_DENSITY_MODES, LAYOUT_DIRECTION_MODES, RANK_CONSTRAINT_MODES, inferGraphvizFormat, renderDependencyGraphToDot, type EdgeLabelsMode, type ExternalPackagesMode, type FolderGroupingMode, type LayoutDensityMode, type LayoutDirectionMode, type RankConstraintMode } from '../graph/render-dot';
 import { renderDotWithGraphviz } from '../graph/render-graphviz';
 import { validateArtifacts } from '../validate/validate';
 
 export async function runGraphCommand(args: string[]): Promise<number> {
-    let values: { input?: string; output?: string; cwd?: string; help?: boolean; 'external-packages'?: string; 'folder-grouping'?: string; 'edge-labels'?: string };
+    let values: { input?: string; output?: string; cwd?: string; help?: boolean; 'external-packages'?: string; 'folder-grouping'?: string; 'edge-labels'?: string; 'layout-direction'?: string; 'rank-constraints'?: string; 'layout-density'?: string };
     try {
         values = parseArgs({ args, options: {
             input: { type: 'string', short: 'i' }, output: { type: 'string', short: 'o' },
             cwd: { type: 'string' }, help: { type: 'boolean', short: 'h' },
-            'external-packages': { type: 'string' }, 'folder-grouping': { type: 'string' }, 'edge-labels': { type: 'string' }
+            'external-packages': { type: 'string' }, 'folder-grouping': { type: 'string' }, 'edge-labels': { type: 'string' },
+            'layout-direction': { type: 'string' }, 'rank-constraints': { type: 'string' }, 'layout-density': { type: 'string' }
         } }).values;
     } catch (error) {
         console.error(`Error parsing arguments: ${error instanceof Error ? error.message : String(error)}`);
@@ -30,6 +31,9 @@ Options:
   --external-packages <none|summary|direct>  External package presentation (default: direct)
   --folder-grouping <none|top-level|nested>   Local folder clustering (default: nested)
   --edge-labels <none|types>                  Dependency-type labels (default: types)
+  --layout-direction <lr|tb>                  Graph direction (default: lr)
+  --rank-constraints <all|intra-folder>       Edges that affect rank placement (default: all)
+  --layout-density <normal|compact>           Node/rank separation (default: normal)
   --cwd <dir>          Working directory root for resolution
   -h, --help           Show help message
 `);
@@ -47,10 +51,16 @@ Options:
     let externalPackages: ExternalPackagesMode;
     let folderGrouping: FolderGroupingMode;
     let edgeLabels: EdgeLabelsMode;
+    let layoutDirection: LayoutDirectionMode;
+    let rankConstraints: RankConstraintMode;
+    let layoutDensity: LayoutDensityMode;
     try {
         externalPackages = validatePolicy('external-packages', values['external-packages'], EXTERNAL_PACKAGE_MODES, 'direct');
         folderGrouping = validatePolicy('folder-grouping', values['folder-grouping'], FOLDER_GROUPING_MODES, 'nested');
         edgeLabels = validatePolicy('edge-labels', values['edge-labels'], EDGE_LABEL_MODES, 'types');
+        layoutDirection = validatePolicy('layout-direction', values['layout-direction'], LAYOUT_DIRECTION_MODES, 'lr');
+        rankConstraints = validatePolicy('rank-constraints', values['rank-constraints'], RANK_CONSTRAINT_MODES, 'all');
+        layoutDensity = validatePolicy('layout-density', values['layout-density'], LAYOUT_DENSITY_MODES, 'normal');
     } catch (error) {
         console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
         return 2;
@@ -66,12 +76,12 @@ Options:
         const parsed: unknown = JSON.parse(await fs.readFile(graphPath, 'utf8'));
         const result = CruiseResultSchema.safeParse(parsed);
         if (!result.success) throw new Error(`Invalid Maritime dependency graph: ${result.error.message}`);
-        const dot = renderDependencyGraphToDot(result.data, { externalPackages, folderGrouping, edgeLabels });
+        const dot = renderDependencyGraphToDot(result.data, { externalPackages, folderGrouping, edgeLabels, layoutDirection, rankConstraints, layoutDensity });
         const format = inferGraphvizFormat(output);
         await fs.mkdir(path.dirname(output), { recursive: true });
         if (format === 'dot') await fs.writeFile(output, dot);
         else await renderDotWithGraphviz(dot, output);
-        console.log(`✅ Dependency graph rendered from ${graphPath} to ${output}`);
+        console.log(`â Dependency graph rendered from ${graphPath} to ${output}`);
         return 0;
     } catch (error) {
         console.error(`Error rendering dependency graph: ${error instanceof Error ? error.message : String(error)}`);

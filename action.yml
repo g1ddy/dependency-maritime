@@ -58,6 +58,18 @@ inputs:
     description: 'Dependency-type labels: none or types.'
     required: false
     default: ''
+  layout-direction:
+    description: 'Graph direction: lr or tb.'
+    required: false
+    default: ''
+  rank-constraints:
+    description: 'Edges that affect rank placement: all or intra-folder.'
+    required: false
+    default: ''
+  layout-density:
+    description: 'Node and rank separation: normal or compact.'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -171,6 +183,9 @@ runs:
         INPUT_EXTERNAL_PACKAGES: ${{ inputs.external-packages }}
         INPUT_FOLDER_GROUPING: ${{ inputs.folder-grouping }}
         INPUT_EDGE_LABELS: ${{ inputs.edge-labels }}
+        INPUT_LAYOUT_DIRECTION: ${{ inputs.layout-direction }}
+        INPUT_RANK_CONSTRAINTS: ${{ inputs.rank-constraints }}
+        INPUT_LAYOUT_DENSITY: ${{ inputs.layout-density }}
       run: |
         GRAPH_ARGS=(--input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT")
         if [ -n "$INPUT_EXTERNAL_PACKAGES" ]; then
@@ -184,6 +199,18 @@ runs:
         if [ -n "$INPUT_EDGE_LABELS" ]; then
           case "$INPUT_EDGE_LABELS" in none|types) ;; *) echo "Invalid edge-labels value '$INPUT_EDGE_LABELS'. Expected: none or types." >&2; exit 2;; esac
           GRAPH_ARGS+=(--edge-labels "$INPUT_EDGE_LABELS")
+        fi
+        if [ -n "$INPUT_LAYOUT_DIRECTION" ]; then
+          case "$INPUT_LAYOUT_DIRECTION" in lr|tb) ;; *) echo "Invalid layout-direction value '$INPUT_LAYOUT_DIRECTION'. Expected: lr or tb." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--layout-direction "$INPUT_LAYOUT_DIRECTION")
+        fi
+        if [ -n "$INPUT_RANK_CONSTRAINTS" ]; then
+          case "$INPUT_RANK_CONSTRAINTS" in all|intra-folder) ;; *) echo "Invalid rank-constraints value '$INPUT_RANK_CONSTRAINTS'. Expected: all or intra-folder." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--rank-constraints "$INPUT_RANK_CONSTRAINTS")
+        fi
+        if [ -n "$INPUT_LAYOUT_DENSITY" ]; then
+          case "$INPUT_LAYOUT_DENSITY" in normal|compact) ;; *) echo "Invalid layout-density value '$INPUT_LAYOUT_DENSITY'. Expected: normal or compact." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--layout-density "$INPUT_LAYOUT_DENSITY")
         fi
         echo "Executing: $MARITIME_BIN graph ${GRAPH_ARGS[*]}"
         $MARITIME_BIN graph "${GRAPH_ARGS[@]}"
