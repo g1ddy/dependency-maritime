@@ -46,6 +46,22 @@ describe('graph command', () => {
         expect(dot).toContain('newrank="true"');
     });
 
+    it('uses a graph profile as the baseline and accepts explicit overrides', async () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-graph-')); dirs.push(dir);
+        const graphPath = path.join(dir, 'graph.json');
+        fs.writeFileSync(graphPath, JSON.stringify({ modules: [], summary: {
+            error: 0, ignore: 0, info: 0, totalCruised: 0, violations: [], warn: 0, optionsUsed: {}
+        }}));
+
+        expect(await runGraphCommand([
+            '--cwd', dir, '--input', 'graph.json', '--output', 'graph.dot',
+            '--graph-profile', 'compact-architecture', '--layout-direction', 'lr'
+        ])).toBe(0);
+        const dot = fs.readFileSync(path.join(dir, 'graph.dot'), 'utf8');
+        expect(dot).toContain('rankdir="LR"');
+        expect(dot).toContain('ranksep="0.35", nodesep="0.2"');
+    });
+
     it('reports a missing Graphviz executable with an actionable error', async () => {
         const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maritime-graph-')); dirs.push(dir);
         fs.writeFileSync(path.join(dir, 'graph.json'), JSON.stringify({ modules: [], summary: {
@@ -63,7 +79,11 @@ describe('graph command', () => {
     it.each([
         ['--external-packages', 'everything', 'none, summary, direct'],
         ['--folder-grouping', 'deep', 'none, top-level, nested'],
-        ['--edge-labels', 'names', 'none, types']
+        ['--edge-labels', 'names', 'none, types'],
+        ['--graph-profile', 'small', 'default, local-architecture, compact-architecture'],
+        ['--layout-direction', 'diagonal', 'lr, tb'],
+        ['--rank-constraints', 'folders', 'all, intra-folder'],
+        ['--layout-density', 'dense', 'normal, compact']
     ])('rejects invalid %s values clearly', async (flag, value, allowed) => {
         const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         expect(await runGraphCommand(['--output', 'graph.dot', flag, value])).toBe(2);

@@ -54,19 +54,39 @@ Easily upload your own `dependency-cruiser` JSON output to visualize your codeba
 
 ## 🚀 Usage
 
-### 1. Generating a Dependency Graph
-To visualize your own project, you need to generate a JSON report using `dependency-cruiser`.
+### 1. Analyze with Maritime CLI
 
-Run the following command in the root of the project you want to analyze:
+Install the headless CLI in the repository you want to analyze, then generate one validated canonical
+evidence bundle. This is the recommended local and non-GitHub-CI path.
 
 ```bash
-npx dependency-cruiser src \
-  --include-only "^src" \
-  --output-type json \
-  > dependency-graph.json
+npm install --save-dev @dependency-maritime/cli@<version>
+npx maritime analyze --source src --output .maritime --fail-on-unmeasured
+npx maritime validate .maritime
 ```
 
-*Adjust the `src` and `--include-only` patterns to match your project structure.*
+Render an optional presentation from the same evidence without a second scan:
+
+```bash
+npx maritime graph --input .maritime --output docs/images/dependency-graph.svg \
+  --graph-profile local-architecture
+```
+
+See [CLI and Artifact Contract](./docs/CLI.md) for supported environments, Graphviz requirements,
+profiles, and advanced overrides.
+
+### GitHub Actions
+
+Use the composite Action when GitHub Actions should run the same CLI contract. Consumers own workflow
+triggers, paths, and review policy; the Action runs analysis, validation, and optional rendering.
+
+```yaml
+- uses: g1ddy/dependency-maritime@cli-v<version>
+  with:
+    source-roots: src
+    render-graph: 'true'
+    graph-profile: local-architecture
+```
 
 #### Integrating Complexity Metrics (Optional)
 To view Cyclomatic Complexity and LOC in the Node Inspector, generate a metrics file using the provided script (if available in your project) or construct a JSON map matching the schema:

@@ -281,7 +281,7 @@ Render a presentation directly from existing canonical evidence:
 maritime graph --input .maritime --output docs/images/dependency-graph.svg
 maritime graph --input .maritime/dependency-graph.json --output docs/images/dependency-graph.svg
 maritime graph --input .maritime --output architecture.svg \
-  --external-packages none --folder-grouping nested --edge-labels none
+  --graph-profile compact-architecture
 ```
 
 For an artifact-directory input, `maritime graph` validates the bundle and reads the graph path
@@ -292,17 +292,46 @@ DOT debug output) is derived presentation and must not be hand-edited. The expor
 unfamiliar local paths, collapses `node_modules` paths to package nodes, deterministically sorts all
 output, and retains available dependency-kind, type-only, circular, and validity edge semantics.
 
-The presentation switches compose independently:
+Start with a named presentation profile. Profiles affect DOT/SVG only and never change or regenerate
+the canonical `.maritime/dependency-graph.json` evidence.
+
+| Profile | External packages | Folder grouping | Edge labels | Direction | Rank constraints | Density |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `default` | `direct` | `nested` | `types` | `lr` | `all` | `normal` |
+| `local-architecture` | `none` | `nested` | `none` | `lr` | `all` | `normal` |
+| `compact-architecture` | `none` | `nested` | `none` | `tb` | `intra-folder` | `compact` |
+
+`default` preserves the renderer's prior policy. `local-architecture` is a clean local-source map;
+`compact-architecture` is intended for wide, cross-folder graphs such as Catan's. Use an individual
+switch only when it deliberately overrides the selected profile.
+
+The presentation switches compose independently after the profile baseline:
 
 | CLI flag | Values | Default | Effect |
 | :--- | :--- | :--- | :--- |
 | `--external-packages` | `none`, `summary`, `direct` | `direct` | Omits third-party nodes, emits one external-boundary node, or emits one node per directly imported package. Scoped and unscoped imports collapse to package names in `direct` mode. |
 | `--folder-grouping` | `none`, `top-level`, `nested` | `nested` | Shows local modules flat, clusters only their first source-directory segment, or recursively derives directory clusters. |
 | `--edge-labels` | `none`, `types` | `types` | Omits dependency-type text or preserves it. Circular, invalid, and type-only edge styling is independent. |
+| `--layout-direction` | `lr`, `tb` | `lr` | Uses Graphviz left-to-right or top-to-bottom rank direction. |
+| `--rank-constraints` | `all`, `intra-folder` | `all` | Lets every local dependency affect rank placement, or limits that effect to edges whose modules share the same top-level source folder. Cross-folder edges remain visible with `constraint=false`. |
+| `--layout-density` | `normal`, `compact` | `normal` | Uses Graphviz's normal spacing or compact `ranksep=0.35` and `nodesep=0.2` spacing. |
+
+For example, retain compact architecture defaults but restore left-to-right presentation:
+
+```bash
+maritime graph --input .maritime --output architecture.svg \
+  --graph-profile compact-architecture --layout-direction lr
+```
 
 These policies affect only DOT/SVG presentation. They never modify
 `.maritime/dependency-graph.json` or invoke dependency-cruiser, so the complete JSON remains the
-canonical evidence. Omitting all three flags preserves the pre-beta.5 renderer policy exactly.
+canonical evidence. Omitting the profile and all overrides preserves the pre-beta.5 renderer policy exactly.
+
+The three layout switches also affect only DOT/SVG presentation. `folder-grouping: nested` creates
+recursive Graphviz cluster boxes for directories; it does not collapse file nodes into folder nodes.
+`newrank=true` remains enabled for all layout policies because it avoids Graphviz 2.42 rank failures
+with deeply nested clusters. Root-level modules are treated as belonging to the root (`.`) folder for
+the `intra-folder` rank-constraint policy.
 
 SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the npm package. The CLI
 reports an actionable error when it is missing. Maritime normalizes Graphviz's generator-version
@@ -314,9 +343,13 @@ The composite action adds matching optional inputs:
 | :--- | :--- | :--- |
 | `render-graph` | Render after successful analysis and validation | `'false'` |
 | `graph-output` | Derived SVG destination | `'docs/images/dependency-graph.svg'` |
+| `graph-profile` | `default`, `local-architecture`, or `compact-architecture` | CLI default (`'default'`) when omitted |
 | `external-packages` | `none`, `summary`, or `direct` | CLI default (`'direct'`) when omitted |
 | `folder-grouping` | `none`, `top-level`, or `nested` | CLI default (`'nested'`) when omitted |
 | `edge-labels` | `none` or `types` | CLI default (`'types'`) when omitted |
+| `layout-direction` | `lr` or `tb` | CLI default (`'lr'`) when omitted |
+| `rank-constraints` | `all` or `intra-folder` | CLI default (`'all'`) when omitted |
+| `layout-density` | `normal` or `compact` | CLI default (`'normal'`) when omitted |
 
 ```yaml
 - uses: g1ddy/dependency-maritime@<pinned-ref>
@@ -325,10 +358,13 @@ The composite action adds matching optional inputs:
     output-dir: '.maritime'
     render-graph: 'true'
     graph-output: 'docs/images/dependency-graph.svg'
-    external-packages: 'none'
-    folder-grouping: 'nested'
-    edge-labels: 'none'
+    graph-profile: 'compact-architecture'
 ```
+
+Individual presentation inputs remain available as advanced overrides. An explicit Action input wins
+over the selected profile, for example `graph-profile: compact-architecture` with
+`layout-direction: lr`. Empty Action inputs are not passed to the CLI, preserving compatibility
+when an Action branch/commit falls back to an older published CLI.
 
 Use this local-architecture policy for the Catan Hex Mastery and Crawler Command Interface
 migrations. It retains nested source structure while removing third-party package density and

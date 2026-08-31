@@ -9,21 +9,71 @@ type DirectoryNode = {
 export const EXTERNAL_PACKAGE_MODES = ['none', 'summary', 'direct'] as const;
 export const FOLDER_GROUPING_MODES = ['none', 'top-level', 'nested'] as const;
 export const EDGE_LABEL_MODES = ['none', 'types'] as const;
+export const LAYOUT_DIRECTION_MODES = ['lr', 'tb'] as const;
+export const RANK_CONSTRAINT_MODES = ['all', 'intra-folder'] as const;
+export const LAYOUT_DENSITY_MODES = ['normal', 'compact'] as const;
+export const GRAPH_PROFILE_MODES = ['default', 'local-architecture', 'compact-architecture'] as const;
 
 export type ExternalPackagesMode = typeof EXTERNAL_PACKAGE_MODES[number];
 export type FolderGroupingMode = typeof FOLDER_GROUPING_MODES[number];
 export type EdgeLabelsMode = typeof EDGE_LABEL_MODES[number];
+export type LayoutDirectionMode = typeof LAYOUT_DIRECTION_MODES[number];
+export type RankConstraintMode = typeof RANK_CONSTRAINT_MODES[number];
+export type LayoutDensityMode = typeof LAYOUT_DENSITY_MODES[number];
+export type GraphProfileMode = typeof GRAPH_PROFILE_MODES[number];
 export type GraphPresentationOptions = {
     externalPackages?: ExternalPackagesMode;
     folderGrouping?: FolderGroupingMode;
     edgeLabels?: EdgeLabelsMode;
+    layoutDirection?: LayoutDirectionMode;
+    rankConstraints?: RankConstraintMode;
+    layoutDensity?: LayoutDensityMode;
+    graphProfile?: GraphProfileMode;
 };
+export type ResolvedGraphPresentation = Required<Omit<GraphPresentationOptions, 'graphProfile'>>;
 
 export const DEFAULT_GRAPH_PRESENTATION = {
     externalPackages: 'direct',
     folderGrouping: 'nested',
-    edgeLabels: 'types'
-} as const satisfies Required<GraphPresentationOptions>;
+    edgeLabels: 'types',
+    layoutDirection: 'lr',
+    rankConstraints: 'all',
+    layoutDensity: 'normal'
+} as const satisfies ResolvedGraphPresentation;
+
+export const DEFAULT_GRAPH_PROFILE = 'default' as const;
+export const GRAPH_PRESENTATION_PROFILES = {
+    default: DEFAULT_GRAPH_PRESENTATION,
+    'local-architecture': {
+        externalPackages: 'none',
+        folderGrouping: 'nested',
+        edgeLabels: 'none',
+        layoutDirection: 'lr',
+        rankConstraints: 'all',
+        layoutDensity: 'normal'
+    },
+    'compact-architecture': {
+        externalPackages: 'none',
+        folderGrouping: 'nested',
+        edgeLabels: 'none',
+        layoutDirection: 'tb',
+        rankConstraints: 'intra-folder',
+        layoutDensity: 'compact'
+    }
+} as const satisfies Record<GraphProfileMode, ResolvedGraphPresentation>;
+
+/** Applies a profile first, then explicit presentation options as deterministic overrides. */
+export function resolveGraphPresentation(options: GraphPresentationOptions = {}): ResolvedGraphPresentation {
+    const profile = GRAPH_PRESENTATION_PROFILES[options.graphProfile ?? DEFAULT_GRAPH_PROFILE];
+    return {
+        externalPackages: options.externalPackages ?? profile.externalPackages,
+        folderGrouping: options.folderGrouping ?? profile.folderGrouping,
+        edgeLabels: options.edgeLabels ?? profile.edgeLabels,
+        layoutDirection: options.layoutDirection ?? profile.layoutDirection,
+        rankConstraints: options.rankConstraints ?? profile.rankConstraints,
+        layoutDensity: options.layoutDensity ?? profile.layoutDensity
+    };
+}
 
 const dotQuote = (value: string): string => JSON.stringify(value);
 const normalizedPath = (value: string): string => value.replaceAll('\\', '/').replace(/^\.\//, '');
@@ -76,8 +126,15 @@ function renderDirectory(directory: DirectoryNode, segments: string[], indent: s
     return lines;
 }
 
-function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode): string {
+function topLevelFolder(source: string): string {
+    const segments = normalizedPath(source).split('/').filter(Boolean);
+    segments.pop();
+    return segments[0] ?? '.';
+}
+
+function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode, constrained: boolean): string {
     const attributes: string[] = [];
+    if (!constrained) attributes.push('constraint="false"');
     const dependencyTypes = [...dependency.dependencyTypes].sort();
     if (edgeLabels === 'types' && dependencyTypes.length > 0) attributes.push(`label=${dotQuote(dependencyTypes.join(', '))}`);
     if (dependency.typeOnly || dependency.preCompilationOnly) attributes.push('style="dashed"');
@@ -91,11 +148,7 @@ function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMo
 
 /** Pure, deterministic conversion of a validated dependency-cruiser result to Graphviz DOT. */
 export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options: GraphPresentationOptions = {}): string {
-    const presentation = {
-        externalPackages: options.externalPackages ?? DEFAULT_GRAPH_PRESENTATION.externalPackages,
-        folderGrouping: options.folderGrouping ?? DEFAULT_GRAPH_PRESENTATION.folderGrouping,
-        edgeLabels: options.edgeLabels ?? DEFAULT_GRAPH_PRESENTATION.edgeLabels
-    };
+    const presentation = resolveGraphPresentation(options);
     const root: DirectoryNode = { directories: new Map(), files: [] };
     const localSources = new Set<string>();
     const externalPackages = new Set<string>();
@@ -106,18 +159,20 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         localSources.add(source);
         if (presentation.folderGrouping === 'nested') addLocalModule(root, source);
         else if (presentation.folderGrouping === 'top-level') {
-            if (!source.includes('/')) {
-                root.files.push({ source, name: source });
+            const segments = source.split('/').filter(Boolean);
+            const name = segments.at(-1);
+            if (segments.length <= 1 || !name) {
+                root.files.push({ source, name: name ?? source });
                 continue;
             }
-            const [topLevel] = source.split('/');
+            const [topLevel] = segments;
             const directory: DirectoryNode = root.directories.get(topLevel) ?? { directories: new Map(), files: [] };
             root.directories.set(topLevel, directory);
             directory.files.push({ source, name: path.posix.basename(source) });
         } else root.files.push({ source, name: path.posix.basename(source) });
     }
 
-    const edges: Array<{ from: string; to: string; dependency: MaritimeDependency }> = [];
+    const edges: Array<{ from: string; to: string; dependency: MaritimeDependency; constrained: boolean }> = [];
     for (const module of [...graph.modules].sort((a, b) => a.source.localeCompare(b.source))) {
         const source = normalizedPath(module.source);
         if (!localSources.has(source)) continue;
@@ -136,7 +191,12 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
                     target = presentation.externalPackages === 'summary' ? 'external:boundary' : `external:${packageName}`;
                 }
             }
-            if (target) edges.push({ from: `local:${source}`, to: target, dependency });
+            if (target) {
+                const constrained = !localSources.has(resolved)
+                    || presentation.rankConstraints === 'all'
+                    || topLevelFolder(source) === topLevelFolder(resolved);
+                edges.push({ from: `local:${source}`, to: target, dependency, constrained });
+            }
         }
     }
 
@@ -149,8 +209,8 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         // Graphviz 2.42 can fail init_rank when the default cluster-local ranker
         // encounters a large recursively nested directory hierarchy. newrank asks
         // dot to compute one global ranking across clusters while preserving the
-        // cluster boxes and deterministic left-to-right presentation.
-        '  graph [compound="true", newrank="true", rankdir="LR", fontname="Helvetica"];',
+        // cluster boxes and deterministic configured-direction presentation.
+        `  graph [compound="true", newrank="true", rankdir="${presentation.layoutDirection.toUpperCase()}", fontname="Helvetica"${presentation.layoutDensity === 'compact' ? ', ranksep="0.35", nodesep="0.2"' : ''}];`,
         '  node [fontname="Helvetica", fontsize="10"];',
         '  edge [fontname="Helvetica", fontsize="8"];',
         ...renderDirectory(root, [], '  ')
@@ -165,7 +225,7 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         lines.push('  }');
     }
     for (const edge of edges) {
-        lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency, presentation.edgeLabels)};`);
+        lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency, presentation.edgeLabels, edge.constrained)};`);
     }
     lines.push('}', '');
     return lines.join('\n');
