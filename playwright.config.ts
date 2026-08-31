@@ -1,6 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:5173/dependency-maritime/';
+const WEB_SERVER_COMMAND = process.env.CI
+  ? 'npm run preview -- --host 127.0.0.1 --port 5173 --strictPort'
+  : 'npm run dev';
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -34,7 +37,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    // CI has already built the application. Serving that immutable output keeps
+    // browser runs independent of Vite's on-demand transforms and file watcher.
+    command: WEB_SERVER_COMMAND,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

@@ -13,17 +13,24 @@ test('File nodes are visible and interactable (not obscured by folders)', async 
   // React handler with a synthetic event.
   await expect(node).toBeVisible();
   await expect(node).toHaveJSProperty('isConnected', true);
-  const receivesPointerEvents = await node.evaluate((element) => {
+  const hitTarget = await node.evaluate((element) => {
     const bounds = element.getBoundingClientRect();
+    const point = {
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height / 2,
+    };
     const hit = document.elementFromPoint(
-      bounds.left + bounds.width / 2,
-      bounds.top + bounds.height / 2
+      point.x,
+      point.y
     );
 
-    return hit === element || element.contains(hit);
+    return { point, receivesPointerEvents: hit === element || element.contains(hit) };
   });
-  expect(receivesPointerEvents).toBe(true);
+  expect(hitTarget.receivesPointerEvents).toBe(true);
 
-  await node.click();
+  // React Flow continuously transforms the node's ancestors in WebKit, so
+  // locator.click() can wait forever for Playwright's stability check. Clicking
+  // the verified hit-test point still sends a real browser pointer event.
+  await page.mouse.click(hitTarget.point.x, hitTarget.point.y);
   await expect(page.getByTestId('isolate-module-toggle')).toBeVisible();
 });
