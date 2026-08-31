@@ -72,6 +72,19 @@ describe('renderDependencyGraphToDot', () => {
         expect(nested).toContain('"cluster:app/domain/schema"');
     });
 
+    it('derives top-level clusters from non-empty absolute-path segments', () => {
+        const fixture: MaritimeCruiseResult = {
+            modules: [
+                { source: '/repo/src/index.ts', valid: true, dependents: [], dependencies: [] },
+                { source: '/repo/src/config.ts', valid: true, dependents: [], dependencies: [] }
+            ],
+            summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 2, violations: [], optionsUsed: {} }
+        };
+        const dot = renderDependencyGraphToDot(fixture, { folderGrouping: 'top-level' });
+        expect(dot).toContain('"cluster:repo"');
+        expect(dot).not.toContain('subgraph "cluster:" {');
+    });
+
     it('defaults to type labels and can omit only dependency-type labels', () => {
         expect(renderDependencyGraphToDot(graph())).toContain('[label="local"]');
         expect(renderDependencyGraphToDot(graph(), { edgeLabels: 'none' })).not.toContain('[label="local"]');
@@ -134,6 +147,19 @@ describe('renderDependencyGraphToDot', () => {
         expect(released).toContain('constraint="false"');
         expect(released).toContain('label="local"');
         expect(constrained).not.toContain('constraint="false"');
+    });
+
+    it('keeps root-level dependencies rank-constrained in intra-folder mode', () => {
+        const fixture: MaritimeCruiseResult = {
+            modules: [
+                { source: 'index.ts', valid: true, dependents: [], dependencies: [dependency('config.ts')] },
+                { source: 'config.ts', valid: true, dependents: [], dependencies: [] }
+            ],
+            summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 2, violations: [], optionsUsed: {} }
+        };
+        const edge = renderDependencyGraphToDot(fixture, { rankConstraints: 'intra-folder' }).split('\n')
+            .find(line => line.includes('"local:index.ts" -> "local:config.ts"'));
+        expect(edge).not.toContain('constraint="false"');
     });
 
     it('keeps circular and invalid edge semantics visible without duplicate attributes', () => {

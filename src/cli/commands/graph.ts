@@ -29,7 +29,7 @@ Options:
   -i, --input <path>   .maritime directory or dependency-graph.json (default: .maritime)
   -o, --output <path>  SVG or DOT output path (required)
   --graph-profile <default|local-architecture|compact-architecture>
-                              Presentation baseline; explicit options below override it (default: default)
+                             Presentation baseline; explicit options below override it (default: default)
   --external-packages <none|summary|direct>  External package presentation (default: direct)
   --folder-grouping <none|top-level|nested>   Local folder clustering (default: nested)
   --edge-labels <none|types>                  Dependency-type labels (default: types)
@@ -85,7 +85,7 @@ Options:
         await fs.mkdir(path.dirname(output), { recursive: true });
         if (format === 'dot') await fs.writeFile(output, dot);
         else await renderDotWithGraphviz(dot, output);
-        console.log(`Ã¢ÂÂ Dependency graph rendered from ${graphPath} to ${output}`);
+        console.log(`✅ Dependency graph rendered from ${graphPath} to ${output}`);
         return 0;
     } catch (error) {
         console.error(`Error rendering dependency graph: ${error instanceof Error ? error.message : String(error)}`);

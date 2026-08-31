@@ -127,8 +127,9 @@ function renderDirectory(directory: DirectoryNode, segments: string[], indent: s
 }
 
 function topLevelFolder(source: string): string {
-    const [topLevel] = normalizedPath(source).split('/').filter(Boolean);
-    return topLevel ?? '.';
+    const segments = normalizedPath(source).split('/').filter(Boolean);
+    segments.pop();
+    return segments[0] ?? '.';
 }
 
 function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode, constrained: boolean): string {
@@ -158,11 +159,13 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         localSources.add(source);
         if (presentation.folderGrouping === 'nested') addLocalModule(root, source);
         else if (presentation.folderGrouping === 'top-level') {
-            if (!source.includes('/')) {
-                root.files.push({ source, name: source });
+            const segments = source.split('/').filter(Boolean);
+            const name = segments.at(-1);
+            if (segments.length <= 1 || !name) {
+                root.files.push({ source, name: name ?? source });
                 continue;
             }
-            const [topLevel] = source.split('/');
+            const [topLevel] = segments;
             const directory: DirectoryNode = root.directories.get(topLevel) ?? { directories: new Map(), files: [] };
             root.directories.set(topLevel, directory);
             directory.files.push({ source, name: path.posix.basename(source) });

@@ -59,10 +59,10 @@ The normal analysis output is a single self-contained artifact directory:
 
 ```text
 .maritime/
-Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ dependency-graph.json
-Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ complexity-metrics.json
-Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ complexity-report.md
-Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ manifest.json
+├── dependency-graph.json
+├── complexity-metrics.json
+├── complexity-report.md
+└── manifest.json
 ```
 
 Every successful `maritime analyze` invocation produces an output directory where `manifest.json`, the dependency graph JSON, complexity metrics JSON, and Markdown report all reside within that directory. All manifest-declared artifact paths are relative to the artifact directory and must not contain path traversal (e.g., `..`) or absolute paths.
@@ -268,10 +268,10 @@ its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
 
 ## Related documentation
 
-- [Roadmap](./ROADMAP.md) Ã¢ÂÂ unfinished CLI delivery work and UI work.
-- [Architecture](./ARCHITECTURE.md) Ã¢ÂÂ the boundary between the headless analyzer and the UI.
-- [Complexity and Health Metrics](./COMPLEXITY.md) Ã¢ÂÂ metric definitions and repository evidence.
-- [Development Guide](./DEVELOPMENT.md) Ã¢ÂÂ local setup and verification.
+- [Roadmap](./ROADMAP.md) — unfinished CLI delivery work and UI work.
+- [Architecture](./ARCHITECTURE.md) — the boundary between the headless analyzer and the UI.
+- [Complexity and Health Metrics](./COMPLEXITY.md) — metric definitions and repository evidence.
+- [Development Guide](./DEVELOPMENT.md) — local setup and verification.
 
 ## Supported graph rendering
 

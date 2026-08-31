@@ -1,4 +1,4 @@
-# Dependency Maritime âï¸
+# Dependency Maritime ⚓️
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![React](https://img.shields.io/badge/react-19.2.3-blue)
@@ -10,7 +10,7 @@
 
 Dependency Maritime is an interactive visualization tool for [dependency-cruiser](https://github.com/sverweij/dependency-cruiser). It transforms complex dependency graphs into navigable, interactive maps, helping you enforce boundaries, identify tangles, and plan refactoring efforts.
 
-## ð¸ Visuals
+## 📸 Visuals
 
 ### Interactive Dashboard
 Visualize your project's structure with an interactive graph. Zoom, pan, and filter to understand relationships.
@@ -24,7 +24,7 @@ Select any file to view detailed metrics, including incoming and outgoing depend
 Easily upload your own `dependency-cruiser` JSON output to visualize your codebase.
 ![Upload Data](docs/images/screenshot-upload.png)
 
-## â¨ Features
+## ✨ Features
 
 *   **Interactive Visualization:** Zoom, pan, and drag nodes to explore your architecture.
 *   **Deep Inspection:** Click any node to see its full path, metrics, and direct neighbors.
@@ -34,7 +34,7 @@ Easily upload your own `dependency-cruiser` JSON output to visualize your codeba
 *   **Compound Health Score:** Automatically assesses node health (Healthy, Warning, Unhealthy) based on a compound formula combining LOC, Complexity, Fan-Out, and Instability.
 *   **100% Client-Side:** Your code structure is analyzed locally; no data leaves your machine.
 
-## ð  Installation
+## 🛠 Installation
 
 1.  **Clone the repository:**
     ```bash
@@ -52,7 +52,7 @@ Easily upload your own `dependency-cruiser` JSON output to visualize your codeba
     npm run dev
     ```
 
-## ð Usage
+## 🚀 Usage
 
 ### 1. Analyze with Maritime CLI
 
@@ -107,9 +107,9 @@ The application calculates a **Compound Complexity Score** for each node to dete
 `Score = (LOC / 10) + (Complexity * 2) + (FanOut * 2) + (Instability * 20)`
 
 **Health Thresholds:**
-*   ð¢ **Healthy:** Score < 20
-*   ð¡ **Warning:** Score between 20 and 50
-*   ð´ **Unhealthy:** Score > 50
+*   🟢 **Healthy:** Score < 20
+*   🟡 **Warning:** Score between 20 and 50
+*   🔴 **Unhealthy:** Score > 50
 
 Nodes will visually reflect their status with colored borders and backgrounds.
 
@@ -119,7 +119,7 @@ Nodes will visually reflect their status with colored borders and backgrounds.
 3.  Drag and drop your `dependency-graph.json` file or click to select it.
 4.  The graph will automatically render your data.
 
-## ð Architecture & Phases
+## 🏗 Architecture & Phases
 
 The project is being built in 4 phases:
 1.  **Phase 1: The "Chartroom" (MVP)** - Core visualization (Complete).
@@ -134,7 +134,7 @@ For more details, check out the documentation:
 *   [Development Guide](./docs/DEVELOPMENT.md)
 *   [Design Decisions](./docs/DESIGN_DECISIONS.md)
 
-## ð¤ Contributing
+## 🤝 Contributing
 
 This project uses **npm** for package management. Please ensure you lock files are updated accordingly.
 
@@ -144,7 +144,7 @@ This project uses **npm** for package management. Please ensure you lock files a
 4.  Push to the branch.
 5.  Create a Pull Request.
 
-## ð License
+## 📝 License
 
 Distributed under the MIT License.
 
