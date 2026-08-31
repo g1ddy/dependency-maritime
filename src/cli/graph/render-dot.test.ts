@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MaritimeCruiseResult, MaritimeDependency } from '../../schema/dependency-cruiser';
-import { externalPackageName, renderDependencyGraphToDot } from './render-dot';
+import { externalPackageName, resolveGraphPresentation, renderDependencyGraphToDot } from './render-dot';
 
 const dependency = (resolved: string, overrides: Partial<MaritimeDependency> = {}): MaritimeDependency => ({
     circular: false, coreModule: false, couldNotResolve: false, dependencyTypes: ['local'],
@@ -95,6 +95,30 @@ describe('renderDependencyGraphToDot', () => {
         const compactTopToBottom = renderDependencyGraphToDot(graph(), { layoutDirection: 'tb', layoutDensity: 'compact' });
         expect(compactTopToBottom).toContain('rankdir="TB"');
         expect(compactTopToBottom).toContain('ranksep="0.35", nodesep="0.2"');
+    });
+
+    it('applies named profiles before explicit presentation overrides', () => {
+        expect(resolveGraphPresentation()).toEqual({
+            externalPackages: 'direct', folderGrouping: 'nested', edgeLabels: 'types',
+            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal'
+        });
+        expect(resolveGraphPresentation({ graphProfile: 'local-architecture' })).toEqual({
+            externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none',
+            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal'
+        });
+        expect(resolveGraphPresentation({ graphProfile: 'compact-architecture' })).toEqual({
+            externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none',
+            layoutDirection: 'tb', rankConstraints: 'intra-folder', layoutDensity: 'compact'
+        });
+        expect(resolveGraphPresentation({ graphProfile: 'compact-architecture', layoutDirection: 'lr' }).layoutDirection).toBe('lr');
+    });
+
+    it('renders the compact architecture profile without external nodes, labels, or default rank constraints', () => {
+        const dot = renderDependencyGraphToDot(graph(), { graphProfile: 'compact-architecture' });
+        expect(dot).toContain('rankdir="TB"');
+        expect(dot).toContain('ranksep="0.35", nodesep="0.2"');
+        expect(dot).not.toContain('external:');
+        expect(dot).not.toContain('[label="local"]');
     });
 
     it('keeps every dependency visible while releasing cross-folder rank constraints', () => {

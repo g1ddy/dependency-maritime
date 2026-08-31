@@ -1,4 +1,4 @@
-# Dependency Maritime ⚓️
+# Dependency Maritime âï¸
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![React](https://img.shields.io/badge/react-19.2.3-blue)
@@ -10,7 +10,7 @@
 
 Dependency Maritime is an interactive visualization tool for [dependency-cruiser](https://github.com/sverweij/dependency-cruiser). It transforms complex dependency graphs into navigable, interactive maps, helping you enforce boundaries, identify tangles, and plan refactoring efforts.
 
-## 📸 Visuals
+## ð¸ Visuals
 
 ### Interactive Dashboard
 Visualize your project's structure with an interactive graph. Zoom, pan, and filter to understand relationships.
@@ -24,7 +24,7 @@ Select any file to view detailed metrics, including incoming and outgoing depend
 Easily upload your own `dependency-cruiser` JSON output to visualize your codebase.
 ![Upload Data](docs/images/screenshot-upload.png)
 
-## ✨ Features
+## â¨ Features
 
 *   **Interactive Visualization:** Zoom, pan, and drag nodes to explore your architecture.
 *   **Deep Inspection:** Click any node to see its full path, metrics, and direct neighbors.
@@ -34,7 +34,7 @@ Easily upload your own `dependency-cruiser` JSON output to visualize your codeba
 *   **Compound Health Score:** Automatically assesses node health (Healthy, Warning, Unhealthy) based on a compound formula combining LOC, Complexity, Fan-Out, and Instability.
 *   **100% Client-Side:** Your code structure is analyzed locally; no data leaves your machine.
 
-## 🛠 Installation
+## ð  Installation
 
 1.  **Clone the repository:**
     ```bash
@@ -52,21 +52,41 @@ Easily upload your own `dependency-cruiser` JSON output to visualize your codeba
     npm run dev
     ```
 
-## 🚀 Usage
+## ð Usage
 
-### 1. Generating a Dependency Graph
-To visualize your own project, you need to generate a JSON report using `dependency-cruiser`.
+### 1. Analyze with Maritime CLI
 
-Run the following command in the root of the project you want to analyze:
+Install the headless CLI in the repository you want to analyze, then generate one validated canonical
+evidence bundle. This is the recommended local and non-GitHub-CI path.
 
 ```bash
-npx dependency-cruiser src \
-  --include-only "^src" \
-  --output-type json \
-  > dependency-graph.json
+npm install --save-dev @dependency-maritime/cli@<version>
+npx maritime analyze --source src --output .maritime --fail-on-unmeasured
+npx maritime validate .maritime
 ```
 
-*Adjust the `src` and `--include-only` patterns to match your project structure.*
+Render an optional presentation from the same evidence without a second scan:
+
+```bash
+npx maritime graph --input .maritime --output docs/images/dependency-graph.svg \
+  --graph-profile local-architecture
+```
+
+See [CLI and Artifact Contract](./docs/CLI.md) for supported environments, Graphviz requirements,
+profiles, and advanced overrides.
+
+### GitHub Actions
+
+Use the composite Action when GitHub Actions should run the same CLI contract. Consumers own workflow
+triggers, paths, and review policy; the Action runs analysis, validation, and optional rendering.
+
+```yaml
+- uses: g1ddy/dependency-maritime@cli-v<version>
+  with:
+    source-roots: src
+    render-graph: 'true'
+    graph-profile: local-architecture
+```
 
 #### Integrating Complexity Metrics (Optional)
 To view Cyclomatic Complexity and LOC in the Node Inspector, generate a metrics file using the provided script (if available in your project) or construct a JSON map matching the schema:
@@ -87,9 +107,9 @@ The application calculates a **Compound Complexity Score** for each node to dete
 `Score = (LOC / 10) + (Complexity * 2) + (FanOut * 2) + (Instability * 20)`
 
 **Health Thresholds:**
-*   🟢 **Healthy:** Score < 20
-*   🟡 **Warning:** Score between 20 and 50
-*   🔴 **Unhealthy:** Score > 50
+*   ð¢ **Healthy:** Score < 20
+*   ð¡ **Warning:** Score between 20 and 50
+*   ð´ **Unhealthy:** Score > 50
 
 Nodes will visually reflect their status with colored borders and backgrounds.
 
@@ -99,7 +119,7 @@ Nodes will visually reflect their status with colored borders and backgrounds.
 3.  Drag and drop your `dependency-graph.json` file or click to select it.
 4.  The graph will automatically render your data.
 
-## 🏗 Architecture & Phases
+## ð Architecture & Phases
 
 The project is being built in 4 phases:
 1.  **Phase 1: The "Chartroom" (MVP)** - Core visualization (Complete).
@@ -114,7 +134,7 @@ For more details, check out the documentation:
 *   [Development Guide](./docs/DEVELOPMENT.md)
 *   [Design Decisions](./docs/DESIGN_DECISIONS.md)
 
-## 🤝 Contributing
+## ð¤ Contributing
 
 This project uses **npm** for package management. Please ensure you lock files are updated accordingly.
 
@@ -124,7 +144,7 @@ This project uses **npm** for package management. Please ensure you lock files a
 4.  Push to the branch.
 5.  Create a Pull Request.
 
-## 📝 License
+## ð License
 
 Distributed under the MIT License.
 

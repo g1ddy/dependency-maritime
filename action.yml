@@ -46,6 +46,10 @@ inputs:
     description: 'Path for the derived Graphviz SVG when render-graph is true.'
     required: false
     default: 'docs/images/dependency-graph.svg'
+  graph-profile:
+    description: 'Optional graph presentation baseline: default, local-architecture, or compact-architecture. Explicit presentation inputs override it.'
+    required: false
+    default: ''
   external-packages:
     description: 'External package presentation: none, summary, or direct.'
     required: false
@@ -180,6 +184,7 @@ runs:
       env:
         INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
         INPUT_GRAPH_OUTPUT: ${{ inputs.graph-output }}
+        INPUT_GRAPH_PROFILE: ${{ inputs.graph-profile }}
         INPUT_EXTERNAL_PACKAGES: ${{ inputs.external-packages }}
         INPUT_FOLDER_GROUPING: ${{ inputs.folder-grouping }}
         INPUT_EDGE_LABELS: ${{ inputs.edge-labels }}
@@ -188,6 +193,10 @@ runs:
         INPUT_LAYOUT_DENSITY: ${{ inputs.layout-density }}
       run: |
         GRAPH_ARGS=(--input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT")
+        if [ -n "$INPUT_GRAPH_PROFILE" ]; then
+          case "$INPUT_GRAPH_PROFILE" in default|local-architecture|compact-architecture) ;; *) echo "Invalid graph-profile value '$INPUT_GRAPH_PROFILE'. Expected: default, local-architecture, or compact-architecture." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--graph-profile "$INPUT_GRAPH_PROFILE")
+        fi
         if [ -n "$INPUT_EXTERNAL_PACKAGES" ]; then
           case "$INPUT_EXTERNAL_PACKAGES" in none|summary|direct) ;; *) echo "Invalid external-packages value '$INPUT_EXTERNAL_PACKAGES'. Expected: none, summary, or direct." >&2; exit 2;; esac
           GRAPH_ARGS+=(--external-packages "$INPUT_EXTERNAL_PACKAGES")

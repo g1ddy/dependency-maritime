@@ -12,6 +12,7 @@ export const EDGE_LABEL_MODES = ['none', 'types'] as const;
 export const LAYOUT_DIRECTION_MODES = ['lr', 'tb'] as const;
 export const RANK_CONSTRAINT_MODES = ['all', 'intra-folder'] as const;
 export const LAYOUT_DENSITY_MODES = ['normal', 'compact'] as const;
+export const GRAPH_PROFILE_MODES = ['default', 'local-architecture', 'compact-architecture'] as const;
 
 export type ExternalPackagesMode = typeof EXTERNAL_PACKAGE_MODES[number];
 export type FolderGroupingMode = typeof FOLDER_GROUPING_MODES[number];
@@ -19,6 +20,7 @@ export type EdgeLabelsMode = typeof EDGE_LABEL_MODES[number];
 export type LayoutDirectionMode = typeof LAYOUT_DIRECTION_MODES[number];
 export type RankConstraintMode = typeof RANK_CONSTRAINT_MODES[number];
 export type LayoutDensityMode = typeof LAYOUT_DENSITY_MODES[number];
+export type GraphProfileMode = typeof GRAPH_PROFILE_MODES[number];
 export type GraphPresentationOptions = {
     externalPackages?: ExternalPackagesMode;
     folderGrouping?: FolderGroupingMode;
@@ -26,7 +28,9 @@ export type GraphPresentationOptions = {
     layoutDirection?: LayoutDirectionMode;
     rankConstraints?: RankConstraintMode;
     layoutDensity?: LayoutDensityMode;
+    graphProfile?: GraphProfileMode;
 };
+export type ResolvedGraphPresentation = Required<Omit<GraphPresentationOptions, 'graphProfile'>>;
 
 export const DEFAULT_GRAPH_PRESENTATION = {
     externalPackages: 'direct',
@@ -35,7 +39,41 @@ export const DEFAULT_GRAPH_PRESENTATION = {
     layoutDirection: 'lr',
     rankConstraints: 'all',
     layoutDensity: 'normal'
-} as const satisfies Required<GraphPresentationOptions>;
+} as const satisfies ResolvedGraphPresentation;
+
+export const DEFAULT_GRAPH_PROFILE = 'default' as const;
+export const GRAPH_PRESENTATION_PROFILES = {
+    default: DEFAULT_GRAPH_PRESENTATION,
+    'local-architecture': {
+        externalPackages: 'none',
+        folderGrouping: 'nested',
+        edgeLabels: 'none',
+        layoutDirection: 'lr',
+        rankConstraints: 'all',
+        layoutDensity: 'normal'
+    },
+    'compact-architecture': {
+        externalPackages: 'none',
+        folderGrouping: 'nested',
+        edgeLabels: 'none',
+        layoutDirection: 'tb',
+        rankConstraints: 'intra-folder',
+        layoutDensity: 'compact'
+    }
+} as const satisfies Record<GraphProfileMode, ResolvedGraphPresentation>;
+
+/** Applies a profile first, then explicit presentation options as deterministic overrides. */
+export function resolveGraphPresentation(options: GraphPresentationOptions = {}): ResolvedGraphPresentation {
+    const profile = GRAPH_PRESENTATION_PROFILES[options.graphProfile ?? DEFAULT_GRAPH_PROFILE];
+    return {
+        externalPackages: options.externalPackages ?? profile.externalPackages,
+        folderGrouping: options.folderGrouping ?? profile.folderGrouping,
+        edgeLabels: options.edgeLabels ?? profile.edgeLabels,
+        layoutDirection: options.layoutDirection ?? profile.layoutDirection,
+        rankConstraints: options.rankConstraints ?? profile.rankConstraints,
+        layoutDensity: options.layoutDensity ?? profile.layoutDensity
+    };
+}
 
 const dotQuote = (value: string): string => JSON.stringify(value);
 const normalizedPath = (value: string): string => value.replaceAll('\\', '/').replace(/^\.\//, '');
@@ -109,14 +147,7 @@ function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMo
 
 /** Pure, deterministic conversion of a validated dependency-cruiser result to Graphviz DOT. */
 export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options: GraphPresentationOptions = {}): string {
-    const presentation = {
-        externalPackages: options.externalPackages ?? DEFAULT_GRAPH_PRESENTATION.externalPackages,
-        folderGrouping: options.folderGrouping ?? DEFAULT_GRAPH_PRESENTATION.folderGrouping,
-        edgeLabels: options.edgeLabels ?? DEFAULT_GRAPH_PRESENTATION.edgeLabels,
-        layoutDirection: options.layoutDirection ?? DEFAULT_GRAPH_PRESENTATION.layoutDirection,
-        rankConstraints: options.rankConstraints ?? DEFAULT_GRAPH_PRESENTATION.rankConstraints,
-        layoutDensity: options.layoutDensity ?? DEFAULT_GRAPH_PRESENTATION.layoutDensity
-    };
+    const presentation = resolveGraphPresentation(options);
     const root: DirectoryNode = { directories: new Map(), files: [] };
     const localSources = new Set<string>();
     const externalPackages = new Set<string>();

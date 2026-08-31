@@ -145,7 +145,7 @@ describe('CLI npm pack clean-install smoke tests', () => {
 
         const graphHelpOutput = execSync('npx maritime graph --help', { cwd: catanDir, encoding: 'utf8' });
         expect(graphHelpOutput).toContain('Usage: maritime graph');
-        execSync('npx maritime graph --input dependency-graph.json --output dependency-graph.dot --external-packages none --folder-grouping top-level --edge-labels none --layout-direction tb --rank-constraints intra-folder --layout-density compact', { cwd: catanDir });
+        execSync('npx maritime graph --input dependency-graph.json --output dependency-graph.dot --graph-profile compact-architecture --folder-grouping top-level', { cwd: catanDir });
         const renderedDot = fs.readFileSync(path.join(catanDir, 'dependency-graph.dot'), 'utf8');
         expect(renderedDot).toContain('cluster:src');
         expect(renderedDot).not.toContain('cluster:src/board');
