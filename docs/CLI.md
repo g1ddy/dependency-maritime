@@ -201,23 +201,83 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 
 ### Usage Examples
 
-Versioned action tags and development refs resolve differently. A `cli-vX.Y.Z[-pre]` tag is
-authoritative and makes the action install the matching exact `@dependency-maritime/cli@X.Y.Z[-pre]`
-version dynamically. A branch or commit SHA cannot encode a package version, so it retains the
-committed `@dependency-maritime/cli@0.1.0-beta.1` last-known-compatible development fallback. That
-fallback is not advanced for each release. Consumers pinning an unreleased action SHA may instead
-pair it explicitly with the compatible exact package through `cli-source`.
+### Dogfood versus consumer
+
+The repository dogfood workflow and a released consumer workflow prove different things and are not
+interchangeable:
+
+| Context | Action source | CLI source | Purpose |
+| :--- | :--- | :--- | :--- |
+| Maritime PR dogfood | Checked-out local `uses: ./` | `cli-source: '.'` after build | Tests the exact unmerged implementation. |
+| Released external consumer | Immutable released Action ref | Matching published `@dependency-maritime/cli@X.Y.Z[-pre]` | Uses a publishable, reproducible contract. |
+
+`.github/workflows/update-maritime-evidence.yml` is the dogfood reference orchestration. It builds
+the checked-out PR CLI, analyzes and validates the canonical bundle, renders the derived SVG, and
+uploads both as candidate evidence. Forks remain read-only. For a changed same-repository PR, its
+write job targets the `generated-evidence-write` Environment and commits only generated evidence.
+Maintainers must configure that Environment with a required reviewer. Leave **prevent self-review**
+disabled when a solo maintainer must be able to approve their own run.
+
+Released consumers must pin both halves of the public contract. A `cli-vX.Y.Z[-pre]` Action tag
+resolves the matching exact published package, but an explicit `cli-source` makes that pairing
+reviewable in the workflow. An unpublished Action SHA cannot make an unpublished checkout available
+to an external consumer.
 
 #### Normal consumer workflow
 
 ```yaml
+name: Maritime evidence
+
+on:
+  pull_request:
+    paths: ['src/**', 'package.json', 'package-lock.json']
+
+permissions:
+  contents: read
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Maritime Analyze & Validate
+        # Pin the full commit SHA associated with the cli-v0.1.0-beta.5 release.
+        uses: g1ddy/dependency-maritime@<released-action-commit-sha>
+        with:
+          cli-source: '@dependency-maritime/cli@0.1.0-beta.5'
+          source-roots: src
+          graph-profile: local-architecture
+          render-graph: 'true'
+```
+
+The caller owns its triggers, source and configuration paths, branch protection, artifact retention,
+and any write or approval policy. The composite Action is only the reusable command wrapper; this
+repository workflow should become reusable only after Catan and Crawler establish which orchestration
+inputs are genuinely common.
+
+#### Catan Hex Mastery consumer profile
+
+Catan is the wide, cross-folder reference for selecting `compact-architecture` instead of the normal
+consumer example's clean `local-architecture` map:
+
+```yaml
 steps:
   - uses: actions/checkout@v4
-  - name: Maritime Analyze & Validate
-    uses: g1ddy/dependency-maritime@<pinned-ref>
+  - name: Generate Catan Maritime evidence
+    # Pin the full commit SHA associated with the cli-v0.1.0-beta.5 release.
+    uses: g1ddy/dependency-maritime@<released-action-commit-sha>
     with:
+      cli-source: '@dependency-maritime/cli@0.1.0-beta.5'
       source-roots: src
+      render-graph: 'true'
+      graph-output: 'docs/images/dependency-graph.svg'
+      graph-profile: compact-architecture
 ```
+
+This profile keeps nested local folders, suppresses external nodes and edge-type labels, lays the
+graph out top-to-bottom, releases cross-folder rank constraints, and compacts spacing. Presentation
+profiles affect only the derived SVG; they never change canonical
+`.maritime/dependency-graph.json` evidence.
 
 #### Multiple Source Roots and Custom Config
 
@@ -366,9 +426,10 @@ over the selected profile, for example `graph-profile: compact-architecture` wit
 `layout-direction: lr`. Empty Action inputs are not passed to the CLI, preserving compatibility
 when an Action branch/commit falls back to an older published CLI.
 
-Use this local-architecture policy for the Catan Hex Mastery and Crawler Command Interface
-migrations. It retains nested source structure while removing third-party package density and
-dependency-type text, without repository-local renderers or package filters.
+Use `compact-architecture` for the wide Catan Hex Mastery graph. Crawler Command Interface can use
+`local-architecture` when its left-to-right clean local-source map is preferable. Both retain nested
+source structure while removing third-party package density and dependency-type text, without
+repository-local renderers or package filters.
 
 Rendering is opt-in. The supported reproducible path is `ubuntu-latest`, where the action requests
 Graphviz `2.42.2-9ubuntu0.1`; identical Graphviz selection and byte-for-byte committed SVG output are
