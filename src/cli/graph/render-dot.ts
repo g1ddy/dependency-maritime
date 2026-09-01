@@ -161,6 +161,33 @@ function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMo
     return attributes.length > 0 ? ` [${attributes.join(', ')}]` : '';
 }
 
+type AggregatedEdge = {
+    from: string;
+    to: string;
+    count: number;
+    constrained: boolean;
+    dependencyTypes: Set<string>;
+    allNonRuntime: boolean;
+    circular: boolean;
+    valid: boolean;
+};
+
+function aggregateEdgeAttributes(edge: AggregatedEdge, edgeLabels: EdgeLabelsMode): string {
+    const attributes: string[] = [];
+    if (!edge.constrained) attributes.push('constraint="false"');
+    const labelParts: string[] = [];
+    if (edge.count > 1) labelParts.push(`×${edge.count}`);
+    if (edgeLabels === 'types') labelParts.push(...[...edge.dependencyTypes].sort());
+    if (labelParts.length > 0) attributes.push(`label=${dotQuote(labelParts.join(' · '))}`);
+    if (edge.allNonRuntime) attributes.push('style="dashed"');
+    if (edge.circular) attributes.push('color="#d97706"', 'penwidth="2"');
+    if (!edge.valid) {
+        if (edge.circular) attributes.push('xlabel="invalid"', 'fontcolor="#dc2626"');
+        else attributes.push('color="#dc2626"', 'penwidth="2"');
+    }
+    return attributes.length > 0 ? ` [${attributes.join(', ')}]` : '';
+}
+
 /** Pure, deterministic conversion of a validated dependency-cruiser result to Graphviz DOT. */
 export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options: GraphPresentationOptions = {}): string {
     const presentation = resolveGraphPresentation(options);
@@ -190,22 +217,45 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
 
     if (presentation.moduleAggregation === 'folders') {
         const folders = [...new Set([...localSources].map(compactFolder))].sort();
-        const aggregateEdges = new Map<string, { from: string; to: string; count: number; constrained: boolean }>();
+        const aggregateEdges = new Map<string, AggregatedEdge>();
         for (const module of [...graph.modules].sort((a, b) => a.source.localeCompare(b.source))) {
             const source = normalizedPath(module.source);
             if (!localSources.has(source)) continue;
             const fromFolder = compactFolder(source);
             for (const dependency of module.dependencies) {
                 const resolved = normalizedPath(dependency.resolved);
-                if (!localSources.has(resolved)) continue;
-                const toFolder = compactFolder(resolved);
-                if (fromFolder === toFolder) continue;
-                const key = `${fromFolder}\0${toFolder}`;
+                let target: string | undefined;
+                if (localSources.has(resolved)) {
+                    const toFolder = compactFolder(resolved);
+                    if (fromFolder === toFolder) continue;
+                    target = `folder:${toFolder}`;
+                } else if (!dependency.coreModule) {
+                    const looksExternal = isExternalPath(resolved) || dependency.dependencyTypes.includes('npm');
+                    const packageName = looksExternal
+                        ? externalPackageName(isExternalPath(resolved) ? resolved : dependency.module)
+                        : undefined;
+                    if (packageName && presentation.externalPackages !== 'none') {
+                        externalPackages.add(packageName);
+                        target = presentation.externalPackages === 'summary' ? 'external:boundary' : `external:${packageName}`;
+                    }
+                }
+                if (!target) continue;
+                const key = `${fromFolder}\0${target}`;
                 const current = aggregateEdges.get(key);
-                if (current) current.count += 1;
+                if (current) {
+                    current.count += 1;
+                    dependency.dependencyTypes.forEach(type => current.dependencyTypes.add(type));
+                    current.allNonRuntime &&= dependency.typeOnly === true || dependency.preCompilationOnly === true;
+                    current.circular ||= dependency.circular;
+                    current.valid &&= dependency.valid;
+                }
                 else aggregateEdges.set(key, {
-                    from: fromFolder, to: toFolder, count: 1,
-                    constrained: presentation.rankConstraints === 'all' || topLevelFolder(source) === topLevelFolder(resolved)
+                    from: `folder:${fromFolder}`, to: target, count: 1,
+                    constrained: !localSources.has(resolved) || presentation.rankConstraints === 'all' || topLevelFolder(source) === topLevelFolder(resolved),
+                    dependencyTypes: new Set(dependency.dependencyTypes),
+                    allNonRuntime: dependency.typeOnly === true || dependency.preCompilationOnly === true,
+                    circular: dependency.circular,
+                    valid: dependency.valid
                 });
             }
         }
@@ -216,12 +266,17 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
             '  edge [fontname="Helvetica", fontsize="8", color="#94a3b8"];',
             ...folders.map(folder => `  ${dotQuote(`folder:${folder}`)} [label=${dotQuote(folder)}, shape="folder"];`)
         ];
+        if (presentation.externalPackages === 'summary' && externalPackages.size > 0) {
+            lines.push('  "external:boundary" [label="External packages", shape="component", style="filled,dashed", fillcolor="#e2e8f0", color="#64748b"];');
+        } else if (presentation.externalPackages === 'direct' && externalPackages.size > 0) {
+            lines.push('  subgraph "cluster:external-packages" {', '    label="External packages";', '    style="dashed";', '    color="#64748b";');
+            for (const packageName of [...externalPackages].sort()) {
+                lines.push(`    ${dotQuote(`external:${packageName}`)} [label=${dotQuote(packageName)}, shape="component", style="filled", fillcolor="#e2e8f0"];`);
+            }
+            lines.push('  }');
+        }
         for (const edge of [...aggregateEdges.values()].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to))) {
-            const attributes = [
-                ...(!edge.constrained ? ['constraint="false"'] : []),
-                ...(edge.count > 1 ? [`label=${dotQuote(`×${edge.count}`)}`] : [])
-            ];
-            lines.push(`  ${dotQuote(`folder:${edge.from}`)} -> ${dotQuote(`folder:${edge.to}`)}${attributes.length ? ` [${attributes.join(', ')}]` : ''};`);
+            lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${aggregateEdgeAttributes(edge, presentation.edgeLabels)};`);
         }
         lines.push('}', '');
         return lines.join('\n');

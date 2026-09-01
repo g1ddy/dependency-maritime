@@ -416,8 +416,8 @@
     "scanned": true
   },
   "src/cli/graph/render-dot.ts": {
-    "complexity": 46,
-    "loc": 297,
+    "complexity": 62,
+    "loc": 352,
     "instability": 0.33,
     "fanIn": 2,
     "fanOut": 1,

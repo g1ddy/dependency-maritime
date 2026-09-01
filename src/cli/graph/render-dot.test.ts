@@ -153,6 +153,51 @@ describe('renderDependencyGraphToDot', () => {
         expect(dot).not.toContain('folder:src/features/board');
     });
 
+    it('composes folder aggregation with direct and summary external-package modes', () => {
+        const direct = renderDependencyGraphToDot(graph(), { moduleAggregation: 'folders', externalPackages: 'direct' });
+        expect(direct).toContain('"external:react" [label="react"');
+        expect(direct).toContain('"folder:src/features/board" -> "external:react"');
+        expect(direct).toContain('"folder:src/features/board" -> "external:@scope/pkg"');
+
+        const summary = renderDependencyGraphToDot(graph(), { moduleAggregation: 'folders', externalPackages: 'summary' });
+        expect(summary.match(/\[label="External packages"/g)).toHaveLength(1);
+        expect(summary.match(/-> "external:boundary"/g)).toHaveLength(1);
+        expect(summary).toContain('label="×2 · npm"');
+    });
+
+    it('keeps mixed runtime aggregate edges solid while preserving dependency semantics', () => {
+        const fixture = graph();
+        fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts', {
+            dependencyTypes: ['local', 'type-only'], typeOnly: true
+        }));
+        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts', {
+            dependencyTypes: ['local'], circular: true, valid: false
+        }));
+        const edge = renderDependencyGraphToDot(fixture, {
+            moduleAggregation: 'folders', externalPackages: 'none', edgeLabels: 'types'
+        }).split('\n').find(line => line.includes('"folder:src/features/board" -> "folder:app/domain"'));
+        expect(edge).toContain('label="×2 · local · type-only"');
+        expect(edge).not.toContain('style="dashed"');
+        expect(edge).toContain('color="#d97706"');
+        expect(edge).toContain('xlabel="invalid"');
+        expect(edge).toContain('fontcolor="#dc2626"');
+    });
+
+
+    it('renders an aggregate edge dashed only when every dependency is non-runtime', () => {
+        const fixture = graph();
+        fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts', {
+            dependencyTypes: ['local', 'type-only'], typeOnly: true
+        }));
+        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts', {
+            dependencyTypes: ['local'], preCompilationOnly: true
+        }));
+        const edge = renderDependencyGraphToDot(fixture, {
+            moduleAggregation: 'folders', externalPackages: 'none'
+        }).split('\n').find(line => line.includes('"folder:src/features/board" -> "folder:app/domain"'));
+        expect(edge).toContain('style="dashed"');
+    });
+
     it('keeps every dependency visible while releasing cross-folder rank constraints', () => {
         const constrained = renderDependencyGraphToDot(graph(), { rankConstraints: 'all' });
         const intraFolder = renderDependencyGraphToDot(graph(), { rankConstraints: 'intra-folder' });

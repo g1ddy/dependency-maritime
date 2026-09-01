@@ -241,10 +241,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Maritime Analyze & Validate
-        # Pin the full commit SHA associated with the cli-v0.1.0-beta.6 release.
-        uses: g1ddy/dependency-maritime@<released-action-commit-sha>
+        # Pin the Action commit and CLI package from the same compact-profile release.
+        uses: g1ddy/dependency-maritime@<released-compact-action-commit-sha>
         with:
-          cli-source: '@dependency-maritime/cli@0.1.0-beta.6'
+          cli-source: '@dependency-maritime/cli@<released-compact-version>
           source-roots: src
           graph-profile: local-architecture
           render-graph: 'true'
@@ -257,13 +257,14 @@ inputs are genuinely common.
 
 #### Repository presentation profiles
 
-Use the following repository mappings with the currently released renderer:
+Use the following repository mappings. Catan moves to `compact-architecture` when it references
+the matching release that contains folder aggregation:
 
 | Repository | Profile |
 | :--- | :--- |
 | Crawler Command Interface | `default` |
 | Dependency Maritime | `local-architecture` |
-| Catan Hex Mastery | `compact-architecture` |
+| Catan Hex Mastery | `compact-architecture` after the matching release |
 
 Catan is the wide, cross-folder reference for `compact-architecture`, which reduces implementation
 detail to deterministic folder nodes and aggregated folder-to-folder dependencies:

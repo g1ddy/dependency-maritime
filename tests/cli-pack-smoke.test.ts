@@ -139,6 +139,12 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(fs.existsSync(path.join(catanDir, 'node_modules', 'tailwindcss'))).toBe(false);
         expect(fs.existsSync(path.join(catanDir, 'node_modules', 'lucide-react'))).toBe(false);
 
+        const aggregationModes = execSync(
+            'node --input-type=module -e "import { MODULE_AGGREGATION_MODES } from \'@dependency-maritime/cli\'; console.log(MODULE_AGGREGATION_MODES.join(\',\'))"',
+            { cwd: catanDir, encoding: 'utf8' }
+        ).trim();
+        expect(aggregationModes).toBe('none,folders');
+
         // Verify --help command works
         const helpOutput = execSync('npx maritime analyze --help', { cwd: catanDir, encoding: 'utf8' });
         expect(helpOutput).toContain('Usage: maritime analyze');
