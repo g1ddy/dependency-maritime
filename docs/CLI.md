@@ -263,11 +263,10 @@ Use the following repository mappings with the currently released renderer:
 | :--- | :--- |
 | Crawler Command Interface | `default` |
 | Dependency Maritime | `local-architecture` |
-| Catan Hex Mastery | `local-architecture` until folder aggregation ships in #265 |
+| Catan Hex Mastery | `compact-architecture` |
 
-Catan is the future wide, cross-folder reference for `compact-architecture`, but the current profile
-only rearranges the same modules and edges. Until #265 delivers and releases real folder aggregation,
-Catan should use the same clean `local-architecture` map as Maritime:
+Catan is the wide, cross-folder reference for `compact-architecture`, which reduces implementation
+detail to deterministic folder nodes and aggregated folder-to-folder dependencies:
 
 ```yaml
 steps:
@@ -280,13 +279,13 @@ steps:
       source-roots: src
       render-graph: 'true'
       graph-output: 'docs/images/dependency-graph.svg'
-      graph-profile: local-architecture
+      graph-profile: compact-architecture
 ```
 
 Presentation profiles affect only the derived SVG; they never change canonical
-`.maritime/dependency-graph.json` evidence. After #265 is available in a matching Action and CLI
-release, Catan can select `compact-architecture` to add real folder aggregation alongside its
-top-to-bottom layout, released cross-folder rank constraints, and compact spacing.
+`.maritime/dependency-graph.json` evidence. The compact profile adds folder aggregation alongside
+its top-to-bottom layout, released
+cross-folder rank constraints, and compact spacing.
 
 #### Multiple Source Roots and Custom Config
 
@@ -364,17 +363,20 @@ output, and retains available dependency-kind, type-only, circular, and validity
 Start with a named presentation profile. Profiles affect DOT/SVG only and never change or regenerate
 the canonical `.maritime/dependency-graph.json` evidence.
 
-| Profile | External packages | Folder grouping | Edge labels | Direction | Rank constraints | Density |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `default` | `direct` | `nested` | `types` | `lr` | `all` | `normal` |
-| `local-architecture` | `none` | `nested` | `none` | `lr` | `all` | `normal` |
-| `compact-architecture` | `none` | `nested` | `none` | `tb` | `intra-folder` | `compact` |
+| Profile | Information granularity | Reference repository |
+| :--- | :--- | :--- |
+| `default` | Individual modules, direct third-party packages, and dependency-kind labels for detailed inspection. | Crawler Command Interface |
+| `local-architecture` | Individual local implementation modules without third-party nodes or dependency-kind labels. | Dependency Maritime |
+| `compact-architecture` | Folder-level local architecture with one node per selected folder and one edge per connected folder pair. | Catan Hex Mastery |
 
-`default` preserves the renderer's prior policy. `local-architecture` is a clean local-source map;
-`compact-architecture` is intended for wide, cross-folder graphs, but it currently rearranges the
-same modules and edges. Catan should remain on `local-architecture` until #265's real folder
-aggregation is released. Use an individual switch only when it deliberately overrides the selected
-profile.
+`default` and `local-architecture` preserve their prior module-level semantics. Compact folder
+selection takes the normalized file's parent directory and retains at most its first three segments
+(the source root plus two architectural segments); shallower parents remain unchanged and root files
+map to `.`. Modules below that depth share one folder node. Intra-folder dependencies disappear and
+all dependencies with the same ordered source/target folder pair become one edge; an `×N` label is
+shown only when that edge represents more than one dependency. Folder nodes and edges are sorted by
+normalized path, making output deterministic. This generic depth suits broad `src/` feature trees
+without recognizing repository-specific names.
 
 The presentation switches compose independently after the profile baseline:
 
@@ -382,6 +384,7 @@ The presentation switches compose independently after the profile baseline:
 | :--- | :--- | :--- | :--- |
 | `--external-packages` | `none`, `summary`, `direct` | `direct` | Omits third-party nodes, emits one external-boundary node, or emits one node per directly imported package. Scoped and unscoped imports collapse to package names in `direct` mode. |
 | `--folder-grouping` | `none`, `top-level`, `nested` | `nested` | Shows local modules flat, clusters only their first source-directory segment, or recursively derives directory clusters. |
+| `--module-aggregation` | `none`, `folders` | `none` | Keeps module nodes or aggregates them using the compact folder-selection and edge-count policy. The compact profile selects `folders`; explicitly selecting `none` is its module-level escape hatch. |
 | `--edge-labels` | `none`, `types` | `types` | Omits dependency-type text or preserves it. Circular, invalid, and type-only edge styling is independent. |
 | `--layout-direction` | `lr`, `tb` | `lr` | Uses Graphviz left-to-right or top-to-bottom rank direction. |
 | `--rank-constraints` | `all`, `intra-folder` | `all` | Lets every local dependency affect rank placement, or limits that effect to edges whose modules share the same top-level source folder. Cross-folder edges remain visible with `constraint=false`. |
@@ -400,7 +403,8 @@ canonical evidence. Omitting the profile and all overrides preserves the pre-bet
 
 The three layout switches also affect only DOT/SVG presentation. `folder-grouping: nested` creates
 recursive Graphviz cluster boxes for directories; it does not collapse file nodes into folder nodes.
-`newrank=true` remains enabled for all layout policies because it avoids Graphviz 2.42 rank failures
+`newrank=true` remains enabled for all layout policies because compact aggregation produced the
+intended simpler fixture without requiring a cluster-local compatibility mode, and it avoids Graphviz 2.42 rank failures
 with deeply nested clusters. Root-level modules are treated as belonging to the root (`.`) folder for
 the `intra-folder` rank-constraint policy.
 
@@ -417,6 +421,7 @@ The composite action adds matching optional inputs:
 | `graph-profile` | `default`, `local-architecture`, or `compact-architecture` | CLI default (`'default'`) when omitted |
 | `external-packages` | `none`, `summary`, or `direct` | CLI default (`'direct'`) when omitted |
 | `folder-grouping` | `none`, `top-level`, or `nested` | CLI default (`'nested'`) when omitted |
+| `module-aggregation` | `none` or `folders` | CLI default (`'none'`) when omitted |
 | `edge-labels` | `none` or `types` | CLI default (`'types'`) when omitted |
 | `layout-direction` | `lr` or `tb` | CLI default (`'lr'`) when omitted |
 | `rank-constraints` | `all` or `intra-folder` | CLI default (`'all'`) when omitted |
@@ -438,8 +443,7 @@ over the selected profile, for example `graph-profile: compact-architecture` wit
 when an Action branch/commit falls back to an older published CLI.
 
 Use `default` for Crawler Command Interface, `local-architecture` for Maritime, and
-`local-architecture` for Catan Hex Mastery until #265's folder aggregation is released. At that
-point Catan can move to `compact-architecture`. The local profiles remove third-party package
+`compact-architecture` for Catan Hex Mastery. The local profiles remove third-party package
 density and dependency-type text without repository-local renderers or package filters.
 
 Rendering is opt-in. The supported reproducible path is `ubuntu-latest`, where the action requests

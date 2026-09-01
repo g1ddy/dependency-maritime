@@ -97,7 +97,8 @@ describe('renderDependencyGraphToDot', () => {
             edgeLabels: undefined,
             layoutDirection: undefined,
             rankConstraints: undefined,
-            layoutDensity: undefined
+            layoutDensity: undefined,
+            moduleAggregation: undefined
         })).toBe(renderDependencyGraphToDot(graph()));
     });
 
@@ -113,15 +114,15 @@ describe('renderDependencyGraphToDot', () => {
     it('applies named profiles before explicit presentation overrides', () => {
         expect(resolveGraphPresentation()).toEqual({
             externalPackages: 'direct', folderGrouping: 'nested', edgeLabels: 'types',
-            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal'
+            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal', moduleAggregation: 'none'
         });
         expect(resolveGraphPresentation({ graphProfile: 'local-architecture' })).toEqual({
             externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none',
-            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal'
+            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal', moduleAggregation: 'none'
         });
         expect(resolveGraphPresentation({ graphProfile: 'compact-architecture' })).toEqual({
             externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none',
-            layoutDirection: 'tb', rankConstraints: 'intra-folder', layoutDensity: 'compact'
+            layoutDirection: 'tb', rankConstraints: 'intra-folder', layoutDensity: 'compact', moduleAggregation: 'folders'
         });
         expect(resolveGraphPresentation({ graphProfile: 'compact-architecture', layoutDirection: 'lr' }).layoutDirection).toBe('lr');
     });
@@ -132,6 +133,24 @@ describe('renderDependencyGraphToDot', () => {
         expect(dot).toContain('ranksep="0.35", nodesep="0.2"');
         expect(dot).not.toContain('external:');
         expect(dot).not.toContain('[label="local"]');
+        expect(dot).toContain('"folder:src/features/board"');
+        expect(dot).not.toContain('local:src/features/board/BoardLayer.tsx');
+    });
+
+    it('deterministically aggregates folder dependencies and exposes only combined counts', () => {
+        const fixture = graph();
+        fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts'));
+        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts'));
+        const dot = renderDependencyGraphToDot(fixture, { graphProfile: 'compact-architecture' });
+        expect(renderDependencyGraphToDot(fixture, { graphProfile: 'compact-architecture' })).toBe(dot);
+        expect(dot.match(/"folder:src\/features\/board" -> "folder:app\/domain"/g)).toHaveLength(1);
+        expect(dot).toContain('label="×2"');
+    });
+
+    it('allows compact layout with module-level rendering as an explicit escape hatch', () => {
+        const dot = renderDependencyGraphToDot(graph(), { graphProfile: 'compact-architecture', moduleAggregation: 'none' });
+        expect(dot).toContain('local:src/features/board/BoardLayer.tsx');
+        expect(dot).not.toContain('folder:src/features/board');
     });
 
     it('keeps every dependency visible while releasing cross-folder rank constraints', () => {

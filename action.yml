@@ -58,6 +58,10 @@ inputs:
     description: 'Local folder clustering: none, top-level, or nested.'
     required: false
     default: ''
+  module-aggregation:
+    description: 'Local node granularity: none keeps modules; folders aggregates at compact architecture depth.'
+    required: false
+    default: ''
   edge-labels:
     description: 'Dependency-type labels: none or types.'
     required: false
@@ -187,6 +191,7 @@ runs:
         INPUT_GRAPH_PROFILE: ${{ inputs.graph-profile }}
         INPUT_EXTERNAL_PACKAGES: ${{ inputs.external-packages }}
         INPUT_FOLDER_GROUPING: ${{ inputs.folder-grouping }}
+        INPUT_MODULE_AGGREGATION: ${{ inputs.module-aggregation }}
         INPUT_EDGE_LABELS: ${{ inputs.edge-labels }}
         INPUT_LAYOUT_DIRECTION: ${{ inputs.layout-direction }}
         INPUT_RANK_CONSTRAINTS: ${{ inputs.rank-constraints }}
@@ -204,6 +209,10 @@ runs:
         if [ -n "$INPUT_FOLDER_GROUPING" ]; then
           case "$INPUT_FOLDER_GROUPING" in none|top-level|nested) ;; *) echo "Invalid folder-grouping value '$INPUT_FOLDER_GROUPING'. Expected: none, top-level, or nested." >&2; exit 2;; esac
           GRAPH_ARGS+=(--folder-grouping "$INPUT_FOLDER_GROUPING")
+        fi
+        if [ -n "$INPUT_MODULE_AGGREGATION" ]; then
+          case "$INPUT_MODULE_AGGREGATION" in none|folders) ;; *) echo "Invalid module-aggregation value '$INPUT_MODULE_AGGREGATION'. Expected: none or folders." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--module-aggregation "$INPUT_MODULE_AGGREGATION")
         fi
         if [ -n "$INPUT_EDGE_LABELS" ]; then
           case "$INPUT_EDGE_LABELS" in none|types) ;; *) echo "Invalid edge-labels value '$INPUT_EDGE_LABELS'. Expected: none or types." >&2; exit 2;; esac

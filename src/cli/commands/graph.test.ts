@@ -83,7 +83,8 @@ describe('graph command', () => {
         ['--graph-profile', 'small', 'default, local-architecture, compact-architecture'],
         ['--layout-direction', 'diagonal', 'lr, tb'],
         ['--rank-constraints', 'folders', 'all, intra-folder'],
-        ['--layout-density', 'dense', 'normal, compact']
+        ['--layout-density', 'dense', 'normal, compact'],
+        ['--module-aggregation', 'files', 'none, folders']
     ])('rejects invalid %s values clearly', async (flag, value, allowed) => {
         const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         expect(await runGraphCommand(['--output', 'graph.dot', flag, value])).toBe(2);

@@ -145,12 +145,12 @@ describe('CLI npm pack clean-install smoke tests', () => {
 
         const graphHelpOutput = execSync('npx maritime graph --help', { cwd: catanDir, encoding: 'utf8' });
         expect(graphHelpOutput).toContain('Usage: maritime graph');
-        execSync('npx maritime graph --input dependency-graph.json --output dependency-graph.dot --graph-profile compact-architecture --folder-grouping top-level', { cwd: catanDir });
+        execSync('npx maritime graph --input dependency-graph.json --output dependency-graph.dot --graph-profile compact-architecture', { cwd: catanDir });
         const renderedDot = fs.readFileSync(path.join(catanDir, 'dependency-graph.dot'), 'utf8');
-        expect(renderedDot).toContain('cluster:src');
-        expect(renderedDot).not.toContain('cluster:src/board');
+        expect(renderedDot).toContain('folder:src/board');
+        expect(renderedDot).toContain('folder:src/game');
         expect(renderedDot).not.toContain('external:');
-        expect(renderedDot).toContain('local:src/game/engine.ts');
+        expect(renderedDot).not.toContain('local:src/game/engine.ts');
         expect(renderedDot).toContain('rankdir="TB"');
         expect(renderedDot).toContain('ranksep="0.35", nodesep="0.2"');
 
