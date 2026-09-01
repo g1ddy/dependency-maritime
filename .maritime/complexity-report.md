@@ -14,7 +14,7 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/cli/graph/render-dot.ts` | **166.2** | 355 | 61 | 1 | 0.33 |
+| `src/cli/graph/render-dot.ts` | **167.9** | 352 | 62 | 1 | 0.33 |
 | `src/cli/commands/analyze.ts` | **114.9** | 293 | 28 | 7 | 0.78 |
 | `src/features/visualization/store.ts` | **112.5** | 667 | 7 | 10 | 0.59 |
 | `src/cli/analyze/adapters.ts` | **107** | 450 | 24 | 2 | 0.5 |
@@ -28,7 +28,7 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
-| `src/cli/graph/render-dot.ts` | **61** | 355 |
+| `src/cli/graph/render-dot.ts` | **62** | 352 |
 | `src/cli/validate/validate.ts` | **32** | 132 |
 | `src/cli/commands/analyze.ts` | **28** | 293 |
 | `src/cli/analyze/adapters.ts` | **24** | 450 |
