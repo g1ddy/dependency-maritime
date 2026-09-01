@@ -167,8 +167,7 @@ type AggregatedEdge = {
     count: number;
     constrained: boolean;
     dependencyTypes: Set<string>;
-    typeOnly: boolean;
-    preCompilationOnly: boolean;
+    allNonRuntime: boolean;
     circular: boolean;
     valid: boolean;
 };
@@ -180,7 +179,7 @@ function aggregateEdgeAttributes(edge: AggregatedEdge, edgeLabels: EdgeLabelsMod
     if (edge.count > 1) labelParts.push(`×${edge.count}`);
     if (edgeLabels === 'types') labelParts.push(...[...edge.dependencyTypes].sort());
     if (labelParts.length > 0) attributes.push(`label=${dotQuote(labelParts.join(' · '))}`);
-    if (edge.typeOnly || edge.preCompilationOnly) attributes.push('style="dashed"');
+    if (edge.allNonRuntime) attributes.push('style="dashed"');
     if (edge.circular) attributes.push('color="#d97706"', 'penwidth="2"');
     if (!edge.valid) {
         if (edge.circular) attributes.push('xlabel="invalid"', 'fontcolor="#dc2626"');
@@ -246,8 +245,7 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
                 if (current) {
                     current.count += 1;
                     dependency.dependencyTypes.forEach(type => current.dependencyTypes.add(type));
-                    current.typeOnly ||= dependency.typeOnly === true;
-                    current.preCompilationOnly ||= dependency.preCompilationOnly === true;
+                    current.allNonRuntime &&= dependency.typeOnly === true || dependency.preCompilationOnly === true;
                     current.circular ||= dependency.circular;
                     current.valid &&= dependency.valid;
                 }
@@ -255,8 +253,7 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
                     from: `folder:${fromFolder}`, to: target, count: 1,
                     constrained: !localSources.has(resolved) || presentation.rankConstraints === 'all' || topLevelFolder(source) === topLevelFolder(resolved),
                     dependencyTypes: new Set(dependency.dependencyTypes),
-                    typeOnly: dependency.typeOnly === true,
-                    preCompilationOnly: dependency.preCompilationOnly === true,
+                    allNonRuntime: dependency.typeOnly === true || dependency.preCompilationOnly === true,
                     circular: dependency.circular,
                     valid: dependency.valid
                 });
