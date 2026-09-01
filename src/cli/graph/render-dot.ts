@@ -12,6 +12,7 @@ export const EDGE_LABEL_MODES = ['none', 'types'] as const;
 export const LAYOUT_DIRECTION_MODES = ['lr', 'tb'] as const;
 export const RANK_CONSTRAINT_MODES = ['all', 'intra-folder'] as const;
 export const LAYOUT_DENSITY_MODES = ['normal', 'compact'] as const;
+export const MODULE_AGGREGATION_MODES = ['none', 'folders'] as const;
 export const GRAPH_PROFILE_MODES = ['default', 'local-architecture', 'compact-architecture'] as const;
 
 export type ExternalPackagesMode = typeof EXTERNAL_PACKAGE_MODES[number];
@@ -20,6 +21,7 @@ export type EdgeLabelsMode = typeof EDGE_LABEL_MODES[number];
 export type LayoutDirectionMode = typeof LAYOUT_DIRECTION_MODES[number];
 export type RankConstraintMode = typeof RANK_CONSTRAINT_MODES[number];
 export type LayoutDensityMode = typeof LAYOUT_DENSITY_MODES[number];
+export type ModuleAggregationMode = typeof MODULE_AGGREGATION_MODES[number];
 export type GraphProfileMode = typeof GRAPH_PROFILE_MODES[number];
 export type GraphPresentationOptions = {
     externalPackages?: ExternalPackagesMode;
@@ -28,6 +30,7 @@ export type GraphPresentationOptions = {
     layoutDirection?: LayoutDirectionMode;
     rankConstraints?: RankConstraintMode;
     layoutDensity?: LayoutDensityMode;
+    moduleAggregation?: ModuleAggregationMode;
     graphProfile?: GraphProfileMode;
 };
 export type ResolvedGraphPresentation = Required<Omit<GraphPresentationOptions, 'graphProfile'>>;
@@ -38,7 +41,8 @@ export const DEFAULT_GRAPH_PRESENTATION = {
     edgeLabels: 'types',
     layoutDirection: 'lr',
     rankConstraints: 'all',
-    layoutDensity: 'normal'
+    layoutDensity: 'normal',
+    moduleAggregation: 'none'
 } as const satisfies ResolvedGraphPresentation;
 
 export const DEFAULT_GRAPH_PROFILE = 'default' as const;
@@ -50,7 +54,8 @@ export const GRAPH_PRESENTATION_PROFILES = {
         edgeLabels: 'none',
         layoutDirection: 'lr',
         rankConstraints: 'all',
-        layoutDensity: 'normal'
+        layoutDensity: 'normal',
+        moduleAggregation: 'none'
     },
     'compact-architecture': {
         externalPackages: 'none',
@@ -58,7 +63,8 @@ export const GRAPH_PRESENTATION_PROFILES = {
         edgeLabels: 'none',
         layoutDirection: 'tb',
         rankConstraints: 'intra-folder',
-        layoutDensity: 'compact'
+        layoutDensity: 'compact',
+        moduleAggregation: 'folders'
     }
 } as const satisfies Record<GraphProfileMode, ResolvedGraphPresentation>;
 
@@ -71,7 +77,8 @@ export function resolveGraphPresentation(options: GraphPresentationOptions = {})
         edgeLabels: options.edgeLabels ?? profile.edgeLabels,
         layoutDirection: options.layoutDirection ?? profile.layoutDirection,
         rankConstraints: options.rankConstraints ?? profile.rankConstraints,
-        layoutDensity: options.layoutDensity ?? profile.layoutDensity
+        layoutDensity: options.layoutDensity ?? profile.layoutDensity,
+        moduleAggregation: options.moduleAggregation ?? profile.moduleAggregation
     };
 }
 
@@ -132,6 +139,14 @@ function topLevelFolder(source: string): string {
     return segments[0] ?? '.';
 }
 
+// Keep the source root plus its first two architectural directory segments. Deeper
+// implementation detail is folded into that node; shallower paths retain their parent.
+export function compactFolder(source: string): string {
+    const directories = normalizedPath(source).split('/').filter(Boolean);
+    directories.pop();
+    return directories.slice(0, 3).join('/') || '.';
+}
+
 function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode, constrained: boolean): string {
     const attributes: string[] = [];
     if (!constrained) attributes.push('constraint="false"');
@@ -141,6 +156,34 @@ function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMo
     if (dependency.circular) attributes.push('color="#d97706"', 'penwidth="2"');
     if (!dependency.valid) {
         if (dependency.circular) attributes.push('xlabel="invalid"', 'fontcolor="#dc2626"');
+        else attributes.push('color="#dc2626"', 'penwidth="2"');
+    }
+    return attributes.length > 0 ? ` [${attributes.join(', ')}]` : '';
+}
+
+type AggregatedEdge = {
+    from: string;
+    to: string;
+    count: number;
+    constrained: boolean;
+    dependencyTypes: Set<string>;
+    typeOnly: boolean;
+    preCompilationOnly: boolean;
+    circular: boolean;
+    valid: boolean;
+};
+
+function aggregateEdgeAttributes(edge: AggregatedEdge, edgeLabels: EdgeLabelsMode): string {
+    const attributes: string[] = [];
+    if (!edge.constrained) attributes.push('constraint="false"');
+    const labelParts: string[] = [];
+    if (edge.count > 1) labelParts.push(`×${edge.count}`);
+    if (edgeLabels === 'types') labelParts.push(...[...edge.dependencyTypes].sort());
+    if (labelParts.length > 0) attributes.push(`label=${dotQuote(labelParts.join(' · '))}`);
+    if (edge.typeOnly || edge.preCompilationOnly) attributes.push('style="dashed"');
+    if (edge.circular) attributes.push('color="#d97706"', 'penwidth="2"');
+    if (!edge.valid) {
+        if (edge.circular) attributes.push('xlabel="invalid"', 'fontcolor="#dc2626"');
         else attributes.push('color="#dc2626"', 'penwidth="2"');
     }
     return attributes.length > 0 ? ` [${attributes.join(', ')}]` : '';
@@ -157,6 +200,7 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
         const source = normalizedPath(module.source);
         if (isExternalPath(source) || module.coreModule) continue;
         localSources.add(source);
+        if (presentation.moduleAggregation === 'folders') continue;
         if (presentation.folderGrouping === 'nested') addLocalModule(root, source);
         else if (presentation.folderGrouping === 'top-level') {
             const segments = source.split('/').filter(Boolean);
@@ -170,6 +214,75 @@ export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options:
             root.directories.set(topLevel, directory);
             directory.files.push({ source, name: path.posix.basename(source) });
         } else root.files.push({ source, name: path.posix.basename(source) });
+    }
+
+    if (presentation.moduleAggregation === 'folders') {
+        const folders = [...new Set([...localSources].map(compactFolder))].sort();
+        const aggregateEdges = new Map<string, AggregatedEdge>();
+        for (const module of [...graph.modules].sort((a, b) => a.source.localeCompare(b.source))) {
+            const source = normalizedPath(module.source);
+            if (!localSources.has(source)) continue;
+            const fromFolder = compactFolder(source);
+            for (const dependency of module.dependencies) {
+                const resolved = normalizedPath(dependency.resolved);
+                let target: string | undefined;
+                if (localSources.has(resolved)) {
+                    const toFolder = compactFolder(resolved);
+                    if (fromFolder === toFolder) continue;
+                    target = `folder:${toFolder}`;
+                } else if (!dependency.coreModule) {
+                    const looksExternal = isExternalPath(resolved) || dependency.dependencyTypes.includes('npm');
+                    const packageName = looksExternal
+                        ? externalPackageName(isExternalPath(resolved) ? resolved : dependency.module)
+                        : undefined;
+                    if (packageName && presentation.externalPackages !== 'none') {
+                        externalPackages.add(packageName);
+                        target = presentation.externalPackages === 'summary' ? 'external:boundary' : `external:${packageName}`;
+                    }
+                }
+                if (!target) continue;
+                const key = `${fromFolder}\0${target}`;
+                const current = aggregateEdges.get(key);
+                if (current) {
+                    current.count += 1;
+                    dependency.dependencyTypes.forEach(type => current.dependencyTypes.add(type));
+                    current.typeOnly ||= dependency.typeOnly === true;
+                    current.preCompilationOnly ||= dependency.preCompilationOnly === true;
+                    current.circular ||= dependency.circular;
+                    current.valid &&= dependency.valid;
+                }
+                else aggregateEdges.set(key, {
+                    from: `folder:${fromFolder}`, to: target, count: 1,
+                    constrained: !localSources.has(resolved) || presentation.rankConstraints === 'all' || topLevelFolder(source) === topLevelFolder(resolved),
+                    dependencyTypes: new Set(dependency.dependencyTypes),
+                    typeOnly: dependency.typeOnly === true,
+                    preCompilationOnly: dependency.preCompilationOnly === true,
+                    circular: dependency.circular,
+                    valid: dependency.valid
+                });
+            }
+        }
+        const lines = [
+            'digraph "dependency-graph" {',
+            `  graph [compound="true", newrank="true", rankdir="${presentation.layoutDirection.toUpperCase()}", fontname="Helvetica"${presentation.layoutDensity === 'compact' ? ', ranksep="0.35", nodesep="0.2"' : ''}];`,
+            '  node [fontname="Helvetica", fontsize="10"];',
+            '  edge [fontname="Helvetica", fontsize="8", color="#94a3b8"];',
+            ...folders.map(folder => `  ${dotQuote(`folder:${folder}`)} [label=${dotQuote(folder)}, shape="folder"];`)
+        ];
+        if (presentation.externalPackages === 'summary' && externalPackages.size > 0) {
+            lines.push('  "external:boundary" [label="External packages", shape="component", style="filled,dashed", fillcolor="#e2e8f0", color="#64748b"];');
+        } else if (presentation.externalPackages === 'direct' && externalPackages.size > 0) {
+            lines.push('  subgraph "cluster:external-packages" {', '    label="External packages";', '    style="dashed";', '    color="#64748b";');
+            for (const packageName of [...externalPackages].sort()) {
+                lines.push(`    ${dotQuote(`external:${packageName}`)} [label=${dotQuote(packageName)}, shape="component", style="filled", fillcolor="#e2e8f0"];`);
+            }
+            lines.push('  }');
+        }
+        for (const edge of [...aggregateEdges.values()].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to))) {
+            lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${aggregateEdgeAttributes(edge, presentation.edgeLabels)};`);
+        }
+        lines.push('}', '');
+        return lines.join('\n');
     }
 
     const edges: Array<{ from: string; to: string; dependency: MaritimeDependency; constrained: boolean }> = [];
