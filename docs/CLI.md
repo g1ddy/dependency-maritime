@@ -310,14 +310,14 @@ package specifier or a packed tarball. This override is not part of normal consu
 ```yaml
     uses: g1ddy/dependency-maritime@<pinned-ref>
     with:
-      cli-source: './dependency-maritime-cli-0.1.0-beta.5.tgz'
+      cli-source: './dependency-maritime-cli-0.1.0-beta.6.tgz'
 ```
 
 The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. The
 `cli-vX.Y.Z[-pre]` tag is the release-version authority; the workflow stamps that version into
 `package.json` and `package-lock.json` only in its ephemeral release workspace, then builds,
 exercises the packed-package contract, and publishes with npm provenance under the `prerelease`
-distribution tag. For this feature, pushing `cli-v0.1.0-beta.5` therefore publishes beta.5. The workflow then
+distribution tag. For this feature, pushing `cli-v0.1.0-beta.6` therefore publishes beta.6. The workflow then
 checks out the exact released tag and runs a clean external consumer job without `cli-source`, so
 the tag-derived action resolution installs and exercises the just-published version while verifying
 all four canonical `.maritime` artifacts and the rendered graph. The action selects the full
