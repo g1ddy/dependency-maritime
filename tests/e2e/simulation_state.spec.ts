@@ -18,7 +18,15 @@ test.describe('Simulation State', () => {
     await expect(targetGroup).toBeVisible();
 
     // 1. Verify Initial State
-    await targetNode.click();
+    // React Flow's transformed ancestors never become "stable" according to
+    // WebKit, so use a real pointer at the node center instead of locator.click().
+    const initialBox = await targetNode.boundingBox();
+    expect(initialBox).not.toBeNull();
+    if (!initialBox) throw new Error('App.tsx node has no bounding box');
+    await page.mouse.click(
+      initialBox.x + initialBox.width / 2,
+      initialBox.y + initialBox.height / 2
+    );
 
     const overlayPath = page.locator('.absolute.inset-0').getByText('src/App.tsx');
     await expect(overlayPath).toBeVisible();
