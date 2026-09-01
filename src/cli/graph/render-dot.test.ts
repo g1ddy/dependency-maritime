@@ -165,7 +165,7 @@ describe('renderDependencyGraphToDot', () => {
         expect(summary).toContain('label="×2 · npm"');
     });
 
-    it('combines dependency types and warning semantics on aggregated edges', () => {
+    it('keeps mixed runtime aggregate edges solid while preserving dependency semantics', () => {
         const fixture = graph();
         fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts', {
             dependencyTypes: ['local', 'type-only'], typeOnly: true
@@ -177,10 +177,25 @@ describe('renderDependencyGraphToDot', () => {
             moduleAggregation: 'folders', externalPackages: 'none', edgeLabels: 'types'
         }).split('\n').find(line => line.includes('"folder:src/features/board" -> "folder:app/domain"'));
         expect(edge).toContain('label="×2 · local · type-only"');
-        expect(edge).toContain('style="dashed"');
+        expect(edge).not.toContain('style="dashed"');
         expect(edge).toContain('color="#d97706"');
         expect(edge).toContain('xlabel="invalid"');
         expect(edge).toContain('fontcolor="#dc2626"');
+    });
+
+
+    it('renders an aggregate edge dashed only when every dependency is non-runtime', () => {
+        const fixture = graph();
+        fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts', {
+            dependencyTypes: ['local', 'type-only'], typeOnly: true
+        }));
+        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts', {
+            dependencyTypes: ['local'], preCompilationOnly: true
+        }));
+        const edge = renderDependencyGraphToDot(fixture, {
+            moduleAggregation: 'folders', externalPackages: 'none'
+        }).split('\n').find(line => line.includes('"folder:src/features/board" -> "folder:app/domain"'));
+        expect(edge).toContain('style="dashed"');
     });
 
     it('keeps every dependency visible while releasing cross-folder rank constraints', () => {
