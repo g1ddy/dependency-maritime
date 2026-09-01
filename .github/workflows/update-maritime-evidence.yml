@@ -2,34 +2,50 @@ name: Update Maritime Evidence
 
 on:
   pull_request:
-    types: [labeled, synchronize]
+    branches: [main]
+    types: [opened, reopened, synchronize]
+    paths:
+      - 'src/**'
+      - 'config/.dependency-cruiser.cjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/update-maritime-evidence.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: maritime-evidence-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  generate-metrics:
-    if: contains(github.event.pull_request.labels.*.name, 'refactor')
+  verify-evidence:
+    name: Verify evidence
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+    outputs:
+      changed: ${{ steps.evidence-diff.outputs.changed }}
 
     steps:
-      - name: Checkout Code
+      - name: Check out the candidate revision
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Build CLI
+      - name: Build checked-out CLI
         run: npm run build:cli
 
-      - name: Maritime Shared Integration
+      # This local invocation deliberately tests the unmerged checkout. Released
+      # consumers must instead pair a released Action ref with its published CLI.
+      - name: Analyze, validate, and render candidate evidence
         uses: ./
         with:
           cli-source: '.'
@@ -40,9 +56,75 @@ jobs:
           upload-artifact: 'false'
           render-graph: 'true'
           graph-output: 'docs/images/dependency-graph.svg'
+          graph-profile: 'local-architecture'
 
-      - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Verify candidate and detect substantive changes
+        id: evidence-diff
+        run: node scripts/check-maritime-evidence.mjs
+
+      - name: Upload candidate evidence
+        uses: actions/upload-artifact@v4
         with:
-          commit_message: "docs(metrics): update dependency graph and complexity report [skip ci]"
-          file_pattern: '.maritime/ docs/images/dependency-graph.svg'
+          name: maritime-evidence-${{ github.event.pull_request.number || github.run_id }}
+          if-no-files-found: error
+          include-hidden-files: true
+          path: |
+            .maritime/
+            docs/images/dependency-graph.svg
+
+  write-evidence:
+    name: Write approved evidence
+    needs: verify-evidence
+    if: >-
+      needs.verify-evidence.outputs.changed == 'true' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: generated-evidence-write
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out the approved candidate revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Download verified candidate evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: maritime-evidence-${{ github.event.pull_request.number }}
+          path: candidate-evidence
+
+      - name: Commit and push generated evidence only
+        env:
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+
+          remote_head="$(git ls-remote origin "refs/heads/$HEAD_BRANCH" | cut -f1)"
+          if [ "$remote_head" != "$EXPECTED_HEAD_SHA" ]; then
+            echo "PR branch moved after verification; refusing to write stale evidence." >&2
+            exit 1
+          fi
+
+          rm -rf .maritime
+          cp -a candidate-evidence/.maritime .maritime
+          cp candidate-evidence/docs/images/dependency-graph.svg docs/images/dependency-graph.svg
+
+          git config user.name 'dependency-maritime-bot'
+          git config user.email 'dependency-maritime-bot@users.noreply.github.com'
+          git add -- .maritime docs/images/dependency-graph.svg
+
+          unexpected="$(git diff --cached --name-only | sed -E '/^(\.maritime\/|docs\/images\/dependency-graph\.svg$)/d')"
+          if [ -n "$unexpected" ]; then
+            echo "Refusing to commit unexpected paths:" >&2
+            printf '%s\n' "$unexpected" >&2
+            exit 1
+          fi
+          git diff --cached --quiet && { echo 'No generated changes remain to commit.'; exit 0; }
+
+          git commit -m 'docs(metrics): update generated Maritime evidence [skip ci]'
+          git push origin "HEAD:refs/heads/$HEAD_BRANCH"

@@ -3139,6 +3139,25 @@
           "couldNotResolve": false,
           "dependencyTypes": [
             "local",
+            "type-only",
+            "export"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./graph/render-dot",
+          "resolved": "src/cli/graph/render-dot.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
             "export"
           ],
           "dynamic": false,
@@ -3425,7 +3444,7 @@
     "ignore": 0,
     "info": 0,
     "totalCruised": 64,
-    "totalDependenciesCruised": 148,
+    "totalDependenciesCruised": 149,
     "violations": [],
     "warn": 0,
     "optionsUsed": {
