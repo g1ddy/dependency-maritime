@@ -24,6 +24,7 @@ describe('Maritime evidence workflow contract', () => {
         expect(workflow).toContain("cli-source: '.'");
         expect(workflow).toContain('run: node scripts/check-maritime-evidence.mjs');
         expect(workflow).toContain('uses: actions/upload-artifact@v4');
+        expect(workflow).toContain('include-hidden-files: true');
     });
 
     it('gates writes by changes, PR origin, and the approval environment', () => {

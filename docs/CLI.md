@@ -241,10 +241,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Maritime Analyze & Validate
-        # Pin the full commit SHA associated with the cli-v0.1.0-beta.5 release.
+        # Pin the full commit SHA associated with the cli-v0.1.0-beta.6 release.
         uses: g1ddy/dependency-maritime@<released-action-commit-sha>
         with:
-          cli-source: '@dependency-maritime/cli@0.1.0-beta.5'
+          cli-source: '@dependency-maritime/cli@0.1.0-beta.6'
           source-roots: src
           graph-profile: local-architecture
           render-graph: 'true'
@@ -255,29 +255,38 @@ and any write or approval policy. The composite Action is only the reusable comm
 repository workflow should become reusable only after Catan and Crawler establish which orchestration
 inputs are genuinely common.
 
-#### Catan Hex Mastery consumer profile
+#### Repository presentation profiles
 
-Catan is the wide, cross-folder reference for selecting `compact-architecture` instead of the normal
-consumer example's clean `local-architecture` map:
+Use the following repository mappings with the currently released renderer:
+
+| Repository | Profile |
+| :--- | :--- |
+| Crawler Command Interface | `default` |
+| Dependency Maritime | `local-architecture` |
+| Catan Hex Mastery | `local-architecture` until folder aggregation ships in #265 |
+
+Catan is the future wide, cross-folder reference for `compact-architecture`, but the current profile
+only rearranges the same modules and edges. Until #265 delivers and releases real folder aggregation,
+Catan should use the same clean `local-architecture` map as Maritime:
 
 ```yaml
 steps:
   - uses: actions/checkout@v4
   - name: Generate Catan Maritime evidence
-    # Pin the full commit SHA associated with the cli-v0.1.0-beta.5 release.
+    # Pin the full commit SHA associated with the cli-v0.1.0-beta.6 release.
     uses: g1ddy/dependency-maritime@<released-action-commit-sha>
     with:
-      cli-source: '@dependency-maritime/cli@0.1.0-beta.5'
+      cli-source: '@dependency-maritime/cli@0.1.0-beta.6'
       source-roots: src
       render-graph: 'true'
       graph-output: 'docs/images/dependency-graph.svg'
-      graph-profile: compact-architecture
+      graph-profile: local-architecture
 ```
 
-This profile keeps nested local folders, suppresses external nodes and edge-type labels, lays the
-graph out top-to-bottom, releases cross-folder rank constraints, and compacts spacing. Presentation
-profiles affect only the derived SVG; they never change canonical
-`.maritime/dependency-graph.json` evidence.
+Presentation profiles affect only the derived SVG; they never change canonical
+`.maritime/dependency-graph.json` evidence. After #265 is available in a matching Action and CLI
+release, Catan can select `compact-architecture` to add real folder aggregation alongside its
+top-to-bottom layout, released cross-folder rank constraints, and compact spacing.
 
 #### Multiple Source Roots and Custom Config
 
@@ -362,8 +371,10 @@ the canonical `.maritime/dependency-graph.json` evidence.
 | `compact-architecture` | `none` | `nested` | `none` | `tb` | `intra-folder` | `compact` |
 
 `default` preserves the renderer's prior policy. `local-architecture` is a clean local-source map;
-`compact-architecture` is intended for wide, cross-folder graphs such as Catan's. Use an individual
-switch only when it deliberately overrides the selected profile.
+`compact-architecture` is intended for wide, cross-folder graphs, but it currently rearranges the
+same modules and edges. Catan should remain on `local-architecture` until #265's real folder
+aggregation is released. Use an individual switch only when it deliberately overrides the selected
+profile.
 
 The presentation switches compose independently after the profile baseline:
 
@@ -426,10 +437,10 @@ over the selected profile, for example `graph-profile: compact-architecture` wit
 `layout-direction: lr`. Empty Action inputs are not passed to the CLI, preserving compatibility
 when an Action branch/commit falls back to an older published CLI.
 
-Use `compact-architecture` for the wide Catan Hex Mastery graph. Crawler Command Interface can use
-`local-architecture` when its left-to-right clean local-source map is preferable. Both retain nested
-source structure while removing third-party package density and dependency-type text, without
-repository-local renderers or package filters.
+Use `default` for Crawler Command Interface, `local-architecture` for Maritime, and
+`local-architecture` for Catan Hex Mastery until #265's folder aggregation is released. At that
+point Catan can move to `compact-architecture`. The local profiles remove third-party package
+density and dependency-type text without repository-local renderers or package filters.
 
 Rendering is opt-in. The supported reproducible path is `ubuntu-latest`, where the action requests
 Graphviz `2.42.2-9ubuntu0.1`; identical Graphviz selection and byte-for-byte committed SVG output are

@@ -67,6 +67,7 @@ jobs:
         with:
           name: maritime-evidence-${{ github.event.pull_request.number || github.run_id }}
           if-no-files-found: error
+          include-hidden-files: true
           path: |
             .maritime/
             docs/images/dependency-graph.svg
