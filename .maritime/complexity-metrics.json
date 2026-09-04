@@ -409,18 +409,26 @@
   },
   "src/cli/commands/graph.ts": {
     "complexity": 14,
-    "loc": 108,
+    "loc": 183,
     "instability": 0.67,
     "fanIn": 2,
     "fanOut": 4,
     "scanned": true
   },
   "src/cli/graph/render-dot.ts": {
-    "complexity": 69,
+    "complexity": 45,
     "loc": 502,
-    "instability": 0.33,
+    "instability": 0.5,
     "fanIn": 2,
-    "fanOut": 1,
+    "fanOut": 2,
+    "scanned": true
+  },
+  "src/cli/graph/presentation.ts": {
+    "complexity": 17,
+    "loc": 130,
+    "instability": 0,
+    "fanIn": 1,
+    "fanOut": 0,
     "scanned": true
   },
   "src/cli/graph/render-graphviz.ts": {
@@ -449,7 +457,7 @@
   },
   "src/cli/index.ts": {
     "complexity": 11,
-    "loc": 89,
+    "loc": 106,
     "instability": 1,
     "fanIn": 0,
     "fanOut": 14,
