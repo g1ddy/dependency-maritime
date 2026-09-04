@@ -25,7 +25,7 @@ const graph = (): MaritimeCruiseResult => ({
 });
 
 const commonPresentation = {
-    folderGrouping: 'nested', layoutDirection: 'lr', rankConstraints: 'all', aggregationDepth: 2
+    folderGrouping: 'nested', rankConstraints: 'all', aggregationDepth: 2
 } as const;
 
 describe('renderDependencyGraphToDot', () => {
@@ -62,7 +62,7 @@ describe('renderDependencyGraphToDot', () => {
             externalPackages: undefined, folderGrouping: undefined, edgeLabels: undefined,
             layoutDirection: undefined, rankConstraints: undefined, layoutDensity: undefined,
             moduleAggregation: undefined, visualTheme: undefined, sourceRootGrouping: undefined,
-            edgePresentation: undefined, clusterRanking: undefined, aggregationDepth: undefined
+            edgePresentation: undefined, clusterRanking: undefined, outputOrder: undefined, aggregationDepth: undefined
         })).toBe(renderDependencyGraphToDot(graph()));
     });
 
@@ -70,35 +70,37 @@ describe('renderDependencyGraphToDot', () => {
         expect(resolveGraphPresentation()).toEqual({
             externalPackages: 'direct', edgeLabels: 'types', layoutDensity: 'normal', moduleAggregation: 'none',
             visualTheme: 'standard', sourceRootGrouping: 'preserve', edgePresentation: 'relations', clusterRanking: 'global',
-            ...commonPresentation
+            outputOrder: 'default', layoutDirection: 'lr', ...commonPresentation
         });
         expect(resolveGraphPresentation({ graphProfile: 'local-architecture' })).toEqual({
             externalPackages: 'none', edgeLabels: 'none', layoutDensity: 'normal', moduleAggregation: 'none',
             visualTheme: 'standard', sourceRootGrouping: 'preserve', edgePresentation: 'relations', clusterRanking: 'global',
-            ...commonPresentation
+            outputOrder: 'default', layoutDirection: 'lr', ...commonPresentation
         });
         expect(resolveGraphPresentation({ graphProfile: 'compact-architecture' })).toEqual({
             externalPackages: 'none', edgeLabels: 'none', layoutDensity: 'compact', moduleAggregation: 'none',
             visualTheme: 'architecture', sourceRootGrouping: 'elide-single', edgePresentation: 'semantic-pairs', clusterRanking: 'local',
-            ...commonPresentation
+            outputOrder: 'edges-first', layoutDirection: 'lr', ...commonPresentation
         });
         expect(resolveGraphPresentation({ graphProfile: 'architecture-overview' })).toEqual({
             externalPackages: 'none', edgeLabels: 'none', layoutDensity: 'normal', moduleAggregation: 'folders',
             visualTheme: 'architecture', sourceRootGrouping: 'preserve', edgePresentation: 'semantic-pairs', clusterRanking: 'global',
-            ...commonPresentation
+            outputOrder: 'default', layoutDirection: 'tb', ...commonPresentation
         });
     });
 
     it('lets explicit settings override every profile characteristic', () => {
         const resolved = resolveGraphPresentation({
             graphProfile: 'compact-architecture', visualTheme: 'standard', sourceRootGrouping: 'preserve',
-            edgePresentation: 'relations', clusterRanking: 'global', layoutDensity: 'normal', moduleAggregation: 'folders',
-            aggregationDepth: 3
+            edgePresentation: 'relations', clusterRanking: 'global', outputOrder: 'nodes-first', layoutDirection: 'tb',
+            layoutDensity: 'normal', moduleAggregation: 'folders', aggregationDepth: 3
         });
         expect(resolved.visualTheme).toBe('standard');
         expect(resolved.sourceRootGrouping).toBe('preserve');
         expect(resolved.edgePresentation).toBe('relations');
         expect(resolved.clusterRanking).toBe('global');
+        expect(resolved.outputOrder).toBe('nodes-first');
+        expect(resolved.layoutDirection).toBe('tb');
         expect(resolved.layoutDensity).toBe('normal');
         expect(resolved.moduleAggregation).toBe('folders');
         expect(resolved.aggregationDepth).toBe(3);
@@ -112,6 +114,7 @@ describe('renderDependencyGraphToDot', () => {
     it('renders compact architecture as local file-level LR architecture styling', () => {
         const dot = renderDependencyGraphToDot(graph(), { graphProfile: 'compact-architecture' });
         expect(dot).toContain('rankdir="LR"');
+        expect(dot).toContain('outputorder="edgesfirst"');
         expect(dot).toContain('ranksep="0.12", nodesep="0.10"');
         expect(dot).not.toContain('newrank="true"');
         expect(dot).not.toContain('external:');
@@ -120,11 +123,12 @@ describe('renderDependencyGraphToDot', () => {
         expect(dot).toContain('style="rounded,bold,filled"');
     });
 
-    it('renders architecture-overview as source-root-relative folder aggregation', () => {
+    it('renders architecture-overview as source-root-relative TB folder aggregation', () => {
         const fixture = graph();
         fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts'));
         fixture.summary.optionsUsed = { args: ['app', 'src', 'tools'] };
         const dot = renderDependencyGraphToDot(fixture, { graphProfile: 'architecture-overview' });
+        expect(dot).toContain('rankdir="TB"');
         expect(dot).toContain('"folder:src/features/board"');
         expect(dot).toContain('"folder:app/domain"');
         expect(dot).not.toContain('local:src/features/board/BoardLayer.tsx');
@@ -136,6 +140,7 @@ describe('renderDependencyGraphToDot', () => {
         expect(aggregationFolder('src/features/board/components/GameHex.tsx', ['src'], 1)).toBe('src/features');
         expect(aggregationFolder('src/features/board/components/GameHex.tsx', ['src'], 2, 'elide-single')).toBe('features/board');
         expect(aggregationFolder('frontend/features/board/GameHex.tsx', ['frontend', 'backend'], 2)).toBe('frontend/features/board');
+        expect(aggregationFolder('features/board/components/GameHex.tsx', ['.'], 2)).toBe('features/board');
     });
 
     it('keeps mixed runtime aggregate edges solid', () => {
@@ -152,7 +157,7 @@ describe('renderDependencyGraphToDot', () => {
     it('renders semantic pairs secondary only when every relation is non-runtime', () => {
         const fixture = graph();
         fixture.modules[0].dependencies = [
-            dependency('app/domain/schema/timeline.ts', { preCompilationOnly: true, dependencyTypes: ['local', 'pre-compilation-only'] })
+            dependency('app/domain/schema/timeline.ts', { dependencyTypes: ['local', 'type-import'] })
         ];
         const edge = renderDependencyGraphToDot(fixture, {
             externalPackages: 'none', edgeLabels: 'none', edgePresentation: 'semantic-pairs'
