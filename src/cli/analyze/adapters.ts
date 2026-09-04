@@ -234,10 +234,8 @@ export async function runEslintComplexityScan(
         for (const t of targets) {
             if (hasExplicitFiles) {
                 try {
-                    // Check if file exists on disk (only for explicit file targets, not glob patterns)
                     await fs.access(t);
                 } catch {
-                    // Stale path (file no longer exists on disk), represent as unmeasured/ignored
                     ignoredResults.push({
                         filePath: t,
                         ignored: true,
@@ -247,7 +245,6 @@ export async function runEslintComplexityScan(
                 }
             }
 
-            // Check if ESLint flat config ignores this path
             const isIgnored = await eslint.isPathIgnored(t);
             if (isIgnored) {
                 ignoredResults.push({
@@ -334,7 +331,6 @@ export async function countLinesOfCode(
             const content = await fs.readFile(absolutePath, 'utf8');
             locMap[file] = content.split('\n').length;
         } catch {
-            // File not found or unreadable, treat as 0 LOC
             locMap[file] = 0;
         }
     }
@@ -430,13 +426,12 @@ export async function writeOutputFiles(
     const absMetricsPath = path.resolve(cwd, metricsPath);
     const absReportPath = path.resolve(cwd, reportPath);
 
-    // Ensure parent directories exist
     await fs.mkdir(path.dirname(absMetricsPath), { recursive: true });
     await fs.mkdir(path.dirname(absReportPath), { recursive: true });
 
     const promises: Promise<void>[] = [
         fs.writeFile(absMetricsPath, JSON.stringify(metricsData, null, 2)),
-        fs.writeFile(reportPath, reportData)
+        fs.writeFile(absReportPath, reportData)
     ];
 
     if (manifestPath && manifestData !== undefined) {
