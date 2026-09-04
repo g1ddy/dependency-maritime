@@ -36,7 +36,7 @@ Options:
   --layout-direction <lr|tb>                  Graph direction (default: lr)
   --rank-constraints <all|intra-folder>       Edges that affect rank placement (default: all)
   --layout-density <normal|compact>           Node/rank separation (default: normal)
-  --module-aggregation <none|folders>         File nodes or compact folder nodes (default: none)
+  --module-aggregation <none|folders>         File nodes or explicit folder nodes (default: none)
   --cwd <dir>          Working directory root for resolution
   -h, --help           Show help message
 `);
@@ -77,13 +77,23 @@ Options:
     const output = path.resolve(cwd, values.output);
     try {
         const stat = await fs.stat(input);
-        const graphPath = stat.isDirectory()
-            ? path.resolve(input, (await validateArtifacts({ artifactDir: input, cwd })).manifest.artifacts.graph)
-            : input;
+        let sourceRoots: string[] | undefined;
+        let graphPath: string;
+        if (stat.isDirectory()) {
+            const validation = await validateArtifacts({ artifactDir: input, cwd });
+            sourceRoots = validation.manifest.sourceRoots;
+            graphPath = path.resolve(input, validation.manifest.artifacts.graph);
+        } else {
+            graphPath = input;
+        }
         const parsed: unknown = JSON.parse(await fs.readFile(graphPath, 'utf8'));
         const result = CruiseResultSchema.safeParse(parsed);
         if (!result.success) throw new Error(`Invalid Maritime dependency graph: ${result.error.message}`);
-        const dot = renderDependencyGraphToDot(result.data, { graphProfile, externalPackages, folderGrouping, edgeLabels, layoutDirection, rankConstraints, layoutDensity, moduleAggregation });
+        const dot = renderDependencyGraphToDot(
+            result.data,
+            { graphProfile, externalPackages, folderGrouping, edgeLabels, layoutDirection, rankConstraints, layoutDensity, moduleAggregation },
+            { sourceRoots }
+        );
         const format = inferGraphvizFormat(output);
         await fs.mkdir(path.dirname(output), { recursive: true });
         if (format === 'dot') await fs.writeFile(output, dot);
