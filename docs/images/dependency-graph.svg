@@ -409,7 +409,7 @@
 <!-- local:src/cli/index.ts&#45;&gt;local:src/cli/graph/render&#45;dot.ts -->
 <g id="edge41" class="edge">
 <title>local:src/cli/index.ts&#45;&gt;local:src/cli/graph/render&#45;dot.ts</title>
-<path fill="none" stroke="black" d="M510.51,-2446.01C524.52,-2472.57 556.99,-2519.88 598,-2542.74 654.32,-2574.13 729.42,-2582.33 778.12,-2581.88"/>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M510.51,-2446.01C524.52,-2472.57 556.99,-2519.88 598,-2542.74 654.32,-2574.13 729.42,-2582.33 778.12,-2581.88"/>
 <polygon fill="black" stroke="black" points="778.48,-2585.37 788.39,-2581.64 778.32,-2578.37 778.48,-2585.37"/>
 </g>
 <!-- local:src/cli/index.ts&#45;&gt;local:src/cli/graph/render&#45;graphviz.ts -->
