@@ -2,18 +2,67 @@ import { parseArgs } from 'node:util';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { CruiseResultSchema } from '../../schema/dependency-cruiser';
-import { EDGE_LABEL_MODES, EXTERNAL_PACKAGE_MODES, FOLDER_GROUPING_MODES, GRAPH_PROFILE_MODES, LAYOUT_DENSITY_MODES, LAYOUT_DIRECTION_MODES, MODULE_AGGREGATION_MODES, RANK_CONSTRAINT_MODES, inferGraphvizFormat, renderDependencyGraphToDot, type EdgeLabelsMode, type ExternalPackagesMode, type FolderGroupingMode, type GraphProfileMode, type LayoutDensityMode, type LayoutDirectionMode, type ModuleAggregationMode, type RankConstraintMode } from '../graph/render-dot';
+import {
+    CLUSTER_RANKING_MODES,
+    EDGE_LABEL_MODES,
+    EDGE_PRESENTATION_MODES,
+    EXTERNAL_PACKAGE_MODES,
+    FOLDER_GROUPING_MODES,
+    GRAPH_PROFILE_MODES,
+    LAYOUT_DENSITY_MODES,
+    LAYOUT_DIRECTION_MODES,
+    MODULE_AGGREGATION_MODES,
+    RANK_CONSTRAINT_MODES,
+    SOURCE_ROOT_GROUPING_MODES,
+    VISUAL_THEME_MODES,
+    inferGraphvizFormat,
+    renderDependencyGraphToDot,
+    type ClusterRankingMode,
+    type EdgeLabelsMode,
+    type EdgePresentationMode,
+    type ExternalPackagesMode,
+    type FolderGroupingMode,
+    type GraphProfileMode,
+    type LayoutDensityMode,
+    type LayoutDirectionMode,
+    type ModuleAggregationMode,
+    type RankConstraintMode,
+    type SourceRootGroupingMode,
+    type VisualThemeMode
+} from '../graph/render-dot';
 import { renderDotWithGraphviz } from '../graph/render-graphviz';
 import { validateArtifacts } from '../validate/validate';
 
+type GraphCommandValues = {
+    input?: string;
+    output?: string;
+    cwd?: string;
+    help?: boolean;
+    'graph-profile'?: string;
+    'external-packages'?: string;
+    'folder-grouping'?: string;
+    'edge-labels'?: string;
+    'layout-direction'?: string;
+    'rank-constraints'?: string;
+    'layout-density'?: string;
+    'module-aggregation'?: string;
+    'visual-theme'?: string;
+    'source-root-grouping'?: string;
+    'edge-presentation'?: string;
+    'cluster-ranking'?: string;
+    'aggregation-depth'?: string;
+};
+
 export async function runGraphCommand(args: string[]): Promise<number> {
-    let values: { input?: string; output?: string; cwd?: string; help?: boolean; 'graph-profile'?: string; 'external-packages'?: string; 'folder-grouping'?: string; 'edge-labels'?: string; 'layout-direction'?: string; 'rank-constraints'?: string; 'layout-density'?: string; 'module-aggregation'?: string };
+    let values: GraphCommandValues;
     try {
         values = parseArgs({ args, options: {
             input: { type: 'string', short: 'i' }, output: { type: 'string', short: 'o' },
             cwd: { type: 'string' }, help: { type: 'boolean', short: 'h' },
             'graph-profile': { type: 'string' }, 'external-packages': { type: 'string' }, 'folder-grouping': { type: 'string' }, 'edge-labels': { type: 'string' },
-            'layout-direction': { type: 'string' }, 'rank-constraints': { type: 'string' }, 'layout-density': { type: 'string' }, 'module-aggregation': { type: 'string' }
+            'layout-direction': { type: 'string' }, 'rank-constraints': { type: 'string' }, 'layout-density': { type: 'string' }, 'module-aggregation': { type: 'string' },
+            'visual-theme': { type: 'string' }, 'source-root-grouping': { type: 'string' }, 'edge-presentation': { type: 'string' }, 'cluster-ranking': { type: 'string' },
+            'aggregation-depth': { type: 'string' }
         } }).values;
     } catch (error) {
         console.error(`Error parsing arguments: ${error instanceof Error ? error.message : String(error)}`);
@@ -28,7 +77,7 @@ Renders existing canonical graph evidence without running dependency analysis.
 Options:
   -i, --input <path>   .maritime directory or dependency-graph.json (default: .maritime)
   -o, --output <path>  SVG or DOT output path (required)
-  --graph-profile <default|local-architecture|compact-architecture>
+  --graph-profile <default|local-architecture|compact-architecture|architecture-overview>
                              Presentation baseline; explicit options below override it (default: default)
   --external-packages <none|summary|direct>  External package presentation (default: direct)
   --folder-grouping <none|top-level|nested>   Local folder clustering (default: nested)
@@ -36,7 +85,14 @@ Options:
   --layout-direction <lr|tb>                  Graph direction (default: lr)
   --rank-constraints <all|intra-folder>       Edges that affect rank placement (default: all)
   --layout-density <normal|compact>           Node/rank separation (default: normal)
-  --module-aggregation <none|folders>         File nodes or explicit folder nodes (default: none)
+  --module-aggregation <none|folders>         File nodes or aggregated folder nodes (default: none)
+  --aggregation-depth <positive integer>      Folder depth below each source root (default: 2)
+  --visual-theme <standard|architecture>      Node/cluster visual treatment (default: standard)
+  --source-root-grouping <preserve|elide-single>
+                             Source-root namespace presentation (default: preserve)
+  --edge-presentation <relations|semantic-pairs>
+                             Raw dependency edges or semantic endpoint pairs (default: relations)
+  --cluster-ranking <global|local>            Global or cluster-local Graphviz ranking (default: global)
   --cwd <dir>          Working directory root for resolution
   -h, --help           Show help message
 `);
@@ -51,6 +107,11 @@ Options:
         if ((allowed as readonly string[]).includes(value)) return value as T;
         throw new Error(`Invalid --${flag} value "${value}". Expected one of: ${allowed.join(', ')}.`);
     };
+    const validatePositiveInteger = (flag: string, value: string | undefined): number | undefined => {
+        if (value === undefined) return undefined;
+        if (/^[1-9][0-9]*$/u.test(value)) return Number(value);
+        throw new Error(`Invalid --${flag} value "${value}". Expected a positive integer.`);
+    };
     let externalPackages: ExternalPackagesMode | undefined;
     let folderGrouping: FolderGroupingMode | undefined;
     let edgeLabels: EdgeLabelsMode | undefined;
@@ -59,6 +120,11 @@ Options:
     let layoutDensity: LayoutDensityMode | undefined;
     let graphProfile: GraphProfileMode | undefined;
     let moduleAggregation: ModuleAggregationMode | undefined;
+    let visualTheme: VisualThemeMode | undefined;
+    let sourceRootGrouping: SourceRootGroupingMode | undefined;
+    let edgePresentation: EdgePresentationMode | undefined;
+    let clusterRanking: ClusterRankingMode | undefined;
+    let aggregationDepth: number | undefined;
     try {
         externalPackages = validatePolicy('external-packages', values['external-packages'], EXTERNAL_PACKAGE_MODES);
         folderGrouping = validatePolicy('folder-grouping', values['folder-grouping'], FOLDER_GROUPING_MODES);
@@ -68,6 +134,11 @@ Options:
         layoutDensity = validatePolicy('layout-density', values['layout-density'], LAYOUT_DENSITY_MODES);
         graphProfile = validatePolicy('graph-profile', values['graph-profile'], GRAPH_PROFILE_MODES);
         moduleAggregation = validatePolicy('module-aggregation', values['module-aggregation'], MODULE_AGGREGATION_MODES);
+        visualTheme = validatePolicy('visual-theme', values['visual-theme'], VISUAL_THEME_MODES);
+        sourceRootGrouping = validatePolicy('source-root-grouping', values['source-root-grouping'], SOURCE_ROOT_GROUPING_MODES);
+        edgePresentation = validatePolicy('edge-presentation', values['edge-presentation'], EDGE_PRESENTATION_MODES);
+        clusterRanking = validatePolicy('cluster-ranking', values['cluster-ranking'], CLUSTER_RANKING_MODES);
+        aggregationDepth = validatePositiveInteger('aggregation-depth', values['aggregation-depth']);
     } catch (error) {
         console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
         return 2;
@@ -91,7 +162,11 @@ Options:
         if (!result.success) throw new Error(`Invalid Maritime dependency graph: ${result.error.message}`);
         const dot = renderDependencyGraphToDot(
             result.data,
-            { graphProfile, externalPackages, folderGrouping, edgeLabels, layoutDirection, rankConstraints, layoutDensity, moduleAggregation },
+            {
+                graphProfile, externalPackages, folderGrouping, edgeLabels, layoutDirection, rankConstraints,
+                layoutDensity, moduleAggregation, visualTheme, sourceRootGrouping, edgePresentation,
+                clusterRanking, aggregationDepth
+            },
             { sourceRoots }
         );
         const format = inferGraphvizFormat(output);

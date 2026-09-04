@@ -1,5 +1,15 @@
 import * as path from 'node:path';
 import type { MaritimeCruiseResult, MaritimeDependency, MaritimeModule } from '../../schema/dependency-cruiser';
+import {
+    resolveGraphPresentation,
+    type EdgeLabelsMode,
+    type GraphPresentationOptions,
+    type ResolvedGraphPresentation,
+    type SourceRootGroupingMode,
+    type VisualThemeMode
+} from './presentation';
+
+export * from './presentation';
 
 type LocalFile = {
     source: string;
@@ -12,87 +22,13 @@ type DirectoryNode = {
     files: LocalFile[];
 };
 
-export const EXTERNAL_PACKAGE_MODES = ['none', 'summary', 'direct'] as const;
-export const FOLDER_GROUPING_MODES = ['none', 'top-level', 'nested'] as const;
-export const EDGE_LABEL_MODES = ['none', 'types'] as const;
-export const LAYOUT_DIRECTION_MODES = ['lr', 'tb'] as const;
-export const RANK_CONSTRAINT_MODES = ['all', 'intra-folder'] as const;
-export const LAYOUT_DENSITY_MODES = ['normal', 'compact'] as const;
-export const MODULE_AGGREGATION_MODES = ['none', 'folders'] as const;
-export const GRAPH_PROFILE_MODES = ['default', 'local-architecture', 'compact-architecture'] as const;
-
-export type ExternalPackagesMode = typeof EXTERNAL_PACKAGE_MODES[number];
-export type FolderGroupingMode = typeof FOLDER_GROUPING_MODES[number];
-export type EdgeLabelsMode = typeof EDGE_LABEL_MODES[number];
-export type LayoutDirectionMode = typeof LAYOUT_DIRECTION_MODES[number];
-export type RankConstraintMode = typeof RANK_CONSTRAINT_MODES[number];
-export type LayoutDensityMode = typeof LAYOUT_DENSITY_MODES[number];
-export type ModuleAggregationMode = typeof MODULE_AGGREGATION_MODES[number];
-export type GraphProfileMode = typeof GRAPH_PROFILE_MODES[number];
-export type GraphPresentationOptions = {
-    externalPackages?: ExternalPackagesMode;
-    folderGrouping?: FolderGroupingMode;
-    edgeLabels?: EdgeLabelsMode;
-    layoutDirection?: LayoutDirectionMode;
-    rankConstraints?: RankConstraintMode;
-    layoutDensity?: LayoutDensityMode;
-    moduleAggregation?: ModuleAggregationMode;
-    graphProfile?: GraphProfileMode;
-};
 export type GraphRenderContext = {
     sourceRoots?: string[];
 };
-export type ResolvedGraphPresentation = Required<Omit<GraphPresentationOptions, 'graphProfile'>>;
-
-export const DEFAULT_GRAPH_PRESENTATION = {
-    externalPackages: 'direct',
-    folderGrouping: 'nested',
-    edgeLabels: 'types',
-    layoutDirection: 'lr',
-    rankConstraints: 'all',
-    layoutDensity: 'normal',
-    moduleAggregation: 'none'
-} as const satisfies ResolvedGraphPresentation;
-
-export const DEFAULT_GRAPH_PROFILE = 'default' as const;
-export const GRAPH_PRESENTATION_PROFILES = {
-    default: DEFAULT_GRAPH_PRESENTATION,
-    'local-architecture': {
-        externalPackages: 'none',
-        folderGrouping: 'nested',
-        edgeLabels: 'none',
-        layoutDirection: 'lr',
-        rankConstraints: 'all',
-        layoutDensity: 'normal',
-        moduleAggregation: 'none'
-    },
-    'compact-architecture': {
-        externalPackages: 'none',
-        folderGrouping: 'nested',
-        edgeLabels: 'none',
-        layoutDirection: 'lr',
-        rankConstraints: 'all',
-        layoutDensity: 'compact',
-        moduleAggregation: 'none'
-    }
-} as const satisfies Record<GraphProfileMode, ResolvedGraphPresentation>;
-
-/** Applies a profile first, then explicit presentation options as deterministic overrides. */
-export function resolveGraphPresentation(options: GraphPresentationOptions = {}): ResolvedGraphPresentation {
-    const profile = GRAPH_PRESENTATION_PROFILES[options.graphProfile ?? DEFAULT_GRAPH_PROFILE];
-    return {
-        externalPackages: options.externalPackages ?? profile.externalPackages,
-        folderGrouping: options.folderGrouping ?? profile.folderGrouping,
-        edgeLabels: options.edgeLabels ?? profile.edgeLabels,
-        layoutDirection: options.layoutDirection ?? profile.layoutDirection,
-        rankConstraints: options.rankConstraints ?? profile.rankConstraints,
-        layoutDensity: options.layoutDensity ?? profile.layoutDensity,
-        moduleAggregation: options.moduleAggregation ?? profile.moduleAggregation
-    };
-}
 
 const dotQuote = (value: string): string => JSON.stringify(value);
 const normalizedPath = (value: string): string => value.replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/$/, '');
+const pathSegments = (value: string): string[] => normalizedPath(value).split('/').filter(Boolean);
 
 function externalPackageName(value: string): string | undefined {
     const normalized = normalizedPath(value);
@@ -111,27 +47,24 @@ function isExternalPath(value: string): boolean {
 }
 
 function localFileFromModule(module: MaritimeModule, source: string): LocalFile {
-    return {
-        source,
-        name: path.posix.basename(source),
-        orphan: module.orphan
-    };
+    return { source, name: path.posix.basename(source), orphan: module.orphan };
 }
 
-function addLocalModule(root: DirectoryNode, module: MaritimeModule, source: string): void {
-    const parts = normalizedPath(source).split('/').filter(part => part && part !== '.');
-    const name = parts.pop();
-    if (!name) return;
+function createDirectoryTree(): DirectoryNode {
+    return { directories: new Map(), files: [] };
+}
+
+function addFileToTree(root: DirectoryNode, file: LocalFile, directorySegments: string[]): void {
     let directory = root;
-    for (const part of parts) {
+    for (const part of directorySegments) {
         let child = directory.directories.get(part);
         if (!child) {
-            child = { directories: new Map(), files: [] };
+            child = createDirectoryTree();
             directory.directories.set(part, child);
         }
         directory = child;
     }
-    directory.files.push({ source, name, orphan: module.orphan });
+    directory.files.push(file);
 }
 
 function nodeFillColor(file: LocalFile): string {
@@ -149,47 +82,47 @@ function nodeFillColor(file: LocalFile): string {
     return '#ffffcc';
 }
 
-function renderDirectory(directory: DirectoryNode, segments: string[], indent: string, compactTheme: boolean): string[] {
+function renderFileNode(file: LocalFile, indent: string, visualTheme: VisualThemeMode): string {
+    if (visualTheme === 'architecture') {
+        return `${indent}${dotQuote(`local:${file.source}`)} [label=${dotQuote(file.name)}, shape="box", style="rounded,filled", color="black", fillcolor=${dotQuote(nodeFillColor(file))}, fontcolor="black", fontname="Helvetica", fontsize="9", height="0.2", margin="0.06,0.035"];`;
+    }
+    return `${indent}${dotQuote(`local:${file.source}`)} [label=${dotQuote(file.name)}, shape="box"];`;
+}
+
+function clusterAttributes(indent: string, visualTheme: VisualThemeMode): string[] {
+    if (visualTheme !== 'architecture') return [`${indent}color="#94a3b8";`];
+    return [
+        `${indent}color="black";`,
+        `${indent}fontcolor="black";`,
+        `${indent}fontname="Helvetica-Bold";`,
+        `${indent}fontsize="9";`,
+        `${indent}penwidth="2";`,
+        `${indent}margin="4";`,
+        `${indent}style="rounded,bold,filled";`,
+        `${indent}fillcolor="#ffffff";`
+    ];
+}
+
+function renderDirectoryContents(directory: DirectoryNode, segments: string[], indent: string, visualTheme: VisualThemeMode): string[] {
     const lines: string[] = [];
     for (const [name, child] of [...directory.directories].sort(([a], [b]) => a.localeCompare(b))) {
         const childSegments = [...segments, name];
         lines.push(`${indent}subgraph ${dotQuote(`cluster:${childSegments.join('/')}`)} {`);
         lines.push(`${indent}  label=${dotQuote(name)};`);
-        if (compactTheme) {
-            lines.push(`${indent}  color="black";`);
-            lines.push(`${indent}  fontcolor="black";`);
-            lines.push(`${indent}  fontname="Helvetica-Bold";`);
-            lines.push(`${indent}  fontsize="9";`);
-            lines.push(`${indent}  penwidth="2";`);
-            lines.push(`${indent}  margin="4";`);
-            lines.push(`${indent}  style="rounded,bold,filled";`);
-            lines.push(`${indent}  fillcolor="#ffffff";`);
-        } else {
-            lines.push(`${indent}  color="#94a3b8";`);
-        }
-        lines.push(...renderDirectory(child, childSegments, `${indent}  `, compactTheme));
+        lines.push(...clusterAttributes(`${indent}  `, visualTheme));
+        lines.push(...renderDirectoryContents(child, childSegments, `${indent}  `, visualTheme));
         lines.push(`${indent}}`);
     }
     for (const file of [...directory.files].sort((a, b) => a.name.localeCompare(b.name) || a.source.localeCompare(b.source))) {
-        if (compactTheme) {
-            lines.push(`${indent}${dotQuote(`local:${file.source}`)} [label=${dotQuote(file.name)}, shape="box", style="rounded,filled", color="black", fillcolor=${dotQuote(nodeFillColor(file))}, fontcolor="black", fontname="Helvetica", fontsize="9", height="0.2", margin="0.06,0.035"];`);
-        } else {
-            lines.push(`${indent}${dotQuote(`local:${file.source}`)} [label=${dotQuote(file.name)}, shape="box"];`);
-        }
+        lines.push(renderFileNode(file, indent, visualTheme));
     }
     return lines;
 }
 
-function findDirectory(root: DirectoryNode, directoryPath: string): { directory: DirectoryNode; segments: string[] } | undefined {
-    const segments = normalizedPath(directoryPath).split('/').filter(Boolean);
-    if (segments.length === 0) return { directory: root, segments: [] };
-    let directory = root;
-    for (const segment of segments) {
-        const child = directory.directories.get(segment);
-        if (!child) return undefined;
-        directory = child;
-    }
-    return { directory, segments };
+function normalizedSourceRoots(sourceRoots: string[] | undefined): string[] | undefined {
+    if (!sourceRoots) return undefined;
+    const roots = [...new Set(sourceRoots.map(normalizedPath).filter(root => root && root !== '.'))];
+    return roots.length > 0 ? roots : undefined;
 }
 
 function inferSourceRoots(graph: MaritimeCruiseResult): string[] | undefined {
@@ -197,45 +130,149 @@ function inferSourceRoots(graph: MaritimeCruiseResult): string[] | undefined {
     if (!optionsUsed || typeof optionsUsed !== 'object') return undefined;
     const args = (optionsUsed as { args?: unknown }).args;
     if (Array.isArray(args)) {
-        const roots = args.filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
-        return roots.length > 0 ? roots : undefined;
+        return normalizedSourceRoots(args.filter((value): value is string => typeof value === 'string' && value.trim().length > 0));
     }
     if (typeof args === 'string') {
-        const roots = args.split(/[\s,]+/u).map(value => value.trim()).filter(Boolean);
-        return roots.length > 0 ? roots : undefined;
+        return normalizedSourceRoots(args.split(/[\s,]+/u).map(value => value.trim()).filter(Boolean));
     }
     return undefined;
 }
 
-function renderLocalTree(
-    root: DirectoryNode,
-    graph: MaritimeCruiseResult,
-    context: GraphRenderContext,
-    compactTheme: boolean
-): string[] {
-    const sourceRoots = context.sourceRoots ?? inferSourceRoots(graph);
-    if (compactTheme && sourceRoots?.length === 1) {
-        const sourceRoot = normalizedPath(sourceRoots[0]);
-        if (sourceRoot && sourceRoot !== '.') {
-            const resolved = findDirectory(root, sourceRoot);
-            if (resolved) return renderDirectory(resolved.directory, resolved.segments, '  ', compactTheme);
+function hasPrefix(segments: string[], prefix: string[]): boolean {
+    return prefix.length <= segments.length && prefix.every((part, index) => segments[index] === part);
+}
+
+function matchingSourceRoot(source: string, sourceRoots: string[] | undefined): string | undefined {
+    if (!sourceRoots) return undefined;
+    const directories = pathSegments(source);
+    directories.pop();
+    return [...sourceRoots]
+        .sort((a, b) => pathSegments(b).length - pathSegments(a).length || a.localeCompare(b))
+        .find(root => hasPrefix(directories, pathSegments(root)));
+}
+
+function filesByRoot(files: LocalFile[], sourceRoots: string[]): { byRoot: Map<string, LocalFile[]>; unmatched: LocalFile[] } {
+    const byRoot = new Map(sourceRoots.map(root => [root, [] as LocalFile[]]));
+    const unmatched: LocalFile[] = [];
+    for (const file of files) {
+        const root = matchingSourceRoot(file.source, sourceRoots);
+        if (root) byRoot.get(root)?.push(file);
+        else unmatched.push(file);
+    }
+    return { byRoot, unmatched };
+}
+
+function buildTree(files: LocalFile[], stripPrefix: string[] = []): DirectoryNode {
+    const tree = createDirectoryTree();
+    for (const file of files) {
+        const directories = pathSegments(file.source);
+        directories.pop();
+        const relative = hasPrefix(directories, stripPrefix) ? directories.slice(stripPrefix.length) : directories;
+        addFileToTree(tree, file, relative);
+    }
+    return tree;
+}
+
+function renderRootCluster(rootPath: string, files: LocalFile[], indent: string, visualTheme: VisualThemeMode): string[] {
+    const rootSegments = pathSegments(rootPath);
+    const tree = buildTree(files, rootSegments);
+    const label = rootSegments.at(-1) ?? rootPath;
+    return [
+        `${indent}subgraph ${dotQuote(`cluster:${rootPath}`)} {`,
+        `${indent}  label=${dotQuote(label)};`,
+        ...clusterAttributes(`${indent}  `, visualTheme),
+        ...renderDirectoryContents(tree, rootSegments, `${indent}  `, visualTheme),
+        `${indent}}`
+    ];
+}
+
+function renderNestedFiles(files: LocalFile[], sourceRoots: string[] | undefined, sourceRootGrouping: SourceRootGroupingMode, visualTheme: VisualThemeMode): string[] {
+    if (!sourceRoots || sourceRoots.length === 0) return renderDirectoryContents(buildTree(files), [], '  ', visualTheme);
+    const { byRoot, unmatched } = filesByRoot(files, sourceRoots);
+    const lines: string[] = [];
+    if (sourceRoots.length === 1 && sourceRootGrouping === 'elide-single') {
+        const sourceRoot = sourceRoots[0];
+        const rootFiles = byRoot.get(sourceRoot) ?? [];
+        const rootSegments = pathSegments(sourceRoot);
+        lines.push(...renderDirectoryContents(buildTree(rootFiles, rootSegments), rootSegments, '  ', visualTheme));
+    } else {
+        for (const sourceRoot of [...sourceRoots].sort()) {
+            const rootFiles = byRoot.get(sourceRoot) ?? [];
+            if (rootFiles.length > 0) lines.push(...renderRootCluster(sourceRoot, rootFiles, '  ', visualTheme));
         }
     }
-    return renderDirectory(root, [], '  ', compactTheme);
+    if (unmatched.length > 0) lines.push(...renderDirectoryContents(buildTree(unmatched), [], '  ', visualTheme));
+    return lines;
+}
+
+function topLevelGroupForFile(file: LocalFile, sourceRoots: string[] | undefined, sourceRootGrouping: SourceRootGroupingMode): string | undefined {
+    const directories = pathSegments(file.source);
+    directories.pop();
+    const matchingRoot = matchingSourceRoot(file.source, sourceRoots);
+    if (matchingRoot) {
+        const rootSegments = pathSegments(matchingRoot);
+        if (sourceRoots?.length === 1 && sourceRootGrouping === 'elide-single') {
+            return directories[rootSegments.length] ? [...rootSegments, directories[rootSegments.length]].join('/') : undefined;
+        }
+        return matchingRoot;
+    }
+    return directories[0];
+}
+
+function renderTopLevelFiles(files: LocalFile[], sourceRoots: string[] | undefined, sourceRootGrouping: SourceRootGroupingMode, visualTheme: VisualThemeMode): string[] {
+    const groups = new Map<string, LocalFile[]>();
+    const ungrouped: LocalFile[] = [];
+    for (const file of files) {
+        const group = topLevelGroupForFile(file, sourceRoots, sourceRootGrouping);
+        if (!group) ungrouped.push(file);
+        else groups.set(group, [...(groups.get(group) ?? []), file]);
+    }
+    const lines: string[] = [];
+    for (const [group, groupFiles] of [...groups].sort(([a], [b]) => a.localeCompare(b))) {
+        lines.push(`  subgraph ${dotQuote(`cluster:${group}`)} {`);
+        lines.push(`    label=${dotQuote(path.posix.basename(group))};`);
+        lines.push(...clusterAttributes('    ', visualTheme));
+        for (const file of [...groupFiles].sort((a, b) => a.source.localeCompare(b.source))) lines.push(renderFileNode(file, '    ', visualTheme));
+        lines.push('  }');
+    }
+    for (const file of [...ungrouped].sort((a, b) => a.source.localeCompare(b.source))) lines.push(renderFileNode(file, '  ', visualTheme));
+    return lines;
+}
+
+function renderLocalFiles(files: LocalFile[], sourceRoots: string[] | undefined, presentation: ResolvedGraphPresentation): string[] {
+    if (presentation.folderGrouping === 'none') {
+        return [...files].sort((a, b) => a.source.localeCompare(b.source)).map(file => renderFileNode(file, '  ', presentation.visualTheme));
+    }
+    if (presentation.folderGrouping === 'top-level') {
+        return renderTopLevelFiles(files, sourceRoots, presentation.sourceRootGrouping, presentation.visualTheme);
+    }
+    return renderNestedFiles(files, sourceRoots, presentation.sourceRootGrouping, presentation.visualTheme);
+}
+
+/** Backward-compatible fixed-depth helper. New rendering uses aggregationDepth relative to source roots. */
+export function compactFolder(source: string): string {
+    return aggregationFolder(source, undefined, 2, 'preserve');
+}
+
+export function aggregationFolder(source: string, sourceRoots: string[] | undefined, depth: number, sourceRootGrouping: SourceRootGroupingMode = 'preserve'): string {
+    if (!Number.isInteger(depth) || depth < 1) throw new Error(`Invalid aggregation depth "${depth}". Expected a positive integer.`);
+    const directories = pathSegments(source);
+    directories.pop();
+    const roots = normalizedSourceRoots(sourceRoots);
+    const matchingRoot = matchingSourceRoot(source, roots);
+    if (matchingRoot) {
+        const rootSegments = pathSegments(matchingRoot);
+        const selected = directories.slice(rootSegments.length, rootSegments.length + depth);
+        if (roots?.length === 1 && sourceRootGrouping === 'elide-single') return selected.join('/') || '.';
+        return [...rootSegments, ...selected].join('/') || matchingRoot;
+    }
+    return directories.slice(0, depth + 1).join('/') || '.';
 }
 
 function topLevelFolder(source: string): string {
-    const segments = normalizedPath(source).split('/').filter(Boolean);
+    const segments = pathSegments(source);
     segments.pop();
     return segments[0] ?? '.';
-}
-
-// Keep the source root plus its first two architectural directory segments. Deeper
-// implementation detail is folded into that node; shallower paths retain their parent.
-export function compactFolder(source: string): string {
-    const directories = normalizedPath(source).split('/').filter(Boolean);
-    directories.pop();
-    return directories.slice(0, 3).join('/') || '.';
 }
 
 function edgeAttributes(dependency: MaritimeDependency, edgeLabels: EdgeLabelsMode, constrained: boolean): string {
@@ -264,8 +301,20 @@ type AggregatedEdge = {
     valid: boolean;
 };
 
-function mergeAggregatedEdge(edge: AggregatedEdge, dependency: MaritimeDependency): void {
+function createAggregatedEdge(from: string, to: string, dependency: MaritimeDependency, constrained: boolean): AggregatedEdge {
+    return {
+        from, to, count: 1, constrained,
+        dependencyTypes: new Set(dependency.dependencyTypes),
+        allNonRuntime: dependency.typeOnly === true || dependency.preCompilationOnly === true,
+        allDynamic: dependency.dynamic === true,
+        circular: dependency.circular,
+        valid: dependency.valid
+    };
+}
+
+function mergeAggregatedEdge(edge: AggregatedEdge, dependency: MaritimeDependency, constrained = edge.constrained): void {
     edge.count += 1;
+    edge.constrained &&= constrained;
     dependency.dependencyTypes.forEach(type => edge.dependencyTypes.add(type));
     edge.allNonRuntime &&= dependency.typeOnly === true || dependency.preCompilationOnly === true;
     edge.allDynamic &&= dependency.dynamic === true;
@@ -289,17 +338,15 @@ function aggregateEdgeAttributes(edge: AggregatedEdge, edgeLabels: EdgeLabelsMod
     return attributes.length > 0 ? ` [${attributes.join(', ')}]` : '';
 }
 
-function compactPairEdgeAttributes(edge: AggregatedEdge, edgeLabels: EdgeLabelsMode): string {
+function semanticPairEdgeAttributes(edge: AggregatedEdge, edgeLabels: EdgeLabelsMode, includeCount: boolean): string {
     const attributes: string[] = [];
     if (!edge.constrained) attributes.push('constraint="false"');
-    if (edgeLabels === 'types' && edge.dependencyTypes.size > 0) {
-        attributes.push(`label=${dotQuote([...edge.dependencyTypes].sort().join(', '))}`);
-    }
-    if (edge.allNonRuntime) {
-        attributes.push('arrowhead="onormal"', 'style="dashed"', 'color="#aaaaaa"', 'penwidth="1"');
-    } else if (edge.allDynamic) {
-        attributes.push('style="dashed"');
-    }
+    const labelParts: string[] = [];
+    if (includeCount && edge.count > 1) labelParts.push(`×${edge.count}`);
+    if (edgeLabels === 'types') labelParts.push(...[...edge.dependencyTypes].sort());
+    if (labelParts.length > 0) attributes.push(`label=${dotQuote(labelParts.join(' · '))}`);
+    if (edge.allNonRuntime) attributes.push('arrowhead="onormal"', 'style="dashed"', 'color="#aaaaaa"', 'penwidth="1"');
+    else if (edge.allDynamic) attributes.push('style="dashed"');
     if (edge.circular) attributes.push('color="#d97706"', 'penwidth="2"');
     if (!edge.valid) {
         if (edge.circular) attributes.push('xlabel="invalid"', 'fontcolor="#dc2626"');
@@ -308,15 +355,48 @@ function compactPairEdgeAttributes(edge: AggregatedEdge, edgeLabels: EdgeLabelsM
     return attributes.length > 0 ? ` [${attributes.join(', ')}]` : '';
 }
 
+function graphAttributes(presentation: ResolvedGraphPresentation): string {
+    const attributes: Array<string | undefined> = [
+        'compound="true"',
+        presentation.clusterRanking === 'global' ? 'newrank="true"' : undefined,
+        `rankdir="${presentation.layoutDirection.toUpperCase()}"`
+    ];
+    if (presentation.visualTheme === 'architecture') attributes.push('splines="true"', 'overlap="false"', 'fontname="Helvetica-bold"', 'fontsize="9"', 'bgcolor="white"');
+    else attributes.push('fontname="Helvetica"');
+    if (presentation.layoutDensity === 'compact') attributes.push('ranksep="0.12"', 'nodesep="0.10"');
+    return attributes.filter((value): value is string => value !== undefined).join(', ');
+}
+
+function nodeDefaults(presentation: ResolvedGraphPresentation): string {
+    if (presentation.visualTheme === 'architecture') return '  node [shape="box", style="rounded,filled", color="black", fillcolor="#ffffcc", fontcolor="black", fontname="Helvetica", fontsize="9", height="0.2"];';
+    return '  node [fontname="Helvetica", fontsize="10"];';
+}
+
+function edgeDefaults(presentation: ResolvedGraphPresentation): string {
+    if (presentation.edgePresentation === 'semantic-pairs') return '  edge [arrowhead="normal", arrowsize="0.6", penwidth="2", color="#00000033", fontname="Helvetica", fontsize="9"];';
+    return '  edge [fontname="Helvetica", fontsize="8"];';
+}
+
+function aggregatedFolderNode(folder: string, presentation: ResolvedGraphPresentation): string {
+    if (presentation.visualTheme === 'architecture') return `  ${dotQuote(`folder:${folder}`)} [label=${dotQuote(folder)}, shape="folder", style="filled,bold", fillcolor="#ffffff", color="black", penwidth="2", fontname="Helvetica-Bold", fontsize="9"];`;
+    return `  ${dotQuote(`folder:${folder}`)} [label=${dotQuote(folder)}, shape="folder"];`;
+}
+
+function appendExternalNodes(lines: string[], externalPackages: Set<string>, presentation: ResolvedGraphPresentation): void {
+    if (presentation.externalPackages === 'summary' && externalPackages.size > 0) {
+        lines.push('  "external:boundary" [label="External packages", shape="component", style="filled,dashed", fillcolor="#e2e8f0", color="#64748b"];');
+    } else if (presentation.externalPackages === 'direct' && externalPackages.size > 0) {
+        lines.push('  subgraph "cluster:external-packages" {', '    label="External packages";', '    style="dashed";', '    color="#64748b";');
+        for (const packageName of [...externalPackages].sort()) lines.push(`    ${dotQuote(`external:${packageName}`)} [label=${dotQuote(packageName)}, shape="component", style="filled", fillcolor="#e2e8f0"];`);
+        lines.push('  }');
+    }
+}
+
 /** Pure, deterministic conversion of a validated dependency-cruiser result to Graphviz DOT. */
-export function renderDependencyGraphToDot(
-    graph: MaritimeCruiseResult,
-    options: GraphPresentationOptions = {},
-    context: GraphRenderContext = {}
-): string {
+export function renderDependencyGraphToDot(graph: MaritimeCruiseResult, options: GraphPresentationOptions = {}, context: GraphRenderContext = {}): string {
     const presentation = resolveGraphPresentation(options);
-    const compactTheme = (options.graphProfile ?? DEFAULT_GRAPH_PROFILE) === 'compact-architecture';
-    const root: DirectoryNode = { directories: new Map(), files: [] };
+    const sourceRoots = normalizedSourceRoots(context.sourceRoots) ?? inferSourceRoots(graph);
+    const localFiles: LocalFile[] = [];
     const localSources = new Set<string>();
     const externalPackages = new Set<string>();
 
@@ -324,79 +404,46 @@ export function renderDependencyGraphToDot(
         const source = normalizedPath(module.source);
         if (isExternalPath(source) || module.coreModule) continue;
         localSources.add(source);
-        if (presentation.moduleAggregation === 'folders') continue;
-        if (presentation.folderGrouping === 'nested') addLocalModule(root, module, source);
-        else if (presentation.folderGrouping === 'top-level') {
-            const segments = source.split('/').filter(Boolean);
-            const name = segments.at(-1);
-            if (segments.length <= 1 || !name) {
-                root.files.push(localFileFromModule(module, source));
-                continue;
-            }
-            const [topLevel] = segments;
-            const directory: DirectoryNode = root.directories.get(topLevel) ?? { directories: new Map(), files: [] };
-            root.directories.set(topLevel, directory);
-            directory.files.push(localFileFromModule(module, source));
-        } else root.files.push(localFileFromModule(module, source));
+        localFiles.push(localFileFromModule(module, source));
     }
 
     if (presentation.moduleAggregation === 'folders') {
-        const folders = [...new Set([...localSources].map(compactFolder))].sort();
+        const folderFor = (source: string): string => aggregationFolder(source, sourceRoots, presentation.aggregationDepth, presentation.sourceRootGrouping);
+        const folders = [...new Set([...localSources].map(folderFor))].sort();
         const aggregateEdges = new Map<string, AggregatedEdge>();
         for (const module of [...graph.modules].sort((a, b) => a.source.localeCompare(b.source))) {
             const source = normalizedPath(module.source);
             if (!localSources.has(source)) continue;
-            const fromFolder = compactFolder(source);
+            const fromFolder = folderFor(source);
             for (const dependency of module.dependencies) {
                 const resolved = normalizedPath(dependency.resolved);
                 let target: string | undefined;
                 if (localSources.has(resolved)) {
-                    const toFolder = compactFolder(resolved);
+                    const toFolder = folderFor(resolved);
                     if (fromFolder === toFolder) continue;
                     target = `folder:${toFolder}`;
                 } else if (!dependency.coreModule) {
                     const looksExternal = isExternalPath(resolved) || dependency.dependencyTypes.includes('npm');
-                    const packageName = looksExternal
-                        ? externalPackageName(isExternalPath(resolved) ? resolved : dependency.module)
-                        : undefined;
+                    const packageName = looksExternal ? externalPackageName(isExternalPath(resolved) ? resolved : dependency.module) : undefined;
                     if (packageName && presentation.externalPackages !== 'none') {
                         externalPackages.add(packageName);
                         target = presentation.externalPackages === 'summary' ? 'external:boundary' : `external:${packageName}`;
                     }
                 }
                 if (!target) continue;
-                const key = `${fromFolder}\0${target}`;
+                const from = `folder:${fromFolder}`;
+                const constrained = !localSources.has(resolved) || presentation.rankConstraints === 'all' || topLevelFolder(source) === topLevelFolder(resolved);
+                const key = `${from}\0${target}`;
                 const current = aggregateEdges.get(key);
-                if (current) mergeAggregatedEdge(current, dependency);
-                else aggregateEdges.set(key, {
-                    from: `folder:${fromFolder}`, to: target, count: 1,
-                    constrained: !localSources.has(resolved) || presentation.rankConstraints === 'all' || topLevelFolder(source) === topLevelFolder(resolved),
-                    dependencyTypes: new Set(dependency.dependencyTypes),
-                    allNonRuntime: dependency.typeOnly === true || dependency.preCompilationOnly === true,
-                    allDynamic: dependency.dynamic === true,
-                    circular: dependency.circular,
-                    valid: dependency.valid
-                });
+                if (current) mergeAggregatedEdge(current, dependency, constrained);
+                else aggregateEdges.set(key, createAggregatedEdge(from, target, dependency, constrained));
             }
         }
-        const lines = [
-            'digraph "dependency-graph" {',
-            `  graph [compound="true", newrank="true", rankdir="${presentation.layoutDirection.toUpperCase()}", fontname="Helvetica"${presentation.layoutDensity === 'compact' ? ', ranksep="0.12", nodesep="0.10"' : ''}];`,
-            '  node [fontname="Helvetica", fontsize="10"];',
-            '  edge [fontname="Helvetica", fontsize="8", color="#94a3b8"];',
-            ...folders.map(folder => `  ${dotQuote(`folder:${folder}`)} [label=${dotQuote(folder)}, shape="folder"];`)
-        ];
-        if (presentation.externalPackages === 'summary' && externalPackages.size > 0) {
-            lines.push('  "external:boundary" [label="External packages", shape="component", style="filled,dashed", fillcolor="#e2e8f0", color="#64748b"];');
-        } else if (presentation.externalPackages === 'direct' && externalPackages.size > 0) {
-            lines.push('  subgraph "cluster:external-packages" {', '    label="External packages";', '    style="dashed";', '    color="#64748b";');
-            for (const packageName of [...externalPackages].sort()) {
-                lines.push(`    ${dotQuote(`external:${packageName}`)} [label=${dotQuote(packageName)}, shape="component", style="filled", fillcolor="#e2e8f0"];`);
-            }
-            lines.push('  }');
-        }
+        const lines = ['digraph "dependency-graph" {', `  graph [${graphAttributes(presentation)}];`, nodeDefaults(presentation), edgeDefaults(presentation), ...folders.map(folder => aggregatedFolderNode(folder, presentation))];
+        appendExternalNodes(lines, externalPackages, presentation);
         for (const edge of [...aggregateEdges.values()].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to))) {
-            lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${aggregateEdgeAttributes(edge, presentation.edgeLabels)};`);
+            const attributes = presentation.edgePresentation === 'semantic-pairs' ? semanticPairEdgeAttributes(edge, presentation.edgeLabels, true) : aggregateEdgeAttributes(edge, presentation.edgeLabels);
+            lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${attributes};`);
         }
         lines.push('}', '');
         return lines.join('\n');
@@ -409,83 +456,36 @@ export function renderDependencyGraphToDot(
         for (const dependency of module.dependencies) {
             const resolved = normalizedPath(dependency.resolved);
             let target: string | undefined;
-            if (localSources.has(resolved)) {
-                target = `local:${resolved}`;
-            } else if (!dependency.coreModule) {
+            if (localSources.has(resolved)) target = `local:${resolved}`;
+            else if (!dependency.coreModule) {
                 const looksExternal = isExternalPath(resolved) || dependency.dependencyTypes.includes('npm');
-                const packageName = looksExternal
-                    ? externalPackageName(isExternalPath(resolved) ? resolved : dependency.module)
-                    : undefined;
+                const packageName = looksExternal ? externalPackageName(isExternalPath(resolved) ? resolved : dependency.module) : undefined;
                 if (packageName && presentation.externalPackages !== 'none') {
                     externalPackages.add(packageName);
                     target = presentation.externalPackages === 'summary' ? 'external:boundary' : `external:${packageName}`;
                 }
             }
             if (target) {
-                const constrained = !localSources.has(resolved)
-                    || presentation.rankConstraints === 'all'
-                    || topLevelFolder(source) === topLevelFolder(resolved);
+                const constrained = !localSources.has(resolved) || presentation.rankConstraints === 'all' || topLevelFolder(source) === topLevelFolder(resolved);
                 edges.push({ from: `local:${source}`, to: target, dependency, constrained });
             }
         }
     }
+    edges.sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to) || JSON.stringify(a.dependency).localeCompare(JSON.stringify(b.dependency)));
 
-    edges.sort((a, b) => a.from.localeCompare(b.from)
-        || a.to.localeCompare(b.to)
-        || JSON.stringify(a.dependency).localeCompare(JSON.stringify(b.dependency)));
-
-    const graphAttributes = compactTheme
-        ? `compound="true", rankdir="${presentation.layoutDirection.toUpperCase()}", splines="true", overlap="false", fontname="Helvetica-bold", fontsize="9", bgcolor="white"${presentation.layoutDensity === 'compact' ? ', ranksep="0.12", nodesep="0.10"' : ''}`
-        : `compound="true", newrank="true", rankdir="${presentation.layoutDirection.toUpperCase()}", fontname="Helvetica"${presentation.layoutDensity === 'compact' ? ', ranksep="0.12", nodesep="0.10"' : ''}`;
-    const lines = [
-        'digraph "dependency-graph" {',
-        `  graph [${graphAttributes}];`,
-        compactTheme
-            ? '  node [shape="box", style="rounded,filled", color="black", fillcolor="#ffffcc", fontcolor="black", fontname="Helvetica", fontsize="9", height="0.2"];'
-            : '  node [fontname="Helvetica", fontsize="10"];',
-        compactTheme
-            ? '  edge [arrowhead="normal", arrowsize="0.6", penwidth="2", color="#00000033", fontname="Helvetica", fontsize="9"];'
-            : '  edge [fontname="Helvetica", fontsize="8"];',
-        ...renderLocalTree(root, graph, context, compactTheme)
-    ];
-    if (presentation.externalPackages === 'summary' && externalPackages.size > 0) {
-        lines.push('  "external:boundary" [label="External packages", shape="component", style="filled,dashed", fillcolor="#e2e8f0", color="#64748b"];');
-    } else if (presentation.externalPackages === 'direct' && externalPackages.size > 0) {
-        lines.push('  subgraph "cluster:external-packages" {', '    label="External packages";', '    style="dashed";', '    color="#64748b";');
-        for (const packageName of [...externalPackages].sort()) {
-            lines.push(`    ${dotQuote(`external:${packageName}`)} [label=${dotQuote(packageName)}, shape="component", style="filled", fillcolor="#e2e8f0"];`);
-        }
-        lines.push('  }');
-    }
-    if (compactTheme) {
+    const lines = ['digraph "dependency-graph" {', `  graph [${graphAttributes(presentation)}];`, nodeDefaults(presentation), edgeDefaults(presentation), ...renderLocalFiles(localFiles, sourceRoots, presentation)];
+    appendExternalNodes(lines, externalPackages, presentation);
+    if (presentation.edgePresentation === 'semantic-pairs') {
         const pairEdges = new Map<string, AggregatedEdge>();
         for (const edge of edges) {
             const key = `${edge.from}\0${edge.to}`;
             const current = pairEdges.get(key);
-            if (current) {
-                current.constrained &&= edge.constrained;
-                mergeAggregatedEdge(current, edge.dependency);
-            } else {
-                pairEdges.set(key, {
-                    from: edge.from,
-                    to: edge.to,
-                    count: 1,
-                    constrained: edge.constrained,
-                    dependencyTypes: new Set(edge.dependency.dependencyTypes),
-                    allNonRuntime: edge.dependency.typeOnly === true || edge.dependency.preCompilationOnly === true,
-                    allDynamic: edge.dependency.dynamic === true,
-                    circular: edge.dependency.circular,
-                    valid: edge.dependency.valid
-                });
-            }
+            if (current) mergeAggregatedEdge(current, edge.dependency, edge.constrained);
+            else pairEdges.set(key, createAggregatedEdge(edge.from, edge.to, edge.dependency, edge.constrained));
         }
-        for (const edge of [...pairEdges.values()].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to))) {
-            lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${compactPairEdgeAttributes(edge, presentation.edgeLabels)};`);
-        }
+        for (const edge of [...pairEdges.values()].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to))) lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${semanticPairEdgeAttributes(edge, presentation.edgeLabels, false)};`);
     } else {
-        for (const edge of edges) {
-            lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency, presentation.edgeLabels, edge.constrained)};`);
-        }
+        for (const edge of edges) lines.push(`  ${dotQuote(edge.from)} -> ${dotQuote(edge.to)}${edgeAttributes(edge.dependency, presentation.edgeLabels, edge.constrained)};`);
     }
     lines.push('}', '');
     return lines.join('\n');

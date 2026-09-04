@@ -47,7 +47,7 @@ inputs:
     required: false
     default: 'docs/images/dependency-graph.svg'
   graph-profile:
-    description: 'Optional graph presentation baseline: default, local-architecture, or compact-architecture. Explicit presentation inputs override it.'
+    description: 'Optional graph presentation baseline: default, local-architecture, compact-architecture, or architecture-overview. Explicit presentation inputs override it.'
     required: false
     default: ''
   external-packages:
@@ -59,7 +59,11 @@ inputs:
     required: false
     default: ''
   module-aggregation:
-    description: 'Local node granularity: none keeps modules; folders aggregates at compact architecture depth.'
+    description: 'Local node granularity: none keeps files; folders aggregates modules into source-root-relative folder nodes.'
+    required: false
+    default: ''
+  aggregation-depth:
+    description: 'Positive folder depth below each configured source root when module-aggregation is folders.'
     required: false
     default: ''
   edge-labels:
@@ -78,6 +82,22 @@ inputs:
     description: 'Node and rank separation: normal or compact.'
     required: false
     default: ''
+  visual-theme:
+    description: 'Node and cluster treatment: standard or architecture.'
+    required: false
+    default: ''
+  source-root-grouping:
+    description: 'Source-root namespace presentation: preserve or elide-single.'
+    required: false
+    default: ''
+  edge-presentation:
+    description: 'Dependency edge presentation: relations or semantic-pairs.'
+    required: false
+    default: ''
+  cluster-ranking:
+    description: 'Graphviz cluster ranking policy: global or local.'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -94,12 +114,7 @@ runs:
         ACTION_REF: ${{ github.action_ref }}
       run: |
         set -euo pipefail
-
-        # Branch/commit refs cannot encode a package version, so retain the last
-        # known compatible package as a development fallback. Versioned action
-        # tags are authoritative: cli-vX.Y.Z[-pre] resolves to package X.Y.Z[-pre].
         FALLBACK_CLI="@dependency-maritime/cli@0.1.0-beta.4"
-
         if [ -n "${INPUT_CLI_SOURCE:-}" ]; then
           CLI_SRC="$INPUT_CLI_SOURCE"
         elif [ -n "${MARITIME_CLI_TEST_SOURCE:-}" ]; then
@@ -114,9 +129,7 @@ runs:
         else
           CLI_SRC="$FALLBACK_CLI"
         fi
-
         echo "Resolving Maritime CLI from: $CLI_SRC"
-
         if [ "$CLI_SRC" = "." ] || [ -f "$CLI_SRC/dist/cli/main.js" ] || [ -f "$CLI_SRC/main.js" ]; then
           if [ -f "$CLI_SRC/dist/cli/main.js" ]; then
             MARITIME_BIN="node $CLI_SRC/dist/cli/main.js"
@@ -133,7 +146,6 @@ runs:
           fi
           MARITIME_BIN="./node_modules/.bin/maritime"
         fi
-
         echo "MARITIME_BIN=$MARITIME_BIN" >> "$GITHUB_ENV"
 
     - name: Run Maritime Analyze
@@ -147,21 +159,11 @@ runs:
         ARGS=()
         ROOTS=$(echo "$INPUT_SOURCE_ROOTS" | tr ',\n' '  ')
         for ROOT in $ROOTS; do
-          if [ -n "$ROOT" ]; then
-            ARGS+=("--source" "$ROOT")
-          fi
+          if [ -n "$ROOT" ]; then ARGS+=("--source" "$ROOT"); fi
         done
-
         ARGS+=("--output" "$INPUT_OUTPUT_DIR")
-
-        if [ -n "${INPUT_DEPCRUISE_CONFIG:-}" ]; then
-          ARGS+=("--depcruise-config" "$INPUT_DEPCRUISE_CONFIG")
-        fi
-
-        if [ "${INPUT_FAIL_ON_UNMEASURED:-false}" = "true" ]; then
-          ARGS+=("--fail-on-unmeasured")
-        fi
-
+        if [ -n "${INPUT_DEPCRUISE_CONFIG:-}" ]; then ARGS+=("--depcruise-config" "$INPUT_DEPCRUISE_CONFIG"); fi
+        if [ "${INPUT_FAIL_ON_UNMEASURED:-false}" = "true" ]; then ARGS+=("--fail-on-unmeasured"); fi
         echo "Executing: $MARITIME_BIN analyze ${ARGS[*]}"
         $MARITIME_BIN analyze "${ARGS[@]}"
 
@@ -177,9 +179,6 @@ runs:
       if: ${{ inputs.render-graph == 'true' || inputs.render-graph == true }}
       uses: ts-graphviz/setup-graphviz@b1de5da23ed0a6d14e0aeee8ed52fdd87af2363c # v2
       with:
-        # Maritime's deterministic committed-SVG contract is the Ubuntu runner path.
-        # setup-graphviz v2 currently emits GitHub's deprecated Node 20 runtime warning;
-        # this pin is retained until an audited successor is available.
         ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'
 
     - name: Render Maritime Dependency Graph
@@ -192,14 +191,19 @@ runs:
         INPUT_EXTERNAL_PACKAGES: ${{ inputs.external-packages }}
         INPUT_FOLDER_GROUPING: ${{ inputs.folder-grouping }}
         INPUT_MODULE_AGGREGATION: ${{ inputs.module-aggregation }}
+        INPUT_AGGREGATION_DEPTH: ${{ inputs.aggregation-depth }}
         INPUT_EDGE_LABELS: ${{ inputs.edge-labels }}
         INPUT_LAYOUT_DIRECTION: ${{ inputs.layout-direction }}
         INPUT_RANK_CONSTRAINTS: ${{ inputs.rank-constraints }}
         INPUT_LAYOUT_DENSITY: ${{ inputs.layout-density }}
+        INPUT_VISUAL_THEME: ${{ inputs.visual-theme }}
+        INPUT_SOURCE_ROOT_GROUPING: ${{ inputs.source-root-grouping }}
+        INPUT_EDGE_PRESENTATION: ${{ inputs.edge-presentation }}
+        INPUT_CLUSTER_RANKING: ${{ inputs.cluster-ranking }}
       run: |
         GRAPH_ARGS=(--input "$INPUT_OUTPUT_DIR" --output "$INPUT_GRAPH_OUTPUT")
         if [ -n "$INPUT_GRAPH_PROFILE" ]; then
-          case "$INPUT_GRAPH_PROFILE" in default|local-architecture|compact-architecture) ;; *) echo "Invalid graph-profile value '$INPUT_GRAPH_PROFILE'. Expected: default, local-architecture, or compact-architecture." >&2; exit 2;; esac
+          case "$INPUT_GRAPH_PROFILE" in default|local-architecture|compact-architecture|architecture-overview) ;; *) echo "Invalid graph-profile value '$INPUT_GRAPH_PROFILE'. Expected: default, local-architecture, compact-architecture, or architecture-overview." >&2; exit 2;; esac
           GRAPH_ARGS+=(--graph-profile "$INPUT_GRAPH_PROFILE")
         fi
         if [ -n "$INPUT_EXTERNAL_PACKAGES" ]; then
@@ -213,6 +217,10 @@ runs:
         if [ -n "$INPUT_MODULE_AGGREGATION" ]; then
           case "$INPUT_MODULE_AGGREGATION" in none|folders) ;; *) echo "Invalid module-aggregation value '$INPUT_MODULE_AGGREGATION'. Expected: none or folders." >&2; exit 2;; esac
           GRAPH_ARGS+=(--module-aggregation "$INPUT_MODULE_AGGREGATION")
+        fi
+        if [ -n "$INPUT_AGGREGATION_DEPTH" ]; then
+          if ! [[ "$INPUT_AGGREGATION_DEPTH" =~ ^[1-9][0-9]*$ ]]; then echo "Invalid aggregation-depth value '$INPUT_AGGREGATION_DEPTH'. Expected a positive integer." >&2; exit 2; fi
+          GRAPH_ARGS+=(--aggregation-depth "$INPUT_AGGREGATION_DEPTH")
         fi
         if [ -n "$INPUT_EDGE_LABELS" ]; then
           case "$INPUT_EDGE_LABELS" in none|types) ;; *) echo "Invalid edge-labels value '$INPUT_EDGE_LABELS'. Expected: none or types." >&2; exit 2;; esac
@@ -229,6 +237,22 @@ runs:
         if [ -n "$INPUT_LAYOUT_DENSITY" ]; then
           case "$INPUT_LAYOUT_DENSITY" in normal|compact) ;; *) echo "Invalid layout-density value '$INPUT_LAYOUT_DENSITY'. Expected: normal or compact." >&2; exit 2;; esac
           GRAPH_ARGS+=(--layout-density "$INPUT_LAYOUT_DENSITY")
+        fi
+        if [ -n "$INPUT_VISUAL_THEME" ]; then
+          case "$INPUT_VISUAL_THEME" in standard|architecture) ;; *) echo "Invalid visual-theme value '$INPUT_VISUAL_THEME'. Expected: standard or architecture." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--visual-theme "$INPUT_VISUAL_THEME")
+        fi
+        if [ -n "$INPUT_SOURCE_ROOT_GROUPING" ]; then
+          case "$INPUT_SOURCE_ROOT_GROUPING" in preserve|elide-single) ;; *) echo "Invalid source-root-grouping value '$INPUT_SOURCE_ROOT_GROUPING'. Expected: preserve or elide-single." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--source-root-grouping "$INPUT_SOURCE_ROOT_GROUPING")
+        fi
+        if [ -n "$INPUT_EDGE_PRESENTATION" ]; then
+          case "$INPUT_EDGE_PRESENTATION" in relations|semantic-pairs) ;; *) echo "Invalid edge-presentation value '$INPUT_EDGE_PRESENTATION'. Expected: relations or semantic-pairs." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--edge-presentation "$INPUT_EDGE_PRESENTATION")
+        fi
+        if [ -n "$INPUT_CLUSTER_RANKING" ]; then
+          case "$INPUT_CLUSTER_RANKING" in global|local) ;; *) echo "Invalid cluster-ranking value '$INPUT_CLUSTER_RANKING'. Expected: global or local." >&2; exit 2;; esac
+          GRAPH_ARGS+=(--cluster-ranking "$INPUT_CLUSTER_RANKING")
         fi
         echo "Executing: $MARITIME_BIN graph ${GRAPH_ARGS[*]}"
         $MARITIME_BIN graph "${GRAPH_ARGS[@]}"
