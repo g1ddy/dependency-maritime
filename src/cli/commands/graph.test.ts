@@ -59,7 +59,7 @@ describe('graph command', () => {
         ])).toBe(0);
         const dot = fs.readFileSync(path.join(dir, 'graph.dot'), 'utf8');
         expect(dot).toContain('rankdir="LR"');
-        expect(dot).toContain('ranksep="0.35", nodesep="0.2"');
+        expect(dot).toContain('ranksep="0.12", nodesep="0.10"');
     });
 
     it('reports a missing Graphviz executable with an actionable error', async () => {
