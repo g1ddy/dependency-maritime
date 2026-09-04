@@ -1,6 +1,6 @@
 ## 🚨 Automated Complexity Report
 
-**Last Updated:** 2026-09-01
+**Last Updated:** 2026-09-04
 
 ### 🏥 Repository Health Score: **79.0 / 100**
 
@@ -14,10 +14,10 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 
 | File | Score | LOC | Complexity | Fan-Out | Instability |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `src/cli/graph/render-dot.ts` | **167.9** | 352 | 62 | 1 | 0.33 |
+| `src/cli/graph/render-dot.ts` | **196.9** | 502 | 69 | 1 | 0.33 |
 | `src/cli/commands/analyze.ts` | **114.9** | 293 | 28 | 7 | 0.78 |
 | `src/features/visualization/store.ts` | **112.5** | 667 | 7 | 10 | 0.59 |
-| `src/cli/analyze/adapters.ts` | **107** | 450 | 24 | 2 | 0.5 |
+| `src/cli/analyze/adapters.ts` | **106.5** | 445 | 24 | 2 | 0.5 |
 | `src/features/visualization/components/NodeInspectorPanel.tsx` | **99.5** | 240 | 22 | 7 | 0.88 |
 | `src/cli/validate/validate.ts` | **96.6** | 132 | 32 | 4 | 0.57 |
 | `src/features/visualization/components/DependencyGraph.tsx` | **89.5** | 264 | 17 | 6 | 0.86 |
@@ -28,13 +28,13 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 ### 🧠 Top 10 Logic-Heavy Files (Cyclomatic Complexity)
 | File | Max Complexity | LOC |
 | :--- | :--- | :--- |
-| `src/cli/graph/render-dot.ts` | **62** | 352 |
+| `src/cli/graph/render-dot.ts` | **69** | 502 |
 | `src/cli/validate/validate.ts` | **32** | 132 |
 | `src/cli/commands/analyze.ts` | **28** | 293 |
-| `src/cli/analyze/adapters.ts` | **24** | 450 |
+| `src/cli/analyze/adapters.ts` | **24** | 445 |
 | `src/features/visualization/components/NodeInspectorPanel.tsx` | **22** | 240 |
 | `src/features/visualization/components/AppNode.tsx` | **19** | 100 |
 | `src/features/visualization/components/DependencyGraph.tsx` | **17** | 264 |
-| `src/cli/commands/graph.ts` | **14** | 98 |
+| `src/cli/commands/graph.ts` | **14** | 108 |
 | `src/features/visualization/logic/metrics.ts` | **14** | 189 |
 | `src/features/visualization/components/GroupNode.tsx` | **13** | 72 |
