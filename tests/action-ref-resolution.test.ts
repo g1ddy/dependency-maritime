@@ -23,16 +23,13 @@ describe('composite action release tag resolution', () => {
         for (const input of [
             'graph-profile', 'external-packages', 'folder-grouping', 'module-aggregation', 'aggregation-depth',
             'edge-labels', 'layout-direction', 'rank-constraints', 'layout-density', 'visual-theme',
-            'source-root-grouping', 'edge-presentation', 'cluster-ranking'
+            'source-root-grouping', 'edge-presentation', 'cluster-ranking', 'output-order'
         ]) expect(parsed.inputs[input]?.default).toBe('');
         expect(actionYaml).toContain('$MARITIME_BIN graph "${GRAPH_ARGS[@]}"');
         expect(actionYaml).toContain("ubuntu-graphviz-version: '2.42.2-9ubuntu0.1'");
         expect(actionYaml).toContain('@dependency-maritime/cli@0.1.0-beta.4');
         expect(actionYaml).toContain('architecture-overview');
-        expect(actionYaml).toContain('if [ -n "$INPUT_VISUAL_THEME" ]; then');
-        expect(actionYaml).toContain('if [ -n "$INPUT_SOURCE_ROOT_GROUPING" ]; then');
-        expect(actionYaml).toContain('if [ -n "$INPUT_EDGE_PRESENTATION" ]; then');
-        expect(actionYaml).toContain('if [ -n "$INPUT_CLUSTER_RANKING" ]; then');
+        expect(actionYaml).toContain('add_enum "$INPUT_OUTPUT_ORDER" output-order "default edges-first nodes-first"');
         expect(actionYaml).toContain('if [ -n "$INPUT_AGGREGATION_DEPTH" ]; then');
     });
 
