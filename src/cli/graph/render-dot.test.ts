@@ -108,7 +108,7 @@ describe('renderDependencyGraphToDot', () => {
         expect(defaults).not.toContain('ranksep=');
         const compactTopToBottom = renderDependencyGraphToDot(graph(), { layoutDirection: 'tb', layoutDensity: 'compact' });
         expect(compactTopToBottom).toContain('rankdir="TB"');
-        expect(compactTopToBottom).toContain('ranksep="0.35", nodesep="0.2"');
+        expect(compactTopToBottom).toContain('ranksep="0.12", nodesep="0.10"');
     });
 
     it('applies named profiles before explicit presentation overrides', () => {
@@ -122,32 +122,34 @@ describe('renderDependencyGraphToDot', () => {
         });
         expect(resolveGraphPresentation({ graphProfile: 'compact-architecture' })).toEqual({
             externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none',
-            layoutDirection: 'tb', rankConstraints: 'intra-folder', layoutDensity: 'compact', moduleAggregation: 'folders'
+            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'compact', moduleAggregation: 'none'
         });
-        expect(resolveGraphPresentation({ graphProfile: 'compact-architecture', layoutDirection: 'lr' }).layoutDirection).toBe('lr');
+        expect(resolveGraphPresentation({ graphProfile: 'compact-architecture', layoutDirection: 'tb' }).layoutDirection).toBe('tb');
     });
 
-    it('renders the compact architecture profile without external nodes, labels, or default rank constraints', () => {
+    it('renders the compact architecture profile as a local file-level LR graph', () => {
         const dot = renderDependencyGraphToDot(graph(), { graphProfile: 'compact-architecture' });
-        expect(dot).toContain('rankdir="TB"');
-        expect(dot).toContain('ranksep="0.35", nodesep="0.2"');
+        expect(dot).toContain('rankdir="LR"');
+        expect(dot).toContain('ranksep="0.12", nodesep="0.10"');
         expect(dot).not.toContain('external:');
         expect(dot).not.toContain('[label="local"]');
-        expect(dot).toContain('"folder:src/features/board"');
-        expect(dot).not.toContain('local:src/features/board/BoardLayer.tsx');
+        expect(dot).toContain('local:src/features/board/BoardLayer.tsx');
+        expect(dot).not.toContain('"folder:src/features/board"');
+        expect(dot).toContain('style="rounded,bold,filled"');
     });
 
-    it('deterministically aggregates folder dependencies and exposes only combined counts', () => {
+    it('deterministically aggregates folder dependencies when explicitly requested', () => {
         const fixture = graph();
         fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts'));
         fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts'));
-        const dot = renderDependencyGraphToDot(fixture, { graphProfile: 'compact-architecture' });
-        expect(renderDependencyGraphToDot(fixture, { graphProfile: 'compact-architecture' })).toBe(dot);
+        const options = { graphProfile: 'compact-architecture', moduleAggregation: 'folders' } as const;
+        const dot = renderDependencyGraphToDot(fixture, options);
+        expect(renderDependencyGraphToDot(fixture, options)).toBe(dot);
         expect(dot.match(/"folder:src\/features\/board" -> "folder:app\/domain"/g)).toHaveLength(1);
         expect(dot).toContain('label="×2"');
     });
 
-    it('allows compact layout with module-level rendering as an explicit escape hatch', () => {
+    it('keeps compact file-level rendering available explicitly', () => {
         const dot = renderDependencyGraphToDot(graph(), { graphProfile: 'compact-architecture', moduleAggregation: 'none' });
         expect(dot).toContain('local:src/features/board/BoardLayer.tsx');
         expect(dot).not.toContain('folder:src/features/board');
@@ -182,7 +184,6 @@ describe('renderDependencyGraphToDot', () => {
         expect(edge).toContain('xlabel="invalid"');
         expect(edge).toContain('fontcolor="#dc2626"');
     });
-
 
     it('renders an aggregate edge dashed only when every dependency is non-runtime', () => {
         const fixture = graph();
