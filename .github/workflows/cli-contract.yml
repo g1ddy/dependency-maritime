@@ -56,7 +56,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build:cli
-    - name: Exercise local composite Action render path
+    - name: Exercise local composite Action compact render path
       uses: ./
       with:
         cli-source: '.'
@@ -66,9 +66,10 @@ jobs:
         fail-on-unmeasured: 'true'
         upload-artifact: 'false'
         render-graph: 'true'
-        graph-output: 'docs/action-smoke/dependency-graph.svg'
+        graph-output: 'docs/action-smoke/dependency-graph-compact.svg'
+        graph-profile: 'compact-architecture'
         external-packages: 'none'
-        folder-grouping: 'top-level'
+        folder-grouping: 'nested'
         edge-labels: 'none'
-    - name: Verify rendered presentation exists
-      run: test -s docs/action-smoke/dependency-graph.svg
+    - name: Verify compact rendered presentation exists
+      run: test -s docs/action-smoke/dependency-graph-compact.svg

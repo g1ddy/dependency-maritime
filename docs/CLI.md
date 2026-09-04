@@ -179,168 +179,88 @@ A public release requires all of the following:
 
 ## GitHub Actions Integration
 
-Dependency Maritime provides an official composite action (`action.yml`) that wraps `maritime analyze` and `maritime validate` into a reusable GitHub Actions step without importing React or UI dependencies.
+Dependency Maritime provides an official composite action (`action.yml`) that wraps `maritime analyze`, `maritime validate`, and optional graph rendering without importing React or UI dependencies.
 
-### Action Inputs
+### Action inputs
 
-| Input | Description | Default | Required |
-| :--- | :--- | :--- | :--- |
-| `cli-source` | Optional development override (for example a packed CLI tarball or another exact package version) | `''` | No |
-| `node-version` | Node.js version baseline to set up | `'20.19.0'` | No |
-| `source-roots` | One or more source roots to analyze (space, newline, or comma separated) | `'src'` | No |
-| `depcruise-config` | Optional path to custom dependency-cruiser configuration file | `''` | No |
-| `output-dir` | Directory where `.maritime` output artifacts will be written | `'.maritime'` | No |
-| `fail-on-unmeasured` | Strict measurement enforcement (fails if any implementation file is unmeasured) | `'true'` | No |
-| `upload-artifact` | Whether to upload the generated `.maritime` directory as a workflow artifact | `'true'` | No |
-| `artifact-name` | Name of the workflow artifact if `upload-artifact` is true | `'maritime-artifacts'` | No |
-| `render-graph` | Render the validated graph on the supported Ubuntu rendering path | `'false'` | No |
-| `graph-output` | Destination for the derived SVG | `'docs/images/dependency-graph.svg'` | No |
-| `external-packages` | External package presentation: `none`, `summary`, or `direct` | `'direct'` | No |
-| `folder-grouping` | Local module clustering: `none`, `top-level`, or `nested` | `'nested'` | No |
-| `edge-labels` | Dependency-type labels: `none` or `types` | `'types'` | No |
+| Input | Description | Default |
+| :--- | :--- | :--- |
+| `cli-source` | Optional development override such as a packed CLI tarball or exact package version | `''` |
+| `node-version` | Node.js version baseline | `'20.19.0'` |
+| `source-roots` | One or more source roots, space/newline/comma separated | `'src'` |
+| `depcruise-config` | Optional repository dependency-cruiser configuration | `''` |
+| `output-dir` | Canonical Maritime artifact directory | `'.maritime'` |
+| `fail-on-unmeasured` | Fail when a selected implementation file is unmeasured | `'true'` |
+| `upload-artifact` | Upload the generated artifact directory | `'true'` |
+| `artifact-name` | Workflow artifact name | `'maritime-artifacts'` |
+| `render-graph` | Render the validated graph | `'false'` |
+| `graph-output` | Derived SVG destination | `'docs/images/dependency-graph.svg'` |
+| `graph-profile` | `default`, `local-architecture`, `compact-architecture`, or `architecture-overview` | `''` (CLI default when omitted) |
+| `external-packages` | `none`, `summary`, or `direct` | `''` |
+| `folder-grouping` | `none`, `top-level`, or `nested` | `''` |
+| `module-aggregation` | `none` or `folders` | `''` |
+| `aggregation-depth` | Positive folder depth below each configured source root | `''` |
+| `edge-labels` | `none` or `types` | `''` |
+| `layout-direction` | `lr` or `tb` | `''` |
+| `rank-constraints` | `all` or `intra-folder` | `''` |
+| `layout-density` | `normal` or `compact` | `''` |
+| `visual-theme` | `standard` or `architecture` | `''` |
+| `source-root-grouping` | `preserve` or `elide-single` | `''` |
+| `edge-presentation` | `relations` or `semantic-pairs` | `''` |
+| `cluster-ranking` | `global` or `local` | `''` |
 
-### Usage Examples
+Empty presentation inputs are intentionally not passed to the CLI. A selected profile supplies the baseline, and explicit inputs override that profile one setting at a time.
 
-### Dogfood versus consumer
+### Dogfood versus released consumers
 
-The repository dogfood workflow and a released consumer workflow prove different things and are not
-interchangeable:
+The repository dogfood workflow and a released consumer workflow prove different things:
 
 | Context | Action source | CLI source | Purpose |
 | :--- | :--- | :--- | :--- |
-| Maritime PR dogfood | Checked-out local `uses: ./` | `cli-source: '.'` after build | Tests the exact unmerged implementation. |
-| Released external consumer | Immutable released Action ref | Matching published `@dependency-maritime/cli@X.Y.Z[-pre]` | Uses a publishable, reproducible contract. |
+| Maritime PR dogfood | checked-out `uses: ./` | `cli-source: '.'` after build | Tests the exact unmerged implementation. |
+| Released external consumer | immutable released Action ref | matching `@dependency-maritime/cli@X.Y.Z[-pre]` | Uses a reproducible published contract. |
 
-`.github/workflows/update-maritime-evidence.yml` is the dogfood reference orchestration. It builds
-the checked-out PR CLI, analyzes and validates the canonical bundle, renders the derived SVG, and
-uploads both as candidate evidence. Forks remain read-only. For a changed same-repository PR, its
-write job targets the `generated-evidence-write` Environment and commits only generated evidence.
-Maintainers must configure that Environment with a required reviewer. Leave **prevent self-review**
-disabled when a solo maintainer must be able to approve their own run.
+`.github/workflows/update-maritime-evidence.yml` is the dogfood reference orchestration. It analyzes, validates, renders, uploads candidate evidence, and writes generated evidence only through the protected `generated-evidence-write` Environment.
 
-Released consumers must pin both halves of the public contract. A `cli-vX.Y.Z[-pre]` Action tag
-resolves the matching exact published package, but an explicit `cli-source` makes that pairing
-reviewable in the workflow. An unpublished Action SHA cannot make an unpublished checkout available
-to an external consumer.
-
-#### Normal consumer workflow
+A normal released consumer looks like:
 
 ```yaml
-name: Maritime evidence
-
-on:
-  pull_request:
-    paths: ['src/**', 'package.json', 'package-lock.json']
-
-permissions:
-  contents: read
-
-jobs:
-  evidence:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Maritime Analyze & Validate
-        # Pin the Action commit and CLI package from the same compact-profile release.
-        uses: g1ddy/dependency-maritime@<released-compact-action-commit-sha>
-        with:
-          cli-source: '@dependency-maritime/cli@<released-compact-version>
-          source-roots: src
-          graph-profile: local-architecture
-          render-graph: 'true'
+- uses: actions/checkout@v4
+- name: Maritime Analyze & Validate
+  uses: g1ddy/dependency-maritime@<released-action-ref>
+  with:
+    cli-source: '@dependency-maritime/cli@<matching-version>'
+    source-roots: src
+    render-graph: 'true'
+    graph-profile: local-architecture
 ```
 
-The caller owns its triggers, source and configuration paths, branch protection, artifact retention,
-and any write or approval policy. The composite Action is only the reusable command wrapper; this
-repository workflow should become reusable only after Catan and Crawler establish which orchestration
-inputs are genuinely common.
+The caller owns workflow triggers, source/configuration paths, branch protection, artifact retention, and write policy. The composite Action is the reusable analysis/render wrapper rather than a repository-specific orchestration policy.
 
-#### Repository presentation profiles
+### Repository presentation profiles
 
-Use the following repository mappings. Catan moves to `compact-architecture` when it references
-the matching release that contains folder aggregation:
+| Repository | Profile | Purpose |
+| :--- | :--- | :--- |
+| Crawler Command Interface | `default` | Detailed dependency inspection with external packages and dependency-kind labels. |
+| Dependency Maritime | `local-architecture` | File-level local architecture without external-package or edge-label noise. |
+| Catan Hex Mastery | `compact-architecture` | Dense file-level LR architecture retaining recursive namespace ownership and semantic edges. |
 
-| Repository | Profile |
-| :--- | :--- |
-| Crawler Command Interface | `default` |
-| Dependency Maritime | `local-architecture` |
-| Catan Hex Mastery | `compact-architecture` after the matching release |
+`architecture-overview` is intentionally different from compact: it changes information granularity by aggregating files into source-root-relative folder nodes. See [Graph Presentation Profiles](./GRAPH_PROFILES.md) for the complete preset matrix.
 
-Catan is the wide, cross-folder reference for `compact-architecture`, which reduces implementation
-detail to deterministic folder nodes and aggregated folder-to-folder dependencies:
+### Multiple source roots and custom configuration
 
 ```yaml
-steps:
-  - uses: actions/checkout@v4
-  - name: Generate Catan Maritime evidence
-    # Pin the full commit SHA associated with the cli-v0.1.0-beta.6 release.
-    uses: g1ddy/dependency-maritime@<released-action-commit-sha>
-    with:
-      cli-source: '@dependency-maritime/cli@0.1.0-beta.6'
-      source-roots: src
-      render-graph: 'true'
-      graph-output: 'docs/images/dependency-graph.svg'
-      graph-profile: compact-architecture
+- uses: g1ddy/dependency-maritime@<pinned-ref>
+  with:
+    source-roots: 'src lib'
+    depcruise-config: 'config/.dependency-cruiser.cjs'
+    output-dir: '.maritime'
+    fail-on-unmeasured: 'true'
 ```
 
-Presentation profiles affect only the derived SVG; they never change canonical
-`.maritime/dependency-graph.json` evidence. The compact profile adds folder aggregation alongside
-its top-to-bottom layout, released
-cross-folder rank constraints, and compact spacing.
+`source-roots: '.'` is valid. The repository root is treated as a configured zero-segment root for presentation policies, so aggregation depth is counted from the repository root rather than applying the unknown-root fallback.
 
-#### Multiple Source Roots and Custom Config
-
-```yaml
-steps:
-  - uses: actions/checkout@v4
-  - name: Maritime Analyze & Validate
-    uses: g1ddy/dependency-maritime@<pinned-ref>
-    with:
-      source-roots: 'src lib'
-      depcruise-config: 'config/.dependency-cruiser.cjs'
-      output-dir: '.maritime'
-      fail-on-unmeasured: 'true'
-      upload-artifact: 'true'
-      artifact-name: 'maritime-analysis'
-```
-
-For Maritime development and unreleased compatibility checks only, set `cli-source` to an exact
-package specifier or a packed tarball. This override is not part of normal consumer setup:
-
-```yaml
-    uses: g1ddy/dependency-maritime@<pinned-ref>
-    with:
-      cli-source: './dependency-maritime-cli-0.1.0-beta.6.tgz'
-```
-
-The prerelease is published from the tag-triggered `Publish CLI prerelease` workflow. The
-`cli-vX.Y.Z[-pre]` tag is the release-version authority; the workflow stamps that version into
-`package.json` and `package-lock.json` only in its ephemeral release workspace, then builds,
-exercises the packed-package contract, and publishes with npm provenance under the `prerelease`
-distribution tag. For this feature, pushing `cli-v0.1.0-beta.6` therefore publishes beta.6. The workflow then
-checks out the exact released tag and runs a clean external consumer job without `cli-source`, so
-the tag-derived action resolution installs and exercises the just-published version while verifying
-all four canonical `.maritime` artifacts and the rendered graph. The action selects the full
-immutable CLI version rather than the distribution tag.
-
-#### Verification Evidence and Consumer Cutover
-
-The packed CLI has already been exercised against Catan Hex Mastery and Crawler Command Interface through their existing hand-rolled workflows. This PR adds the shared action contract and the release-time external consumer proof; it does not itself migrate those repositories to consume the action.
-
-The authoritative PR and `main` contract proof is `.github/workflows/cli-contract.yml`: it runs the
-Node 20.19, 22, and 24 packed-consumer matrix plus the composite-action render smoke. The authoritative
-`cli-v*` release proof is `.github/workflows/publish-cli-prerelease.yml`: after publication, it invokes
-the released action and package from a clean external consumer and validates the complete four-file
-`.maritime` bundle and rendered graph. There is no separate manually dispatched consumer-smoke
-workflow. Real-repository cutover remains a consumer-side follow-up so each repository can preserve
-its own trigger, baseline-commit, dependency-cruiser, and Graphviz behavior.
-
-## Related documentation
-
-- [Roadmap](./ROADMAP.md) — unfinished CLI delivery work and UI work.
-- [Architecture](./ARCHITECTURE.md) — the boundary between the headless analyzer and the UI.
-- [Complexity and Health Metrics](./COMPLEXITY.md) — metric definitions and repository evidence.
-- [Development Guide](./DEVELOPMENT.md) — local setup and verification.
+Explicit and discovered dependency-cruiser configurations are used as supplied. Maritime's portable fallback uses `tsPreCompilationDeps: 'specify'` so generated evidence can distinguish pre-compilation-only relationships without changing consumer-owned configuration.
 
 ## Supported graph rendering
 
@@ -348,112 +268,56 @@ Render a presentation directly from existing canonical evidence:
 
 ```bash
 maritime graph --input .maritime --output docs/images/dependency-graph.svg
-maritime graph --input .maritime/dependency-graph.json --output docs/images/dependency-graph.svg
 maritime graph --input .maritime --output architecture.svg \
   --graph-profile compact-architecture
+maritime graph --input .maritime --output overview.svg \
+  --graph-profile architecture-overview
 ```
 
-For an artifact-directory input, `maritime graph` validates the bundle and reads the graph path
-declared by `manifest.json`; an explicit JSON input is also supported. It never runs
-dependency-cruiser or a second structural scan. The JSON remains canonical machine-readable evidence, while SVG (or explicit
-DOT debug output) is derived presentation and must not be hand-edited. The exported pure
-`renderDependencyGraphToDot(graph)` function recursively derives directory clusters, preserves
-unfamiliar local paths, collapses `node_modules` paths to package nodes, deterministically sorts all
-output, and retains available dependency-kind, type-only, circular, and validity edge semantics.
+For an artifact-directory input, `maritime graph` validates the bundle and reads both the graph path and `sourceRoots` from `manifest.json`. An explicit JSON input is also supported and may infer roots from dependency-cruiser metadata. Rendering never runs a second dependency analysis; JSON remains canonical evidence and SVG/DOT remains derived presentation.
 
-Start with a named presentation profile. Profiles affect DOT/SVG only and never change or regenerate
-the canonical `.maritime/dependency-graph.json` evidence.
+Profiles are named presets over the same explicit settings:
 
-| Profile | Information granularity | Reference repository |
+| Profile | Granularity | Key presentation behavior |
 | :--- | :--- | :--- |
-| `default` | Individual modules, direct third-party packages, and dependency-kind labels for detailed inspection. | Crawler Command Interface |
-| `local-architecture` | Individual local implementation modules without third-party nodes or dependency-kind labels. | Dependency Maritime |
-| `compact-architecture` | Folder-level local architecture with one node per selected folder and one edge per connected folder pair. | Catan Hex Mastery |
-
-`default` and `local-architecture` preserve their prior module-level semantics. Compact folder
-selection takes the normalized file's parent directory and retains at most its first three segments
-(the source root plus two architectural segments); shallower parents remain unchanged and root files
-map to `.`. Modules below that depth share one folder node. Intra-folder dependencies disappear and
-all dependencies with the same ordered source/target folder pair become one edge; an `×N` label is
-shown only when that edge represents more than one dependency. Folder nodes and edges are sorted by
-normalized path, making output deterministic. This generic depth suits broad `src/` feature trees
-without recognizing repository-specific names.
+| `default` | files + direct externals | nested folders, type labels, normal density, global cluster ranking |
+| `local-architecture` | local files | no externals or edge labels; otherwise standard presentation |
+| `compact-architecture` | local files | LR, compact `.10/.12` spacing, architecture theme, semantic-pair edges, sole-root elision, cluster-local ranking |
+| `architecture-overview` | folders | source-root-relative folder aggregation at depth 2, architecture theme, semantic-pair edges |
 
 The presentation switches compose independently after the profile baseline:
 
-| CLI flag | Values | Default | Effect |
-| :--- | :--- | :--- | :--- |
-| `--external-packages` | `none`, `summary`, `direct` | `direct` | Omits third-party nodes, emits one external-boundary node, or emits one node per directly imported package. Scoped and unscoped imports collapse to package names in `direct` mode. |
-| `--folder-grouping` | `none`, `top-level`, `nested` | `nested` | Shows local modules flat, clusters only their first source-directory segment, or recursively derives directory clusters. |
-| `--module-aggregation` | `none`, `folders` | `none` | Keeps module nodes or aggregates them using the compact folder-selection and edge-count policy. The compact profile selects `folders`; explicitly selecting `none` is its module-level escape hatch. |
-| `--edge-labels` | `none`, `types` | `types` | Omits dependency-type text or preserves it. Circular, invalid, and type-only edge styling is independent. |
-| `--layout-direction` | `lr`, `tb` | `lr` | Uses Graphviz left-to-right or top-to-bottom rank direction. |
-| `--rank-constraints` | `all`, `intra-folder` | `all` | Lets every local dependency affect rank placement, or limits that effect to edges whose modules share the same top-level source folder. Cross-folder edges remain visible with `constraint=false`. |
-| `--layout-density` | `normal`, `compact` | `normal` | Uses Graphviz's normal spacing or compact `ranksep=0.35` and `nodesep=0.2` spacing. |
-
-For example, retain compact architecture defaults but restore left-to-right presentation:
-
-```bash
-maritime graph --input .maritime --output architecture.svg \
-  --graph-profile compact-architecture --layout-direction lr
-```
-
-These policies affect only DOT/SVG presentation. They never modify
-`.maritime/dependency-graph.json` or invoke dependency-cruiser, so the complete JSON remains the
-canonical evidence. Omitting the profile and all overrides preserves the pre-beta.5 renderer policy exactly.
-
-The three layout switches also affect only DOT/SVG presentation. `folder-grouping: nested` creates
-recursive Graphviz cluster boxes for directories; it does not collapse file nodes into folder nodes.
-`newrank=true` remains enabled for all layout policies because compact aggregation produced the
-intended simpler fixture without requiring a cluster-local compatibility mode, and it avoids Graphviz 2.42 rank failures
-with deeply nested clusters. Root-level modules are treated as belonging to the root (`.`) folder for
-the `intra-folder` rank-constraint policy.
-
-SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the npm package. The CLI
-reports an actionable error when it is missing. Maritime normalizes Graphviz's generator-version
-comment, but byte-for-byte SVG stability still depends on keeping the Graphviz version fixed.
-
-The composite action adds matching optional inputs:
-
-| Input | Description | Default |
+| CLI flag | Values | Effect |
 | :--- | :--- | :--- |
-| `render-graph` | Render after successful analysis and validation | `'false'` |
-| `graph-output` | Derived SVG destination | `'docs/images/dependency-graph.svg'` |
-| `graph-profile` | `default`, `local-architecture`, or `compact-architecture` | CLI default (`'default'`) when omitted |
-| `external-packages` | `none`, `summary`, or `direct` | CLI default (`'direct'`) when omitted |
-| `folder-grouping` | `none`, `top-level`, or `nested` | CLI default (`'nested'`) when omitted |
-| `module-aggregation` | `none` or `folders` | CLI default (`'none'`) when omitted |
-| `edge-labels` | `none` or `types` | CLI default (`'types'`) when omitted |
-| `layout-direction` | `lr` or `tb` | CLI default (`'lr'`) when omitted |
-| `rank-constraints` | `all` or `intra-folder` | CLI default (`'all'`) when omitted |
-| `layout-density` | `normal` or `compact` | CLI default (`'normal'`) when omitted |
+| `--external-packages` | `none`, `summary`, `direct` | External package presentation. |
+| `--folder-grouping` | `none`, `top-level`, `nested` | File namespace clustering. |
+| `--module-aggregation` | `none`, `folders` | Keep file nodes or intentionally summarize them into folder nodes. |
+| `--aggregation-depth` | positive integer | Folder depth below each configured source root when aggregation is enabled. |
+| `--edge-labels` | `none`, `types` | Dependency-type text. |
+| `--layout-direction` | `lr`, `tb` | Graph rank direction. |
+| `--rank-constraints` | `all`, `intra-folder` | Which local edges influence rank placement. |
+| `--layout-density` | `normal`, `compact` | Normal or compact node/rank separation. |
+| `--visual-theme` | `standard`, `architecture` | Standard or reference-like semantic node/cluster styling. |
+| `--source-root-grouping` | `preserve`, `elide-single` | Preserve root namespaces or remove one redundant sole-root wrapper. |
+| `--edge-presentation` | `relations`, `semantic-pairs` | Raw relationships or one semantic edge per endpoint pair. |
+| `--cluster-ranking` | `global`, `local` | Graphviz global (`newrank=true`) or cluster-local ranking. |
 
-```yaml
-- uses: g1ddy/dependency-maritime@<pinned-ref>
-  with:
-    source-roots: 'app src'
-    output-dir: '.maritime'
-    render-graph: 'true'
-    graph-output: 'docs/images/dependency-graph.svg'
-    graph-profile: 'compact-architecture'
-```
+With `module-aggregation=folders`, aggregation depth is relative to configured source roots. With `source-roots: src`, depth `2` maps `src/features/board/components/GameHex.tsx` to `src/features/board`. With `source-roots: .`, the same depth maps `features/board/components/GameHex.tsx` to `features/board`.
 
-Individual presentation inputs remain available as advanced overrides. An explicit Action input wins
-over the selected profile, for example `graph-profile: compact-architecture` with
-`layout-direction: lr`. Empty Action inputs are not passed to the CLI, preserving compatibility
-when an Action branch/commit falls back to an older published CLI.
+Under `semantic-pairs`, duplicate source/target relationships combine. Runtime evidence wins over type/pre-compilation-only evidence when both are present; a pair is secondary/dashed only when every underlying relationship is non-runtime.
 
-Use `default` for Crawler Command Interface, `local-architecture` for Maritime, and
-`compact-architecture` for Catan Hex Mastery. The local profiles remove third-party package
-density and dependency-type text without repository-local renderers or package filters.
+SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the npm package. The supported reproducible Action path is `ubuntu-latest`, where Maritime requests Graphviz `2.42.2-9ubuntu0.1`. The CLI contract smoke exercises the actual `compact-architecture` profile on this pinned path because compact intentionally uses cluster-local ranking.
 
-Rendering is opt-in. The supported reproducible path is `ubuntu-latest`, where the action requests
-Graphviz `2.42.2-9ubuntu0.1`; identical Graphviz selection and byte-for-byte committed SVG output are
-not guaranteed on macOS or Windows runners. The SHA-pinned `ts-graphviz/setup-graphviz@v2` step
-currently runs on GitHub's deprecated Node 20 Actions runtime (GitHub forces Node 24 and emits a
-warning), so this setup mechanism is not presented as a long-term cross-runner portability guarantee.
-The action renders the newly generated graph and includes the requested presentation in artifact
-upload behavior. It never commits consumer files. Generic test fixtures validate Maritime's
-own usage, Crawler Command Interface's deterministic external-package use case, and Catan Hex
-Mastery's recursive feature/component/hook hierarchy. Consumer repository migrations remain
-follow-up work.
+## Release and verification
+
+The prerelease workflow is tag-driven. A `cli-vX.Y.Z[-pre]` tag is the release-version authority; the publish workflow stamps that version in its ephemeral workspace, builds and tests the packed package, publishes with npm provenance, then exercises the released Action/package pair from a clean consumer.
+
+The authoritative PR/main contract proof is `.github/workflows/cli-contract.yml`: it runs the packed CLI consumer matrix on Node 20.19, 22, and 24 plus the composite Action compact-render smoke. Real consumer cutover remains repository-owned so Catan, Crawler, and Maritime can retain their own triggers and evidence/write policies.
+
+## Related documentation
+
+- [Graph Presentation Profiles](./GRAPH_PROFILES.md) — profile matrix and presentation-setting semantics.
+- [Roadmap](./ROADMAP.md) — unfinished CLI delivery and UI work.
+- [Architecture](./ARCHITECTURE.md) — headless analyzer versus UI boundaries.
+- [Complexity and Health Metrics](./COMPLEXITY.md) — metric definitions and repository evidence.
+- [Development Guide](./DEVELOPMENT.md) — local setup and verification.

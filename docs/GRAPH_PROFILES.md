@@ -72,6 +72,8 @@ to:
 src/features/board
 ```
 
+The repository root `.` is also a valid configured source root and counts as zero path segments. With `source-roots: .` and aggregation depth `2`, `features/board/components/GameHex.tsx` maps to `features/board`, not `features/board/components`.
+
 When `source-root-grouping=elide-single` and `src` is the sole source root, the same aggregation becomes `features/board`. With multiple roots, root identity is preserved so independently configured roots cannot collapse into one namespace.
 
 Dependencies whose files collapse into the same folder are omitted. Multiple dependencies between the same source and target folders are combined. Under `semantic-pairs`, a count may be shown and runtime evidence wins over type/pre-compilation-only evidence when both share the same endpoints.

@@ -121,7 +121,7 @@ function renderDirectoryContents(directory: DirectoryNode, segments: string[], i
 
 function normalizedSourceRoots(sourceRoots: string[] | undefined): string[] | undefined {
     if (!sourceRoots) return undefined;
-    const roots = [...new Set(sourceRoots.map(normalizedPath).filter(root => root && root !== '.'))];
+    const roots = [...new Set(sourceRoots.map(normalizedPath).filter(root => root.length > 0))];
     return roots.length > 0 ? roots : undefined;
 }
 

@@ -53,6 +53,24 @@ describe('architecture presentation profiles', () => {
         expect(dot).toContain('subgraph "cluster:src/features"');
     });
 
+    it('treats repository root as a configured zero-segment source root', () => {
+        const graph: MaritimeCruiseResult = {
+            modules: [
+                { source: 'features/board/components/GameHex.tsx', valid: true, dependents: [], dependencies: [] },
+                { source: 'domain/projection.ts', valid: true, dependents: [], dependencies: [] }
+            ],
+            summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 2, violations: [], optionsUsed: {} }
+        };
+        const dot = renderDependencyGraphToDot(
+            graph,
+            { graphProfile: 'architecture-overview', aggregationDepth: 2 },
+            { sourceRoots: ['.'] }
+        );
+        expect(dot).toContain('"folder:features/board"');
+        expect(dot).toContain('"folder:domain"');
+        expect(dot).not.toContain('"folder:features/board/components"');
+    });
+
     it('uses dependency-cruiser semantic node colors with orphan precedence', () => {
         const dot = renderDependencyGraphToDot(fixture(), { graphProfile: 'compact-architecture' });
         expect(dot).toMatch(/local:src\/features\/a\.ts.*fillcolor="#ddfeff"/u);
