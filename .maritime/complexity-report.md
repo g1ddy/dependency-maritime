@@ -34,7 +34,7 @@ _Score = (LOC/10) + (Complexity*2) + (FanOut*2) + (Instability*20)_
 | `src/cli/analyze/adapters.ts` | **24** | 445 |
 | `src/features/visualization/components/NodeInspectorPanel.tsx` | **22** | 240 |
 | `src/features/visualization/components/AppNode.tsx` | **19** | 100 |
-| `src/cli/graph/presentation.ts` | **17** | 130 |
+| `src/cli/graph/presentation.ts` | **18** | 105 |
 | `src/features/visualization/components/DependencyGraph.tsx` | **17** | 264 |
 | `src/cli/commands/graph.ts` | **14** | 183 |
 | `src/features/visualization/logic/metrics.ts` | **14** | 189 |

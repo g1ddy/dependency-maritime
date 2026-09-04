@@ -424,8 +424,8 @@
     "scanned": true
   },
   "src/cli/graph/presentation.ts": {
-    "complexity": 17,
-    "loc": 130,
+    "complexity": 18,
+    "loc": 105,
     "instability": 0,
     "fanIn": 1,
     "fanOut": 0,
