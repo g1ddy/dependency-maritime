@@ -15,7 +15,7 @@ export function getPortableFallbackConfig(cwd: string = process.cwd()): { option
         doNotFollow: {
             path: 'node_modules'
         },
-        tsPreCompilationDeps: true,
+        tsPreCompilationDeps: 'specify',
         enhancedResolveOptions: {
             exportsFields: ['exports'],
             conditionNames: ['import', 'require', 'node', 'default']
@@ -436,7 +436,7 @@ export async function writeOutputFiles(
 
     const promises: Promise<void>[] = [
         fs.writeFile(absMetricsPath, JSON.stringify(metricsData, null, 2)),
-        fs.writeFile(absReportPath, reportData)
+        fs.writeFile(reportPath, reportData)
     ];
 
     if (manifestPath && manifestData !== undefined) {
