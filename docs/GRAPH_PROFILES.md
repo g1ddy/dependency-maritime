@@ -9,7 +9,7 @@ Maritime graph profiles are named presets over explicit presentation settings. A
 | External packages | `direct` | `none` | `none` | `none` |
 | Folder grouping | `nested` | `nested` | `nested` | `nested` |
 | Edge labels | `types` | `none` | `none` | `none` |
-| Layout direction | `lr` | `lr` | `lr` | `lr` |
+| Layout direction | `lr` | `lr` | `lr` | `tb` |
 | Rank constraints | `all` | `all` | `all` | `all` |
 | Layout density | `normal` | `normal` | `compact` | `normal` |
 | Module aggregation | `none` | `none` | `none` | `folders` |
@@ -17,6 +17,7 @@ Maritime graph profiles are named presets over explicit presentation settings. A
 | Source-root grouping | `preserve` | `preserve` | `elide-single` | `preserve` |
 | Edge presentation | `relations` | `relations` | `semantic-pairs` | `semantic-pairs` |
 | Cluster ranking | `global` | `global` | `local` | `global` |
+| Output order | `default` | `default` | `edges-first` | `default` |
 | Aggregation depth | `2` | `2` | `2` | `2` |
 
 ### `default`
@@ -29,11 +30,11 @@ File-level local architecture without third-party nodes or edge labels. This is 
 
 ### `compact-architecture`
 
-File-level local architecture optimized for dense diagrams. It uses the architecture theme, compact spacing, semantic endpoint-pair edges, cluster-local ranking, and elides a sole redundant source-root wrapper. Catan Hex Mastery is the reference consumer.
+File-level local architecture optimized for dense diagrams. It uses LR layout, the architecture theme, compact spacing, semantic endpoint-pair edges, cluster-local ranking, sole-root elision, and `edges-first` Graphviz paint order so relationship lines are laid down behind nodes. Catan Hex Mastery is the reference consumer.
 
 ### `architecture-overview`
 
-A higher-level summary that intentionally changes information granularity. Files are aggregated into source-root-relative folder nodes and dependencies between those folders are combined. This is distinct from `compact-architecture`: compact keeps files; overview summarizes folders.
+A higher-level TB summary that intentionally changes information granularity. Files are aggregated into source-root-relative folder nodes and dependencies between those folders are combined. This is distinct from `compact-architecture`: compact keeps files; overview summarizes folders.
 
 No additional intermediate profile is defined between `local-architecture` and `compact-architecture`. Consumers can create that presentation by overriding individual settings, and Maritime can add another named preset later if repeated consumer usage establishes a stable intent.
 
@@ -53,6 +54,9 @@ CLI options and Action inputs use the same concepts:
 - `source-root-grouping`: `preserve`, `elide-single`
 - `edge-presentation`: `relations`, `semantic-pairs`
 - `cluster-ranking`: `global`, `local`
+- `output-order`: `default`, `edges-first`, `nodes-first`
+
+`output-order=default` leaves Graphviz's paint order unspecified. `edges-first` and `nodes-first` explicitly emit the corresponding Graphviz `outputorder` value. This controls visual layering, not dependency topology or rank placement.
 
 Explicit settings override the selected profile one setting at a time.
 
@@ -60,17 +64,7 @@ Explicit settings override the selected profile one setting at a time.
 
 `module-aggregation=none` keeps each source file as a node.
 
-`module-aggregation=folders` maps files into architectural folder nodes. `aggregation-depth` is counted **below the configured source root**, not from the repository path itself. For example, with source root `src`, aggregation depth `2` maps:
-
-```text
-src/features/board/components/GameHex.tsx
-```
-
-to:
-
-```text
-src/features/board
-```
+`module-aggregation=folders` maps files into architectural folder nodes. `aggregation-depth` is counted **below the configured source root**, not from the repository path itself. For example, with source root `src`, aggregation depth `2` maps `src/features/board/components/GameHex.tsx` to `src/features/board`.
 
 The repository root `.` is also a valid configured source root and counts as zero path segments. With `source-roots: .` and aggregation depth `2`, `features/board/components/GameHex.tsx` maps to `features/board`, not `features/board/components`.
 
@@ -82,6 +76,6 @@ Dependencies whose files collapse into the same folder are omitted. Multiple dep
 
 `relations` emits dependency relationships using the standard renderer behavior.
 
-`semantic-pairs` combines duplicate source/target relationships. Runtime relationships are primary. A pair is shown as a secondary dashed gray edge only when every underlying relationship is type/pre-compilation-only. Dynamic-only pairs remain dashed.
+`semantic-pairs` combines duplicate source/target relationships. Runtime relationships are primary. A pair is secondary/dashed only when every underlying relationship is non-runtime. Maritime recognizes the dependency-cruiser boolean metadata as well as `pre-compilation-only`, `triple-slash-type-reference`, `type-import`, and `type-only` dependency types. Dynamic-only pairs remain dashed.
 
 This presentation benefits from dependency-cruiser evidence generated with `tsPreCompilationDeps: 'specify'`. Maritime uses that value only in its portable fallback configuration; explicit and discovered consumer dependency-cruiser configurations are never rewritten.
