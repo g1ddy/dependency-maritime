@@ -24,6 +24,7 @@ export {
     SOURCE_ROOT_GROUPING_MODES,
     EDGE_PRESENTATION_MODES,
     CLUSTER_RANKING_MODES,
+    OUTPUT_ORDER_MODES,
     GRAPH_PROFILE_MODES
 } from './graph/render-dot';
 export type {
@@ -41,6 +42,7 @@ export type {
     SourceRootGroupingMode,
     EdgePresentationMode,
     ClusterRankingMode,
+    OutputOrderMode,
     GraphProfileMode
 } from './graph/render-dot';
 export { renderDotWithGraphviz, normalizeGraphvizSvg } from './graph/render-graphviz';
@@ -70,14 +72,8 @@ export {
 export * from './analyze/models';
 
 export async function analyzeProject(options: {
-    graph?: string;
-    metrics?: string;
-    report?: string;
-    output?: string;
-    depcruiseConfig?: string;
-    source?: string | string[];
-    cwd?: string;
-    failOnUnmeasured?: boolean;
+    graph?: string; metrics?: string; report?: string; output?: string; depcruiseConfig?: string;
+    source?: string | string[]; cwd?: string; failOnUnmeasured?: boolean;
 }): Promise<number> {
     const args: string[] = [];
     if (options.graph) args.push('--graph', options.graph);
@@ -94,10 +90,7 @@ export async function analyzeProject(options: {
     return runAnalyzeCommand(args);
 }
 
-export async function validateProject(options: {
-    artifactDir?: string;
-    cwd?: string;
-} = {}): Promise<number> {
+export async function validateProject(options: { artifactDir?: string; cwd?: string } = {}): Promise<number> {
     const args: string[] = [];
     if (options.artifactDir) args.push(options.artifactDir);
     if (options.cwd) args.push('--cwd', options.cwd);
