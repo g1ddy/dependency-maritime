@@ -9,6 +9,7 @@ export const VISUAL_THEME_MODES = ['standard', 'architecture'] as const;
 export const SOURCE_ROOT_GROUPING_MODES = ['preserve', 'elide-single'] as const;
 export const EDGE_PRESENTATION_MODES = ['relations', 'semantic-pairs'] as const;
 export const CLUSTER_RANKING_MODES = ['global', 'local'] as const;
+export const OUTPUT_ORDER_MODES = ['default', 'edges-first', 'nodes-first'] as const;
 export const GRAPH_PROFILE_MODES = ['default', 'local-architecture', 'compact-architecture', 'architecture-overview'] as const;
 
 export type ExternalPackagesMode = typeof EXTERNAL_PACKAGE_MODES[number];
@@ -22,6 +23,7 @@ export type VisualThemeMode = typeof VISUAL_THEME_MODES[number];
 export type SourceRootGroupingMode = typeof SOURCE_ROOT_GROUPING_MODES[number];
 export type EdgePresentationMode = typeof EDGE_PRESENTATION_MODES[number];
 export type ClusterRankingMode = typeof CLUSTER_RANKING_MODES[number];
+export type OutputOrderMode = typeof OUTPUT_ORDER_MODES[number];
 export type GraphProfileMode = typeof GRAPH_PROFILE_MODES[number];
 
 export type GraphPresentationOptions = {
@@ -36,6 +38,7 @@ export type GraphPresentationOptions = {
     sourceRootGrouping?: SourceRootGroupingMode;
     edgePresentation?: EdgePresentationMode;
     clusterRanking?: ClusterRankingMode;
+    outputOrder?: OutputOrderMode;
     aggregationDepth?: number;
     graphProfile?: GraphProfileMode;
 };
@@ -54,6 +57,7 @@ export const DEFAULT_GRAPH_PRESENTATION = {
     sourceRootGrouping: 'preserve',
     edgePresentation: 'relations',
     clusterRanking: 'global',
+    outputOrder: 'default',
     aggregationDepth: 2
 } as const satisfies ResolvedGraphPresentation;
 
@@ -62,56 +66,26 @@ export const DEFAULT_GRAPH_PROFILE = 'default' as const;
 export const GRAPH_PRESENTATION_PROFILES = {
     default: DEFAULT_GRAPH_PRESENTATION,
     'local-architecture': {
-        externalPackages: 'none',
-        folderGrouping: 'nested',
-        edgeLabels: 'none',
-        layoutDirection: 'lr',
-        rankConstraints: 'all',
-        layoutDensity: 'normal',
-        moduleAggregation: 'none',
-        visualTheme: 'standard',
-        sourceRootGrouping: 'preserve',
-        edgePresentation: 'relations',
-        clusterRanking: 'global',
-        aggregationDepth: 2
+        externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none', layoutDirection: 'lr', rankConstraints: 'all',
+        layoutDensity: 'normal', moduleAggregation: 'none', visualTheme: 'standard', sourceRootGrouping: 'preserve',
+        edgePresentation: 'relations', clusterRanking: 'global', outputOrder: 'default', aggregationDepth: 2
     },
     'compact-architecture': {
-        externalPackages: 'none',
-        folderGrouping: 'nested',
-        edgeLabels: 'none',
-        layoutDirection: 'lr',
-        rankConstraints: 'all',
-        layoutDensity: 'compact',
-        moduleAggregation: 'none',
-        visualTheme: 'architecture',
-        sourceRootGrouping: 'elide-single',
-        edgePresentation: 'semantic-pairs',
-        clusterRanking: 'local',
-        aggregationDepth: 2
+        externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none', layoutDirection: 'lr', rankConstraints: 'all',
+        layoutDensity: 'compact', moduleAggregation: 'none', visualTheme: 'architecture', sourceRootGrouping: 'elide-single',
+        edgePresentation: 'semantic-pairs', clusterRanking: 'local', outputOrder: 'edges-first', aggregationDepth: 2
     },
     'architecture-overview': {
-        externalPackages: 'none',
-        folderGrouping: 'nested',
-        edgeLabels: 'none',
-        layoutDirection: 'lr',
-        rankConstraints: 'all',
-        layoutDensity: 'normal',
-        moduleAggregation: 'folders',
-        visualTheme: 'architecture',
-        sourceRootGrouping: 'preserve',
-        edgePresentation: 'semantic-pairs',
-        clusterRanking: 'global',
-        aggregationDepth: 2
+        externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none', layoutDirection: 'tb', rankConstraints: 'all',
+        layoutDensity: 'normal', moduleAggregation: 'folders', visualTheme: 'architecture', sourceRootGrouping: 'preserve',
+        edgePresentation: 'semantic-pairs', clusterRanking: 'global', outputOrder: 'default', aggregationDepth: 2
     }
 } as const satisfies Record<GraphProfileMode, ResolvedGraphPresentation>;
 
-/** Applies a profile first, then explicit presentation settings as deterministic overrides. */
 export function resolveGraphPresentation(options: GraphPresentationOptions = {}): ResolvedGraphPresentation {
     const profile = GRAPH_PRESENTATION_PROFILES[options.graphProfile ?? DEFAULT_GRAPH_PROFILE];
     const aggregationDepth = options.aggregationDepth ?? profile.aggregationDepth;
-    if (!Number.isInteger(aggregationDepth) || aggregationDepth < 1) {
-        throw new Error(`Invalid aggregationDepth "${aggregationDepth}". Expected a positive integer.`);
-    }
+    if (!Number.isInteger(aggregationDepth) || aggregationDepth < 1) throw new Error(`Invalid aggregationDepth "${aggregationDepth}". Expected a positive integer.`);
     return {
         externalPackages: options.externalPackages ?? profile.externalPackages,
         folderGrouping: options.folderGrouping ?? profile.folderGrouping,
@@ -124,6 +98,7 @@ export function resolveGraphPresentation(options: GraphPresentationOptions = {})
         sourceRootGrouping: options.sourceRootGrouping ?? profile.sourceRootGrouping,
         edgePresentation: options.edgePresentation ?? profile.edgePresentation,
         clusterRanking: options.clusterRanking ?? profile.clusterRanking,
+        outputOrder: options.outputOrder ?? profile.outputOrder,
         aggregationDepth
     };
 }
