@@ -166,10 +166,10 @@ describe('adapters', () => {
             expect(result.config.options).toBeDefined();
         });
 
-        it('should generate portable fallback options with tsconfig detection', () => {
+        it('should generate portable fallback options with classified pre-compilation evidence', () => {
             const fallback = getPortableFallbackConfig(process.cwd());
             expect(fallback.options.doNotFollow).toEqual({ path: 'node_modules' });
-            expect(fallback.options.tsPreCompilationDeps).toBe(true);
+            expect(fallback.options.tsPreCompilationDeps).toBe('specify');
         });
     });
 

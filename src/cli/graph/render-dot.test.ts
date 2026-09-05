@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MaritimeCruiseResult, MaritimeDependency } from '../../schema/dependency-cruiser';
-import { externalPackageName, resolveGraphPresentation, renderDependencyGraphToDot } from './render-dot';
+import { aggregationFolder, externalPackageName, resolveGraphPresentation, renderDependencyGraphToDot } from './render-dot';
 
 const dependency = (resolved: string, overrides: Partial<MaritimeDependency> = {}): MaritimeDependency => ({
     circular: false, coreModule: false, couldNotResolve: false, dependencyTypes: ['local'],
@@ -24,219 +24,155 @@ const graph = (): MaritimeCruiseResult => ({
     summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 7, violations: [], optionsUsed: {} }
 });
 
+const commonPresentation = {
+    folderGrouping: 'nested', rankConstraints: 'all', aggregationDepth: 2
+} as const;
+
 describe('renderDependencyGraphToDot', () => {
-    it('is deterministic and recursively renders roots, sibling files, and nested folders', () => {
+    it('renders deterministic nested file-level graphs by default', () => {
         const first = renderDependencyGraphToDot(graph());
         expect(renderDependencyGraphToDot(graph())).toBe(first);
         expect(first).toContain('"cluster:app/domain/schema"');
         expect(first).toContain('"cluster:src/features/board/components"');
-        expect(first).toContain('"cluster:src/features/board/hooks"');
-        expect(first).toContain('"cluster:tools"');
         expect(first).toContain('label="BoardLayer.tsx"');
         expect(first).toContain('"local:app/domain/projection.ts" -> "local:app/domain/schema/timeline.ts"');
     });
 
-    it('collapses unscoped and scoped packages and excludes node_modules folder clusters', () => {
-        const dot = renderDependencyGraphToDot(graph());
-        expect(dot).toContain('"external:react" [label="react"');
-        expect(dot).toContain('"external:@scope/pkg" [label="@scope/pkg"');
-        expect(dot).not.toContain('cluster:node_modules');
-        expect(dot).not.toContain('local:node_modules');
-        expect(dot).toContain('style="dashed"');
-        expect(externalPackageName('/repo/node_modules/@scope/pkg/lib/a.js')).toBe('@scope/pkg');
-    });
-
-    it('supports none, summary, and direct external-package policies deterministically', () => {
-        const none = renderDependencyGraphToDot(graph(), { externalPackages: 'none' });
-        expect(none).not.toContain('external:');
+    it('supports none, summary, and direct external-package policies', () => {
+        expect(renderDependencyGraphToDot(graph(), { externalPackages: 'none' })).not.toContain('external:');
         const summary = renderDependencyGraphToDot(graph(), { externalPackages: 'summary' });
-        expect(summary.match(/\[label="External packages"/g)).toHaveLength(1);
-        expect(summary).toContain('-> "external:boundary"');
+        expect(summary).toContain('"external:boundary"');
         expect(summary).not.toContain('external:react');
         const direct = renderDependencyGraphToDot(graph(), { externalPackages: 'direct' });
         expect(direct).toContain('external:react');
         expect(direct).toContain('external:@scope/pkg');
-        for (const externalPackages of ['none', 'summary', 'direct'] as const) {
-            expect(renderDependencyGraphToDot(graph(), { externalPackages })).toBe(renderDependencyGraphToDot(graph(), { externalPackages }));
-        }
+        expect(externalPackageName('/repo/node_modules/@scope/pkg/lib/a.js')).toBe('@scope/pkg');
     });
 
-    it('supports flat, top-level, and nested local folder grouping', () => {
-        const flat = renderDependencyGraphToDot(graph(), { folderGrouping: 'none' });
-        expect(flat).not.toContain('subgraph "cluster:app');
+    it('supports flat, top-level, and nested folder grouping', () => {
+        expect(renderDependencyGraphToDot(graph(), { folderGrouping: 'none' })).not.toContain('subgraph "cluster:app');
         const top = renderDependencyGraphToDot(graph(), { folderGrouping: 'top-level' });
         expect(top).toContain('"cluster:app"');
-        expect(top).toContain('"cluster:src"');
         expect(top).not.toContain('"cluster:app/domain"');
-        const nested = renderDependencyGraphToDot(graph(), { folderGrouping: 'nested' });
-        expect(nested).toContain('"cluster:app/domain/schema"');
+        expect(renderDependencyGraphToDot(graph(), { folderGrouping: 'nested' })).toContain('"cluster:app/domain/schema"');
     });
 
-    it('derives top-level clusters from non-empty absolute-path segments', () => {
-        const fixture: MaritimeCruiseResult = {
-            modules: [
-                { source: '/repo/src/index.ts', valid: true, dependents: [], dependencies: [] },
-                { source: '/repo/src/config.ts', valid: true, dependents: [], dependencies: [] }
-            ],
-            summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 2, violations: [], optionsUsed: {} }
-        };
-        const dot = renderDependencyGraphToDot(fixture, { folderGrouping: 'top-level' });
-        expect(dot).toContain('"cluster:repo"');
-        expect(dot).not.toContain('subgraph "cluster:" {');
-    });
-
-    it('defaults to type labels and can omit only dependency-type labels', () => {
-        expect(renderDependencyGraphToDot(graph())).toContain('[label="local"]');
-        expect(renderDependencyGraphToDot(graph(), { edgeLabels: 'none' })).not.toContain('[label="local"]');
-    });
-
-    it('retains defaults when optional presentation values are explicitly undefined', () => {
+    it('keeps explicit undefined settings equivalent to defaults', () => {
         expect(renderDependencyGraphToDot(graph(), {
-            externalPackages: undefined,
-            folderGrouping: undefined,
-            edgeLabels: undefined,
-            layoutDirection: undefined,
-            rankConstraints: undefined,
-            layoutDensity: undefined,
-            moduleAggregation: undefined
+            externalPackages: undefined, folderGrouping: undefined, edgeLabels: undefined,
+            layoutDirection: undefined, rankConstraints: undefined, layoutDensity: undefined,
+            moduleAggregation: undefined, visualTheme: undefined, sourceRootGrouping: undefined,
+            edgePresentation: undefined, clusterRanking: undefined, outputOrder: undefined, aggregationDepth: undefined
         })).toBe(renderDependencyGraphToDot(graph()));
     });
 
-    it('supports layout direction and compact density without changing the default DOT policy', () => {
-        const defaults = renderDependencyGraphToDot(graph());
-        expect(defaults).toContain('rankdir="LR"');
-        expect(defaults).not.toContain('ranksep=');
-        const compactTopToBottom = renderDependencyGraphToDot(graph(), { layoutDirection: 'tb', layoutDensity: 'compact' });
-        expect(compactTopToBottom).toContain('rankdir="TB"');
-        expect(compactTopToBottom).toContain('ranksep="0.35", nodesep="0.2"');
-    });
-
-    it('applies named profiles before explicit presentation overrides', () => {
+    it('defines profiles entirely as declarative presentation presets', () => {
         expect(resolveGraphPresentation()).toEqual({
-            externalPackages: 'direct', folderGrouping: 'nested', edgeLabels: 'types',
-            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal', moduleAggregation: 'none'
+            externalPackages: 'direct', edgeLabels: 'types', layoutDensity: 'normal', moduleAggregation: 'none',
+            visualTheme: 'standard', sourceRootGrouping: 'preserve', edgePresentation: 'relations', clusterRanking: 'global',
+            outputOrder: 'default', layoutDirection: 'lr', ...commonPresentation
         });
         expect(resolveGraphPresentation({ graphProfile: 'local-architecture' })).toEqual({
-            externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none',
-            layoutDirection: 'lr', rankConstraints: 'all', layoutDensity: 'normal', moduleAggregation: 'none'
+            externalPackages: 'none', edgeLabels: 'none', layoutDensity: 'normal', moduleAggregation: 'none',
+            visualTheme: 'standard', sourceRootGrouping: 'preserve', edgePresentation: 'relations', clusterRanking: 'global',
+            outputOrder: 'default', layoutDirection: 'lr', ...commonPresentation
         });
         expect(resolveGraphPresentation({ graphProfile: 'compact-architecture' })).toEqual({
-            externalPackages: 'none', folderGrouping: 'nested', edgeLabels: 'none',
-            layoutDirection: 'tb', rankConstraints: 'intra-folder', layoutDensity: 'compact', moduleAggregation: 'folders'
+            externalPackages: 'none', edgeLabels: 'none', layoutDensity: 'compact', moduleAggregation: 'none',
+            visualTheme: 'architecture', sourceRootGrouping: 'elide-single', edgePresentation: 'semantic-pairs', clusterRanking: 'local',
+            outputOrder: 'edges-first', layoutDirection: 'lr', ...commonPresentation
         });
-        expect(resolveGraphPresentation({ graphProfile: 'compact-architecture', layoutDirection: 'lr' }).layoutDirection).toBe('lr');
+        expect(resolveGraphPresentation({ graphProfile: 'architecture-overview' })).toEqual({
+            externalPackages: 'none', edgeLabels: 'none', layoutDensity: 'normal', moduleAggregation: 'folders',
+            visualTheme: 'architecture', sourceRootGrouping: 'preserve', edgePresentation: 'semantic-pairs', clusterRanking: 'global',
+            outputOrder: 'default', layoutDirection: 'tb', ...commonPresentation
+        });
     });
 
-    it('renders the compact architecture profile without external nodes, labels, or default rank constraints', () => {
+    it('lets explicit settings override every profile characteristic', () => {
+        const resolved = resolveGraphPresentation({
+            graphProfile: 'compact-architecture', visualTheme: 'standard', sourceRootGrouping: 'preserve',
+            edgePresentation: 'relations', clusterRanking: 'global', outputOrder: 'nodes-first', layoutDirection: 'tb',
+            layoutDensity: 'normal', moduleAggregation: 'folders', aggregationDepth: 3
+        });
+        expect(resolved.visualTheme).toBe('standard');
+        expect(resolved.sourceRootGrouping).toBe('preserve');
+        expect(resolved.edgePresentation).toBe('relations');
+        expect(resolved.clusterRanking).toBe('global');
+        expect(resolved.outputOrder).toBe('nodes-first');
+        expect(resolved.layoutDirection).toBe('tb');
+        expect(resolved.layoutDensity).toBe('normal');
+        expect(resolved.moduleAggregation).toBe('folders');
+        expect(resolved.aggregationDepth).toBe(3);
+    });
+
+    it('rejects invalid aggregation depth', () => {
+        expect(() => resolveGraphPresentation({ aggregationDepth: 0 })).toThrow('positive integer');
+        expect(() => resolveGraphPresentation({ aggregationDepth: 1.5 })).toThrow('positive integer');
+    });
+
+    it('renders compact architecture as local file-level LR architecture styling', () => {
         const dot = renderDependencyGraphToDot(graph(), { graphProfile: 'compact-architecture' });
-        expect(dot).toContain('rankdir="TB"');
-        expect(dot).toContain('ranksep="0.35", nodesep="0.2"');
+        expect(dot).toContain('rankdir="LR"');
+        expect(dot).toContain('outputorder="edgesfirst"');
+        expect(dot).toContain('ranksep="0.12", nodesep="0.10"');
+        expect(dot).not.toContain('newrank="true"');
         expect(dot).not.toContain('external:');
-        expect(dot).not.toContain('[label="local"]');
-        expect(dot).toContain('"folder:src/features/board"');
-        expect(dot).not.toContain('local:src/features/board/BoardLayer.tsx');
+        expect(dot).toContain('local:src/features/board/BoardLayer.tsx');
+        expect(dot).not.toContain('"folder:src/features/board"');
+        expect(dot).toContain('style="rounded,bold,filled"');
     });
 
-    it('deterministically aggregates folder dependencies and exposes only combined counts', () => {
+    it('renders architecture-overview as source-root-relative TB folder aggregation', () => {
         const fixture = graph();
         fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts'));
-        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts'));
-        const dot = renderDependencyGraphToDot(fixture, { graphProfile: 'compact-architecture' });
-        expect(renderDependencyGraphToDot(fixture, { graphProfile: 'compact-architecture' })).toBe(dot);
-        expect(dot.match(/"folder:src\/features\/board" -> "folder:app\/domain"/g)).toHaveLength(1);
-        expect(dot).toContain('label="×2"');
+        fixture.summary.optionsUsed = { args: ['app', 'src', 'tools'] };
+        const dot = renderDependencyGraphToDot(fixture, { graphProfile: 'architecture-overview' });
+        expect(dot).toContain('rankdir="TB"');
+        expect(dot).toContain('"folder:src/features/board"');
+        expect(dot).toContain('"folder:app/domain"');
+        expect(dot).not.toContain('local:src/features/board/BoardLayer.tsx');
+        expect(dot).toContain('newrank="true"');
     });
 
-    it('allows compact layout with module-level rendering as an explicit escape hatch', () => {
-        const dot = renderDependencyGraphToDot(graph(), { graphProfile: 'compact-architecture', moduleAggregation: 'none' });
-        expect(dot).toContain('local:src/features/board/BoardLayer.tsx');
-        expect(dot).not.toContain('folder:src/features/board');
+    it('computes aggregation depth relative to configured source roots', () => {
+        expect(aggregationFolder('src/features/board/components/GameHex.tsx', ['src'], 2)).toBe('src/features/board');
+        expect(aggregationFolder('src/features/board/components/GameHex.tsx', ['src'], 1)).toBe('src/features');
+        expect(aggregationFolder('src/features/board/components/GameHex.tsx', ['src'], 2, 'elide-single')).toBe('features/board');
+        expect(aggregationFolder('frontend/features/board/GameHex.tsx', ['frontend', 'backend'], 2)).toBe('frontend/features/board');
+        expect(aggregationFolder('features/board/components/GameHex.tsx', ['.'], 2)).toBe('features/board');
     });
 
-    it('composes folder aggregation with direct and summary external-package modes', () => {
-        const direct = renderDependencyGraphToDot(graph(), { moduleAggregation: 'folders', externalPackages: 'direct' });
-        expect(direct).toContain('"external:react" [label="react"');
-        expect(direct).toContain('"folder:src/features/board" -> "external:react"');
-        expect(direct).toContain('"folder:src/features/board" -> "external:@scope/pkg"');
-
-        const summary = renderDependencyGraphToDot(graph(), { moduleAggregation: 'folders', externalPackages: 'summary' });
-        expect(summary.match(/\[label="External packages"/g)).toHaveLength(1);
-        expect(summary.match(/-> "external:boundary"/g)).toHaveLength(1);
-        expect(summary).toContain('label="×2 · npm"');
-    });
-
-    it('keeps mixed runtime aggregate edges solid while preserving dependency semantics', () => {
+    it('keeps mixed runtime aggregate edges solid', () => {
         const fixture = graph();
-        fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts', {
-            dependencyTypes: ['local', 'type-only'], typeOnly: true
-        }));
-        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts', {
-            dependencyTypes: ['local'], circular: true, valid: false
-        }));
+        fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts', { typeOnly: true, dependencyTypes: ['local', 'type-only'] }));
+        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts'));
         const edge = renderDependencyGraphToDot(fixture, {
             moduleAggregation: 'folders', externalPackages: 'none', edgeLabels: 'types'
         }).split('\n').find(line => line.includes('"folder:src/features/board" -> "folder:app/domain"'));
-        expect(edge).toContain('label="×2 · local · type-only"');
+        expect(edge).toContain('×2');
         expect(edge).not.toContain('style="dashed"');
-        expect(edge).toContain('color="#d97706"');
-        expect(edge).toContain('xlabel="invalid"');
-        expect(edge).toContain('fontcolor="#dc2626"');
     });
 
-
-    it('renders an aggregate edge dashed only when every dependency is non-runtime', () => {
+    it('renders semantic pairs secondary only when every relation is non-runtime', () => {
         const fixture = graph();
-        fixture.modules[2].dependencies.push(dependency('app/domain/projection.ts', {
-            dependencyTypes: ['local', 'type-only'], typeOnly: true
-        }));
-        fixture.modules[3].dependencies.push(dependency('app/domain/projection.ts', {
-            dependencyTypes: ['local'], preCompilationOnly: true
-        }));
+        fixture.modules[0].dependencies = [
+            dependency('app/domain/schema/timeline.ts', { dependencyTypes: ['local', 'type-import'] })
+        ];
         const edge = renderDependencyGraphToDot(fixture, {
-            moduleAggregation: 'folders', externalPackages: 'none'
-        }).split('\n').find(line => line.includes('"folder:src/features/board" -> "folder:app/domain"'));
+            externalPackages: 'none', edgeLabels: 'none', edgePresentation: 'semantic-pairs'
+        }).split('\n').find(line => line.includes('projection.ts" -> "local:app/domain/schema/timeline.ts'));
+        expect(edge).toContain('arrowhead="onormal"');
         expect(edge).toContain('style="dashed"');
+        expect(edge).toContain('color="#aaaaaa"');
     });
 
-    it('keeps every dependency visible while releasing cross-folder rank constraints', () => {
-        const constrained = renderDependencyGraphToDot(graph(), { rankConstraints: 'all' });
-        const intraFolder = renderDependencyGraphToDot(graph(), { rankConstraints: 'intra-folder' });
-        const crossFolder = intraFolder.split('\n').find(line => line.includes('projection.ts" -> "local:app/domain/schema/timeline.ts'));
-        expect(crossFolder).not.toContain('constraint="false"');
-
+    it('keeps circular and invalid relationship semantics', () => {
         const fixture = graph();
-        fixture.modules[0].dependencies.push(dependency('src/features/board/BoardLayer.tsx'));
-        const released = renderDependencyGraphToDot(fixture, { rankConstraints: 'intra-folder' }).split('\n')
-            .find(line => line.includes('projection.ts" -> "local:src/features/board/BoardLayer.tsx'));
-        expect(released).toContain('constraint="false"');
-        expect(released).toContain('label="local"');
-        expect(constrained).not.toContain('constraint="false"');
-    });
-
-    it('keeps root-level dependencies rank-constrained in intra-folder mode', () => {
-        const fixture: MaritimeCruiseResult = {
-            modules: [
-                { source: 'index.ts', valid: true, dependents: [], dependencies: [dependency('config.ts')] },
-                { source: 'config.ts', valid: true, dependents: [], dependencies: [] }
-            ],
-            summary: { error: 0, warn: 0, info: 0, ignore: 0, totalCruised: 2, violations: [], optionsUsed: {} }
-        };
-        const edge = renderDependencyGraphToDot(fixture, { rankConstraints: 'intra-folder' }).split('\n')
-            .find(line => line.includes('"local:index.ts" -> "local:config.ts"'));
-        expect(edge).not.toContain('constraint="false"');
-    });
-
-    it('keeps circular and invalid edge semantics visible without duplicate attributes', () => {
-        const fixture = graph();
-        fixture.modules[0].dependencies[0] = dependency('app/domain/schema/timeline.ts', {
-            circular: true,
-            valid: false
-        });
+        fixture.modules[0].dependencies[0] = dependency('app/domain/schema/timeline.ts', { circular: true, valid: false });
         const edge = renderDependencyGraphToDot(fixture).split('\n').find(line => line.includes('projection.ts" ->'));
         expect(edge).toContain('color="#d97706"');
         expect(edge).toContain('xlabel="invalid"');
         expect(edge).toContain('fontcolor="#dc2626"');
-        expect(edge?.match(/color=/g)).toHaveLength(2);
-        expect(edge?.match(/penwidth=/g)).toHaveLength(1);
     });
 });

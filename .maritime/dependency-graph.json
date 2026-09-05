@@ -2782,11 +2782,38 @@
           "valid": true,
           "preCompilationOnly": true,
           "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./presentation",
+          "resolved": "src/cli/graph/presentation.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
         "src/cli/commands/graph.ts",
         "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/graph/presentation.ts",
+      "valid": true,
+      "dependencies": [],
+      "dependents": [
+        "src/cli/graph/render-dot.ts"
       ],
       "orphan": false
     },
@@ -3443,8 +3470,8 @@
     "error": 0,
     "ignore": 0,
     "info": 0,
-    "totalCruised": 64,
-    "totalDependenciesCruised": 149,
+    "totalCruised": 65,
+    "totalDependenciesCruised": 150,
     "violations": [],
     "warn": 0,
     "optionsUsed": {

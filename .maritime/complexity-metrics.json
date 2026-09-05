@@ -345,7 +345,7 @@
   },
   "src/cli/analyze/adapters.ts": {
     "complexity": 24,
-    "loc": 450,
+    "loc": 445,
     "instability": 0.5,
     "fanIn": 2,
     "fanOut": 2,
@@ -409,18 +409,26 @@
   },
   "src/cli/commands/graph.ts": {
     "complexity": 14,
-    "loc": 98,
+    "loc": 249,
     "instability": 0.67,
     "fanIn": 2,
     "fanOut": 4,
     "scanned": true
   },
   "src/cli/graph/render-dot.ts": {
-    "complexity": 62,
-    "loc": 352,
-    "instability": 0.33,
+    "complexity": 37,
+    "loc": 840,
+    "instability": 0.5,
     "fanIn": 2,
-    "fanOut": 1,
+    "fanOut": 2,
+    "scanned": true
+  },
+  "src/cli/graph/presentation.ts": {
+    "complexity": 18,
+    "loc": 105,
+    "instability": 0,
+    "fanIn": 1,
+    "fanOut": 0,
     "scanned": true
   },
   "src/cli/graph/render-graphviz.ts": {
@@ -449,7 +457,7 @@
   },
   "src/cli/index.ts": {
     "complexity": 11,
-    "loc": 89,
+    "loc": 99,
     "instability": 1,
     "fanIn": 0,
     "fanOut": 14,
