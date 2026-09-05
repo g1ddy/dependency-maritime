@@ -409,15 +409,15 @@
   },
   "src/cli/commands/graph.ts": {
     "complexity": 14,
-    "loc": 105,
+    "loc": 249,
     "instability": 0.67,
     "fanIn": 2,
     "fanOut": 4,
     "scanned": true
   },
   "src/cli/graph/render-dot.ts": {
-    "complexity": 45,
-    "loc": 88,
+    "complexity": 37,
+    "loc": 840,
     "instability": 0.5,
     "fanIn": 2,
     "fanOut": 2,
