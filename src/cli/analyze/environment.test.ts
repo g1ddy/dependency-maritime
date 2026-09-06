@@ -7,17 +7,20 @@ import { ValidationError } from './models';
 
 describe('environment', () => {
     describe('validateNodeVersion', () => {
-        it('should accept Node 22.13.0 and higher', () => {
+        it('should accept Node 22.13.0+ and 24.x', () => {
             expect(() => validateNodeVersion('22.13.0')).not.toThrow();
             expect(() => validateNodeVersion('v22.13.0')).not.toThrow();
             expect(() => validateNodeVersion('22.14.0')).not.toThrow();
             expect(() => validateNodeVersion('24.0.0')).not.toThrow();
+            expect(() => validateNodeVersion('24.2.0')).not.toThrow();
         });
 
-        it('should reject Node versions below 22.13.0', () => {
+        it('should reject unsupported Node versions', () => {
             expect(() => validateNodeVersion('20.19.0')).toThrow(ValidationError);
-            expect(() => validateNodeVersion('20.19.0')).toThrow(/requires Node.js >=22.13.0/);
+            expect(() => validateNodeVersion('20.19.0')).toThrow(/requires Node.js \^22\.13\.0 \|\| \^24\.0\.0/);
             expect(() => validateNodeVersion('22.12.0')).toThrow(ValidationError);
+            expect(() => validateNodeVersion('23.0.0')).toThrow(ValidationError);
+            expect(() => validateNodeVersion('25.0.0')).toThrow(ValidationError);
             expect(() => validateNodeVersion('18.20.0')).toThrow(ValidationError);
         });
     });

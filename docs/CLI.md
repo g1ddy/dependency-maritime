@@ -163,7 +163,7 @@ The reusable CLI contract workflow executes:
 1. `npm run build:cli`
 2. `npm run test:cli-package`
 
-across the supported Node.js compatibility matrix (`22.x`, `24.x`) with `fail-fast: false`.
+across the supported Node.js compatibility matrix (`22.13.0`, `24.x`) with `fail-fast: false`.
 It also runs the composite-action graph render smoke. Direct pull-request execution preserves the
 `CLI Contract Checks` workflow and job names used by required-check branch protection.
 
