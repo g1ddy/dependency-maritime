@@ -15,7 +15,7 @@ The primary artifact is a versioned Node CLI package, `@dependency-maritime/cli`
 
 The first public contract is intentionally modern and frontend-specific:
 
-- Node.js `>=20.19.0`.
+- Node.js `>=22.13.0`.
 - ESLint 9+ with flat configuration.
 - TypeScript frontend repositories.
 - dependency-cruiser as the dependency-graph engine and `ICruiseResult` as the canonical graph exchange format.
@@ -163,7 +163,7 @@ The reusable CLI contract workflow executes:
 1. `npm run build:cli`
 2. `npm run test:cli-package`
 
-across the supported Node.js compatibility matrix (`20.19.0`, `22.x`, `24.x`) with `fail-fast: false`.
+across the supported Node.js compatibility matrix (`22.x`, `24.x`) with `fail-fast: false`.
 It also runs the composite-action graph render smoke. Direct pull-request execution preserves the
 `CLI Contract Checks` workflow and job names used by required-check branch protection.
 
@@ -186,7 +186,7 @@ Dependency Maritime provides an official composite action (`action.yml`) that wr
 | Input | Description | Default |
 | :--- | :--- | :--- |
 | `cli-source` | Optional development override such as a packed CLI tarball or exact package version | `''` |
-| `node-version` | Node.js version baseline | `'20.19.0'` |
+| `node-version` | Node.js version baseline | `'22.13.0'` |
 | `source-roots` | One or more source roots, space/newline/comma separated | `'src'` |
 | `depcruise-config` | Optional repository dependency-cruiser configuration | `''` |
 | `output-dir` | Canonical Maritime artifact directory | `'.maritime'` |
@@ -312,7 +312,7 @@ SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the 
 
 The prerelease workflow is tag-driven. A `cli-vX.Y.Z[-pre]` tag is the release-version authority; the publish workflow stamps that version in its ephemeral workspace, builds and tests the packed package, publishes with npm provenance, then exercises the released Action/package pair from a clean consumer.
 
-The authoritative PR/main contract proof is `.github/workflows/cli-contract.yml`: it runs the packed CLI consumer matrix on Node 20.19, 22, and 24 plus the composite Action compact-render smoke. Real consumer cutover remains repository-owned so Catan, Crawler, and Maritime can retain their own triggers and evidence/write policies.
+The authoritative PR/main contract proof is `.github/workflows/cli-contract.yml`: it runs the packed CLI consumer matrix on Node 22 and 24 plus the composite Action compact-render smoke. Real consumer cutover remains repository-owned so Catan, Crawler, and Maritime can retain their own triggers and evidence/write policies.
 
 ## Related documentation
 

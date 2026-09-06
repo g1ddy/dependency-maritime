@@ -7,17 +7,18 @@ import { ValidationError } from './models';
 
 describe('environment', () => {
     describe('validateNodeVersion', () => {
-        it('should accept Node 20.19.0 and higher', () => {
-            expect(() => validateNodeVersion('20.19.0')).not.toThrow();
-            expect(() => validateNodeVersion('v20.19.0')).not.toThrow();
-            expect(() => validateNodeVersion('20.20.0')).not.toThrow();
-            expect(() => validateNodeVersion('22.0.0')).not.toThrow();
+        it('should accept Node 22.13.0 and higher', () => {
+            expect(() => validateNodeVersion('22.13.0')).not.toThrow();
+            expect(() => validateNodeVersion('v22.13.0')).not.toThrow();
+            expect(() => validateNodeVersion('22.14.0')).not.toThrow();
+            expect(() => validateNodeVersion('24.0.0')).not.toThrow();
         });
 
-        it('should reject Node versions below 20.19.0', () => {
+        it('should reject Node versions below 22.13.0', () => {
+            expect(() => validateNodeVersion('20.19.0')).toThrow(ValidationError);
+            expect(() => validateNodeVersion('20.19.0')).toThrow(/requires Node.js >=22.13.0/);
+            expect(() => validateNodeVersion('22.12.0')).toThrow(ValidationError);
             expect(() => validateNodeVersion('18.20.0')).toThrow(ValidationError);
-            expect(() => validateNodeVersion('18.20.0')).toThrow(/requires Node.js >=20.19.0/);
-            expect(() => validateNodeVersion('20.18.3')).toThrow(ValidationError);
         });
     });
 
@@ -85,18 +86,18 @@ describe('environment', () => {
 
         it('should throw ValidationError on legacy config', () => {
             fs.writeFileSync(path.join(testDir, '.eslintrc.json'), '{}');
-            expect(() => validateEslintEnvironment(testDir, '22.0.0')).toThrow(ValidationError);
-            expect(() => validateEslintEnvironment(testDir, '22.0.0')).toThrow(/Legacy ESLint configuration detected \(\.eslintrc\.json\)/);
+            expect(() => validateEslintEnvironment(testDir, '22.13.0')).toThrow(ValidationError);
+            expect(() => validateEslintEnvironment(testDir, '22.13.0')).toThrow(/Legacy ESLint configuration detected \(\.eslintrc\.json\)/);
         });
 
         it('should throw ValidationError if no flat config is found', () => {
-            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(ValidationError);
-            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(/No ESLint flat configuration found/);
+            expect(() => validateEslintEnvironment(testDir, '22.13.0')).toThrow(ValidationError);
+            expect(() => validateEslintEnvironment(testDir, '22.13.0')).toThrow(/No ESLint flat configuration found/);
         });
 
         it('should succeed on valid environment and flat config', () => {
             fs.writeFileSync(path.join(testDir, 'eslint.config.mjs'), 'export default [];');
-            const result = validateEslintEnvironment(testDir, '20.19.0');
+            const result = validateEslintEnvironment(testDir, '22.13.0');
             expect(result.mode).toBe('Flat Config (eslint.config.mjs)');
         });
 
@@ -106,8 +107,8 @@ describe('environment', () => {
                 fs.writeFileSync(path.join(isolatedDir, 'eslint.config.js'), 'export default [];');
                 fs.writeFileSync(path.join(isolatedDir, 'package.json'), JSON.stringify({ name: 'dummy' }));
 
-                expect(() => validateEslintEnvironment(isolatedDir, '20.19.0')).toThrow(ValidationError);
-                expect(() => validateEslintEnvironment(isolatedDir, '20.19.0')).toThrow(/ESLint is not installed/);
+                expect(() => validateEslintEnvironment(isolatedDir, '22.13.0')).toThrow(ValidationError);
+                expect(() => validateEslintEnvironment(isolatedDir, '22.13.0')).toThrow(/ESLint is not installed/);
             } finally {
                 if (fs.existsSync(isolatedDir)) {
                     fs.rmSync(isolatedDir, { recursive: true, force: true });
@@ -130,8 +131,8 @@ describe('environment', () => {
                 'module.exports = { ESLint: class { static version = "8.57.0"; } };'
             );
 
-            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(ValidationError);
-            expect(() => validateEslintEnvironment(testDir, '20.19.0')).toThrow(/Unsupported ESLint version \(v8.57.0\)/);
+            expect(() => validateEslintEnvironment(testDir, '22.13.0')).toThrow(ValidationError);
+            expect(() => validateEslintEnvironment(testDir, '22.13.0')).toThrow(/Unsupported ESLint version \(v8.57.0\)/);
         });
     });
 });

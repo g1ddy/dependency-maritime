@@ -70,7 +70,7 @@ A successful output directory contains:
 
 Important invariants:
 
-- Node `>=20.19.0`, ESLint 9+ flat config, and TypeScript frontend repositories are the current
+- Node `>=22.13.0`, ESLint 9+ flat config, and TypeScript frontend repositories are the current
   supported environment.
 - Legacy `.eslintrc.*` and `eslintConfig` metadata are unsupported.
 - Consumers may supply dependency-cruiser configuration; otherwise the CLI uses its portable
@@ -123,5 +123,5 @@ npm run test:cli-package
 ```
 
 For a distributable CLI or artifact-contract change, `npm run build:cli` and
-`npm run test:cli-package` are mandatory. CI validates that contract on Node 20.19, 22, and 24.
+`npm run test:cli-package` are mandatory. CI validates that contract on Node 22 and 24.
 Do not add brittle time-based browser waits; use explicit readiness conditions.

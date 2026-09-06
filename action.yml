@@ -9,7 +9,7 @@ inputs:
   node-version:
     description: 'Node.js version baseline to set up if Node is not already configured.'
     required: false
-    default: '20.19.0'
+    default: '22.13.0'
   cli-source:
     description: 'Optional CLI source override for development (for example, a packed tarball). The action otherwise installs the CLI version derived from a cli-v* action tag, with the committed compatibility version as a branch/commit fallback.'
     required: false

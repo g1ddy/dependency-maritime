@@ -8,7 +8,7 @@ Package scripts are the executable source of truth; verify the current commands 
 
 Prerequisites:
 
-- Node.js 20.19 or later
+- Node.js 22.13 or later
 - npm
 
 ~~~bash
