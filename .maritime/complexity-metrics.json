@@ -369,7 +369,7 @@
   },
   "src/cli/analyze/environment.ts": {
     "complexity": 12,
-    "loc": 119,
+    "loc": 118,
     "instability": 0.33,
     "fanIn": 2,
     "fanOut": 1,
