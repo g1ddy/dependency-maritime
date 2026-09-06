@@ -28,10 +28,11 @@ export function validateNodeVersion(nodeVersionStr: string = process.versions.no
     const major = parts[0] || 0;
     const minor = parts[1] || 0;
 
-    // Baseline requirement: Node >= 20.19.0
-    if (major < 20 || (major === 20 && minor < 19)) {
+    // Supported runtime contract: ^22.13.0 || ^24.0.0
+    const isValid = (major === 22 && minor >= 13) || major === 24;
+    if (!isValid) {
         throw new ValidationError(
-            `Maritime requires Node.js >=20.19.0 (current version: v${cleanVersion}).`
+            `Maritime requires Node.js ^22.13.0 || ^24.0.0 (current version: v${cleanVersion}).`
         );
     }
 }
