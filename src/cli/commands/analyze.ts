@@ -1,8 +1,5 @@
 import { parseArgs } from 'node:util';
-import * as fsPromises from 'node:fs/promises';
 import {
-    readDependencyGraph,
-    generateDependencyGraph,
     runEslintComplexityScan,
     countLinesOfCode,
     writeOutputFiles,
@@ -12,11 +9,12 @@ import { calculateMetrics, calculateNamespaceMetrics, isSupportedTypeScriptFile 
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import { validateEslintEnvironment } from '../analyze/environment';
-import { ValidationError, type AnalysisThresholds, type DependencyCruiserModule } from '../analyze/models';
+import { ValidationError, type AnalysisThresholds } from '../analyze/models';
 import { MANIFEST_SCHEMA_VERSION, type ArtifactManifest } from '../../schema/manifest';
-import { readBaselineFile, writeBaselineFile, evaluateArchitectureDebt, type ViolationInput } from '../analyze/architecture-debt';
+import { readBaselineFile, writeBaselineFile, evaluateArchitectureDebt } from '../analyze/architecture-debt';
 import { calculateChangeImpact, type ImpactAnalysisResult } from '../analyze/impact';
-import * as path from 'path';
+import { resolveAnalysisGraph } from '../analyze/graph-input';
+import * as path from 'node:path';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
     loc: 300,
@@ -82,18 +80,19 @@ Options:
   --cwd <dir>                  Working directory root for resolution
   --fail-on-unmeasured         Fail if any graph source file is skipped/unmeasured by ESLint
   --baseline <file>            Path to existing architecture debt baseline JSON
-  --write-baseline <file>      Write current architecture violations as a new baseline JSON file
-  --fail-on-new-violations     Fail analysis if new architecture violations are introduced relative to baseline
+  --write-baseline <file>      Establish a baseline from current architecture violations
+  --fail-on-new-violations     Fail analysis if new architecture violations are introduced relative to --baseline
   --base <revision>            Calculate PR change impact surface relative to Git base revision (e.g. main)
 
+Baseline modes:
+  Establish: maritime analyze --source src --output .maritime --write-baseline .maritime/baseline.json
+  Enforce:   maritime analyze --source src --output .maritime --baseline .maritime/baseline.json --fail-on-new-violations
+
+  --write-baseline cannot be combined with --baseline or --fail-on-new-violations.
+  --fail-on-new-violations requires --baseline.
+
 Examples:
-  # Concise generated-graph workflow:
   maritime analyze --source app --output .maritime
-
-  # Architecture debt baseline enforcement:
-  maritime analyze --source app --output .maritime --baseline .maritime/architecture-baseline.json --fail-on-new-violations
-
-  # PR Change impact analysis:
   maritime analyze --source app --output .maritime --base origin/main
 
 Exit Codes:
@@ -102,6 +101,16 @@ Exit Codes:
   2 - Invalid CLI arguments, environment, or invalid input artifact/schema
         `);
         return 0;
+    }
+
+    if (values['write-baseline'] && (values.baseline || values['fail-on-new-violations'])) {
+        console.error('Error: --write-baseline is an initialization mode and cannot be combined with --baseline or --fail-on-new-violations.');
+        return 2;
+    }
+
+    if (values['fail-on-new-violations'] && !values.baseline) {
+        console.error('Error: --fail-on-new-violations requires --baseline <file>.');
+        return 2;
     }
 
     const workingDir = values.cwd ? path.resolve(values.cwd) : process.cwd();
@@ -137,8 +146,6 @@ Exit Codes:
 
     try {
         console.log('📊 Starting Complexity Analysis...');
-
-        // 1. Validate environment & ESLint flat config baseline
         console.log('   - Validating Environment & Configuration...');
         const { mode: eslintConfigMode } = validateEslintEnvironment(workingDir);
 
@@ -152,55 +159,26 @@ Exit Codes:
             ? path.resolve(workingDir, values.output)
             : path.dirname(path.resolve(workingDir, targetMetricsPath));
 
-        // 2. Read or generate graph & Extract violations
-        let modules: DependencyCruiserModule[];
-        const isGraphSupplied = values.graph !== undefined;
-        let effectiveGraphPath: string;
-        let cruiseSummaryViolations: ViolationInput[] = [];
+        console.log(values.graph
+            ? '   - Reading and normalizing supplied Dependency Cruiser JSON...'
+            : '   - Generating Dependency Graph with dependency-cruiser...');
 
-        if (isGraphSupplied) {
-            console.log('   - Reading Supplied Dependency Cruiser JSON...');
-            const readRes = await readDependencyGraph(values.graph!, workingDir);
-            modules = readRes.modules;
-            cruiseSummaryViolations = readRes.graph.summary.violations;
+        const graphResult = await resolveAnalysisGraph({
+            suppliedGraphPath: values.graph,
+            targetGraphPath,
+            manifestDir,
+            rawSources,
+            depcruiseConfig: values['depcruise-config'],
+            workingDir
+        });
 
-            const absGraphPath = path.resolve(workingDir, values.graph!);
-            const relGraphToManifest = path.relative(manifestDir, absGraphPath);
-            const isOutside = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
-
-            if (isOutside) {
-                console.log('   - Staging supplied graph into artifact directory...');
-                effectiveGraphPath = path.join(manifestDir, path.basename(absGraphPath));
-                try {
-                    await fsPromises.mkdir(manifestDir, { recursive: true });
-                    await fsPromises.copyFile(absGraphPath, effectiveGraphPath);
-                } catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err);
-                    throw new Error(`Failed to stage supplied dependency graph into artifact directory: ${message}`);
-                }
-            } else {
-                effectiveGraphPath = absGraphPath;
-            }
-        } else {
-            console.log('   - Generating Dependency Graph with dependency-cruiser...');
-            const genResult = await generateDependencyGraph({
-                sourceRoots: rawSources,
-                configPath: values['depcruise-config'],
-                cwd: workingDir
-            });
-            console.log(`   - Dependency-Cruiser Config Source: ${genResult.configSource}`);
-            modules = genResult.modules;
-
-            const cruiseRes = genResult.cruiseResult as { summary?: { violations?: ViolationInput[] } };
-            if (cruiseRes.summary && Array.isArray(cruiseRes.summary.violations)) {
-                cruiseSummaryViolations = cruiseRes.summary.violations;
-            }
-
-            // Write the generated graph to targetGraphPath
-            effectiveGraphPath = path.resolve(workingDir, targetGraphPath);
-            await fsPromises.mkdir(path.dirname(effectiveGraphPath), { recursive: true });
-            await fsPromises.writeFile(effectiveGraphPath, JSON.stringify(genResult.cruiseResult, null, 2));
+        if (graphResult.configSource) {
+            console.log(`   - Dependency-Cruiser Config Source: ${graphResult.configSource}`);
         }
+
+        const modules = graphResult.modules;
+        const cruiseSummaryViolations = graphResult.violations;
+        const effectiveGraphPath = graphResult.effectiveGraphPath;
 
         const sourceFiles = modules
             .map(m => m.source)
@@ -212,20 +190,12 @@ Exit Codes:
                 return isSource && isSupportedTypeScriptFile(src);
             });
 
-        // 3. ESLint for complexity
         console.log('   - Running ESLint for Complexity...');
         const eslintResults = await runEslintComplexityScan(rawSources, sourceFiles, workingDir);
         const complexityMap = parseEslintComplexityReport(eslintResults, workingDir);
 
-        // 4. Count LOC
         console.log('   - Counting Lines of Code...');
         const locMap = await countLinesOfCode(sourceFiles, workingDir);
-
-        // 5. Architecture Debt Evaluation & Baseline Writing
-        if (values['write-baseline']) {
-            console.log(`   - Writing Architecture Debt baseline to: ${values['write-baseline']}`);
-            await writeBaselineFile(values['write-baseline'], cruiseSummaryViolations, workingDir);
-        }
 
         let debtEvaluation;
         if (values.baseline) {
@@ -242,7 +212,11 @@ Exit Codes:
             );
         }
 
-        // 6. PR / Change Impact Evaluation
+        if (values['write-baseline']) {
+            console.log(`   - Writing Architecture Debt baseline to: ${values['write-baseline']}`);
+            await writeBaselineFile(values['write-baseline'], cruiseSummaryViolations, workingDir);
+        }
+
         let impactEvaluation: ImpactAnalysisResult | undefined;
         if (values.base) {
             console.log(`   - Evaluating PR Change Impact relative to base revision: ${values.base}`);
@@ -252,7 +226,6 @@ Exit Codes:
             });
         }
 
-        // 7. Calculate metrics
         console.log('   - Aggregating Metrics...');
         const analysisResult = calculateMetrics(
             modules,
@@ -277,7 +250,6 @@ Exit Codes:
             }
         }
 
-        // 6. Generate metrics and report
         console.log('   - Generating Outputs...');
 
         const metricsMap = analysisResult.files.reduce((acc, f) => {
@@ -304,7 +276,8 @@ Exit Codes:
             } : undefined,
             impactEvaluation ? {
                 baseRevision: impactEvaluation.baseRevision,
-                directlyChangedCount: impactEvaluation.directlyChangedFiles.length,
+                gitChangedCount: impactEvaluation.gitChangedFiles.length,
+                directlyChangedGraphCount: impactEvaluation.directlyChangedFiles.length,
                 transitiveImpactCount: impactEvaluation.transitivelyAffectedFiles.length,
                 affectedFolderCount: impactEvaluation.affectedFolders.length,
                 impactRatio: impactEvaluation.impactRatio
@@ -351,7 +324,8 @@ Exit Codes:
                 ...(impactEvaluation ? {
                     changeImpact: {
                         baseRevision: impactEvaluation.baseRevision,
-                        directlyChangedCount: impactEvaluation.directlyChangedFiles.length,
+                        gitChangedCount: impactEvaluation.gitChangedFiles.length,
+                        directlyChangedGraphCount: impactEvaluation.directlyChangedFiles.length,
                         transitiveImpactCount: impactEvaluation.transitivelyAffectedFiles.length,
                         affectedFolderCount: impactEvaluation.affectedFolders.length,
                         impactRatio: impactEvaluation.impactRatio
@@ -375,7 +349,6 @@ Exit Codes:
 
         console.log('✅ Complexity Report Updated and Metrics Exported!');
         return 0;
-
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         console.error(`Error analyzing project: ${message}`);
