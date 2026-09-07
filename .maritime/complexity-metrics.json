@@ -345,7 +345,7 @@
   },
   "src/cli/analyze/adapters.ts": {
     "complexity": 24,
-    "loc": 445,
+    "loc": 447,
     "instability": 0.5,
     "fanIn": 2,
     "fanOut": 2,
@@ -353,17 +353,25 @@
   },
   "src/cli/analyze/models.ts": {
     "complexity": 1,
-    "loc": 58,
+    "loc": 63,
     "instability": 0,
-    "fanIn": 9,
+    "fanIn": 11,
     "fanOut": 0,
     "scanned": true
   },
+  "src/cli/analyze/architecture-debt.ts": {
+    "complexity": 16,
+    "loc": 205,
+    "instability": 0.5,
+    "fanIn": 1,
+    "fanOut": 1,
+    "scanned": true
+  },
   "src/cli/analyze/calculate-metrics.ts": {
-    "complexity": 6,
-    "loc": 121,
-    "instability": 0.33,
-    "fanIn": 2,
+    "complexity": 20,
+    "loc": 185,
+    "instability": 0.25,
+    "fanIn": 3,
     "fanOut": 1,
     "scanned": true
   },
@@ -372,6 +380,14 @@
     "loc": 119,
     "instability": 0.33,
     "fanIn": 2,
+    "fanOut": 1,
+    "scanned": true
+  },
+  "src/cli/analyze/impact.ts": {
+    "complexity": 22,
+    "loc": 117,
+    "instability": 0.5,
+    "fanIn": 1,
     "fanOut": 1,
     "scanned": true
   },
@@ -384,24 +400,24 @@
     "scanned": true
   },
   "src/cli/analyze/render-markdown-report.ts": {
-    "complexity": 4,
-    "loc": 54,
-    "instability": 0.33,
+    "complexity": 9,
+    "loc": 115,
+    "instability": 0.5,
     "fanIn": 2,
-    "fanOut": 1,
+    "fanOut": 2,
     "scanned": true
   },
   "src/cli/commands/analyze.ts": {
-    "complexity": 28,
-    "loc": 293,
-    "instability": 0.78,
+    "complexity": 40,
+    "loc": 370,
+    "instability": 0.82,
     "fanIn": 2,
-    "fanOut": 7,
+    "fanOut": 9,
     "scanned": true
   },
   "src/schema/manifest.ts": {
     "complexity": 1,
-    "loc": 30,
+    "loc": 47,
     "instability": 0,
     "fanIn": 3,
     "fanOut": 0,
