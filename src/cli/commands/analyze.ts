@@ -172,6 +172,9 @@ Exit Codes:
             workingDir
         });
 
+        if (graphResult.stagedSuppliedGraph) {
+            console.log('   - Staging supplied graph into artifact directory...');
+        }
         if (graphResult.configSource) {
             console.log(`   - Dependency-Cruiser Config Source: ${graphResult.configSource}`);
         }
