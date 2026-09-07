@@ -43,10 +43,15 @@ export interface EslintFileComplexity {
     scanned: boolean;
 }
 
+export interface DependencyCruiserDependency {
+    resolved: string;
+    valid?: boolean;
+}
+
 export interface DependencyCruiserModule {
     source: string;
-    dependencies: unknown[];
-    dependents: unknown[];
+    dependencies: DependencyCruiserDependency[];
+    dependents: string[];
 }
 
 export class ValidationError extends Error {

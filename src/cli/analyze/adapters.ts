@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import { existsSync } from 'node:fs';
 import * as path from 'path';
-import { CruiseResultSchema } from '../../schema/dependency-cruiser';
+import { normalizeMaritimeGraph, type MaritimeCruiseResult } from '../../schema/dependency-cruiser';
 import { ValidationError, type DependencyCruiserModule, type EslintResult } from './models';
 
 export interface ResolvedDepcruiseConfig {
@@ -63,6 +63,8 @@ export async function resolveDepcruiseConfig(
     }
 
     const conventionalFiles = [
+        '.dependency-cruiser.ts',
+        '.dependency-cruiser.cts',
         '.dependency-cruiser.cjs',
         '.dependency-cruiser.js',
         '.dependency-cruiser.mjs',
@@ -102,7 +104,7 @@ export interface GenerateDependencyGraphOptions {
 }
 
 export interface GenerateDependencyGraphResult {
-    cruiseResult: unknown;
+    cruiseResult: MaritimeCruiseResult;
     modules: DependencyCruiserModule[];
     configSource: 'explicit' | 'discovered' | 'fallback';
 }
@@ -139,28 +141,36 @@ export async function generateDependencyGraph(
         process.chdir(prevCwd);
     }
 
-    const validationResult = CruiseResultSchema.safeParse(cruiseResultRaw);
-    if (!validationResult.success) {
-        throw new ValidationError(`Generated dependency graph failed schema validation:\n${validationResult.error.message}`);
+    let normalizedGraph: MaritimeCruiseResult;
+    try {
+        normalizedGraph = normalizeMaritimeGraph(cruiseResultRaw);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new ValidationError(`Generated dependency graph failed schema validation:\n${message}`);
     }
 
-    const modules: DependencyCruiserModule[] = validationResult.data.modules.map(m => ({
+    const modules: DependencyCruiserModule[] = normalizedGraph.modules.map(m => ({
         source: m.source,
         dependencies: m.dependencies,
         dependents: m.dependents
     }));
 
     return {
-        cruiseResult: validationResult.data,
+        cruiseResult: normalizedGraph,
         modules,
         configSource: resolvedConfig.source
     };
 }
 
+export interface ReadDependencyGraphResult {
+    graph: MaritimeCruiseResult;
+    modules: DependencyCruiserModule[];
+}
+
 export async function readDependencyGraph(
     graphPath: string,
     cwd: string = process.cwd()
-): Promise<DependencyCruiserModule[]> {
+): Promise<ReadDependencyGraphResult> {
     const absolutePath = path.resolve(cwd, graphPath);
     let data: string;
     let parsed: unknown;
@@ -179,18 +189,24 @@ export async function readDependencyGraph(
         throw new ValidationError(`Invalid JSON in dependency graph at ${graphPath}: ${message}`);
     }
 
-    const validationResult = CruiseResultSchema.safeParse(parsed);
-
-    if (!validationResult.success) {
-        throw new ValidationError(`Invalid dependency-cruiser output shape in ${graphPath}:\n${validationResult.error.message}`);
+    let normalizedGraph: MaritimeCruiseResult;
+    try {
+        normalizedGraph = normalizeMaritimeGraph(parsed);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new ValidationError(`Invalid dependency-cruiser output shape in ${graphPath}:\n${message}`);
     }
 
-    // Return using the validated structure, picking only what we need
-    return validationResult.data.modules.map(m => ({
+    const modules: DependencyCruiserModule[] = normalizedGraph.modules.map(m => ({
         source: m.source,
         dependencies: m.dependencies,
         dependents: m.dependents
     }));
+
+    return {
+        graph: normalizedGraph,
+        modules
+    };
 }
 
 export async function runEslintComplexityScan(
