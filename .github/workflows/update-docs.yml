@@ -25,6 +25,9 @@ concurrency:
 jobs:
   update-docs:
     runs-on: ubuntu-latest
+    concurrency:
+      group: generated-artifact-writes-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     permissions:
       contents: write
 
