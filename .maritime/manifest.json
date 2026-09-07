@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "toolVersion": "0.1.0-beta.5",
-  "generatedAt": "2026-09-07T01:15:16.431Z",
+  "generatedAt": "2026-09-07T02:29:52.722Z",
   "sourceRoots": [
     "src"
   ],
@@ -11,9 +11,9 @@
     "report": "complexity-report.md"
   },
   "summary": {
-    "totalFiles": 65,
+    "totalFiles": 66,
     "healthScore": 74,
-    "scannedCount": 65,
+    "scannedCount": 66,
     "skippedCount": 0,
     "architecture": {
       "namespaces": [
@@ -26,7 +26,7 @@
         },
         {
           "folder": "src/cli",
-          "moduleCount": 17,
+          "moduleCount": 18,
           "afferentCoupling": 0,
           "efferentCoupling": 3,
           "instability": 1
@@ -62,7 +62,7 @@
         {
           "folder": "src/schema",
           "moduleCount": 3,
-          "afferentCoupling": 10,
+          "afferentCoupling": 11,
           "efferentCoupling": 0,
           "instability": 0
         }
