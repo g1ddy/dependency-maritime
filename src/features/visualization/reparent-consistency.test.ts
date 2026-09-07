@@ -11,7 +11,7 @@ const mockData: ICruiseResult = {
     ignore: 0,
     totalCruised: 1,
     totalDependenciesCruised: 0,
-    optionsUsed: {}
+    optionsUsed: {},
   },
   modules: [
     {

@@ -71,7 +71,7 @@ export function DependencyGraph() {
 
   useEffect(() => {
     // Load graph data on mount
-    const parsedData = CruiseResultSchema.parse(graphData) as ICruiseResult;
+    const parsedData = CruiseResultSchema.parse(graphData) as unknown as ICruiseResult;
     // Validate metrics data at runtime for robustness
     const parsedMetrics = ComplexityMetricsMapSchema.parse(complexityMetrics);
     setGraphData(parsedData, parsedMetrics);

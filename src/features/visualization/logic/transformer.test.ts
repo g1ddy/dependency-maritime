@@ -19,7 +19,7 @@ describe('Graph Transformer Logic', () => {
     }
     const fileContent = fs.readFileSync(sampleDataPath, 'utf-8');
     const json: unknown = JSON.parse(fileContent);
-    sampleData = CruiseResultSchema.parse(json) as ICruiseResult;
+    sampleData = CruiseResultSchema.parse(json) as unknown as ICruiseResult;
   });
 
   it('should create a Graphology graph from cruise result', () => {

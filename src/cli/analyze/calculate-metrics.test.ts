@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateMetrics, calculateInstability, calculateScore, calculateHealthScore } from './calculate-metrics';
+import { calculateMetrics, calculateInstability, calculateScore, calculateHealthScore, calculateNamespaceMetrics } from './calculate-metrics';
 import type { FileMetric, AnalysisThresholds, DependencyCruiserModule } from './models';
 
 describe('calculate-metrics', () => {
@@ -66,6 +66,38 @@ describe('calculate-metrics', () => {
         });
     });
 
+    describe('calculateNamespaceMetrics', () => {
+        it('should calculate folder coupling and instability correctly', () => {
+            const mods: DependencyCruiserModule[] = [
+                {
+                    source: 'src/features/a.ts',
+                    dependencies: [{ resolved: 'src/components/b.ts' } as any],
+                    dependents: []
+                },
+                {
+                    source: 'src/components/b.ts',
+                    dependencies: [],
+                    dependents: ['src/features/a.ts']
+                }
+            ];
+
+            const ns = calculateNamespaceMetrics(mods);
+            expect(ns).toHaveLength(2);
+
+            const components = ns.find(n => n.folder === 'src/components');
+            expect(components?.moduleCount).toBe(1);
+            expect(components?.afferentCoupling).toBe(1); // src/features/a.ts depends on it
+            expect(components?.efferentCoupling).toBe(0);
+            expect(components?.instability).toBe(0);
+
+            const features = ns.find(n => n.folder === 'src/features');
+            expect(features?.moduleCount).toBe(1);
+            expect(features?.afferentCoupling).toBe(0);
+            expect(features?.efferentCoupling).toBe(1); // depends on src/components/b.ts
+            expect(features?.instability).toBe(1);
+        });
+    });
+
     describe('calculateMetrics', () => {
         const thresholds: AnalysisThresholds = {
             loc: 300,
@@ -75,7 +107,7 @@ describe('calculate-metrics', () => {
 
         const modules: DependencyCruiserModule[] = [
             { source: 'src/a.ts', dependencies: [], dependents: [] },
-            { source: 'src/b.ts', dependencies: [{}], dependents: [] },
+            { source: 'src/b.ts', dependencies: [{ resolved: 'src/a.ts' }], dependents: [] },
             { source: 'src/a.test.ts', dependencies: [], dependents: [] },
             { source: 'src/types.d.ts', dependencies: [], dependents: [] },
             { source: 'src/styles.css', dependencies: [], dependents: [] },

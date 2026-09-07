@@ -63,6 +63,8 @@ export async function resolveDepcruiseConfig(
     }
 
     const conventionalFiles = [
+        '.dependency-cruiser.ts',
+        '.dependency-cruiser.cts',
         '.dependency-cruiser.cjs',
         '.dependency-cruiser.js',
         '.dependency-cruiser.mjs',

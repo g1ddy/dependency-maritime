@@ -8,11 +8,28 @@ export const ArtifactManifestArtifactsSchema = z.object({
   report: z.string().min(1),
 });
 
+export const ArchitectureDebtSummarySchema = z.object({
+  baselineCount: z.number().int().nonnegative(),
+  existingDebtCount: z.number().int().nonnegative(),
+  newViolationCount: z.number().int().nonnegative(),
+  resolvedCount: z.number().int().nonnegative(),
+});
+
+export const ChangeImpactSummarySchema = z.object({
+  baseRevision: z.string().nullable(),
+  directlyChangedCount: z.number().int().nonnegative(),
+  transitiveImpactCount: z.number().int().nonnegative(),
+  affectedFolderCount: z.number().int().nonnegative(),
+  impactRatio: z.number(),
+});
+
 export const ArtifactManifestSummarySchema = z.object({
   totalFiles: z.number().int().nonnegative(),
   healthScore: z.number(),
   scannedCount: z.number().int().nonnegative(),
   skippedCount: z.number().int().nonnegative(),
+  architectureDebt: ArchitectureDebtSummarySchema.optional(),
+  changeImpact: ChangeImpactSummarySchema.optional(),
 });
 
 export const ArtifactManifestSchema = z.object({

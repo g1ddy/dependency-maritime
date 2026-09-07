@@ -8,12 +8,14 @@ import {
     writeOutputFiles,
     getToolVersion
 } from '../analyze/adapters';
-import { calculateMetrics, isSupportedTypeScriptFile } from '../analyze/calculate-metrics';
+import { calculateMetrics, calculateNamespaceMetrics, isSupportedTypeScriptFile } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
 import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import { validateEslintEnvironment } from '../analyze/environment';
 import { ValidationError, type AnalysisThresholds, type DependencyCruiserModule } from '../analyze/models';
 import { MANIFEST_SCHEMA_VERSION, type ArtifactManifest } from '../../schema/manifest';
+import { readBaselineFile, evaluateArchitectureDebt, type ViolationInput } from '../analyze/architecture-debt';
+import { calculateChangeImpact, type ImpactAnalysisResult } from '../analyze/impact';
 import * as path from 'path';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
@@ -32,6 +34,9 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
         'depcruise-config'?: string;
         cwd?: string;
         'fail-on-unmeasured'?: boolean;
+        baseline?: string;
+        'fail-on-new-violations'?: boolean;
+        base?: string;
         help?: boolean;
     };
 
@@ -48,6 +53,9 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
                 'depcruise-config': { type: 'string' },
                 cwd: { type: 'string' },
                 'fail-on-unmeasured': { type: 'boolean', default: false },
+                baseline: { type: 'string' },
+                'fail-on-new-violations': { type: 'boolean', default: false },
+                base: { type: 'string' },
                 help: { type: 'boolean', short: 'h' }
             }
         });
@@ -135,10 +143,11 @@ Exit Codes:
             ? path.resolve(workingDir, values.output)
             : path.dirname(path.resolve(workingDir, targetMetricsPath));
 
-        // 2. Read or generate graph
+        // 2. Read or generate graph & Extract violations
         let modules: DependencyCruiserModule[];
         const isGraphSupplied = values.graph !== undefined;
         let effectiveGraphPath: string;
+        let cruiseSummaryViolations: ViolationInput[] = [];
 
         if (isGraphSupplied) {
             console.log('   - Reading Supplied Dependency Cruiser JSON...');
@@ -171,6 +180,11 @@ Exit Codes:
             console.log(`   - Dependency-Cruiser Config Source: ${genResult.configSource}`);
             modules = genResult.modules;
 
+            const cruiseRes = genResult.cruiseResult as { summary?: { violations?: ViolationInput[] } };
+            if (cruiseRes.summary && Array.isArray(cruiseRes.summary.violations)) {
+                cruiseSummaryViolations = cruiseRes.summary.violations;
+            }
+
             // Write the generated graph to targetGraphPath
             effectiveGraphPath = path.resolve(workingDir, targetGraphPath);
             await fsPromises.mkdir(path.dirname(effectiveGraphPath), { recursive: true });
@@ -196,7 +210,33 @@ Exit Codes:
         console.log('   - Counting Lines of Code...');
         const locMap = await countLinesOfCode(sourceFiles, workingDir);
 
-        // 5. Calculate metrics
+        // 5. Architecture Debt Evaluation
+        let debtEvaluation;
+        if (values.baseline) {
+            console.log(`   - Evaluating Architecture Debt against baseline: ${values.baseline}`);
+            const baselineData = await readBaselineFile(values.baseline, workingDir);
+            debtEvaluation = evaluateArchitectureDebt(cruiseSummaryViolations, baselineData);
+        } else if (cruiseSummaryViolations.length > 0) {
+            debtEvaluation = evaluateArchitectureDebt(cruiseSummaryViolations);
+        }
+
+        if (debtEvaluation && values['fail-on-new-violations'] && debtEvaluation.newViolationCount > 0) {
+            throw new ValidationError(
+                `Analysis failed because ${debtEvaluation.newViolationCount} new architecture violation(s) were introduced (--fail-on-new-violations).`
+            );
+        }
+
+        // 6. PR / Change Impact Evaluation
+        let impactEvaluation: ImpactAnalysisResult | undefined;
+        if (values.base) {
+            console.log(`   - Evaluating PR Change Impact relative to base revision: ${values.base}`);
+            impactEvaluation = calculateChangeImpact(modules, {
+                baseRevision: values.base,
+                cwd: workingDir
+            });
+        }
+
+        // 7. Calculate metrics
         console.log('   - Aggregating Metrics...');
         const analysisResult = calculateMetrics(
             modules,
@@ -205,6 +245,8 @@ Exit Codes:
             DEFAULT_THRESHOLDS,
             normalizedSources
         );
+
+        const namespaceMetrics = calculateNamespaceMetrics(modules);
 
         console.log(`   - Skipped / Unmeasured Source Files: ${analysisResult.skippedCount}`);
 
@@ -234,7 +276,25 @@ Exit Codes:
             return acc;
         }, {} as Record<string, unknown>);
 
-        const reportContent = renderMarkdownReport(analysisResult, DEFAULT_THRESHOLDS);
+        const reportContent = renderMarkdownReport(
+            analysisResult,
+            DEFAULT_THRESHOLDS,
+            new Date(),
+            debtEvaluation ? {
+                baselineCount: debtEvaluation.baselineCount,
+                existingDebtCount: debtEvaluation.existingDebtCount,
+                newViolationCount: debtEvaluation.newViolationCount,
+                resolvedCount: debtEvaluation.resolvedCount
+            } : undefined,
+            impactEvaluation ? {
+                baseRevision: impactEvaluation.baseRevision,
+                directlyChangedCount: impactEvaluation.directlyChangedFiles.length,
+                transitiveImpactCount: impactEvaluation.transitivelyAffectedFiles.length,
+                affectedFolderCount: impactEvaluation.affectedFolders.length,
+                impactRatio: impactEvaluation.impactRatio
+            } : undefined,
+            namespaceMetrics
+        );
 
         const targetManifestPath = path.relative(workingDir, path.join(manifestDir, 'manifest.json')).replace(/\\/g, '/');
 
@@ -263,7 +323,24 @@ Exit Codes:
                 totalFiles: analysisResult.files.length,
                 healthScore: analysisResult.healthScore,
                 scannedCount: analysisResult.files.filter(f => f.scanned).length,
-                skippedCount: analysisResult.skippedCount
+                skippedCount: analysisResult.skippedCount,
+                ...(debtEvaluation ? {
+                    architectureDebt: {
+                        baselineCount: debtEvaluation.baselineCount,
+                        existingDebtCount: debtEvaluation.existingDebtCount,
+                        newViolationCount: debtEvaluation.newViolationCount,
+                        resolvedCount: debtEvaluation.resolvedCount
+                    }
+                } : {}),
+                ...(impactEvaluation ? {
+                    changeImpact: {
+                        baseRevision: impactEvaluation.baseRevision,
+                        directlyChangedCount: impactEvaluation.directlyChangedFiles.length,
+                        transitiveImpactCount: impactEvaluation.transitivelyAffectedFiles.length,
+                        affectedFolderCount: impactEvaluation.affectedFolders.length,
+                        impactRatio: impactEvaluation.impactRatio
+                    }
+                } : {})
             }
         };
 

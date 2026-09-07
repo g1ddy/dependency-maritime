@@ -37,6 +37,70 @@ export function calculateHealthScore(files: FileMetric[], thresholds: AnalysisTh
     return Math.max(0, Math.min(100, score));
 }
 
+export interface NamespaceMetric {
+    folder: string;
+    moduleCount: number;
+    afferentCoupling: number;
+    efferentCoupling: number;
+    instability: number;
+}
+
+export function calculateNamespaceMetrics(modules: DependencyCruiserModule[]): NamespaceMetric[] {
+    const folderModulesMap = new Map<string, Set<string>>();
+    const moduleToFolderMap = new Map<string, string>();
+
+    for (const m of modules) {
+        if (m.source.startsWith('node_modules/') || m.source.startsWith('node:')) {
+            continue;
+        }
+        const parts = m.source.split('/');
+        const folder = parts.length > 1 ? parts.slice(0, 2).join('/') : parts[0];
+        if (!folderModulesMap.has(folder)) {
+            folderModulesMap.set(folder, new Set());
+        }
+        folderModulesMap.get(folder)!.add(m.source);
+        moduleToFolderMap.set(m.source, folder);
+    }
+
+    const folderAfferentMap = new Map<string, Set<string>>();
+    const folderEfferentMap = new Map<string, Set<string>>();
+
+    for (const folder of folderModulesMap.keys()) {
+        folderAfferentMap.set(folder, new Set());
+        folderEfferentMap.set(folder, new Set());
+    }
+
+    for (const m of modules) {
+        const sourceFolder = moduleToFolderMap.get(m.source);
+        if (!sourceFolder) continue;
+
+        for (const dep of m.dependencies) {
+            const targetFolder = moduleToFolderMap.get(dep.resolved);
+            if (targetFolder && targetFolder !== sourceFolder) {
+                folderEfferentMap.get(sourceFolder)?.add(dep.resolved);
+                folderAfferentMap.get(targetFolder)?.add(m.source);
+            }
+        }
+    }
+
+    const result: NamespaceMetric[] = [];
+    for (const [folder, modSet] of folderModulesMap.entries()) {
+        const ca = folderAfferentMap.get(folder)?.size || 0;
+        const ce = folderEfferentMap.get(folder)?.size || 0;
+        const instability = (ca + ce === 0) ? 0 : parseFloat((ce / (ca + ce)).toFixed(3));
+
+        result.push({
+            folder,
+            moduleCount: modSet.size,
+            afferentCoupling: ca,
+            efferentCoupling: ce,
+            instability
+        });
+    }
+
+    return result.sort((a, b) => a.folder.localeCompare(b.folder));
+}
+
 export function calculateMetrics(
     modules: DependencyCruiserModule[],
     locMap: Record<string, number>,

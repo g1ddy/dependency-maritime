@@ -54,7 +54,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       // Cast the result of Zod parsing to ICruiseResult to satisfy TypeScript.
       // We've marked optional fields in Zod to ensure validation passes,
       // even if the output is missing some of the 'required' fields in the official interface.
-      const result = CruiseResultSchema.parse(data) as ICruiseResult;
+      const result = CruiseResultSchema.parse(data) as unknown as ICruiseResult;
 
       const complexityError = validateComplexity(result);
       if (complexityError) {
