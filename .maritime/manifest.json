@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "toolVersion": "0.1.0-beta.5",
-  "generatedAt": "2026-09-07T02:29:52.722Z",
+  "generatedAt": "2026-09-06T19:06:34.105Z",
   "sourceRoots": [
     "src"
   ],
@@ -11,62 +11,9 @@
     "report": "complexity-report.md"
   },
   "summary": {
-    "totalFiles": 66,
-    "healthScore": 74,
-    "scannedCount": 66,
-    "skippedCount": 0,
-    "architecture": {
-      "namespaces": [
-        {
-          "folder": "src",
-          "moduleCount": 4,
-          "afferentCoupling": 0,
-          "efferentCoupling": 11,
-          "instability": 1
-        },
-        {
-          "folder": "src/cli",
-          "moduleCount": 18,
-          "afferentCoupling": 0,
-          "efferentCoupling": 3,
-          "instability": 1
-        },
-        {
-          "folder": "src/components",
-          "moduleCount": 17,
-          "afferentCoupling": 8,
-          "efferentCoupling": 1,
-          "instability": 0.111
-        },
-        {
-          "folder": "src/features/relationships",
-          "moduleCount": 6,
-          "afferentCoupling": 1,
-          "efferentCoupling": 2,
-          "instability": 0.667
-        },
-        {
-          "folder": "src/features/visualization",
-          "moduleCount": 19,
-          "afferentCoupling": 1,
-          "efferentCoupling": 13,
-          "instability": 0.929
-        },
-        {
-          "folder": "src/lib",
-          "moduleCount": 1,
-          "afferentCoupling": 16,
-          "efferentCoupling": 0,
-          "instability": 0
-        },
-        {
-          "folder": "src/schema",
-          "moduleCount": 3,
-          "afferentCoupling": 11,
-          "efferentCoupling": 0,
-          "instability": 0
-        }
-      ]
-    }
+    "totalFiles": 63,
+    "healthScore": 78,
+    "scannedCount": 63,
+    "skippedCount": 0
   }
 }
