@@ -1,10 +1,10 @@
 
 import { describe, it, expect } from 'vitest';
 import { createGraphFromCruiseResult, transformToReactFlow } from './transformer';
-import type { ICruiseResult } from '../../../schema/dependency-cruiser';
+import { normalizeMaritimeGraph } from '../../../schema/dependency-cruiser';
 
 describe('Type Definition Hiding Logic', () => {
-  const mockData: ICruiseResult = {
+  const rawData = {
     modules: [
       {
         source: 'src/A.ts',
@@ -99,7 +99,7 @@ describe('Type Definition Hiding Logic', () => {
   };
 
   it('removes type-only edges (including pre-compilation-only) when hideTypeDefinitions is true', () => {
-    const graph = createGraphFromCruiseResult(mockData);
+    const graph = createGraphFromCruiseResult(normalizeMaritimeGraph(rawData));
     const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: true });
 
     // Lookup node IDs
@@ -133,7 +133,7 @@ describe('Type Definition Hiding Logic', () => {
   });
 
   it('keeps type-only edges when hideTypeDefinitions is false', () => {
-    const graph = createGraphFromCruiseResult(mockData);
+    const graph = createGraphFromCruiseResult(normalizeMaritimeGraph(rawData));
     const { nodes, edges } = transformToReactFlow(graph, { hideTypeDefinitions: false });
 
     // Lookup node IDs

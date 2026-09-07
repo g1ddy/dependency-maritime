@@ -1,10 +1,33 @@
 import type { AnalysisResult, AnalysisThresholds, FileMetric } from './models';
+import type { NamespaceMetric } from './calculate-metrics';
 
 function escapeMarkdown(text: string): string {
     return text.replace(/_/g, '\\_').replace(/\*/g, '\\*');
 }
 
-export function renderMarkdownReport(result: AnalysisResult, thresholds: AnalysisThresholds, date: Date = new Date()): string {
+export interface DebtReportData {
+    baselineCount: number;
+    existingDebtCount: number;
+    newViolationCount: number;
+    resolvedCount: number;
+}
+
+export interface ImpactReportData {
+    baseRevision: string | null;
+    directlyChangedCount: number;
+    transitiveImpactCount: number;
+    affectedFolderCount: number;
+    impactRatio: number;
+}
+
+export function renderMarkdownReport(
+    result: AnalysisResult,
+    thresholds: AnalysisThresholds,
+    date: Date = new Date(),
+    debtData?: DebtReportData,
+    impactData?: ImpactReportData,
+    namespaces?: NamespaceMetric[]
+): string {
     const dateString = date.toISOString().split('T')[0];
 
     const healthScoreFormatted = result.healthScore.toFixed(1);
@@ -26,8 +49,46 @@ export function renderMarkdownReport(result: AnalysisResult, thresholds: Analysi
         skippedSection = `\n\n### ⚠️ Skipped / Unmeasured Files (${unmeasuredFilesCount})\n${fileList}`;
     }
 
+    let debtSection = '';
+    if (debtData) {
+        debtSection = `
+### 🏛️ Architecture Debt Summary
+* **Baseline Violations**: ${debtData.baselineCount}
+* **Existing Debt**: ${debtData.existingDebtCount}
+* **New Violations**: ${debtData.newViolationCount}
+* **Resolved Violations**: ${debtData.resolvedCount}
+`;
+    }
+
+    let impactSection = '';
+    if (impactData) {
+        impactSection = `
+### 🎯 PR / Change Impact Surface
+* **Base Revision**: \`${impactData.baseRevision || 'N/A'}\`
+* **Directly Changed Files**: ${impactData.directlyChangedCount}
+* **Transitively Affected Files**: ${impactData.transitiveImpactCount}
+* **Impacted Architectural Folders**: ${impactData.affectedFolderCount}
+* **Repository Impact Surface**: ${(impactData.impactRatio * 100).toFixed(1)}%
+`;
+    }
+
+    let namespaceSection = '';
+    if (namespaces && namespaces.length > 0) {
+        const rows = namespaces.map(ns =>
+            `| \`${escapeMarkdown(ns.folder)}\` | ${ns.moduleCount} | ${ns.afferentCoupling} ($C_a$) | ${ns.efferentCoupling} ($C_e$) | **${ns.instability}** |`
+        ).join('\n');
+
+        namespaceSection = `
+### 📐 Architectural Folder Coupling & Instability Metrics
+| Folder / Namespace | Modules | Afferent ($C_a$) | Efferent ($C_e$) | Instability ($I$) |
+| :--- | :--- | :--- | :--- | :--- |
+${rows}
+`;
+    }
+
     return `
 ## 🚨 Automated Complexity Report
+${debtSection}${impactSection}${namespaceSection}
 
 **Last Updated:** ${dateString}
 

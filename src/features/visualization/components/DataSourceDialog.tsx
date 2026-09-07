@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FileJson, Database } from 'lucide-react';
-import { CruiseResultSchema, type ICruiseResult } from '@/schema/dependency-cruiser';
+import { normalizeMaritimeGraph, type MaritimeCruiseResult } from '@/schema/dependency-cruiser';
 import { ComplexityMetricsMapSchema } from '@/schema/complexity-metrics';
 import { ZodError } from 'zod';
 import { type ComplexityMetricsMap } from '../types';
@@ -13,7 +13,7 @@ import projectData from '../../../../.maritime/dependency-graph.json';
 interface DataSourceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDataLoaded: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
+  onDataLoaded: (data: MaritimeCruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
 }
 
 export const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
@@ -31,7 +31,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
     }
   }, [open]);
 
-  const validateComplexity = (result: ICruiseResult): string | null => {
+  const validateComplexity = (result: MaritimeCruiseResult): string | null => {
     if (result.modules.length > MAX_MODULES) {
       return `The graph contains ${result.modules.length} modules, exceeding the limit of ${MAX_MODULES}. Large graphs can cause browser performance issues.`;
     }
@@ -54,7 +54,7 @@ export function DataSourceDialog({ open, onOpenChange, onDataLoaded }: DataSourc
       // Cast the result of Zod parsing to ICruiseResult to satisfy TypeScript.
       // We've marked optional fields in Zod to ensure validation passes,
       // even if the output is missing some of the 'required' fields in the official interface.
-      const result = CruiseResultSchema.parse(data) as ICruiseResult;
+      const result = normalizeMaritimeGraph(data);
 
       const complexityError = validateComplexity(result);
       if (complexityError) {

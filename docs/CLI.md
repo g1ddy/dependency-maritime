@@ -43,6 +43,19 @@ Increment 3 therefore promotes graph generation into the normal analyzer workflo
 maritime analyze --source app --output .maritime
 ```
 
+### Architecture Debt & PR Impact Flags
+
+```bash
+# Evaluate architecture debt against a known baseline and fail if new violations exist
+maritime analyze --source src --output .maritime --baseline .maritime/baseline.json --fail-on-new-violations
+
+# Establish or record a new baseline of architecture violations
+maritime analyze --source src --output .maritime --write-baseline .maritime/baseline.json
+
+# Calculate PR change impact surface relative to Git base revision
+maritime analyze --source src --output .maritime --base origin/main
+```
+
 which produces the dependency graph, metrics, and report itself. Graph generation must support repository-supplied dependency-cruiser configuration without assuming Dependency Maritime's own `src/`, `tsconfig.app.json`, or architectural rules.
 
 The package should also expose side-effect-free programmatic APIs such as:
@@ -111,7 +124,31 @@ A versioned envelope containing schema version, tool version, source roots, gene
     "totalFiles": 42,
     "healthScore": 95.5,
     "scannedCount": 42,
-    "skippedCount": 0
+    "skippedCount": 0,
+    "architectureDebt": {
+      "baselineCount": 5,
+      "existingDebtCount": 5,
+      "newViolationCount": 0,
+      "resolvedCount": 0
+    },
+    "changeImpact": {
+      "baseRevision": "origin/main",
+      "directlyChangedCount": 3,
+      "transitiveImpactCount": 12,
+      "affectedFolderCount": 4,
+      "impactRatio": 0.2857
+    },
+    "architecture": {
+      "namespaces": [
+        {
+          "folder": "src/features/visualization",
+          "moduleCount": 12,
+          "afferentCoupling": 4,
+          "efferentCoupling": 6,
+          "instability": 0.6
+        }
+      ]
+    }
   }
 }
 ```

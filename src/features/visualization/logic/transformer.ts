@@ -1,6 +1,6 @@
 import Graph from 'graphology';
 import { type Node, type Edge } from '@xyflow/react';
-import { type ICruiseResult, type IModule, type IDependency } from '../../../schema/dependency-cruiser';
+import { type MaritimeCruiseResult, type MaritimeModule, type MaritimeDependency } from '../../../schema/dependency-cruiser';
 import { classifyNode, type ModuleCategory } from './filters';
 import { generateUUID } from './uuid';
 
@@ -8,12 +8,12 @@ import { generateUUID } from './uuid';
  * Converts the dependency-cruiser output into a Graphology graph.
  * This acts as the "Headless" logic layer.
  */
-export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
+export function createGraphFromCruiseResult(data: MaritimeCruiseResult): Graph {
   const graph = new Graph({ type: 'directed', allowSelfLoops: true, multi: false });
   const pathMap = new Map<string, string>(); // Maps original file path -> Node GUID
 
   // 1. Add all nodes
-  data.modules.forEach((mod: IModule) => {
+  data.modules.forEach((mod: MaritimeModule) => {
     // We use a GUID as the unique ID for file nodes
     if (!pathMap.has(mod.source)) {
       const guid = generateUUID();
@@ -28,8 +28,8 @@ export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
   });
 
   // 2. Add all edges
-  data.modules.forEach((mod: IModule) => {
-    mod.dependencies.forEach((dep: IDependency) => {
+  data.modules.forEach((mod: MaritimeModule) => {
+    mod.dependencies.forEach((dep: MaritimeDependency) => {
       // Ensure the target node exists
       const sourceId = pathMap.get(mod.source);
       let targetId = pathMap.get(dep.resolved);

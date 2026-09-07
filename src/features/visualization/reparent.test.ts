@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGraphStore } from './store';
-import { type ICruiseResult } from '../../schema/dependency-cruiser';
+import { normalizeMaritimeGraph } from '../../schema/dependency-cruiser';
 
 // Inline mock data to ensure deterministic tests
-const mockData: ICruiseResult = {
+const rawData = {
   summary: {
     violations: [],
     error: 0,
@@ -12,7 +12,7 @@ const mockData: ICruiseResult = {
     ignore: 0,
     totalCruised: 3,
     totalDependenciesCruised: 0,
-    optionsUsed: {}
+    optionsUsed: {},
   },
   modules: [
     {
@@ -39,7 +39,7 @@ const mockData: ICruiseResult = {
 describe('Reparenting Logic', () => {
   beforeEach(() => {
     useGraphStore.getState().reset();
-    useGraphStore.getState().setGraphData(mockData);
+    useGraphStore.getState().setGraphData(normalizeMaritimeGraph(rawData));
   });
 
   it('should update fullPath correctly when moving node to a new folder', () => {
