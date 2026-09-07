@@ -23,6 +23,18 @@ export const ChangeImpactSummarySchema = z.object({
   impactRatio: z.number(),
 });
 
+export const NamespaceMetricSchema = z.object({
+  folder: z.string(),
+  moduleCount: z.number().int().nonnegative(),
+  afferentCoupling: z.number().int().nonnegative(),
+  efferentCoupling: z.number().int().nonnegative(),
+  instability: z.number(),
+});
+
+export const ArchitectureSummarySchema = z.object({
+  namespaces: z.array(NamespaceMetricSchema).optional(),
+});
+
 export const ArtifactManifestSummarySchema = z.object({
   totalFiles: z.number().int().nonnegative(),
   healthScore: z.number(),
@@ -30,6 +42,7 @@ export const ArtifactManifestSummarySchema = z.object({
   skippedCount: z.number().int().nonnegative(),
   architectureDebt: ArchitectureDebtSummarySchema.optional(),
   changeImpact: ChangeImpactSummarySchema.optional(),
+  architecture: ArchitectureSummarySchema.optional(),
 });
 
 export const ArtifactManifestSchema = z.object({

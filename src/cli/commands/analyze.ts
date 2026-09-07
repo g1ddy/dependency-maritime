@@ -14,7 +14,7 @@ import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import { validateEslintEnvironment } from '../analyze/environment';
 import { ValidationError, type AnalysisThresholds, type DependencyCruiserModule } from '../analyze/models';
 import { MANIFEST_SCHEMA_VERSION, type ArtifactManifest } from '../../schema/manifest';
-import { readBaselineFile, evaluateArchitectureDebt, type ViolationInput } from '../analyze/architecture-debt';
+import { readBaselineFile, writeBaselineFile, evaluateArchitectureDebt, type ViolationInput } from '../analyze/architecture-debt';
 import { calculateChangeImpact, type ImpactAnalysisResult } from '../analyze/impact';
 import * as path from 'path';
 
@@ -35,6 +35,7 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
         cwd?: string;
         'fail-on-unmeasured'?: boolean;
         baseline?: string;
+        'write-baseline'?: string;
         'fail-on-new-violations'?: boolean;
         base?: string;
         help?: boolean;
@@ -54,6 +55,7 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
                 cwd: { type: 'string' },
                 'fail-on-unmeasured': { type: 'boolean', default: false },
                 baseline: { type: 'string' },
+                'write-baseline': { type: 'string' },
                 'fail-on-new-violations': { type: 'boolean', default: false },
                 base: { type: 'string' },
                 help: { type: 'boolean', short: 'h' }
@@ -71,21 +73,28 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
 Usage: maritime analyze [options]
 
 Options:
-  --output <dir>            Output directory for all generated artifacts (e.g. .maritime)
-  --source <dir>            Source directory/directories to analyze (repeatable or comma-separated, default: "src")
-  --graph <file>            Dependency graph JSON file path (input if file exists; output if generated)
-  --metrics <file>          Output JSON file for complexity metrics
-  --report <file>           Output Markdown file for complexity report
-  --depcruise-config <file> Optional path to repository dependency-cruiser configuration
-  --cwd <dir>               Working directory root for resolution
-  --fail-on-unmeasured      Fail if any graph source file is skipped/unmeasured by ESLint
+  --output <dir>               Output directory for all generated artifacts (e.g. .maritime)
+  --source <dir>               Source directory/directories to analyze (repeatable or comma-separated, default: "src")
+  --graph <file>               Dependency graph JSON file path (input if file exists; output if generated)
+  --metrics <file>             Output JSON file for complexity metrics
+  --report <file>              Output Markdown file for complexity report
+  --depcruise-config <file>    Optional path to repository dependency-cruiser configuration
+  --cwd <dir>                  Working directory root for resolution
+  --fail-on-unmeasured         Fail if any graph source file is skipped/unmeasured by ESLint
+  --baseline <file>            Path to existing architecture debt baseline JSON
+  --write-baseline <file>      Write current architecture violations as a new baseline JSON file
+  --fail-on-new-violations     Fail analysis if new architecture violations are introduced relative to baseline
+  --base <revision>            Calculate PR change impact surface relative to Git base revision (e.g. main)
 
 Examples:
   # Concise generated-graph workflow:
   maritime analyze --source app --output .maritime
 
-  # Explicit pre-generated graph workflow:
-  maritime analyze --source app --graph artifacts/dependency-graph.json --metrics metrics.json --report report.md
+  # Architecture debt baseline enforcement:
+  maritime analyze --source app --output .maritime --baseline .maritime/architecture-baseline.json --fail-on-new-violations
+
+  # PR Change impact analysis:
+  maritime analyze --source app --output .maritime --base origin/main
 
 Exit Codes:
   0 - Successful analysis
@@ -151,7 +160,9 @@ Exit Codes:
 
         if (isGraphSupplied) {
             console.log('   - Reading Supplied Dependency Cruiser JSON...');
-            modules = await readDependencyGraph(values.graph!, workingDir);
+            const readRes = await readDependencyGraph(values.graph!, workingDir);
+            modules = readRes.modules;
+            cruiseSummaryViolations = readRes.graph.summary.violations;
 
             const absGraphPath = path.resolve(workingDir, values.graph!);
             const relGraphToManifest = path.relative(manifestDir, absGraphPath);
@@ -210,7 +221,12 @@ Exit Codes:
         console.log('   - Counting Lines of Code...');
         const locMap = await countLinesOfCode(sourceFiles, workingDir);
 
-        // 5. Architecture Debt Evaluation
+        // 5. Architecture Debt Evaluation & Baseline Writing
+        if (values['write-baseline']) {
+            console.log(`   - Writing Architecture Debt baseline to: ${values['write-baseline']}`);
+            await writeBaselineFile(values['write-baseline'], cruiseSummaryViolations, workingDir);
+        }
+
         let debtEvaluation;
         if (values.baseline) {
             console.log(`   - Evaluating Architecture Debt against baseline: ${values.baseline}`);
@@ -340,7 +356,10 @@ Exit Codes:
                         affectedFolderCount: impactEvaluation.affectedFolders.length,
                         impactRatio: impactEvaluation.impactRatio
                     }
-                } : {})
+                } : {}),
+                architecture: {
+                    namespaces: namespaceMetrics
+                }
             }
         };
 

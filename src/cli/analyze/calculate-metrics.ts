@@ -45,6 +45,22 @@ export interface NamespaceMetric {
     instability: number;
 }
 
+export function resolveNamespace(filePath: string): string {
+    const parts = filePath.split('/');
+    if (parts.length <= 1) {
+        return parts[0];
+    }
+    // E.g. "src/App.tsx" -> "src"
+    if (parts.length === 2) {
+        return parts[0];
+    }
+    // E.g. "src/features/visualization/store.ts" -> "src/features/visualization"
+    if (parts[0] === 'src' && parts[1] === 'features' && parts.length >= 3) {
+        return `src/features/${parts[2]}`;
+    }
+    return `${parts[0]}/${parts[1]}`;
+}
+
 export function calculateNamespaceMetrics(modules: DependencyCruiserModule[]): NamespaceMetric[] {
     const folderModulesMap = new Map<string, Set<string>>();
     const moduleToFolderMap = new Map<string, string>();
@@ -53,8 +69,7 @@ export function calculateNamespaceMetrics(modules: DependencyCruiserModule[]): N
         if (m.source.startsWith('node_modules/') || m.source.startsWith('node:')) {
             continue;
         }
-        const parts = m.source.split('/');
-        const folder = parts.length > 1 ? parts.slice(0, 2).join('/') : parts[0];
+        const folder = resolveNamespace(m.source);
         if (!folderModulesMap.has(folder)) {
             folderModulesMap.set(folder, new Set());
         }

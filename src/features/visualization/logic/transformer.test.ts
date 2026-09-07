@@ -3,13 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createGraphFromCruiseResult, transformToReactFlow } from './transformer';
-import { CruiseResultSchema, type ICruiseResult } from '../../../schema/dependency-cruiser';
+import { normalizeMaritimeGraph, type MaritimeCruiseResult } from '../../../schema/dependency-cruiser';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe('Graph Transformer Logic', () => {
-  let sampleData: ICruiseResult;
+  let sampleData: MaritimeCruiseResult;
 
   beforeAll(() => {
     // Load sample data
@@ -19,7 +19,7 @@ describe('Graph Transformer Logic', () => {
     }
     const fileContent = fs.readFileSync(sampleDataPath, 'utf-8');
     const json: unknown = JSON.parse(fileContent);
-    sampleData = CruiseResultSchema.parse(json) as unknown as ICruiseResult;
+    sampleData = normalizeMaritimeGraph(json);
   });
 
   it('should create a Graphology graph from cruise result', () => {

@@ -70,14 +70,14 @@ describe('calculate-metrics', () => {
         it('should calculate folder coupling and instability correctly', () => {
             const mods: DependencyCruiserModule[] = [
                 {
-                    source: 'src/features/a.ts',
+                    source: 'src/features/visualization/a.ts',
                     dependencies: [{ resolved: 'src/components/b.ts' }],
                     dependents: []
                 },
                 {
                     source: 'src/components/b.ts',
                     dependencies: [],
-                    dependents: ['src/features/a.ts']
+                    dependents: ['src/features/visualization/a.ts']
                 }
             ];
 
@@ -86,11 +86,11 @@ describe('calculate-metrics', () => {
 
             const components = ns.find(n => n.folder === 'src/components');
             expect(components?.moduleCount).toBe(1);
-            expect(components?.afferentCoupling).toBe(1); // src/features/a.ts depends on it
+            expect(components?.afferentCoupling).toBe(1); // src/features/visualization/a.ts depends on it
             expect(components?.efferentCoupling).toBe(0);
             expect(components?.instability).toBe(0);
 
-            const features = ns.find(n => n.folder === 'src/features');
+            const features = ns.find(n => n.folder === 'src/features/visualization');
             expect(features?.moduleCount).toBe(1);
             expect(features?.afferentCoupling).toBe(0);
             expect(features?.efferentCoupling).toBe(1); // depends on src/components/b.ts

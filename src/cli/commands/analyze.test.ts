@@ -19,9 +19,13 @@ describe('runAnalyzeCommand', () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {});
         vi.spyOn(console, 'error').mockImplementation(() => {});
 
-        vi.spyOn(adapters, 'readDependencyGraph').mockResolvedValue([
-            { source: 'src/a.ts', dependencies: [], dependents: [] }
-        ]);
+        vi.spyOn(adapters, 'readDependencyGraph').mockResolvedValue({
+            graph: {
+                modules: [{ source: 'src/a.ts', valid: true, dependencies: [], dependents: [] }],
+                summary: { error: 0, ignore: 0, info: 0, totalCruised: 1, violations: [], warn: 0, optionsUsed: {} }
+            },
+            modules: [{ source: 'src/a.ts', dependencies: [], dependents: [] }]
+        });
 
         vi.spyOn(adapters, 'runEslintComplexityScan').mockResolvedValue([
             { filePath: `${process.cwd()}/src/a.ts`, messages: [] }

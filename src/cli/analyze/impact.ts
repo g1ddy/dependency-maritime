@@ -1,5 +1,6 @@
-import { execSync } from 'node:child_process';
-import type { DependencyCruiserModule } from './models';
+import { execFileSync } from 'node:child_process';
+import { resolveNamespace } from './calculate-metrics';
+import { ValidationError, type DependencyCruiserModule } from './models';
 
 export interface ImpactAnalysisOptions {
     baseRevision?: string;
@@ -9,6 +10,7 @@ export interface ImpactAnalysisOptions {
 
 export interface ImpactAnalysisResult {
     baseRevision: string | null;
+    gitChangedFiles: string[];
     directlyChangedFiles: string[];
     transitivelyAffectedFiles: string[];
     affectedFolders: string[];
@@ -17,10 +19,11 @@ export interface ImpactAnalysisResult {
 
 export function getGitChangedFiles(baseRevision: string, cwd: string = process.cwd()): string[] {
     try {
-        const output = execSync(`git diff --name-only ${baseRevision}`, { cwd, encoding: 'utf8' });
+        const output = execFileSync('git', ['diff', '--name-only', baseRevision, '--'], { cwd, encoding: 'utf8' });
         return output.split('\n').map(s => s.trim()).filter(Boolean);
-    } catch {
-        return [];
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new ValidationError(`Failed to obtain git diff against base revision "${baseRevision}": ${message}`);
     }
 }
 
@@ -29,22 +32,12 @@ export function calculateChangeImpact(
     options: ImpactAnalysisOptions = {}
 ): ImpactAnalysisResult {
     const cwd = options.cwd || process.cwd();
-    let directlyChanged: string[] = [];
+    let gitChanged: string[] = [];
 
     if (options.changedFiles && options.changedFiles.length > 0) {
-        directlyChanged = options.changedFiles;
+        gitChanged = options.changedFiles;
     } else if (options.baseRevision) {
-        directlyChanged = getGitChangedFiles(options.baseRevision, cwd);
-    }
-
-    if (directlyChanged.length === 0) {
-        return {
-            baseRevision: options.baseRevision || null,
-            directlyChangedFiles: [],
-            transitivelyAffectedFiles: [],
-            affectedFolders: [],
-            impactRatio: 0
-        };
+        gitChanged = getGitChangedFiles(options.baseRevision, cwd);
     }
 
     const moduleMap = new Map<string, DependencyCruiserModule>();
@@ -64,10 +57,10 @@ export function calculateChangeImpact(
     }
 
     // Match directly changed files against modules in the graph
-    const normalizedDirect = directlyChanged.map(f => f.replace(/\\/g, '/'));
+    const normalizedGitChanged = gitChanged.map(f => f.replace(/\\/g, '/'));
     const directlyChangedInGraph = new Set<string>();
 
-    for (const f of normalizedDirect) {
+    for (const f of normalizedGitChanged) {
         if (moduleMap.has(f)) {
             directlyChangedInGraph.add(f);
         }
@@ -92,15 +85,10 @@ export function calculateChangeImpact(
 
     const transitivelyAffected = Array.from(affectedSet).filter(f => !directlyChangedInGraph.has(f));
 
-    // Extract impacted top-level/feature folders
+    // Extract impacted top-level/feature folders using resolveNamespace
     const affectedFoldersSet = new Set<string>();
     for (const f of affectedSet) {
-        const parts = f.split('/');
-        if (parts.length > 1) {
-            affectedFoldersSet.add(parts.slice(0, 2).join('/'));
-        } else {
-            affectedFoldersSet.add(parts[0]);
-        }
+        affectedFoldersSet.add(resolveNamespace(f));
     }
 
     const totalGraphModules = modules.length;
@@ -108,6 +96,7 @@ export function calculateChangeImpact(
 
     return {
         baseRevision: options.baseRevision || null,
+        gitChangedFiles: normalizedGitChanged,
         directlyChangedFiles: Array.from(directlyChangedInGraph),
         transitivelyAffectedFiles: transitivelyAffected,
         affectedFolders: Array.from(affectedFoldersSet).sort(),

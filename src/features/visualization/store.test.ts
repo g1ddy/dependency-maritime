@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useGraphStore } from './store';
 import { calculateGraphMetrics } from './logic/metrics'; // Direct import of the function to mock
-import { type ICruiseResult } from '../../schema/dependency-cruiser';
+import { normalizeMaritimeGraph } from '../../schema/dependency-cruiser';
 import { type NodeChange, type EdgeChange } from '@xyflow/react';
 
 // Mock the metrics logic to allow spying while keeping implementation
@@ -14,7 +14,7 @@ vi.mock('./logic/metrics', async () => {
 });
 
 // Inline mock data
-const mockData = {
+const rawData = {
   summary: {
     violations: [],
     error: 0,
@@ -115,7 +115,7 @@ describe('Visualization Store', () => {
 
   describe('Populated Graph', () => {
     beforeEach(() => {
-      useGraphStore.getState().setGraphData(mockData as unknown as ICruiseResult);
+      useGraphStore.getState().setGraphData(normalizeMaritimeGraph(rawData));
     });
 
     it('should have nodes and edges', () => {
@@ -183,7 +183,7 @@ describe('Visualization Store', () => {
       const version1 = useGraphStore.getState().metricsVersion;
 
       // 2. Trigger another load immediately to simulate race
-      store.setGraphData(mockData as unknown as ICruiseResult);
+      store.setGraphData(normalizeMaritimeGraph(rawData));
       const version2 = useGraphStore.getState().metricsVersion;
 
       expect(version2).toBeGreaterThan(version1);
@@ -337,7 +337,7 @@ describe('Visualization Store', () => {
 
   describe('Simulation Mode', () => {
     beforeEach(() => {
-      useGraphStore.getState().setGraphData(mockData as unknown as ICruiseResult);
+      useGraphStore.getState().setGraphData(normalizeMaritimeGraph(rawData));
     });
 
     it('should initialize simulation state correctly', () => {

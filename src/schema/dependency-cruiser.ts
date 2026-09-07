@@ -107,3 +107,32 @@ export const CruiseResultSchema = z.object({
 export type MaritimeDependency = z.infer<typeof DependencySchema>;
 export type MaritimeModule = z.infer<typeof ModuleSchema>;
 export type MaritimeCruiseResult = z.infer<typeof CruiseResultSchema>;
+
+/**
+ * Normalizes raw dependency-cruiser output to Maritime's canonical graph shape,
+ * stripping machine-dependent environment details.
+ */
+export function normalizeMaritimeGraph(raw: unknown): MaritimeCruiseResult {
+    const validated = CruiseResultSchema.parse(raw);
+    return {
+        modules: validated.modules.map(m => ({
+            source: m.source,
+            valid: m.valid,
+            dependencies: m.dependencies,
+            dependents: m.dependents,
+            coreModule: m.coreModule,
+            couldNotResolve: m.couldNotResolve,
+            orphan: m.orphan
+        })),
+        summary: {
+            error: validated.summary.error,
+            ignore: validated.summary.ignore,
+            info: validated.summary.info,
+            totalCruised: validated.summary.totalCruised,
+            totalDependenciesCruised: validated.summary.totalDependenciesCruised,
+            violations: validated.summary.violations,
+            warn: validated.summary.warn,
+            optionsUsed: validated.summary.optionsUsed
+        }
+    };
+}
