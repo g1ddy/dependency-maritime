@@ -346,8 +346,8 @@
   "src/cli/analyze/adapters.ts": {
     "complexity": 24,
     "loc": 445,
-    "instability": 0.33,
-    "fanIn": 4,
+    "instability": 0.5,
+    "fanIn": 2,
     "fanOut": 2,
     "scanned": true
   },
@@ -355,13 +355,13 @@
     "complexity": 1,
     "loc": 58,
     "instability": 0,
-    "fanIn": 11,
+    "fanIn": 9,
     "fanOut": 0,
     "scanned": true
   },
   "src/cli/analyze/calculate-metrics.ts": {
     "complexity": 6,
-    "loc": 136,
+    "loc": 121,
     "instability": 0.33,
     "fanIn": 2,
     "fanOut": 1,
@@ -375,28 +375,12 @@
     "fanOut": 1,
     "scanned": true
   },
-  "src/cli/analyze/graph-input.ts": {
-    "complexity": 6,
-    "loc": 73,
-    "instability": 0.67,
-    "fanIn": 1,
-    "fanOut": 2,
-    "scanned": true
-  },
-  "src/cli/analyze/output-manifest.ts": {
-    "complexity": 4,
-    "loc": 87,
-    "instability": 0.8,
-    "fanIn": 1,
-    "fanOut": 4,
-    "scanned": true
-  },
-  "src/schema/manifest.ts": {
-    "complexity": 1,
-    "loc": 30,
-    "instability": 0,
-    "fanIn": 3,
-    "fanOut": 0,
+  "src/cli/analyze/parse-eslint.ts": {
+    "complexity": 9,
+    "loc": 39,
+    "instability": 0.33,
+    "fanIn": 2,
+    "fanOut": 1,
     "scanned": true
   },
   "src/cli/analyze/render-markdown-report.ts": {
@@ -407,20 +391,20 @@
     "fanOut": 1,
     "scanned": true
   },
-  "src/cli/analyze/parse-eslint.ts": {
-    "complexity": 9,
-    "loc": 39,
-    "instability": 0.33,
-    "fanIn": 2,
-    "fanOut": 1,
-    "scanned": true
-  },
   "src/cli/commands/analyze.ts": {
-    "complexity": 18,
-    "loc": 199,
+    "complexity": 28,
+    "loc": 293,
     "instability": 0.78,
     "fanIn": 2,
     "fanOut": 7,
+    "scanned": true
+  },
+  "src/schema/manifest.ts": {
+    "complexity": 1,
+    "loc": 30,
+    "instability": 0,
+    "fanIn": 3,
+    "fanOut": 0,
     "scanned": true
   },
   "src/cli/commands/graph.ts": {

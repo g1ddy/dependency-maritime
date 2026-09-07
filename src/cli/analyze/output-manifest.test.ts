@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { writeAnalysisOutputs } from './output-manifest';
 import * as adapters from './adapters';
 import { ValidationError, type AnalysisResult, type AnalysisThresholds } from './models';
+import type { ArtifactManifest } from '../../schema/manifest';
 
 describe('writeAnalysisOutputs', () => {
     const workingDir = '/project';
@@ -66,7 +67,7 @@ describe('writeAnalysisOutputs', () => {
         expect(calls[2]).toBe('.maritime/complexity-report.md');
         expect(calls[3]).toContain('Automated Complexity Report');
         expect(calls[4]).toBe('.maritime/manifest.json');
-        const manifest = calls[5] as any;
+        const manifest = calls[5] as ArtifactManifest;
         expect(manifest.schemaVersion).toBe('1.0.0');
         expect(manifest.artifacts.graph).toBe('dependency-graph.json');
         expect(manifest.artifacts.metrics).toBe('complexity-metrics.json');

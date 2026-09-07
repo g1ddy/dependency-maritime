@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import * as fsPromises from 'node:fs/promises';
 import { resolveGraphInput } from './graph-input';
 import * as adapters from './adapters';
+import type { ICruiseResult } from 'dependency-cruiser';
 
 vi.mock('node:fs/promises', async (importOriginal) => {
     const actual = await importOriginal<typeof import('node:fs/promises')>();
@@ -83,7 +84,7 @@ describe('resolveGraphInput', () => {
 
     it('generates graph when graphPath is omitted', async () => {
         const mockModules = [{ source: 'src/b.ts', dependencies: [], dependents: [] }];
-        const mockCruiseResult = { modules: mockModules, summary: {} } as any;
+        const mockCruiseResult = { modules: mockModules, summary: {} } as unknown as ICruiseResult;
 
         vi.spyOn(adapters, 'generateDependencyGraph').mockResolvedValue({
             modules: mockModules,

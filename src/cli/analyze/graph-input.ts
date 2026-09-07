@@ -26,11 +26,11 @@ export async function resolveGraphInput(options: ResolveGraphInputOptions): Prom
     let effectiveGraphPath: string;
     let configSource: string | undefined;
 
-    if (isGraphSupplied) {
+    if (isGraphSupplied && graphPath !== undefined) {
         console.log('   - Reading Supplied Dependency Cruiser JSON...');
-        modules = await readDependencyGraph(graphPath!, workingDir);
+        modules = await readDependencyGraph(graphPath, workingDir);
 
-        const absGraphPath = path.resolve(workingDir, graphPath!);
+        const absGraphPath = path.resolve(workingDir, graphPath);
         const relGraphToManifest = path.relative(manifestDir, absGraphPath);
         const isOutside = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
 
