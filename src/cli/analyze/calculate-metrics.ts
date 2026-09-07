@@ -1,4 +1,4 @@
-import type { FileMetric, AnalysisThresholds, AnalysisResult, DependencyCruiserModule, EslintFileComplexity } from './models';
+import { ValidationError, type FileMetric, type AnalysisThresholds, type AnalysisResult, type DependencyCruiserModule, type EslintFileComplexity } from './models';
 
 export function isSupportedTypeScriptFile(filepath: string): boolean {
     const lower = filepath.toLowerCase();
@@ -117,4 +117,19 @@ export function calculateMetrics(
         skippedCount,
         unmeasuredFiles
     };
+}
+
+export function checkUnmeasuredFiles(analysisResult: AnalysisResult, failOnUnmeasured = false): void {
+    console.log(`   - Skipped / Unmeasured Source Files: ${analysisResult.skippedCount}`);
+
+    if (analysisResult.skippedCount > 0) {
+        console.warn(`⚠️ Warning: ${analysisResult.skippedCount} graph source file(s) were skipped or ignored by ESLint and could not be measured:`);
+        analysisResult.unmeasuredFiles.forEach(f => console.warn(`   - ${f}`));
+
+        if (failOnUnmeasured) {
+            throw new ValidationError(
+                `Analysis failed because ${analysisResult.skippedCount} graph source file(s) were not scanned by ESLint (--fail-on-unmeasured).`
+            );
+        }
+    }
 }
