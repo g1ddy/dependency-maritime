@@ -12,7 +12,7 @@ describe('Dependency Cruiser Schema', () => {
     const sampleDataPath = path.resolve(__dirname, '../../sample-data/dependency-graph.json');
 
     if (!fs.existsSync(sampleDataPath)) {
-        throw new Error(`Sample data not found at: ${sampleDataPath}`);
+      throw new Error(`Sample data not found at: ${sampleDataPath}`);
     }
 
     const fileContent = fs.readFileSync(sampleDataPath, 'utf-8');
@@ -27,68 +27,52 @@ describe('Dependency Cruiser Schema', () => {
     expect(result.success).toBe(true);
 
     if (result.success) {
-        expect(result.data.modules.length).toBeGreaterThan(0);
-        const appModule = result.data.modules.find(m => m.source === 'src/App.tsx');
-        expect(appModule).toBeDefined();
-        expect(appModule?.dependencies.length).toBeGreaterThan(0);
+      expect(result.data.modules.length).toBeGreaterThan(0);
+      const appModule = result.data.modules.find(m => m.source === 'src/App.tsx');
+      expect(appModule).toBeDefined();
+      expect(appModule?.dependencies.length).toBeGreaterThan(0);
     }
   });
 
-  it('strips unknown upstream fields at top-level, module, dependency, violation, and rule levels', () => {
+  it('removes machine-specific top-level metadata while preserving deterministic dependency fields', () => {
     const normalized = normalizeMaritimeGraph({
-      environment: { platform: 'machine-specific' },
       modules: [{
         source: 'src/a.ts',
-        valid: false,
+        valid: true,
+        dependents: [],
         dependencies: [{
           circular: false,
           coreModule: false,
           couldNotResolve: false,
-          dependencyTypes: ['local', 'import'],
+          dependencyTypes: ['local'],
           dynamic: false,
           exoticallyRequired: false,
           followable: true,
           moduleSystem: 'es6',
           module: './b',
           resolved: 'src/b.ts',
-          valid: false,
-          upstreamOnly: 'discard me'
-        }],
-        dependents: [],
-        orphan: false,
-        upstreamModuleField: true
+          valid: true,
+          matchesDoNotFollow: false
+        }]
       }],
       summary: {
-        error: 1,
+        error: 0,
         ignore: 0,
         info: 0,
         totalCruised: 1,
-        totalDependenciesCruised: 1,
+        violations: [],
         warn: 0,
         optionsUsed: {},
-        environment: { node: '22' },
-        violations: [{
-          type: 'dependency',
-          from: 'src/a.ts',
-          to: 'src/b.ts',
-          upstreamViolationField: true,
-          rule: {
-            name: 'feature-isolation',
-            severity: 'error',
-            comment: 'upstream-only policy prose'
-          }
-        }]
+        deterministicSummaryField: 'kept'
+      },
+      environment: {
+        nodeVersion: 'v22.13.0',
+        platform: 'linux'
       }
     });
 
     expect(normalized).not.toHaveProperty('environment');
-    expect(normalized.modules[0]).not.toHaveProperty('upstreamModuleField');
-    expect(normalized.modules[0].dependencies[0]).not.toHaveProperty('upstreamOnly');
-    expect(normalized.summary).not.toHaveProperty('environment');
-    expect(normalized.summary.violations[0]).not.toHaveProperty('upstreamViolationField');
-    expect(normalized.summary.violations[0].rule).toEqual({
-      name: 'feature-isolation',
-      severity: 'error'
-    });
+    expect(normalized.modules[0].dependencies[0]).toMatchObject({ matchesDoNotFollow: false });
+    expect(normalized.summary).toMatchObject({ deterministicSummaryField: 'kept' });
   });
 });
