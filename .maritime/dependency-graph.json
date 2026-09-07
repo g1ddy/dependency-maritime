@@ -2395,14 +2395,44 @@
       "dependencies": [],
       "dependents": [
         "src/cli/analyze/adapters.ts",
+        "src/cli/analyze/architecture-debt.ts",
         "src/cli/analyze/calculate-metrics.ts",
         "src/cli/analyze/environment.ts",
+        "src/cli/analyze/impact.ts",
         "src/cli/analyze/parse-eslint.ts",
         "src/cli/analyze/render-markdown-report.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/validate/validate.ts",
         "src/cli/commands/validate.ts",
         "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/analyze/architecture-debt.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/commands/analyze.ts"
       ],
       "orphan": false
     },
@@ -2432,6 +2462,8 @@
         }
       ],
       "dependents": [
+        "src/cli/analyze/impact.ts",
+        "src/cli/analyze/render-markdown-report.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
       ],
@@ -2463,6 +2495,52 @@
       "dependents": [
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/analyze/impact.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./calculate-metrics",
+          "resolved": "src/cli/analyze/calculate-metrics.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/commands/analyze.ts"
       ],
       "orphan": false
     },
@@ -2501,6 +2579,26 @@
       "source": "src/cli/analyze/render-markdown-report.ts",
       "valid": true,
       "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./calculate-metrics",
+          "resolved": "src/cli/analyze/calculate-metrics.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        },
         {
           "circular": false,
           "coreModule": false,
@@ -2580,6 +2678,24 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
+          "module": "../analyze/architecture-debt",
+          "resolved": "src/cli/analyze/architecture-debt.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
           "module": "../analyze/calculate-metrics",
           "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
@@ -2600,6 +2716,24 @@
           "moduleSystem": "es6",
           "module": "../analyze/environment",
           "resolved": "src/cli/analyze/environment.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../analyze/impact",
+          "resolved": "src/cli/analyze/impact.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -3450,13 +3584,7 @@
       ],
       "coreModule": false,
       "couldNotResolve": false,
-      "orphan": false,
-      "followable": false,
-      "matchesDoNotFollow": false,
-      "dependencyTypes": [
-        "local",
-        "import"
-      ]
+      "orphan": false
     },
     {
       "source": "src/vite-env.d.ts",
@@ -3470,8 +3598,8 @@
     "error": 0,
     "ignore": 0,
     "info": 0,
-    "totalCruised": 65,
-    "totalDependenciesCruised": 150,
+    "totalCruised": 67,
+    "totalDependenciesCruised": 156,
     "violations": [],
     "warn": 0,
     "optionsUsed": {
@@ -3522,68 +3650,6 @@
       },
       "tsPreCompilationDeps": "specify",
       "args": "src"
-    },
-    "ruleSetUsed": {
-      "forbidden": [
-        {
-          "name": "feature-isolation",
-          "severity": "error",
-          "comment": "Features should be isolated and not import from other features.",
-          "from": {
-            "path": "^src/features/([^/]+)"
-          },
-          "to": {
-            "path": "^src/features",
-            "pathNot": "^src/features/$1"
-          },
-          "scope": "module"
-        },
-        {
-          "name": "shared-ui-purity",
-          "severity": "error",
-          "comment": "Shared UI components cannot import from features (prevents coupling).",
-          "from": {
-            "path": "^src/components"
-          },
-          "to": {
-            "path": "^src/features"
-          },
-          "scope": "module"
-        },
-        {
-          "name": "logic-ui-separation",
-          "severity": "error",
-          "comment": "Headless logic (src/lib) cannot import from UI/Features.",
-          "from": {
-            "path": "^src/lib"
-          },
-          "to": {
-            "path": "^src/(components|features)"
-          },
-          "scope": "module"
-        },
-        {
-          "name": "no-circular",
-          "severity": "warn",
-          "comment": "This dependency is part of a circular relationship. You might want to revise your solution (i.e. use dependency injection, divide components in smaller parts, etc).",
-          "from": {},
-          "to": {
-            "circular": true
-          },
-          "scope": "module"
-        },
-        {
-          "name": "no-orphans",
-          "severity": "info",
-          "comment": "This is an orphan module - it's likely not used (anymore?). Please remove it, or add it to the dependency graph.",
-          "from": {
-            "orphan": true,
-            "pathNot": "\\.d\\.ts$"
-          },
-          "to": {},
-          "scope": "module"
-        }
-      ]
     }
   }
 }
