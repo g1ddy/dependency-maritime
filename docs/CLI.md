@@ -134,6 +134,8 @@ A versioned envelope containing schema version, tool version, source roots, gene
     "changeImpact": {
       "baseRevision": "origin/main",
       "directlyChangedCount": 3,
+      "gitChangedCount": 10,
+      "directlyChangedGraphCount": 3,
       "transitiveImpactCount": 12,
       "affectedFolderCount": 4,
       "impactRatio": 0.2857
@@ -152,6 +154,11 @@ A versioned envelope containing schema version, tool version, source roots, gene
   }
 }
 ```
+
+`directlyChangedCount` is the schema `1.0.0` compatibility name for directly changed graph
+modules. New producers also emit `directlyChangedGraphCount` with the same value and optionally
+report `gitChangedCount` for all files changed in Git; consumers must continue accepting manifests
+that contain only the compatibility field.
 
 ## Validation contract
 
