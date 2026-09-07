@@ -28,20 +28,25 @@ async function writeCanonicalGraph(graphPath: string, graph: MaritimeCruiseResul
     await fsPromises.writeFile(graphPath, JSON.stringify(graph, null, 2));
 }
 
+function resolveCanonicalGraphPath(options: ResolveAnalysisGraphOptions, inputGraphPath: string): string {
+    const requestedGraphPath = path.resolve(options.workingDir, options.targetGraphPath);
+    if (requestedGraphPath !== inputGraphPath) {
+        return requestedGraphPath;
+    }
+
+    return path.join(path.dirname(requestedGraphPath), `maritime-${path.basename(requestedGraphPath)}`);
+}
+
 export async function resolveAnalysisGraph(
     options: ResolveAnalysisGraphOptions
 ): Promise<ResolveAnalysisGraphResult> {
     if (options.suppliedGraphPath) {
         const readResult = await readDependencyGraph(options.suppliedGraphPath, options.workingDir);
         const inputGraphPath = path.resolve(options.workingDir, options.suppliedGraphPath);
-        const relGraphToManifest = path.relative(options.manifestDir, inputGraphPath);
-        const stagedSuppliedGraph = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
-        const effectiveGraphPath = stagedSuppliedGraph
-            ? path.join(options.manifestDir, path.basename(inputGraphPath))
-            : inputGraphPath;
+        const effectiveGraphPath = resolveCanonicalGraphPath(options, inputGraphPath);
 
-        // Never copy raw Dependency-Cruiser bytes into canonical evidence. readDependencyGraph()
-        // validates and normalizes first, and the artifact bundle receives that normalized shape.
+        // The supplied path is read-only caller input. Canonical evidence is always serialized to
+        // a distinct output path after readDependencyGraph() validates and normalizes the graph.
         await writeCanonicalGraph(effectiveGraphPath, readResult.graph);
 
         return {
@@ -49,7 +54,7 @@ export async function resolveAnalysisGraph(
             graph: readResult.graph,
             violations: readResult.graph.summary.violations,
             effectiveGraphPath,
-            stagedSuppliedGraph
+            stagedSuppliedGraph: true
         };
     }
 

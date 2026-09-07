@@ -17,8 +17,10 @@ export const ArchitectureDebtSummarySchema = z.object({
 
 export const ChangeImpactSummarySchema = z.object({
   baseRevision: z.string().nullable(),
-  gitChangedCount: z.number().int().nonnegative(),
-  directlyChangedGraphCount: z.number().int().nonnegative(),
+  /** @deprecated Compatibility alias for directlyChangedGraphCount in schema 1.0.0. */
+  directlyChangedCount: z.number().int().nonnegative(),
+  gitChangedCount: z.number().int().nonnegative().optional(),
+  directlyChangedGraphCount: z.number().int().nonnegative().optional(),
   transitiveImpactCount: z.number().int().nonnegative(),
   affectedFolderCount: z.number().int().nonnegative(),
   impactRatio: z.number().min(0).max(1),

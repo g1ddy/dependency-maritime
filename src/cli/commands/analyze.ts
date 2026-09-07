@@ -115,12 +115,12 @@ Exit Codes:
 
     const workingDir = values.cwd ? path.resolve(values.cwd) : process.cwd();
 
-    let targetGraphPath = values.graph;
+    let targetGraphPath: string | undefined;
     let targetMetricsPath = values.metrics;
     let targetReportPath = values.report;
 
     if (values.output) {
-        targetGraphPath = targetGraphPath ?? path.join(values.output, 'dependency-graph.json');
+        targetGraphPath = path.join(values.output, 'dependency-graph.json');
         targetMetricsPath = targetMetricsPath ?? path.join(values.output, 'complexity-metrics.json');
         targetReportPath = targetReportPath ?? path.join(values.output, 'complexity-report.md');
     }
@@ -131,7 +131,7 @@ Exit Codes:
     }
 
     if (!targetGraphPath) {
-        targetGraphPath = 'dependency-graph.json';
+        targetGraphPath = path.join(path.dirname(targetMetricsPath), 'dependency-graph.json');
     }
 
     const rawSources = (values.source && values.source.length > 0)
@@ -327,6 +327,7 @@ Exit Codes:
                 ...(impactEvaluation ? {
                     changeImpact: {
                         baseRevision: impactEvaluation.baseRevision,
+                        directlyChangedCount: impactEvaluation.directlyChangedFiles.length,
                         gitChangedCount: impactEvaluation.gitChangedFiles.length,
                         directlyChangedGraphCount: impactEvaluation.directlyChangedFiles.length,
                         transitiveImpactCount: impactEvaluation.transitivelyAffectedFiles.length,
