@@ -1,19 +1,14 @@
 import { parseArgs } from 'node:util';
-import * as fsPromises from 'node:fs/promises';
 import {
-    readDependencyGraph,
-    generateDependencyGraph,
     runEslintComplexityScan,
-    countLinesOfCode,
-    writeOutputFiles,
-    getToolVersion
+    countLinesOfCode
 } from '../analyze/adapters';
-import { calculateMetrics, isSupportedTypeScriptFile } from '../analyze/calculate-metrics';
+import { calculateMetrics, checkUnmeasuredFiles, isSupportedTypeScriptFile } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
-import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import { validateEslintEnvironment } from '../analyze/environment';
-import { ValidationError, type AnalysisThresholds, type DependencyCruiserModule } from '../analyze/models';
-import { MANIFEST_SCHEMA_VERSION, type ArtifactManifest } from '../../schema/manifest';
+import { resolveGraphInput } from '../analyze/graph-input';
+import { writeAnalysisOutputs } from '../analyze/output-manifest';
+import { ValidationError, type AnalysisThresholds } from '../analyze/models';
 import * as path from 'path';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
@@ -136,46 +131,14 @@ Exit Codes:
             : path.dirname(path.resolve(workingDir, targetMetricsPath));
 
         // 2. Read or generate graph
-        let modules: DependencyCruiserModule[];
-        const isGraphSupplied = values.graph !== undefined;
-        let effectiveGraphPath: string;
-
-        if (isGraphSupplied) {
-            console.log('   - Reading Supplied Dependency Cruiser JSON...');
-            modules = await readDependencyGraph(values.graph!, workingDir);
-
-            const absGraphPath = path.resolve(workingDir, values.graph!);
-            const relGraphToManifest = path.relative(manifestDir, absGraphPath);
-            const isOutside = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
-
-            if (isOutside) {
-                console.log('   - Staging supplied graph into artifact directory...');
-                effectiveGraphPath = path.join(manifestDir, path.basename(absGraphPath));
-                try {
-                    await fsPromises.mkdir(manifestDir, { recursive: true });
-                    await fsPromises.copyFile(absGraphPath, effectiveGraphPath);
-                } catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err);
-                    throw new Error(`Failed to stage supplied dependency graph into artifact directory: ${message}`);
-                }
-            } else {
-                effectiveGraphPath = absGraphPath;
-            }
-        } else {
-            console.log('   - Generating Dependency Graph with dependency-cruiser...');
-            const genResult = await generateDependencyGraph({
-                sourceRoots: rawSources,
-                configPath: values['depcruise-config'],
-                cwd: workingDir
-            });
-            console.log(`   - Dependency-Cruiser Config Source: ${genResult.configSource}`);
-            modules = genResult.modules;
-
-            // Write the generated graph to targetGraphPath
-            effectiveGraphPath = path.resolve(workingDir, targetGraphPath);
-            await fsPromises.mkdir(path.dirname(effectiveGraphPath), { recursive: true });
-            await fsPromises.writeFile(effectiveGraphPath, JSON.stringify(genResult.cruiseResult, null, 2));
-        }
+        const { modules, effectiveGraphPath } = await resolveGraphInput({
+            graphPath: values.graph,
+            targetGraphPath,
+            rawSources,
+            depcruiseConfig: values['depcruise-config'],
+            manifestDir,
+            workingDir
+        });
 
         const sourceFiles = modules
             .map(m => m.source)
@@ -206,76 +169,19 @@ Exit Codes:
             normalizedSources
         );
 
-        console.log(`   - Skipped / Unmeasured Source Files: ${analysisResult.skippedCount}`);
-
-        if (analysisResult.skippedCount > 0) {
-            console.warn(`⚠️ Warning: ${analysisResult.skippedCount} graph source file(s) were skipped or ignored by ESLint and could not be measured:`);
-            analysisResult.unmeasuredFiles.forEach(f => console.warn(`   - ${f}`));
-
-            if (values['fail-on-unmeasured']) {
-                throw new ValidationError(
-                    `Analysis failed because ${analysisResult.skippedCount} graph source file(s) were not scanned by ESLint (--fail-on-unmeasured).`
-                );
-            }
-        }
+        checkUnmeasuredFiles(analysisResult, values['fail-on-unmeasured']);
 
         // 6. Generate metrics and report
-        console.log('   - Generating Outputs...');
-
-        const metricsMap = analysisResult.files.reduce((acc, f) => {
-            acc[f.file] = {
-                complexity: f.complexity,
-                loc: f.loc,
-                instability: f.instability,
-                fanIn: f.fanIn,
-                fanOut: f.fanOut,
-                scanned: f.scanned
-            };
-            return acc;
-        }, {} as Record<string, unknown>);
-
-        const reportContent = renderMarkdownReport(analysisResult, DEFAULT_THRESHOLDS);
-
-        const targetManifestPath = path.relative(workingDir, path.join(manifestDir, 'manifest.json')).replace(/\\/g, '/');
-
-        const relGraph = path.relative(manifestDir, effectiveGraphPath).replace(/\\/g, '/');
-        const relMetrics = path.relative(manifestDir, path.resolve(workingDir, targetMetricsPath)).replace(/\\/g, '/');
-        const relReport = path.relative(manifestDir, path.resolve(workingDir, targetReportPath)).replace(/\\/g, '/');
-
-        const artifactRelPaths = { graph: relGraph, metrics: relMetrics, report: relReport };
-        for (const [key, relPath] of Object.entries(artifactRelPaths)) {
-            if (relPath.startsWith('..') || path.isAbsolute(relPath)) {
-                throw new ValidationError(`Manifest artifact path for "${key}" escapes the artifact directory: "${relPath}"`);
-            }
-        }
-
-        const manifest: ArtifactManifest = {
-            schemaVersion: MANIFEST_SCHEMA_VERSION,
-            toolVersion: getToolVersion(),
-            generatedAt: new Date().toISOString(),
-            sourceRoots: normalizedSources,
-            artifacts: {
-                graph: relGraph,
-                metrics: relMetrics,
-                report: relReport
-            },
-            summary: {
-                totalFiles: analysisResult.files.length,
-                healthScore: analysisResult.healthScore,
-                scannedCount: analysisResult.files.filter(f => f.scanned).length,
-                skippedCount: analysisResult.skippedCount
-            }
-        };
-
-        await writeOutputFiles(
+        await writeAnalysisOutputs({
+            analysisResult,
+            thresholds: DEFAULT_THRESHOLDS,
+            normalizedSources,
+            effectiveGraphPath,
             targetMetricsPath,
-            metricsMap,
             targetReportPath,
-            reportContent,
-            targetManifestPath,
-            manifest,
+            manifestDir,
             workingDir
-        );
+        });
 
         console.log('✅ Complexity Report Updated and Metrics Exported!');
         return 0;
