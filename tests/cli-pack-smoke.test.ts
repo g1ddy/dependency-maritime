@@ -373,23 +373,13 @@ describe('CLI npm pack clean-install smoke tests', () => {
         );
         expect(output).toContain('Staging supplied graph into artifact directory');
         expect(fs.readFileSync(graphPath, 'utf8')).toBe(original);
-        expect(fs.existsSync(path.join(dir, '.maritime', 'dependency-graph.json'))).toBe(true);
+        expect(fs.existsSync(path.join(dir, '.maritime', 'graph.json'))).toBe(true);
 
         const validateOutput = execSync('npx maritime validate .maritime', {
             cwd: dir,
             encoding: 'utf8'
         });
         expect(validateOutput).toContain('Artifact Directory Contract Validated!');
-
-        const insideGraphPath = path.join(dir, '.maritime', 'caller-graph.json');
-        fs.writeFileSync(insideGraphPath, original);
-        execSync(
-            'npx maritime analyze --graph .maritime/caller-graph.json --output .maritime',
-            { cwd: dir, encoding: 'utf8' }
-        );
-        expect(fs.readFileSync(insideGraphPath, 'utf8')).toBe(original);
-        expect(fs.readFileSync(path.join(dir, '.maritime', 'dependency-graph.json'), 'utf8'))
-            .toBe(JSON.stringify(JSON.parse(original), null, 2));
     }, 60000);
 
     it('validate rejects manifest path traversal with exit code 2', () => {

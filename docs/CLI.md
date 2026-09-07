@@ -80,7 +80,7 @@ The normal analysis output is a single self-contained artifact directory:
 
 Every successful `maritime analyze` invocation produces an output directory where `manifest.json`, the dependency graph JSON, complexity metrics JSON, and Markdown report all reside within that directory. All manifest-declared artifact paths are relative to the artifact directory and must not contain path traversal (e.g., `..`) or absolute paths.
 
-When `--graph <file>` is supplied outside `--output <dir>`, Maritime validates and normalizes the supplied graph, then serializes the normalized representation into the output directory and references it from the manifest using a relative path. The original caller graph file is never modified or removed. If canonical serialization cannot be completed, analysis fails with a non-zero exit code without emitting a manifest.
+When `--graph <file>` is supplied outside `--output <dir>`, the validated supplied graph is staged (copied) into the output directory and referenced in the manifest as a relative path inside that directory. The original caller graph file is never modified or removed. If staging cannot be completed, analysis fails with a non-zero exit code without emitting a manifest.
 
 ### `dependency-graph.json`
 
@@ -134,8 +134,6 @@ A versioned envelope containing schema version, tool version, source roots, gene
     "changeImpact": {
       "baseRevision": "origin/main",
       "directlyChangedCount": 3,
-      "gitChangedCount": 10,
-      "directlyChangedGraphCount": 3,
       "transitiveImpactCount": 12,
       "affectedFolderCount": 4,
       "impactRatio": 0.2857
@@ -154,11 +152,6 @@ A versioned envelope containing schema version, tool version, source roots, gene
   }
 }
 ```
-
-`directlyChangedCount` is the schema `1.0.0` compatibility name for directly changed graph
-modules. New producers also emit `directlyChangedGraphCount` with the same value and optionally
-report `gitChangedCount` for all files changed in Git; consumers must continue accepting manifests
-that contain only the compatibility field.
 
 ## Validation contract
 

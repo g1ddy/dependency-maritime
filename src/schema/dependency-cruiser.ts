@@ -2,65 +2,95 @@ import { z } from 'zod';
 import type { ICruiseResult, IModule, IDependency } from 'dependency-cruiser';
 
 /**
- * Re-export official types for integrations that need to describe raw Dependency-Cruiser data.
- * Maritime's persisted graph is validated and normalized before it becomes canonical evidence.
+ * Re-export official types as the source of truth for the application.
  */
 export type { ICruiseResult, IModule, IDependency };
 
-const CycleEntrySchema = z.object({
-  name: z.string(),
-  dependencyTypes: z.array(z.string())
+/**
+ * Schema for a single dependency relation.
+ * Represents a 'to' edge in the dependency graph.
+ */
+export const DependencySchema = z.object({
+  /** 'true' if following this dependency will ultimately return to the source */
+  circular: z.boolean(),
+  /** Whether or not this is a node.js core module */
+  coreModule: z.boolean(),
+  /** 'true' if dependency-cruiser could not resolve the module name to a file */
+  couldNotResolve: z.boolean(),
+  /** The type of inclusion - local, core, npm, etc. */
+  dependencyTypes: z.array(z.string()),
+  /** true if this dependency is dynamic, false in all other cases */
+  dynamic: z.boolean(),
+  /** true if the dependency was defined by a require not named 'require' */
+  exoticallyRequired: z.boolean(),
+  /** Whether or not this is a dependency that can be followed any further */
+  followable: z.boolean(),
+  /** the instability of the dependency */
+  instability: z.number().optional(),
+  /** If the module specification is an URI with a protocol, this holds it */
+  protocol: z.enum(['data:', 'file:', 'node:']).optional(),
+  /** If the module specification is an URI and contains a mime type, this holds it */
+  mimeType: z.string().optional(),
+  /** The module system used (e.g., "es6", "cjs") */
+  moduleSystem: z.enum(['amd', 'cjs', 'es6', 'tsd']),
+  /** The import string used in the code (e.g., "./utils") */
+  module: z.string(),
+  /** The absolute or relative path to the resolved file (e.g., "src/utils.ts") */
+  resolved: z.string(),
+  /** 'true' if this dependency violated a rule */
+  valid: z.boolean(),
+  /** Whether the dependency exists only before compilation (e.g. type-only) */
+  preCompilationOnly: z.boolean().optional(),
+  /** 'true' when the module included the module explicitly as type only */
+  typeOnly: z.boolean().optional(),
+  /** Cycle path if circular */
+  cycle: z.array(z.object({
+    name: z.string(),
+    dependencyTypes: z.array(z.string())
+  })).optional(),
 }).passthrough();
 
 /**
- * Validation schema for a dependency relation. Upstream dependency fields are intentionally
- * preserved because they are deterministic graph semantics used by existing Maritime consumers.
+ * Schema for a module (file) in the graph.
+ * Represents a node in the dependency graph.
  */
-export const DependencySchema = z.object({
-  circular: z.boolean(),
-  coreModule: z.boolean(),
-  couldNotResolve: z.boolean(),
-  dependencyTypes: z.array(z.string()),
-  dynamic: z.boolean(),
-  exoticallyRequired: z.boolean(),
-  followable: z.boolean(),
-  instability: z.number().optional(),
-  protocol: z.enum(['data:', 'file:', 'node:']).optional(),
-  mimeType: z.string().optional(),
-  moduleSystem: z.enum(['amd', 'cjs', 'es6', 'tsd']),
-  module: z.string(),
-  resolved: z.string(),
-  valid: z.boolean(),
-  preCompilationOnly: z.boolean().optional(),
-  typeOnly: z.boolean().optional(),
-  cycle: z.array(CycleEntrySchema).optional(),
-}).passthrough();
-
-/** Validation schema for a dependency-cruiser module. */
 export const ModuleSchema = z.object({
+  /** The path to the source file (acts as the unique ID) */
   source: z.string(),
+  /** 'true' if this module violated a rule */
   valid: z.boolean(),
+  /** List of outgoing dependencies */
   dependencies: z.array(DependencySchema),
+  /** List of files that depend on this module (incoming edges) */
   dependents: z.array(z.string()),
+  /** Whether or not this is a node.js core module */
   coreModule: z.boolean().optional(),
+  /** 'true' if dependency-cruiser could not resolve the module name to a file */
   couldNotResolve: z.boolean().optional(),
+  /** Whether the module is an orphan */
   orphan: z.boolean().optional(),
 }).passthrough();
 
-/** Validation schema for an upstream architecture violation. */
+/**
+ * Schema for a violation found by dependency-cruiser.
+ */
 export const ViolationSchema = z.object({
-  type: z.enum(['dependency', 'module', 'cycle', 'reachability', 'instability']).optional(),
-  from: z.string(),
-  to: z.string(),
-  rule: z.object({
-    name: z.string(),
-    severity: z.enum(['error', 'warn', 'info', 'ignore']),
-  }).passthrough(),
+    type: z.enum(['dependency', 'module', 'cycle', 'reachability', 'instability']).optional(),
+    from: z.string(),
+    to: z.string(),
+    rule: z.object({
+        name: z.string(),
+        severity: z.enum(['error', 'warn', 'info', 'ignore']),
+    }).passthrough(),
 }).passthrough();
 
-/** Validation schema for raw dependency-cruiser output. */
+/**
+ * Schema for the top-level dependency-cruiser output.
+ */
 export const CruiseResultSchema = z.object({
+  /** List of all modules scanned */
   modules: z.array(ModuleSchema),
+  /** Summary of the scan (violations, errors, etc.) */
   summary: z.object({
     error: z.number(),
     ignore: z.number(),
@@ -73,26 +103,36 @@ export const CruiseResultSchema = z.object({
   }).passthrough(),
 }).passthrough();
 
+/** Canonical graph types guaranteed after Maritime schema validation. */
 export type MaritimeDependency = z.infer<typeof DependencySchema>;
 export type MaritimeModule = z.infer<typeof ModuleSchema>;
-export type MaritimeViolation = z.infer<typeof ViolationSchema>;
-
-export interface MaritimeCruiseResult {
-  modules: MaritimeModule[];
-  summary: z.infer<typeof CruiseResultSchema>['summary'];
-}
+export type MaritimeCruiseResult = z.infer<typeof CruiseResultSchema>;
 
 /**
- * Normalizes raw dependency-cruiser output to Maritime's canonical graph envelope.
- *
- * Dependency-Cruiser 18 adds top-level runtime/environment metadata that can vary by machine.
- * Maritime deliberately omits those top-level additions while preserving validated module,
- * dependency, violation, and summary fields so existing deterministic graph semantics are not lost.
+ * Normalizes raw dependency-cruiser output to Maritime's canonical graph shape,
+ * stripping machine-dependent environment details.
  */
 export function normalizeMaritimeGraph(raw: unknown): MaritimeCruiseResult {
-  const validated = CruiseResultSchema.parse(raw);
-  return {
-    modules: validated.modules,
-    summary: validated.summary
-  };
+    const validated = CruiseResultSchema.parse(raw);
+    return {
+        modules: validated.modules.map(m => ({
+            source: m.source,
+            valid: m.valid,
+            dependencies: m.dependencies,
+            dependents: m.dependents,
+            coreModule: m.coreModule,
+            couldNotResolve: m.couldNotResolve,
+            orphan: m.orphan
+        })),
+        summary: {
+            error: validated.summary.error,
+            ignore: validated.summary.ignore,
+            info: validated.summary.info,
+            totalCruised: validated.summary.totalCruised,
+            totalDependenciesCruised: validated.summary.totalDependenciesCruised,
+            violations: validated.summary.violations,
+            warn: validated.summary.warn,
+            optionsUsed: validated.summary.optionsUsed
+        }
+    };
 }
