@@ -19,6 +19,7 @@ export interface ResolveAnalysisGraphResult {
     graph: MaritimeCruiseResult;
     violations: ViolationInput[];
     effectiveGraphPath: string;
+    stagedSuppliedGraph: boolean;
     configSource?: 'explicit' | 'discovered' | 'fallback';
 }
 
@@ -34,20 +35,21 @@ export async function resolveAnalysisGraph(
         const readResult = await readDependencyGraph(options.suppliedGraphPath, options.workingDir);
         const inputGraphPath = path.resolve(options.workingDir, options.suppliedGraphPath);
         const relGraphToManifest = path.relative(options.manifestDir, inputGraphPath);
-        const isOutsideArtifactDir = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
-        const effectiveGraphPath = isOutsideArtifactDir
+        const stagedSuppliedGraph = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
+        const effectiveGraphPath = stagedSuppliedGraph
             ? path.join(options.manifestDir, path.basename(inputGraphPath))
             : inputGraphPath;
 
         // Never copy raw Dependency-Cruiser bytes into canonical evidence. readDependencyGraph()
-        // validates and normalizes first, and the artifact bundle always receives that normalized shape.
+        // validates and normalizes first, and the artifact bundle receives that normalized shape.
         await writeCanonicalGraph(effectiveGraphPath, readResult.graph);
 
         return {
             modules: readResult.modules,
             graph: readResult.graph,
             violations: readResult.graph.summary.violations,
-            effectiveGraphPath
+            effectiveGraphPath,
+            stagedSuppliedGraph
         };
     }
 
@@ -64,6 +66,7 @@ export async function resolveAnalysisGraph(
         graph: generated.cruiseResult,
         violations: generated.cruiseResult.summary.violations,
         effectiveGraphPath,
+        stagedSuppliedGraph: false,
         configSource: generated.configSource
     };
 }
