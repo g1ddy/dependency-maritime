@@ -14,7 +14,7 @@ vi.mock('./logic/metrics', async () => {
 });
 
 // Inline mock data
-const mockData: ICruiseResult = {
+const mockData = {
   summary: {
     violations: [],
     error: 0,
@@ -115,7 +115,7 @@ describe('Visualization Store', () => {
 
   describe('Populated Graph', () => {
     beforeEach(() => {
-      useGraphStore.getState().setGraphData(mockData);
+      useGraphStore.getState().setGraphData(mockData as unknown as ICruiseResult);
     });
 
     it('should have nodes and edges', () => {
@@ -183,7 +183,7 @@ describe('Visualization Store', () => {
       const version1 = useGraphStore.getState().metricsVersion;
 
       // 2. Trigger another load immediately to simulate race
-      store.setGraphData(mockData);
+      store.setGraphData(mockData as unknown as ICruiseResult);
       const version2 = useGraphStore.getState().metricsVersion;
 
       expect(version2).toBeGreaterThan(version1);
@@ -337,7 +337,7 @@ describe('Visualization Store', () => {
 
   describe('Simulation Mode', () => {
     beforeEach(() => {
-      useGraphStore.getState().setGraphData(mockData);
+      useGraphStore.getState().setGraphData(mockData as unknown as ICruiseResult);
     });
 
     it('should initialize simulation state correctly', () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useGraphStore } from './store';
 import { type ICruiseResult } from '../../schema/dependency-cruiser';
 
-const mockData: ICruiseResult = {
+const mockData = {
   summary: {
     violations: [],
     error: 0,
@@ -26,7 +26,7 @@ const mockData: ICruiseResult = {
 describe('Reparenting Consistency', () => {
   beforeEach(() => {
     useGraphStore.getState().reset();
-    useGraphStore.getState().setGraphData(mockData);
+    useGraphStore.getState().setGraphData(mockData as unknown as ICruiseResult);
   });
 
   it('updates the underlying Graphology graph when reparenting', () => {

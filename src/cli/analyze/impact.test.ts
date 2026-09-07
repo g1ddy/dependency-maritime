@@ -11,12 +11,12 @@ describe('calculateChangeImpact', () => {
         },
         {
             source: 'src/components/Header.tsx',
-            dependencies: [{ resolved: 'src/components/Button.tsx' } as any],
+            dependencies: [{ resolved: 'src/components/Button.tsx' }],
             dependents: ['src/App.tsx']
         },
         {
             source: 'src/App.tsx',
-            dependencies: [{ resolved: 'src/components/Header.tsx' } as any],
+            dependencies: [{ resolved: 'src/components/Header.tsx' }],
             dependents: []
         },
         {

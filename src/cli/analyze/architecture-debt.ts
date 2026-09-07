@@ -55,32 +55,43 @@ export async function readBaselineFile(baselinePath: string, cwd: string = proce
 
     try {
         const raw = await fs.readFile(absPath, 'utf8');
-        const parsed = JSON.parse(raw);
+        const parsed: unknown = JSON.parse(raw);
 
         // Support array of violations or object with violations array or raw depcruise format
-        let rawViolations: unknown;
+        let rawViolations: Record<string, unknown>[] = [];
         if (Array.isArray(parsed)) {
-            rawViolations = parsed.map((item: Record<string, unknown>) => ({
-                ruleName: item.ruleName || (item.rule as Record<string, unknown>)?.name || 'unknown',
-                severity: item.severity || (item.rule as Record<string, unknown>)?.severity || 'warn',
-                from: item.from || '',
-                to: item.to || ''
+            const list = parsed as unknown as Record<string, unknown>[];
+            rawViolations = list.map(item => ({
+                ruleName: typeof item.ruleName === 'string' ? item.ruleName : (typeof (item.rule as Record<string, unknown>)?.name === 'string' ? (item.rule as Record<string, unknown>).name as string : 'unknown'),
+                severity: typeof item.severity === 'string' ? item.severity : (typeof (item.rule as Record<string, unknown>)?.severity === 'string' ? (item.rule as Record<string, unknown>).severity as string : 'warn'),
+                from: typeof item.from === 'string' ? item.from : '',
+                to: typeof item.to === 'string' ? item.to : ''
             }));
-        } else if (parsed && typeof parsed === 'object' && Array.isArray((parsed as Record<string, unknown>).violations)) {
-            rawViolations = ((parsed as Record<string, unknown>).violations as Record<string, unknown>[]).map(item => ({
-                ruleName: item.ruleName || (item.rule as Record<string, unknown>)?.name || 'unknown',
-                severity: item.severity || (item.rule as Record<string, unknown>)?.severity || 'warn',
-                from: item.from || '',
-                to: item.to || ''
+        } else if (parsed && typeof parsed === 'object' && parsed !== null && 'violations' in parsed && Array.isArray((parsed as Record<string, unknown>).violations)) {
+            const list = (parsed as Record<string, unknown>).violations as Record<string, unknown>[];
+            rawViolations = list.map(item => ({
+                ruleName: typeof item.ruleName === 'string' ? item.ruleName : (typeof (item.rule as Record<string, unknown>)?.name === 'string' ? (item.rule as Record<string, unknown>).name as string : 'unknown'),
+                severity: typeof item.severity === 'string' ? item.severity : (typeof (item.rule as Record<string, unknown>)?.severity === 'string' ? (item.rule as Record<string, unknown>).severity as string : 'warn'),
+                from: typeof item.from === 'string' ? item.from : '',
+                to: typeof item.to === 'string' ? item.to : ''
+            }));
+        } else if (parsed && typeof parsed === 'object' && parsed !== null && 'summary' in parsed) {
+            const list = ((parsed as Record<string, unknown>).summary as { violations?: Record<string, unknown>[] })?.violations || [];
+            rawViolations = list.map(item => ({
+                ruleName: typeof item.ruleName === 'string' ? item.ruleName : (typeof (item.rule as Record<string, unknown>)?.name === 'string' ? (item.rule as Record<string, unknown>).name as string : 'unknown'),
+                severity: typeof item.severity === 'string' ? item.severity : (typeof (item.rule as Record<string, unknown>)?.severity === 'string' ? (item.rule as Record<string, unknown>).severity as string : 'warn'),
+                from: typeof item.from === 'string' ? item.from : '',
+                to: typeof item.to === 'string' ? item.to : ''
             }));
         } else if (parsed && typeof parsed === 'object' && (parsed as Record<string, unknown>).summary) {
             const summaryObj = (parsed as Record<string, unknown>).summary as Record<string, unknown>;
             if (Array.isArray(summaryObj.violations)) {
-                rawViolations = summaryObj.violations.map((item: Record<string, unknown>) => ({
-                    ruleName: (item.rule as Record<string, unknown>)?.name || 'unknown',
-                    severity: (item.rule as Record<string, unknown>)?.severity || 'warn',
-                    from: item.from || '',
-                    to: item.to || ''
+                const list = summaryObj.violations as Record<string, unknown>[];
+                rawViolations = list.map(item => ({
+                    ruleName: typeof (item.rule as Record<string, unknown>)?.name === 'string' ? (item.rule as Record<string, unknown>).name as string : 'unknown',
+                    severity: typeof (item.rule as Record<string, unknown>)?.severity === 'string' ? (item.rule as Record<string, unknown>).severity as string : 'warn',
+                    from: typeof item.from === 'string' ? item.from : '',
+                    to: typeof item.to === 'string' ? item.to : ''
                 }));
             }
         }

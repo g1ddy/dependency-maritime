@@ -71,7 +71,7 @@ describe('calculate-metrics', () => {
             const mods: DependencyCruiserModule[] = [
                 {
                     source: 'src/features/a.ts',
-                    dependencies: [{ resolved: 'src/components/b.ts' } as any],
+                    dependencies: [{ resolved: 'src/components/b.ts' }],
                     dependents: []
                 },
                 {
