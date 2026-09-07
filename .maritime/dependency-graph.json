@@ -1063,6 +1063,7 @@
         "src/features/visualization/store.ts",
         "src/features/visualization/logic/transformer.ts",
         "src/cli/analyze/adapters.ts",
+        "src/cli/analyze/graph-input.ts",
         "src/cli/commands/graph.ts",
         "src/cli/graph/render-dot.ts",
         "src/cli/validate/validate.ts"
@@ -2384,6 +2385,7 @@
         }
       ],
       "dependents": [
+        "src/cli/analyze/graph-input.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
       ],
@@ -2398,6 +2400,7 @@
         "src/cli/analyze/architecture-debt.ts",
         "src/cli/analyze/calculate-metrics.ts",
         "src/cli/analyze/environment.ts",
+        "src/cli/analyze/graph-input.ts",
         "src/cli/analyze/impact.ts",
         "src/cli/analyze/parse-eslint.ts",
         "src/cli/analyze/render-markdown-report.ts",
@@ -2432,6 +2435,7 @@
         }
       ],
       "dependents": [
+        "src/cli/analyze/graph-input.ts",
         "src/cli/commands/analyze.ts"
       ],
       "orphan": false
@@ -2495,6 +2499,94 @@
       "dependents": [
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/analyze/graph-input.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../../schema/dependency-cruiser",
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./adapters",
+          "resolved": "src/cli/analyze/adapters.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./architecture-debt",
+          "resolved": "src/cli/analyze/architecture-debt.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/commands/analyze.ts"
       ],
       "orphan": false
     },
@@ -2716,6 +2808,24 @@
           "moduleSystem": "es6",
           "module": "../analyze/environment",
           "resolved": "src/cli/analyze/environment.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../analyze/graph-input",
+          "resolved": "src/cli/analyze/graph-input.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -3584,7 +3694,13 @@
       ],
       "coreModule": false,
       "couldNotResolve": false,
-      "orphan": false
+      "orphan": false,
+      "followable": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ]
     },
     {
       "source": "src/vite-env.d.ts",
@@ -3598,8 +3714,8 @@
     "error": 0,
     "ignore": 0,
     "info": 0,
-    "totalCruised": 67,
-    "totalDependenciesCruised": 156,
+    "totalCruised": 68,
+    "totalDependenciesCruised": 161,
     "violations": [],
     "warn": 0,
     "optionsUsed": {
@@ -3650,6 +3766,214 @@
       },
       "tsPreCompilationDeps": "specify",
       "args": "src"
+    },
+    "ruleSetUsed": {
+      "forbidden": [
+        {
+          "name": "feature-isolation",
+          "severity": "error",
+          "comment": "Features should be isolated and not import from other features.",
+          "from": {
+            "path": "^src/features/([^/]+)"
+          },
+          "to": {
+            "path": "^src/features",
+            "pathNot": "^src/features/$1"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "shared-ui-purity",
+          "severity": "error",
+          "comment": "Shared UI components cannot import from features (prevents coupling).",
+          "from": {
+            "path": "^src/components"
+          },
+          "to": {
+            "path": "^src/features"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "logic-ui-separation",
+          "severity": "error",
+          "comment": "Headless logic (src/lib) cannot import from UI/Features.",
+          "from": {
+            "path": "^src/lib"
+          },
+          "to": {
+            "path": "^src/(components|features)"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-circular",
+          "severity": "warn",
+          "comment": "This dependency is part of a circular relationship. You might want to revise your solution (i.e. use dependency injection, divide components in smaller parts, etc).",
+          "from": {},
+          "to": {
+            "circular": true
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-orphans",
+          "severity": "info",
+          "comment": "This is an orphan module - it's likely not used (anymore?). Please remove it, or add it to the dependency graph.",
+          "from": {
+            "orphan": true,
+            "pathNot": "\\.d\\.ts$"
+          },
+          "to": {},
+          "scope": "module"
+        }
+      ]
+    },
+    "environment": {
+      "version": "18.2.0",
+      "nodeVersionSupported": "^22||^24||>=26",
+      "nodeVersionFound": "v22.13.0",
+      "osVersionFound": "x64 linux@6.17.0-1022-azure",
+      "transpilersFound": [
+        {
+          "name": "javascript",
+          "version": "*",
+          "available": true,
+          "currentVersion": "acorn@8.18.0"
+        },
+        {
+          "name": "babel",
+          "version": ">=7.0.0 <8.0.0",
+          "available": true,
+          "currentVersion": "@babel/core@7.28.6"
+        },
+        {
+          "name": "coffee-script",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "coffeescript",
+          "version": ">=1.0.0 <3.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "livescript",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "svelte",
+          "version": ">=3.0.0 <6.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "swc",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "typescript",
+          "version": ">=2.0.0 <7.0.0",
+          "available": true,
+          "currentVersion": "typescript@5.9.3"
+        },
+        {
+          "name": "vue-template-compiler",
+          "version": ">=2.0.0 <3.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "@vue/compiler-sfc",
+          "version": ">=3.0.0 <4.0.0",
+          "available": false,
+          "currentVersion": "-"
+        }
+      ],
+      "extensionsFound": [
+        {
+          "extension": ".js",
+          "available": true
+        },
+        {
+          "extension": ".cjs",
+          "available": true
+        },
+        {
+          "extension": ".mjs",
+          "available": true
+        },
+        {
+          "extension": ".jsx",
+          "available": true
+        },
+        {
+          "extension": ".ts",
+          "available": true
+        },
+        {
+          "extension": ".tsx",
+          "available": true
+        },
+        {
+          "extension": ".d.ts",
+          "available": true
+        },
+        {
+          "extension": ".cts",
+          "available": true
+        },
+        {
+          "extension": ".d.cts",
+          "available": true
+        },
+        {
+          "extension": ".mts",
+          "available": true
+        },
+        {
+          "extension": ".d.mts",
+          "available": true
+        },
+        {
+          "extension": ".vue",
+          "available": false
+        },
+        {
+          "extension": ".svelte",
+          "available": false
+        },
+        {
+          "extension": ".ls",
+          "available": false
+        },
+        {
+          "extension": ".coffee",
+          "available": false
+        },
+        {
+          "extension": ".litcoffee",
+          "available": false
+        },
+        {
+          "extension": ".coffee.md",
+          "available": false
+        },
+        {
+          "extension": ".csx",
+          "available": false
+        },
+        {
+          "extension": ".cjsx",
+          "available": false
+        }
+      ]
     }
   }
 }
