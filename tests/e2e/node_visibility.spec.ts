@@ -17,7 +17,11 @@ test('File nodes are visible and interactable (not obscured by folders)', async 
   await expect(node).toHaveJSProperty('isConnected', true);
 
   const findHitTarget = async (): Promise<Point | null> => node.evaluate((element) => {
-    const bounds = element.getBoundingClientRect();
+    // Find the nearest .react-flow__node wrapper which is the true interaction boundary
+    const wrapper = element.closest('.react-flow__node');
+    if (!wrapper) return null;
+
+    const bounds = wrapper.getBoundingClientRect();
     const samples = [
       [0.5, 0.5],
       [0.25, 0.5],
@@ -36,7 +40,9 @@ test('File nodes are visible and interactable (not obscured by folders)', async 
         y: bounds.top + bounds.height * yRatio,
       };
       const hit = document.elementFromPoint(point.x, point.y);
-      if (hit === element || (hit instanceof Node && element.contains(hit))) {
+
+      // Accept hit if it is the wrapper itself or any descendant of the wrapper
+      if (hit === wrapper || (hit instanceof Node && wrapper.contains(hit))) {
         return point;
       }
     }
