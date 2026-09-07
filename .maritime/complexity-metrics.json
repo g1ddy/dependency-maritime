@@ -168,8 +168,8 @@
     "scanned": true
   },
   "src/schema/dependency-cruiser.ts": {
-    "complexity": 7,
-    "loc": 197,
+    "complexity": 1,
+    "loc": 99,
     "instability": 0,
     "fanIn": 9,
     "fanOut": 0,
@@ -384,8 +384,8 @@
     "scanned": true
   },
   "src/cli/analyze/graph-input.ts": {
-    "complexity": 4,
-    "loc": 70,
+    "complexity": 2,
+    "loc": 78,
     "instability": 0.8,
     "fanIn": 1,
     "fanOut": 4,
@@ -417,7 +417,7 @@
   },
   "src/cli/commands/analyze.ts": {
     "complexity": 41,
-    "loc": 362,
+    "loc": 366,
     "instability": 0.83,
     "fanIn": 2,
     "fanOut": 10,
@@ -425,7 +425,7 @@
   },
   "src/schema/manifest.ts": {
     "complexity": 1,
-    "loc": 61,
+    "loc": 63,
     "instability": 0,
     "fanIn": 3,
     "fanOut": 0,

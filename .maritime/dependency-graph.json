@@ -19,7 +19,8 @@
           "module": "@/components/layout/Header",
           "resolved": "src/components/layout/Header.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -36,7 +37,8 @@
           "module": "@/features/relationships",
           "resolved": "src/features/relationships/index.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -53,7 +55,8 @@
           "module": "@/features/relationships/components/DataSourceDialog",
           "resolved": "src/features/relationships/components/DataSourceDialog.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -70,7 +73,8 @@
           "module": "@/features/visualization/components/DataSourceDialog",
           "resolved": "src/features/visualization/components/DataSourceDialog.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -87,7 +91,8 @@
           "module": "@/features/visualization/components/DependencyGraph",
           "resolved": "src/features/visualization/components/DependencyGraph.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -104,7 +109,8 @@
           "module": "@/features/visualization/components/GraphOverlay",
           "resolved": "src/features/visualization/components/GraphOverlay.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -121,7 +127,8 @@
           "module": "@/features/visualization/components/NodeInspectorPanel",
           "resolved": "src/features/visualization/components/NodeInspectorPanel.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -138,7 +145,8 @@
           "module": "@/features/visualization/components/SettingsDialog",
           "resolved": "src/features/visualization/components/SettingsDialog.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -155,7 +163,8 @@
           "module": "@/features/visualization/store",
           "resolved": "src/features/visualization/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -182,7 +191,8 @@
           "module": "@/components/mode-toggle",
           "resolved": "src/components/mode-toggle.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -199,7 +209,8 @@
           "module": "@/components/ui/button",
           "resolved": "src/components/ui/button.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -216,7 +227,8 @@
           "module": "@/components/ui/sheet",
           "resolved": "src/components/ui/sheet.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -233,7 +245,8 @@
           "module": "@/components/ui/tooltip",
           "resolved": "src/components/ui/tooltip.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -250,7 +263,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -277,7 +291,8 @@
           "module": "@/components/theme-context",
           "resolved": "src/components/theme-context.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -294,7 +309,8 @@
           "module": "@/components/ui/button",
           "resolved": "src/components/ui/button.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -311,7 +327,8 @@
           "module": "@/components/ui/dropdown-menu",
           "resolved": "src/components/ui/dropdown-menu.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -348,7 +365,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -405,7 +423,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -434,7 +453,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -461,7 +481,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -490,7 +511,8 @@
           "module": "./components/RelationshipGraph",
           "resolved": "src/features/relationships/components/RelationshipGraph.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -507,7 +529,8 @@
           "module": "./components/RelationshipOverlay",
           "resolved": "src/features/relationships/components/RelationshipOverlay.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -524,7 +547,8 @@
           "module": "./store",
           "resolved": "src/features/relationships/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -543,7 +567,8 @@
           "module": "./types",
           "resolved": "src/features/relationships/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -570,7 +595,8 @@
           "module": "../store",
           "resolved": "src/features/relationships/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -589,7 +615,8 @@
           "module": "../types",
           "resolved": "src/features/relationships/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -618,7 +645,8 @@
           "module": "./types",
           "resolved": "src/features/relationships/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -661,7 +689,8 @@
           "module": "../store",
           "resolved": "src/features/relationships/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -680,7 +709,8 @@
           "module": "../types",
           "resolved": "src/features/relationships/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -697,7 +727,8 @@
           "module": "@/components/ui/button",
           "resolved": "src/components/ui/button.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -724,7 +755,8 @@
           "module": "../store",
           "resolved": "src/features/relationships/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -743,7 +775,8 @@
           "module": "../types",
           "resolved": "src/features/relationships/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -760,7 +793,8 @@
           "module": "@/components/DataSourceDialog",
           "resolved": "src/components/DataSourceDialog.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -787,7 +821,8 @@
           "module": "@/components/FileUploadZone",
           "resolved": "src/components/FileUploadZone.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -804,7 +839,8 @@
           "module": "@/components/ui/button",
           "resolved": "src/components/ui/button.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -821,7 +857,8 @@
           "module": "@/components/ui/dialog",
           "resolved": "src/components/ui/dialog.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -838,7 +875,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -866,7 +904,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -893,7 +932,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -923,7 +963,8 @@
           "module": "../types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -940,7 +981,8 @@
           "module": "@/components/DataSourceDialog",
           "resolved": "src/components/DataSourceDialog.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -957,7 +999,8 @@
           "module": "@/schema/complexity-metrics",
           "resolved": "src/schema/complexity-metrics.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -974,7 +1017,8 @@
           "module": "@/schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1045,7 +1089,8 @@
           "module": "../store",
           "resolved": "src/features/visualization/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1064,7 +1109,8 @@
           "module": "../types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1081,7 +1127,8 @@
           "module": "./AppNode",
           "resolved": "src/features/visualization/components/AppNode.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1098,7 +1145,8 @@
           "module": "./GroupNode",
           "resolved": "src/features/visualization/components/GroupNode.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1115,7 +1163,8 @@
           "module": "@/schema/complexity-metrics",
           "resolved": "src/schema/complexity-metrics.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1132,7 +1181,8 @@
           "module": "@/schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1161,7 +1211,8 @@
           "module": "../../schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1180,7 +1231,8 @@
           "module": "./logic/filters",
           "resolved": "src/features/visualization/logic/filters.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1197,7 +1249,8 @@
           "module": "./logic/graph-utils",
           "resolved": "src/features/visualization/logic/graph-utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1216,7 +1269,8 @@
           "module": "./logic/layout",
           "resolved": "src/features/visualization/logic/layout.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1233,7 +1287,8 @@
           "module": "./logic/layout-elk",
           "resolved": "src/features/visualization/logic/layout-elk.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1252,7 +1307,8 @@
           "module": "./logic/layout.worker",
           "resolved": "src/features/visualization/logic/layout.worker.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1269,7 +1325,8 @@
           "module": "./logic/layout.worker?worker",
           "resolved": "src/features/visualization/logic/layout.worker.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1286,7 +1343,8 @@
           "module": "./logic/metrics",
           "resolved": "src/features/visualization/logic/metrics.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1303,7 +1361,8 @@
           "module": "./logic/transformer",
           "resolved": "src/features/visualization/logic/transformer.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1322,7 +1381,8 @@
           "module": "./types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1387,7 +1447,8 @@
           "module": "./layout",
           "resolved": "src/features/visualization/logic/layout.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1415,7 +1476,8 @@
           "module": "./layout",
           "resolved": "src/features/visualization/logic/layout.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1444,7 +1506,8 @@
           "module": "../types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1473,7 +1536,8 @@
           "module": "../../../schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1490,7 +1554,8 @@
           "module": "./filters",
           "resolved": "src/features/visualization/logic/filters.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1507,7 +1572,8 @@
           "module": "./uuid",
           "resolved": "src/features/visualization/logic/uuid.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1543,7 +1609,8 @@
           "module": "../store",
           "resolved": "src/features/visualization/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1562,7 +1629,8 @@
           "module": "../types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1579,7 +1647,8 @@
           "module": "./styles",
           "resolved": "src/features/visualization/components/styles.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1616,7 +1685,8 @@
           "module": "../store",
           "resolved": "src/features/visualization/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1635,7 +1705,8 @@
           "module": "../types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1652,7 +1723,8 @@
           "module": "./styles",
           "resolved": "src/features/visualization/components/styles.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1681,7 +1753,8 @@
           "module": "../logic/filters",
           "resolved": "src/features/visualization/logic/filters.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1698,7 +1771,8 @@
           "module": "../store",
           "resolved": "src/features/visualization/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1717,7 +1791,8 @@
           "module": "../types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1734,7 +1809,8 @@
           "module": "@/components/ui/button",
           "resolved": "src/components/ui/button.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1751,7 +1827,8 @@
           "module": "@/components/ui/card",
           "resolved": "src/components/ui/card.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1768,7 +1845,8 @@
           "module": "@/components/ui/dropdown-menu",
           "resolved": "src/components/ui/dropdown-menu.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1785,7 +1863,8 @@
           "module": "@/components/ui/label",
           "resolved": "src/components/ui/label.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1802,7 +1881,8 @@
           "module": "@/components/ui/separator",
           "resolved": "src/components/ui/separator.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1819,7 +1899,8 @@
           "module": "@/components/ui/switch",
           "resolved": "src/components/ui/switch.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1836,7 +1917,8 @@
           "module": "@/components/ui/tooltip",
           "resolved": "src/components/ui/tooltip.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -1853,7 +1935,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1880,7 +1963,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1907,7 +1991,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1935,7 +2020,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1963,7 +2049,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -1991,7 +2078,8 @@
           "module": "../logic/graph-utils",
           "resolved": "src/features/visualization/logic/graph-utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2008,7 +2096,8 @@
           "module": "../store",
           "resolved": "src/features/visualization/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2027,7 +2116,8 @@
           "module": "../types",
           "resolved": "src/features/visualization/types.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2044,7 +2134,8 @@
           "module": "@/components/ui/badge",
           "resolved": "src/components/ui/badge.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2061,7 +2152,8 @@
           "module": "@/components/ui/button",
           "resolved": "src/components/ui/button.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2078,7 +2170,8 @@
           "module": "@/components/ui/separator",
           "resolved": "src/components/ui/separator.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2095,7 +2188,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2122,7 +2216,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2149,7 +2244,8 @@
           "module": "../store",
           "resolved": "src/features/visualization/store.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2166,7 +2262,8 @@
           "module": "@/components/ui/button",
           "resolved": "src/components/ui/button.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2183,7 +2280,8 @@
           "module": "@/components/ui/dialog",
           "resolved": "src/components/ui/dialog.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2200,7 +2298,8 @@
           "module": "@/components/ui/dropdown-menu",
           "resolved": "src/components/ui/dropdown-menu.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2217,7 +2316,8 @@
           "module": "@/components/ui/label",
           "resolved": "src/components/ui/label.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2234,7 +2334,8 @@
           "module": "@/components/ui/switch",
           "resolved": "src/components/ui/switch.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2261,7 +2362,8 @@
           "module": "../../schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2278,7 +2380,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2327,7 +2430,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2357,7 +2461,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2387,7 +2492,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2417,7 +2523,8 @@
           "module": "../../schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2434,7 +2541,8 @@
           "module": "./adapters",
           "resolved": "src/cli/analyze/adapters.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2453,7 +2561,8 @@
           "module": "./architecture-debt",
           "resolved": "src/cli/analyze/architecture-debt.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2472,7 +2581,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2499,7 +2609,8 @@
           "module": "./calculate-metrics",
           "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2516,7 +2627,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2545,7 +2657,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2575,7 +2688,8 @@
           "module": "./calculate-metrics",
           "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2594,7 +2708,8 @@
           "module": "./models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2622,7 +2737,8 @@
           "module": "../../schema/manifest",
           "resolved": "src/schema/manifest.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2639,7 +2755,8 @@
           "module": "../analyze/adapters",
           "resolved": "src/cli/analyze/adapters.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2656,7 +2773,8 @@
           "module": "../analyze/architecture-debt",
           "resolved": "src/cli/analyze/architecture-debt.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2673,7 +2791,8 @@
           "module": "../analyze/calculate-metrics",
           "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2690,7 +2809,8 @@
           "module": "../analyze/environment",
           "resolved": "src/cli/analyze/environment.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2707,7 +2827,8 @@
           "module": "../analyze/graph-input",
           "resolved": "src/cli/analyze/graph-input.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2724,7 +2845,8 @@
           "module": "../analyze/impact",
           "resolved": "src/cli/analyze/impact.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2741,7 +2863,8 @@
           "module": "../analyze/models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2758,7 +2881,8 @@
           "module": "../analyze/parse-eslint",
           "resolved": "src/cli/analyze/parse-eslint.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2775,7 +2899,8 @@
           "module": "../analyze/render-markdown-report",
           "resolved": "src/cli/analyze/render-markdown-report.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2814,7 +2939,8 @@
           "module": "../../schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2831,7 +2957,8 @@
           "module": "../graph/render-dot",
           "resolved": "src/cli/graph/render-dot.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2848,7 +2975,8 @@
           "module": "../graph/render-graphviz",
           "resolved": "src/cli/graph/render-graphviz.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2865,7 +2993,8 @@
           "module": "../validate/validate",
           "resolved": "src/cli/validate/validate.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2895,7 +3024,8 @@
           "module": "../../schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": true
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2912,7 +3042,8 @@
           "module": "./presentation",
           "resolved": "src/cli/graph/presentation.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2959,7 +3090,8 @@
           "module": "../../schema/complexity-metrics",
           "resolved": "src/schema/complexity-metrics.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2976,7 +3108,8 @@
           "module": "../../schema/dependency-cruiser",
           "resolved": "src/schema/dependency-cruiser.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -2993,7 +3126,8 @@
           "module": "../../schema/manifest",
           "resolved": "src/schema/manifest.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3010,7 +3144,8 @@
           "module": "../analyze/models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -3039,7 +3174,8 @@
           "module": "../analyze/models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3056,7 +3192,8 @@
           "module": "../validate/validate",
           "resolved": "src/cli/validate/validate.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -3084,7 +3221,8 @@
           "module": "../schema/manifest",
           "resolved": "src/schema/manifest.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3101,7 +3239,8 @@
           "module": "./analyze/adapters",
           "resolved": "src/cli/analyze/adapters.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3118,7 +3257,8 @@
           "module": "./analyze/calculate-metrics",
           "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3135,7 +3275,8 @@
           "module": "./analyze/environment",
           "resolved": "src/cli/analyze/environment.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3152,7 +3293,8 @@
           "module": "./analyze/models",
           "resolved": "src/cli/analyze/models.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3169,7 +3311,8 @@
           "module": "./analyze/parse-eslint",
           "resolved": "src/cli/analyze/parse-eslint.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3186,7 +3329,8 @@
           "module": "./analyze/render-markdown-report",
           "resolved": "src/cli/analyze/render-markdown-report.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3203,7 +3347,8 @@
           "module": "./commands/analyze",
           "resolved": "src/cli/commands/analyze.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3220,7 +3365,8 @@
           "module": "./commands/graph",
           "resolved": "src/cli/commands/graph.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3237,7 +3383,8 @@
           "module": "./commands/validate",
           "resolved": "src/cli/commands/validate.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3254,7 +3401,8 @@
           "module": "./graph/render-dot",
           "resolved": "src/cli/graph/render-dot.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3272,7 +3420,8 @@
           "module": "./graph/render-dot",
           "resolved": "src/cli/graph/render-dot.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3289,7 +3438,8 @@
           "module": "./graph/render-graphviz",
           "resolved": "src/cli/graph/render-graphviz.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3306,7 +3456,8 @@
           "module": "./validate/validate",
           "resolved": "src/cli/validate/validate.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [],
@@ -3331,7 +3482,8 @@
           "module": "./commands/analyze",
           "resolved": "src/cli/commands/analyze.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3348,7 +3500,8 @@
           "module": "./commands/graph",
           "resolved": "src/cli/commands/graph.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3365,7 +3518,8 @@
           "module": "./commands/validate",
           "resolved": "src/cli/commands/validate.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [],
@@ -3390,7 +3544,8 @@
           "module": "./theme-context",
           "resolved": "src/components/theme-context.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -3417,7 +3572,8 @@
           "module": "@/lib/utils",
           "resolved": "src/lib/utils.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [],
@@ -3442,7 +3598,8 @@
           "module": "./layout-elk",
           "resolved": "src/features/visualization/logic/layout-elk.ts",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [],
@@ -3467,7 +3624,8 @@
           "module": "./App.tsx",
           "resolved": "src/App.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3484,7 +3642,8 @@
           "module": "./index.css",
           "resolved": "src/index.css",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3501,7 +3660,8 @@
           "module": "@/components/theme-provider",
           "resolved": "src/components/theme-provider.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         },
         {
           "circular": false,
@@ -3518,7 +3678,8 @@
           "module": "@/components/ui/tooltip",
           "resolved": "src/components/ui/tooltip.tsx",
           "valid": true,
-          "preCompilationOnly": false
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [],
@@ -3533,7 +3694,13 @@
       ],
       "coreModule": false,
       "couldNotResolve": false,
-      "orphan": false
+      "orphan": false,
+      "followable": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ]
     },
     {
       "source": "src/vite-env.d.ts",
@@ -3599,6 +3766,214 @@
       },
       "tsPreCompilationDeps": "specify",
       "args": "src"
+    },
+    "ruleSetUsed": {
+      "forbidden": [
+        {
+          "name": "feature-isolation",
+          "severity": "error",
+          "comment": "Features should be isolated and not import from other features.",
+          "from": {
+            "path": "^src/features/([^/]+)"
+          },
+          "to": {
+            "path": "^src/features",
+            "pathNot": "^src/features/$1"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "shared-ui-purity",
+          "severity": "error",
+          "comment": "Shared UI components cannot import from features (prevents coupling).",
+          "from": {
+            "path": "^src/components"
+          },
+          "to": {
+            "path": "^src/features"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "logic-ui-separation",
+          "severity": "error",
+          "comment": "Headless logic (src/lib) cannot import from UI/Features.",
+          "from": {
+            "path": "^src/lib"
+          },
+          "to": {
+            "path": "^src/(components|features)"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-circular",
+          "severity": "warn",
+          "comment": "This dependency is part of a circular relationship. You might want to revise your solution (i.e. use dependency injection, divide components in smaller parts, etc).",
+          "from": {},
+          "to": {
+            "circular": true
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-orphans",
+          "severity": "info",
+          "comment": "This is an orphan module - it's likely not used (anymore?). Please remove it, or add it to the dependency graph.",
+          "from": {
+            "orphan": true,
+            "pathNot": "\\.d\\.ts$"
+          },
+          "to": {},
+          "scope": "module"
+        }
+      ]
+    },
+    "environment": {
+      "version": "18.2.0",
+      "nodeVersionSupported": "^22||^24||>=26",
+      "nodeVersionFound": "v22.13.0",
+      "osVersionFound": "x64 linux@6.17.0-1022-azure",
+      "transpilersFound": [
+        {
+          "name": "javascript",
+          "version": "*",
+          "available": true,
+          "currentVersion": "acorn@8.18.0"
+        },
+        {
+          "name": "babel",
+          "version": ">=7.0.0 <8.0.0",
+          "available": true,
+          "currentVersion": "@babel/core@7.28.6"
+        },
+        {
+          "name": "coffee-script",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "coffeescript",
+          "version": ">=1.0.0 <3.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "livescript",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "svelte",
+          "version": ">=3.0.0 <6.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "swc",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "typescript",
+          "version": ">=2.0.0 <7.0.0",
+          "available": true,
+          "currentVersion": "typescript@5.9.3"
+        },
+        {
+          "name": "vue-template-compiler",
+          "version": ">=2.0.0 <3.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "@vue/compiler-sfc",
+          "version": ">=3.0.0 <4.0.0",
+          "available": false,
+          "currentVersion": "-"
+        }
+      ],
+      "extensionsFound": [
+        {
+          "extension": ".js",
+          "available": true
+        },
+        {
+          "extension": ".cjs",
+          "available": true
+        },
+        {
+          "extension": ".mjs",
+          "available": true
+        },
+        {
+          "extension": ".jsx",
+          "available": true
+        },
+        {
+          "extension": ".ts",
+          "available": true
+        },
+        {
+          "extension": ".tsx",
+          "available": true
+        },
+        {
+          "extension": ".d.ts",
+          "available": true
+        },
+        {
+          "extension": ".cts",
+          "available": true
+        },
+        {
+          "extension": ".d.cts",
+          "available": true
+        },
+        {
+          "extension": ".mts",
+          "available": true
+        },
+        {
+          "extension": ".d.mts",
+          "available": true
+        },
+        {
+          "extension": ".vue",
+          "available": false
+        },
+        {
+          "extension": ".svelte",
+          "available": false
+        },
+        {
+          "extension": ".ls",
+          "available": false
+        },
+        {
+          "extension": ".coffee",
+          "available": false
+        },
+        {
+          "extension": ".litcoffee",
+          "available": false
+        },
+        {
+          "extension": ".coffee.md",
+          "available": false
+        },
+        {
+          "extension": ".csx",
+          "available": false
+        },
+        {
+          "extension": ".cjsx",
+          "available": false
+        }
+      ]
     }
   }
 }
