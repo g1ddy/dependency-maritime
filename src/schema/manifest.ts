@@ -17,11 +17,10 @@ export const ArchitectureDebtSummarySchema = z.object({
 
 export const ChangeImpactSummarySchema = z.object({
   baseRevision: z.string().nullable(),
-  gitChangedCount: z.number().int().nonnegative(),
-  directlyChangedGraphCount: z.number().int().nonnegative(),
+  directlyChangedCount: z.number().int().nonnegative(),
   transitiveImpactCount: z.number().int().nonnegative(),
   affectedFolderCount: z.number().int().nonnegative(),
-  impactRatio: z.number().min(0).max(1),
+  impactRatio: z.number(),
 });
 
 export const NamespaceMetricSchema = z.object({
@@ -29,7 +28,7 @@ export const NamespaceMetricSchema = z.object({
   moduleCount: z.number().int().nonnegative(),
   afferentCoupling: z.number().int().nonnegative(),
   efferentCoupling: z.number().int().nonnegative(),
-  instability: z.number().min(0).max(1),
+  instability: z.number(),
 });
 
 export const ArchitectureSummarySchema = z.object({

@@ -14,8 +14,7 @@ export interface DebtReportData {
 
 export interface ImpactReportData {
     baseRevision: string | null;
-    gitChangedCount: number;
-    directlyChangedGraphCount: number;
+    directlyChangedCount: number;
     transitiveImpactCount: number;
     affectedFolderCount: number;
     impactRatio: number;
@@ -66,9 +65,8 @@ export function renderMarkdownReport(
         impactSection = `
 ### 🎯 PR / Change Impact Surface
 * **Base Revision**: \`${impactData.baseRevision || 'N/A'}\`
-* **Git Changed Files**: ${impactData.gitChangedCount}
-* **Directly Changed Graph Modules**: ${impactData.directlyChangedGraphCount}
-* **Transitively Affected Graph Modules**: ${impactData.transitiveImpactCount}
+* **Directly Changed Files**: ${impactData.directlyChangedCount}
+* **Transitively Affected Files**: ${impactData.transitiveImpactCount}
 * **Impacted Architectural Folders**: ${impactData.affectedFolderCount}
 * **Repository Impact Surface**: ${(impactData.impactRatio * 100).toFixed(1)}%
 `;

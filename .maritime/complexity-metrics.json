@@ -168,10 +168,10 @@
     "scanned": true
   },
   "src/schema/dependency-cruiser.ts": {
-    "complexity": 7,
-    "loc": 197,
+    "complexity": 1,
+    "loc": 110,
     "instability": 0,
-    "fanIn": 9,
+    "fanIn": 8,
     "fanOut": 0,
     "scanned": true
   },
@@ -345,33 +345,25 @@
   },
   "src/cli/analyze/adapters.ts": {
     "complexity": 24,
-    "loc": 461,
-    "instability": 0.4,
-    "fanIn": 3,
+    "loc": 445,
+    "instability": 0.5,
+    "fanIn": 2,
     "fanOut": 2,
     "scanned": true
   },
   "src/cli/analyze/models.ts": {
     "complexity": 1,
-    "loc": 63,
+    "loc": 58,
     "instability": 0,
-    "fanIn": 12,
+    "fanIn": 9,
     "fanOut": 0,
     "scanned": true
   },
-  "src/cli/analyze/architecture-debt.ts": {
-    "complexity": 24,
-    "loc": 216,
+  "src/cli/analyze/calculate-metrics.ts": {
+    "complexity": 6,
+    "loc": 121,
     "instability": 0.33,
     "fanIn": 2,
-    "fanOut": 1,
-    "scanned": true
-  },
-  "src/cli/analyze/calculate-metrics.ts": {
-    "complexity": 19,
-    "loc": 200,
-    "instability": 0.2,
-    "fanIn": 4,
     "fanOut": 1,
     "scanned": true
   },
@@ -383,22 +375,6 @@
     "fanOut": 1,
     "scanned": true
   },
-  "src/cli/analyze/graph-input.ts": {
-    "complexity": 4,
-    "loc": 70,
-    "instability": 0.8,
-    "fanIn": 1,
-    "fanOut": 4,
-    "scanned": true
-  },
-  "src/cli/analyze/impact.ts": {
-    "complexity": 19,
-    "loc": 106,
-    "instability": 0.67,
-    "fanIn": 1,
-    "fanOut": 2,
-    "scanned": true
-  },
   "src/cli/analyze/parse-eslint.ts": {
     "complexity": 9,
     "loc": 39,
@@ -408,24 +384,24 @@
     "scanned": true
   },
   "src/cli/analyze/render-markdown-report.ts": {
-    "complexity": 9,
-    "loc": 117,
-    "instability": 0.5,
+    "complexity": 4,
+    "loc": 54,
+    "instability": 0.33,
     "fanIn": 2,
-    "fanOut": 2,
+    "fanOut": 1,
     "scanned": true
   },
   "src/cli/commands/analyze.ts": {
-    "complexity": 41,
-    "loc": 362,
-    "instability": 0.83,
+    "complexity": 28,
+    "loc": 293,
+    "instability": 0.78,
     "fanIn": 2,
-    "fanOut": 10,
+    "fanOut": 7,
     "scanned": true
   },
   "src/schema/manifest.ts": {
     "complexity": 1,
-    "loc": 61,
+    "loc": 30,
     "instability": 0,
     "fanIn": 3,
     "fanOut": 0,
