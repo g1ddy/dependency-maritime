@@ -11,7 +11,8 @@ const graphResult = {
     },
     modules: [{ source: 'src/a.ts', dependencies: [], dependents: [] }],
     violations: [],
-    effectiveGraphPath: `${process.cwd()}/graph.json`
+    effectiveGraphPath: `${process.cwd()}/graph.json`,
+    stagedSuppliedGraph: false
 };
 
 describe('runAnalyzeCommand', () => {
@@ -89,6 +90,23 @@ describe('runAnalyzeCommand', () => {
         expect(manifest.artifacts.graph).toBe('graph.json');
         expect(manifest.artifacts.metrics).toBe('metrics.json');
         expect(manifest.artifacts.report).toBe('report.md');
+    });
+
+    it('reports when a supplied graph is staged into the artifact directory', async () => {
+        vi.mocked(graphInput.resolveAnalysisGraph).mockResolvedValueOnce({
+            ...graphResult,
+            effectiveGraphPath: `${process.cwd()}/.maritime/graph.json`,
+            stagedSuppliedGraph: true
+        });
+
+        const exitCode = await runAnalyzeCommand([
+            '--source', 'src',
+            '--graph', 'outside/graph.json',
+            '--output', '.maritime'
+        ]);
+
+        expect(exitCode).toBe(0);
+        expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Staging supplied graph into artifact directory'));
     });
 
     it('writes a baseline only in explicit baseline initialization mode', async () => {
