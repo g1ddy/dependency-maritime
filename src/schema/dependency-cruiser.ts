@@ -3,18 +3,18 @@ import type { ICruiseResult, IModule, IDependency } from 'dependency-cruiser';
 
 /**
  * Re-export official types for integrations that need to describe raw Dependency-Cruiser data.
- * Maritime's public artifact contract uses the normalized types below instead.
+ * Maritime's persisted graph is validated and normalized before it becomes canonical evidence.
  */
 export type { ICruiseResult, IModule, IDependency };
 
 const CycleEntrySchema = z.object({
   name: z.string(),
   dependencyTypes: z.array(z.string())
-});
+}).passthrough();
 
 /**
- * Validation schema for a raw dependency relation. It accepts upstream additions, but the
- * normalizer below explicitly selects the fields Maritime owns in canonical evidence.
+ * Validation schema for a dependency relation. Upstream dependency fields are intentionally
+ * preserved because they are deterministic graph semantics used by existing Maritime consumers.
  */
 export const DependencySchema = z.object({
   circular: z.boolean(),
@@ -36,7 +36,7 @@ export const DependencySchema = z.object({
   cycle: z.array(CycleEntrySchema).optional(),
 }).passthrough();
 
-/** Validation schema for a raw dependency-cruiser module. */
+/** Validation schema for a dependency-cruiser module. */
 export const ModuleSchema = z.object({
   source: z.string(),
   valid: z.boolean(),
@@ -73,124 +73,26 @@ export const CruiseResultSchema = z.object({
   }).passthrough(),
 }).passthrough();
 
-/** Canonical graph shapes Maritime persists after validation and normalization. */
-export interface MaritimeDependency {
-  circular: boolean;
-  coreModule: boolean;
-  couldNotResolve: boolean;
-  dependencyTypes: string[];
-  dynamic: boolean;
-  exoticallyRequired: boolean;
-  followable: boolean;
-  instability?: number;
-  protocol?: 'data:' | 'file:' | 'node:';
-  mimeType?: string;
-  moduleSystem: 'amd' | 'cjs' | 'es6' | 'tsd';
-  module: string;
-  resolved: string;
-  valid: boolean;
-  preCompilationOnly?: boolean;
-  typeOnly?: boolean;
-  cycle?: { name: string; dependencyTypes: string[] }[];
-}
-
-export interface MaritimeModule {
-  source: string;
-  valid: boolean;
-  dependencies: MaritimeDependency[];
-  dependents: string[];
-  coreModule?: boolean;
-  couldNotResolve?: boolean;
-  orphan?: boolean;
-}
-
-export interface MaritimeViolation {
-  type?: 'dependency' | 'module' | 'cycle' | 'reachability' | 'instability';
-  from: string;
-  to: string;
-  rule: {
-    name: string;
-    severity: 'error' | 'warn' | 'info' | 'ignore';
-  };
-}
+export type MaritimeDependency = z.infer<typeof DependencySchema>;
+export type MaritimeModule = z.infer<typeof ModuleSchema>;
+export type MaritimeViolation = z.infer<typeof ViolationSchema>;
 
 export interface MaritimeCruiseResult {
   modules: MaritimeModule[];
-  summary: {
-    error: number;
-    ignore: number;
-    info: number;
-    totalCruised: number;
-    totalDependenciesCruised?: number;
-    violations: MaritimeViolation[];
-    warn: number;
-    optionsUsed: unknown;
-  };
-}
-
-function normalizeDependency(dependency: z.infer<typeof DependencySchema>): MaritimeDependency {
-  return {
-    circular: dependency.circular,
-    coreModule: dependency.coreModule,
-    couldNotResolve: dependency.couldNotResolve,
-    dependencyTypes: [...dependency.dependencyTypes],
-    dynamic: dependency.dynamic,
-    exoticallyRequired: dependency.exoticallyRequired,
-    followable: dependency.followable,
-    ...(dependency.instability !== undefined ? { instability: dependency.instability } : {}),
-    ...(dependency.protocol !== undefined ? { protocol: dependency.protocol } : {}),
-    ...(dependency.mimeType !== undefined ? { mimeType: dependency.mimeType } : {}),
-    moduleSystem: dependency.moduleSystem,
-    module: dependency.module,
-    resolved: dependency.resolved,
-    valid: dependency.valid,
-    ...(dependency.preCompilationOnly !== undefined ? { preCompilationOnly: dependency.preCompilationOnly } : {}),
-    ...(dependency.typeOnly !== undefined ? { typeOnly: dependency.typeOnly } : {}),
-    ...(dependency.cycle !== undefined ? {
-      cycle: dependency.cycle.map(entry => ({
-        name: entry.name,
-        dependencyTypes: [...entry.dependencyTypes]
-      }))
-    } : {})
-  };
+  summary: z.infer<typeof CruiseResultSchema>['summary'];
 }
 
 /**
- * Normalizes raw dependency-cruiser output to Maritime's canonical graph shape. Unknown upstream
- * fields are deliberately discarded at every persisted level so machine/environment details cannot
- * silently become part of Maritime's public artifact contract.
+ * Normalizes raw dependency-cruiser output to Maritime's canonical graph envelope.
+ *
+ * Dependency-Cruiser 18 adds top-level runtime/environment metadata that can vary by machine.
+ * Maritime deliberately omits those top-level additions while preserving validated module,
+ * dependency, violation, and summary fields so existing deterministic graph semantics are not lost.
  */
 export function normalizeMaritimeGraph(raw: unknown): MaritimeCruiseResult {
   const validated = CruiseResultSchema.parse(raw);
   return {
-    modules: validated.modules.map(module => ({
-      source: module.source,
-      valid: module.valid,
-      dependencies: module.dependencies.map(normalizeDependency),
-      dependents: [...module.dependents],
-      ...(module.coreModule !== undefined ? { coreModule: module.coreModule } : {}),
-      ...(module.couldNotResolve !== undefined ? { couldNotResolve: module.couldNotResolve } : {}),
-      ...(module.orphan !== undefined ? { orphan: module.orphan } : {})
-    })),
-    summary: {
-      error: validated.summary.error,
-      ignore: validated.summary.ignore,
-      info: validated.summary.info,
-      totalCruised: validated.summary.totalCruised,
-      ...(validated.summary.totalDependenciesCruised !== undefined
-        ? { totalDependenciesCruised: validated.summary.totalDependenciesCruised }
-        : {}),
-      violations: validated.summary.violations.map(violation => ({
-        ...(violation.type !== undefined ? { type: violation.type } : {}),
-        from: violation.from,
-        to: violation.to,
-        rule: {
-          name: violation.rule.name,
-          severity: violation.rule.severity
-        }
-      })),
-      warn: validated.summary.warn,
-      optionsUsed: validated.summary.optionsUsed
-    }
+    modules: validated.modules,
+    summary: validated.summary
   };
 }
