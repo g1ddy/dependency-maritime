@@ -213,6 +213,49 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(overview).toContain('newrank="true"');
     }, 60000);
 
+    it('clean-install Crawler fixture verifies fallback/config-discovery and validates generated .maritime evidence', () => {
+        const dir = path.join(tmpRoot, 'crawler');
+        fs.mkdirSync(path.join(dir, 'src', 'cli'), { recursive: true });
+        fs.mkdirSync(path.join(dir, 'src', 'crawler'), { recursive: true });
+        writePackage(dir, 'crawler-command-interface');
+
+        fs.writeFileSync(
+            path.join(dir, 'src', 'crawler', 'engine.ts'),
+            'export const runCrawler = () => "crawling";\n'
+        );
+        fs.writeFileSync(
+            path.join(dir, 'src', 'cli', 'index.ts'),
+            'import { runCrawler } from "../crawler/engine"; console.log(runCrawler());\n'
+        );
+
+        installPacked(dir);
+
+        // Run analysis using automatic portable fallback/config discovery
+        const analyzeOutput = execSync('npx maritime analyze --source src --output .maritime', {
+            cwd: dir,
+            encoding: 'utf8'
+        });
+
+        expect(analyzeOutput).toContain('Generating Dependency Graph with dependency-cruiser');
+        expect(analyzeOutput).toContain('Complexity Report Updated and Metrics Exported');
+
+        for (const file of [
+            'dependency-graph.json',
+            'complexity-metrics.json',
+            'complexity-report.md',
+            'manifest.json'
+        ]) {
+            expect(fs.existsSync(path.join(dir, '.maritime', file))).toBe(true);
+        }
+
+        const validateOutput = execSync('npx maritime validate .maritime', {
+            cwd: dir,
+            encoding: 'utf8'
+        });
+        expect(validateOutput).toContain('Artifact Directory Contract Validated!');
+        expect(validateOutput).toContain('Schema Version: 1.0.0');
+    }, 60000);
+
     it('generated-graph fallback creates, measures, reports, and validates the canonical artifact bundle', () => {
         const dir = path.join(tmpRoot, 'fallback');
         fs.mkdirSync(path.join(dir, 'app', 'domain'), { recursive: true });

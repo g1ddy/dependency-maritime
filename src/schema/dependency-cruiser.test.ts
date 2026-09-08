@@ -75,4 +75,56 @@ describe('Dependency Cruiser Schema', () => {
     expect(normalized.modules[0].dependencies[0]).toMatchObject({ matchesDoNotFollow: false });
     expect(normalized.summary).toMatchObject({ deterministicSummaryField: 'kept' });
   });
+
+  it('validates instability and stable-dependency violations in summary.violations', () => {
+    const normalized = normalizeMaritimeGraph({
+      modules: [{
+        source: 'src/a.ts',
+        valid: false,
+        dependents: [],
+        dependencies: [{
+          circular: false,
+          coreModule: false,
+          couldNotResolve: false,
+          dependencyTypes: ['local'],
+          dynamic: false,
+          exoticallyRequired: false,
+          followable: true,
+          instability: 0.8,
+          moduleSystem: 'es6',
+          module: './b',
+          resolved: 'src/b.ts',
+          valid: false
+        }]
+      }],
+      summary: {
+        error: 1,
+        ignore: 0,
+        info: 0,
+        totalCruised: 1,
+        violations: [{
+          type: 'instability',
+          from: 'src/a.ts',
+          to: 'src/b.ts',
+          rule: {
+            name: 'no-unstable-dependencies',
+            severity: 'error'
+          }
+        }],
+        warn: 0,
+        optionsUsed: {}
+      }
+    });
+
+    expect(normalized.summary.violations[0]).toEqual({
+      type: 'instability',
+      from: 'src/a.ts',
+      to: 'src/b.ts',
+      rule: {
+        name: 'no-unstable-dependencies',
+        severity: 'error'
+      }
+    });
+    expect(normalized.modules[0].dependencies[0].instability).toBe(0.8);
+  });
 });

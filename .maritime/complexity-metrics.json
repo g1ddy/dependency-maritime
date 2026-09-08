@@ -169,7 +169,7 @@
   },
   "src/schema/dependency-cruiser.ts": {
     "complexity": 1,
-    "loc": 99,
+    "loc": 105,
     "instability": 0,
     "fanIn": 9,
     "fanOut": 0,
@@ -241,7 +241,7 @@
   },
   "src/features/visualization/logic/transformer.ts": {
     "complexity": 13,
-    "loc": 270,
+    "loc": 279,
     "instability": 0.75,
     "fanIn": 1,
     "fanOut": 3,

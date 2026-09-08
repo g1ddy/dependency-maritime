@@ -148,7 +148,13 @@
 }
 
 /* Disable Animations Helper */
-body.disable-animations * {
-  transition: none !important;
+body.disable-animations *,
+body.disable-animations *::before,
+body.disable-animations *::after {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
 }
