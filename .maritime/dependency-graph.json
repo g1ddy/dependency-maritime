@@ -2386,6 +2386,7 @@
       ],
       "dependents": [
         "src/cli/analyze/graph-input.ts",
+        "src/cli/analyze/output-manifest.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
       ],
@@ -2397,17 +2398,83 @@
       "dependencies": [],
       "dependents": [
         "src/cli/analyze/adapters.ts",
+        "src/cli/analyze/architecture-analysis.ts",
         "src/cli/analyze/architecture-debt.ts",
+        "src/cli/analyze/impact.ts",
         "src/cli/analyze/calculate-metrics.ts",
         "src/cli/analyze/environment.ts",
         "src/cli/analyze/graph-input.ts",
-        "src/cli/analyze/impact.ts",
-        "src/cli/analyze/parse-eslint.ts",
+        "src/cli/analyze/output-manifest.ts",
         "src/cli/analyze/render-markdown-report.ts",
+        "src/cli/analyze/parse-eslint.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/validate/validate.ts",
         "src/cli/commands/validate.ts",
         "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/analyze/architecture-analysis.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./architecture-debt",
+          "resolved": "src/cli/analyze/architecture-debt.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./impact",
+          "resolved": "src/cli/analyze/impact.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/commands/analyze.ts"
       ],
       "orphan": false
     },
@@ -2435,8 +2502,56 @@
         }
       ],
       "dependents": [
+        "src/cli/analyze/architecture-analysis.ts",
         "src/cli/analyze/graph-input.ts",
-        "src/cli/commands/analyze.ts"
+        "src/cli/analyze/output-manifest.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/analyze/impact.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./calculate-metrics",
+          "resolved": "src/cli/analyze/calculate-metrics.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/analyze/architecture-analysis.ts",
+        "src/cli/analyze/output-manifest.ts"
       ],
       "orphan": false
     },
@@ -2467,6 +2582,7 @@
       ],
       "dependents": [
         "src/cli/analyze/impact.ts",
+        "src/cli/analyze/output-manifest.ts",
         "src/cli/analyze/render-markdown-report.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
@@ -2591,7 +2707,7 @@
       "orphan": false
     },
     {
-      "source": "src/cli/analyze/impact.ts",
+      "source": "src/cli/analyze/output-manifest.ts",
       "valid": true,
       "dependencies": [
         {
@@ -2606,10 +2722,88 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
+          "module": "../../schema/manifest",
+          "resolved": "src/schema/manifest.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./adapters",
+          "resolved": "src/cli/analyze/adapters.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./architecture-debt",
+          "resolved": "src/cli/analyze/architecture-debt.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
           "module": "./calculate-metrics",
           "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
-          "preCompilationOnly": false,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./impact",
+          "resolved": "src/cli/analyze/impact.ts",
+          "valid": true,
+          "preCompilationOnly": true,
           "matchesDoNotFollow": false
         },
         {
@@ -2629,6 +2823,24 @@
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./render-markdown-report",
+          "resolved": "src/cli/analyze/render-markdown-report.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2637,32 +2849,12 @@
       "orphan": false
     },
     {
-      "source": "src/cli/analyze/parse-eslint.ts",
+      "source": "src/schema/manifest.ts",
       "valid": true,
-      "dependencies": [
-        {
-          "circular": false,
-          "coreModule": false,
-          "couldNotResolve": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import",
-            "pre-compilation-only"
-          ],
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "followable": true,
-          "moduleSystem": "es6",
-          "module": "./models",
-          "resolved": "src/cli/analyze/models.ts",
-          "valid": true,
-          "preCompilationOnly": true,
-          "matchesDoNotFollow": false
-        }
-      ],
+      "dependencies": [],
       "dependents": [
-        "src/cli/commands/analyze.ts",
+        "src/cli/analyze/output-manifest.ts",
+        "src/cli/validate/validate.ts",
         "src/cli/index.ts"
       ],
       "orphan": false
@@ -2713,6 +2905,37 @@
         }
       ],
       "dependents": [
+        "src/cli/analyze/output-manifest.ts",
+        "src/cli/index.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/analyze/parse-eslint.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
       ],
@@ -2722,24 +2945,6 @@
       "source": "src/cli/commands/analyze.ts",
       "valid": true,
       "dependencies": [
-        {
-          "circular": false,
-          "coreModule": false,
-          "couldNotResolve": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "followable": true,
-          "moduleSystem": "es6",
-          "module": "../../schema/manifest",
-          "resolved": "src/schema/manifest.ts",
-          "valid": true,
-          "preCompilationOnly": false,
-          "matchesDoNotFollow": false
-        },
         {
           "circular": false,
           "coreModule": false,
@@ -2770,8 +2975,8 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "../analyze/architecture-debt",
-          "resolved": "src/cli/analyze/architecture-debt.ts",
+          "module": "../analyze/architecture-analysis",
+          "resolved": "src/cli/analyze/architecture-analysis.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2842,8 +3047,8 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "../analyze/impact",
-          "resolved": "src/cli/analyze/impact.ts",
+          "module": "../analyze/models",
+          "resolved": "src/cli/analyze/models.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2860,8 +3065,8 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "../analyze/models",
-          "resolved": "src/cli/analyze/models.ts",
+          "module": "../analyze/output-manifest",
+          "resolved": "src/cli/analyze/output-manifest.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2883,40 +3088,11 @@
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
-        },
-        {
-          "circular": false,
-          "coreModule": false,
-          "couldNotResolve": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "followable": true,
-          "moduleSystem": "es6",
-          "module": "../analyze/render-markdown-report",
-          "resolved": "src/cli/analyze/render-markdown-report.ts",
-          "valid": true,
-          "preCompilationOnly": false,
-          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
         "src/cli/index.ts",
         "src/cli/main.ts"
-      ],
-      "orphan": false
-    },
-    {
-      "source": "src/schema/manifest.ts",
-      "valid": true,
-      "dependencies": [],
-      "dependents": [
-        "src/cli/commands/analyze.ts",
-        "src/cli/validate/validate.ts",
-        "src/cli/index.ts"
       ],
       "orphan": false
     },
@@ -3714,8 +3890,8 @@
     "error": 0,
     "ignore": 0,
     "info": 0,
-    "totalCruised": 68,
-    "totalDependenciesCruised": 161,
+    "totalCruised": 70,
+    "totalDependenciesCruised": 169,
     "violations": [],
     "warn": 0,
     "optionsUsed": {
