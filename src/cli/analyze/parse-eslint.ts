@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 import type { EslintResult, EslintFileComplexity } from './models';
 
 export function parseEslintComplexityReport(

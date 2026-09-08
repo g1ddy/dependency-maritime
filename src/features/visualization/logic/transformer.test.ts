@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createGraphFromCruiseResult, transformToReactFlow } from './transformer';
 import { normalizeMaritimeGraph, type MaritimeCruiseResult } from '../../../schema/dependency-cruiser';
 

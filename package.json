@@ -34,7 +34,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build:cli": "esbuild src/cli/main.ts --bundle --platform=node --format=esm --packages=external --banner:js=\"#!/usr/bin/env node\" --outfile=dist/cli/main.js && esbuild src/cli/index.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/cli/index.js && tsc -p tsconfig.cli.json && node -e \"fs.copyFileSync('dist/cli/cli/index.d.ts', 'dist/cli/index.d.ts')\"",
+    "build:cli": "esbuild src/cli/main.ts --bundle --platform=node --format=esm --packages=external --banner:js=\"#!/usr/bin/env node\" --outfile=dist/cli/main.js && esbuild src/cli/index.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/cli/index.js && tsc -p tsconfig.cli.json && node -e \"require('node:fs').copyFileSync('dist/cli/cli/index.d.ts', 'dist/cli/index.d.ts')\"",
     "build": "npm run build:cli && tsc -b && vite build",
     "lint": "eslint .",
     "depcruise": "depcruise src --config config/.dependency-cruiser.cjs",
@@ -44,7 +44,7 @@
     "test": "vitest",
     "test:unit": "vitest",
     "test:bench": "vitest bench -c vitest.bench.config.ts",
-    "test:cli-package": "vitest run tests/cli-pack-smoke.test.ts tests/action-ref-resolution.test.ts tests/evidence-workflow.test.ts",
+    "test:cli-package": "vitest run tests/cli-pack-smoke.test.ts tests/runtime-contract.test.ts tests/action-ref-resolution.test.ts tests/evidence-workflow.test.ts",
     "test:e2e": "playwright test",
     "test:screenshots": "playwright test -c config/playwright.screenshots.config.ts"
   },

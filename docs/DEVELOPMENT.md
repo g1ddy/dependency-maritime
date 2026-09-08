@@ -8,7 +8,7 @@ Package scripts are the executable source of truth; verify the current commands 
 
 Prerequisites:
 
-- Node.js 22.13 or later
+- Node.js 22.13.x or Node.js 24.x (22.13 is the API/type floor; 24 is the forward-compatibility target)
 - npm
 
 ~~~bash

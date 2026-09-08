@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import * as fs from 'fs/promises';
+import * as fs from 'node:fs/promises';
 import { readDependencyGraph, runEslintComplexityScan, resolveDepcruiseConfig, getPortableFallbackConfig, getToolVersion, writeOutputFiles } from './adapters';
 import { ValidationError } from './models';
 import { ESLint } from 'eslint';
