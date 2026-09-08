@@ -78,7 +78,12 @@ describe('writeAnalysisOutputs', () => {
             affectedFolderCount: 1,
             impactRatio: 0.5
         });
-        expect(manifest.summary.architecture.namespaces).toHaveLength(1);
+
+        const architecture = manifest.summary.architecture;
+        if (!architecture) {
+            throw new Error('Expected architecture summary in generated manifest');
+        }
+        expect(architecture.namespaces).toHaveLength(1);
         expect(calls[3]).toContain('Architecture Debt Summary');
         expect(calls[3]).toContain('PR / Change Impact Surface');
     });
