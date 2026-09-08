@@ -52,7 +52,7 @@ These are the unfinished delivery items previously tracked in [CLI.md](./CLI.md)
 
 ### Consumer confidence
 
-- [x] Validate the packed CLI against at least two additional ESLint 9+ flat-config TypeScript frontend repositories (Catan Hex Mastery and Crawler Command Interface) through their existing hand-rolled tarball workflows.
+- [x] Validate one immutable CLI build against the real Catan Hex Mastery and Crawler Command Interface revisions; see the pinned [consumer verification evidence](./CONSUMER_VERIFICATION.md).
 
 ### Artifact archive and UI bundle upload
 
