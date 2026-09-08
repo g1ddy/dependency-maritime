@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import { execSync } from 'child_process';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { execFileSync, execSync } from 'node:child_process';
 import * as yaml from 'js-yaml';
 
 type ExecFailure = {
@@ -254,6 +254,79 @@ describe('CLI npm pack clean-install smoke tests', () => {
         });
         expect(validateOutput).toContain('Artifact Directory Contract Validated!');
         expect(validateOutput).toContain('Schema Version: 1.0.0');
+    }, 60000);
+
+    it('runs analyze, validate, and DOT graph generation with their documented permissions', () => {
+        const dir = path.join(tmpRoot, 'permissions');
+        fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+        writePackage(dir, 'permission-model-smoke');
+        fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const safe = true;\n');
+        installPacked(dir);
+
+        const cli = path.join(dir, 'node_modules', '@dependency-maritime', 'cli', 'dist', 'cli', 'main.js');
+        const run = (args: string[], read: string[], write: string[] = []): string => execFileSync(
+            process.execPath,
+            [
+                '--permission',
+                ...read.map(value => `--allow-fs-read=${value}`),
+                ...write.map(value => `--allow-fs-write=${value}`),
+                cli,
+                ...args
+            ],
+            { cwd: dir, encoding: 'utf8' }
+        );
+
+        const outputDir = path.join(dir, '.maritime');
+        fs.mkdirSync(outputDir);
+        const derivedDir = path.join(dir, 'derived');
+        fs.mkdirSync(derivedDir);
+        const analyze = run(
+            ['analyze', '--source', 'src', '--output', '.maritime', '--fail-on-unmeasured'],
+            [dir],
+            [outputDir]
+        );
+        expect(analyze).toContain('Complexity Report Updated and Metrics Exported');
+
+        const dependencyDir = path.join(dir, 'node_modules');
+        const validate = run(['validate', '.maritime'], [outputDir, dependencyDir]);
+        expect(validate).toContain('Artifact Directory Contract Validated!');
+
+        const graph = run(
+            ['graph', '--input', '.maritime', '--output', 'derived/graph.dot'],
+            [outputDir, dependencyDir],
+            [derivedDir]
+        );
+        expect(graph).toContain('Dependency graph rendered');
+        expect(fs.existsSync(path.join(dir, 'derived', 'graph.dot'))).toBe(true);
+
+        const svgFailure = captureFailure(
+            `"${process.execPath}" --permission --allow-fs-read="${outputDir}" --allow-fs-read="${dependencyDir}" --allow-fs-write="${derivedDir}" "${cli}" graph --input .maritime --output derived/graph.svg`,
+            dir
+        );
+        expect(svgFailure.exitCode).toBe(2);
+        expect(svgFailure.output).toContain('ERR_ACCESS_DENIED');
+        expect(svgFailure.output).toContain('ChildProcess');
+    }, 60000);
+
+    it('packed executable rejects unsupported Node versions with the package engine range', () => {
+        const dir = path.join(tmpRoot, 'unsupported-runtime');
+        fs.mkdirSync(dir, { recursive: true });
+        writePackage(dir, 'unsupported-runtime');
+        installPacked(dir);
+        fs.writeFileSync(
+            path.join(dir, 'mock-node-version.mjs'),
+            "Object.defineProperty(process.versions, 'node', { value: '23.0.0' });\n"
+        );
+
+        const cli = path.join(dir, 'node_modules', '@dependency-maritime', 'cli', 'dist', 'cli', 'main.js');
+        const failure = captureFailure(
+            `"${process.execPath}" --import ./mock-node-version.mjs "${cli}" validate .maritime`,
+            dir
+        );
+        expect(failure.exitCode).toBe(1);
+        expect(failure.output).toContain('Maritime runtime error:');
+        expect(failure.output).toContain('requires Node.js ^22.13.0 || ^24.0.0');
+        expect(failure.output).toContain('current version: v23.0.0');
     }, 60000);
 
     it('generated-graph fallback creates, measures, reports, and validates the canonical artifact bundle', () => {
