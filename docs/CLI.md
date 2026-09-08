@@ -43,6 +43,19 @@ Increment 3 therefore promotes graph generation into the normal analyzer workflo
 maritime analyze --source app --output .maritime
 ```
 
+### Architecture Debt & PR Impact Flags
+
+```bash
+# Evaluate architecture debt against a known baseline and fail if new violations exist
+maritime analyze --source src --output .maritime --baseline .maritime/baseline.json --fail-on-new-violations
+
+# Establish or record a new baseline of architecture violations
+maritime analyze --source src --output .maritime --write-baseline .maritime/baseline.json
+
+# Calculate PR change impact surface relative to Git base revision
+maritime analyze --source src --output .maritime --base origin/main
+```
+
 which produces the dependency graph, metrics, and report itself. Graph generation must support repository-supplied dependency-cruiser configuration without assuming Dependency Maritime's own `src/`, `tsconfig.app.json`, or architectural rules.
 
 The package should also expose side-effect-free programmatic APIs such as:
@@ -67,7 +80,7 @@ The normal analysis output is a single self-contained artifact directory:
 
 Every successful `maritime analyze` invocation produces an output directory where `manifest.json`, the dependency graph JSON, complexity metrics JSON, and Markdown report all reside within that directory. All manifest-declared artifact paths are relative to the artifact directory and must not contain path traversal (e.g., `..`) or absolute paths.
 
-When `--graph <file>` is supplied outside `--output <dir>`, the validated supplied graph is staged (copied) into the output directory and referenced in the manifest as a relative path inside that directory. The original caller graph file is never modified or removed. If staging cannot be completed, analysis fails with a non-zero exit code without emitting a manifest.
+When `--graph <file>` is supplied outside `--output <dir>`, Maritime validates and normalizes the supplied graph, then serializes the normalized representation into the output directory and references it from the manifest using a relative path. The original caller graph file is never modified or removed. If canonical serialization cannot be completed, analysis fails with a non-zero exit code without emitting a manifest.
 
 ### `dependency-graph.json`
 
@@ -111,10 +124,41 @@ A versioned envelope containing schema version, tool version, source roots, gene
     "totalFiles": 42,
     "healthScore": 95.5,
     "scannedCount": 42,
-    "skippedCount": 0
+    "skippedCount": 0,
+    "architectureDebt": {
+      "baselineCount": 5,
+      "existingDebtCount": 5,
+      "newViolationCount": 0,
+      "resolvedCount": 0
+    },
+    "changeImpact": {
+      "baseRevision": "origin/main",
+      "directlyChangedCount": 3,
+      "gitChangedCount": 10,
+      "directlyChangedGraphCount": 3,
+      "transitiveImpactCount": 12,
+      "affectedFolderCount": 4,
+      "impactRatio": 0.2857
+    },
+    "architecture": {
+      "namespaces": [
+        {
+          "folder": "src/features/visualization",
+          "moduleCount": 12,
+          "afferentCoupling": 4,
+          "efferentCoupling": 6,
+          "instability": 0.6
+        }
+      ]
+    }
   }
 }
 ```
+
+`directlyChangedCount` is the schema `1.0.0` compatibility name for directly changed graph
+modules. New producers also emit `directlyChangedGraphCount` with the same value and optionally
+report `gitChangedCount` for all files changed in Git; consumers must continue accepting manifests
+that contain only the compatibility field.
 
 ## Validation contract
 
@@ -313,6 +357,9 @@ SVG rendering requires Graphviz `dot` on `PATH`; Graphviz is not bundled in the 
 The prerelease workflow is tag-driven. A `cli-vX.Y.Z[-pre]` tag is the release-version authority; the publish workflow stamps that version in its ephemeral workspace, builds and tests the packed package, publishes with npm provenance, then exercises the released Action/package pair from a clean consumer.
 
 The authoritative PR/main contract proof is `.github/workflows/cli-contract.yml`: it runs the packed CLI consumer matrix on Node 22 and 24 plus the composite Action compact-render smoke. Real consumer cutover remains repository-owned so Catan, Crawler, and Maritime can retain their own triggers and evidence/write policies.
+
+The pinned package, Action, consumer revisions, commands, and observed Catan/Crawler results for the
+Dependency-Cruiser 18 acceptance run are recorded in [Real consumer verification](./CONSUMER_VERIFICATION.md).
 
 ## Related documentation
 

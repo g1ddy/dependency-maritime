@@ -71,6 +71,12 @@ The CLI owns source discovery, dependency-cruiser integration, ESLint complexity
 artifact creation, and artifact validation. It consumes shared schemas and must remain runnable
 from a clean consumer installation without the UI dependency graph.
 
+Within `src/cli/`, command modules own argument parsing, top-level sequencing, logging, and exit-code
+translation. Analysis implementation belongs under `src/cli/analyze/`: `graph-input.ts` owns graph
+resolution/canonical staging, `architecture-analysis.ts` owns architecture-debt and change-impact
+orchestration, and `output-manifest.ts` owns metrics/report/manifest assembly. These modules preserve
+the public `maritime analyze` behavior while keeping implementation details independently testable.
+
 ### Visualization
 
 The visualization feature owns graph-to-React-Flow transformation, layout, filtering, interaction,

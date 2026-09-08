@@ -8,11 +8,44 @@ export const ArtifactManifestArtifactsSchema = z.object({
   report: z.string().min(1),
 });
 
+export const ArchitectureDebtSummarySchema = z.object({
+  baselineCount: z.number().int().nonnegative(),
+  existingDebtCount: z.number().int().nonnegative(),
+  newViolationCount: z.number().int().nonnegative(),
+  resolvedCount: z.number().int().nonnegative(),
+});
+
+export const ChangeImpactSummarySchema = z.object({
+  baseRevision: z.string().nullable(),
+  /** @deprecated Compatibility alias for directlyChangedGraphCount in schema 1.0.0. */
+  directlyChangedCount: z.number().int().nonnegative(),
+  gitChangedCount: z.number().int().nonnegative().optional(),
+  directlyChangedGraphCount: z.number().int().nonnegative().optional(),
+  transitiveImpactCount: z.number().int().nonnegative(),
+  affectedFolderCount: z.number().int().nonnegative(),
+  impactRatio: z.number().min(0).max(1),
+});
+
+export const NamespaceMetricSchema = z.object({
+  folder: z.string(),
+  moduleCount: z.number().int().nonnegative(),
+  afferentCoupling: z.number().int().nonnegative(),
+  efferentCoupling: z.number().int().nonnegative(),
+  instability: z.number().min(0).max(1),
+});
+
+export const ArchitectureSummarySchema = z.object({
+  namespaces: z.array(NamespaceMetricSchema).optional(),
+});
+
 export const ArtifactManifestSummarySchema = z.object({
   totalFiles: z.number().int().nonnegative(),
   healthScore: z.number(),
   scannedCount: z.number().int().nonnegative(),
   skippedCount: z.number().int().nonnegative(),
+  architectureDebt: ArchitectureDebtSummarySchema.optional(),
+  changeImpact: ChangeImpactSummarySchema.optional(),
+  architecture: ArchitectureSummarySchema.optional(),
 });
 
 export const ArtifactManifestSchema = z.object({

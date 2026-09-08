@@ -31,8 +31,8 @@ describe('adapters', () => {
             vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify(validData));
 
             const result = await readDependencyGraph('dummy.json');
-            expect(result).toHaveLength(1);
-            expect(result[0].source).toBe('src/a.ts');
+            expect(result.modules).toHaveLength(1);
+            expect(result.modules[0].source).toBe('src/a.ts');
         });
 
         it('should throw Error if file cannot be read', async () => {

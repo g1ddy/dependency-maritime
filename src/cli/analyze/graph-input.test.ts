@@ -1,118 +1,71 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import * as path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as fsPromises from 'node:fs/promises';
-import { resolveGraphInput } from './graph-input';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import * as adapters from './adapters';
-import type { ICruiseResult } from 'dependency-cruiser';
+import { resolveAnalysisGraph } from './graph-input';
 
-vi.mock('node:fs/promises', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('node:fs/promises')>();
-    return {
-        ...actual,
-        mkdir: vi.fn().mockResolvedValue(undefined),
-        copyFile: vi.fn().mockResolvedValue(undefined),
-        writeFile: vi.fn().mockResolvedValue(undefined)
-    };
-});
+const normalizedGraph = {
+    modules: [{ source: 'src/a.ts', valid: true, dependencies: [], dependents: [] }],
+    summary: { error: 0, ignore: 0, info: 0, totalCruised: 1, violations: [], warn: 0, optionsUsed: {} }
+};
 
-describe('resolveGraphInput', () => {
-    const workingDir = '/project';
-    const manifestDir = '/project/.maritime';
+describe('resolveAnalysisGraph', () => {
+    let workingDir: string;
 
-    beforeEach(() => {
-        vi.spyOn(console, 'log').mockImplementation(() => {});
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-        vi.spyOn(console, 'error').mockImplementation(() => {});
+    beforeEach(async () => {
+        workingDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'maritime-graph-input-'));
+        vi.spyOn(adapters, 'readDependencyGraph').mockResolvedValue({
+            graph: normalizedGraph,
+            modules: [{ source: 'src/a.ts', dependencies: [], dependents: [] }]
+        });
     });
 
-    afterEach(() => {
+    afterEach(async () => {
         vi.restoreAllMocks();
+        await fsPromises.rm(workingDir, { recursive: true, force: true });
     });
 
-    it('reads supplied graph inside manifest directory without staging', async () => {
-        const mockModules = [{ source: 'src/a.ts', dependencies: [], dependents: [] }];
-        vi.spyOn(adapters, 'readDependencyGraph').mockResolvedValue(mockModules);
+    it('serializes an outside supplied graph to the canonical artifact path', async () => {
+        const inputPath = path.join(workingDir, 'raw-graph.json');
+        const manifestDir = path.join(workingDir, '.maritime');
+        const originalBytes = '{"raw":"caller-owned"}\n';
+        await fsPromises.writeFile(inputPath, originalBytes);
 
-        const result = await resolveGraphInput({
-            graphPath: '.maritime/dependency-graph.json',
-            targetGraphPath: '.maritime/dependency-graph.json',
-            rawSources: ['src'],
+        const result = await resolveAnalysisGraph({
+            suppliedGraphPath: inputPath,
+            targetGraphPath: path.join(manifestDir, 'dependency-graph.json'),
             manifestDir,
+            rawSources: ['src'],
             workingDir
         });
 
-        expect(result.isGraphSupplied).toBe(true);
-        expect(result.modules).toEqual(mockModules);
-        expect(result.effectiveGraphPath).toBe(path.resolve(workingDir, '.maritime/dependency-graph.json'));
-        expect(fsPromises.copyFile).not.toHaveBeenCalled();
-    });
-
-    it('stages supplied graph into manifest directory when path is outside', async () => {
-        const mockModules = [{ source: 'src/a.ts', dependencies: [], dependents: [] }];
-        vi.spyOn(adapters, 'readDependencyGraph').mockResolvedValue(mockModules);
-
-        const result = await resolveGraphInput({
-            graphPath: '../outside/graph.json',
-            targetGraphPath: '.maritime/dependency-graph.json',
-            rawSources: ['src'],
-            manifestDir,
-            workingDir
-        });
-
-        expect(result.isGraphSupplied).toBe(true);
-        expect(result.modules).toEqual(mockModules);
-        expect(result.effectiveGraphPath).toBe(path.join(manifestDir, 'graph.json'));
-        expect(fsPromises.mkdir).toHaveBeenCalledWith(manifestDir, { recursive: true });
-        expect(fsPromises.copyFile).toHaveBeenCalledWith(
-            path.resolve(workingDir, '../outside/graph.json'),
-            path.join(manifestDir, 'graph.json')
+        expect(result.effectiveGraphPath).toBe(path.join(manifestDir, 'dependency-graph.json'));
+        expect(await fsPromises.readFile(result.effectiveGraphPath, 'utf8')).toBe(
+            JSON.stringify(result.graph, null, 2)
         );
+        expect(await fsPromises.readFile(inputPath, 'utf8')).toBe(originalBytes);
     });
 
-    it('throws error when staging outside graph fails', async () => {
-        vi.spyOn(adapters, 'readDependencyGraph').mockResolvedValue([]);
-        vi.mocked(fsPromises.copyFile).mockRejectedValueOnce(new Error('Disk full'));
+    it('never overwrites a supplied graph that is already at the requested artifact path', async () => {
+        const manifestDir = path.join(workingDir, '.maritime');
+        const inputPath = path.join(manifestDir, 'dependency-graph.json');
+        const originalBytes = '{ "raw": "preserve these exact bytes" }\n';
+        await fsPromises.mkdir(manifestDir, { recursive: true });
+        await fsPromises.writeFile(inputPath, originalBytes);
 
-        await expect(resolveGraphInput({
-            graphPath: '../outside/graph.json',
-            targetGraphPath: '.maritime/dependency-graph.json',
-            rawSources: ['src'],
+        const result = await resolveAnalysisGraph({
+            suppliedGraphPath: inputPath,
+            targetGraphPath: inputPath,
             manifestDir,
-            workingDir
-        })).rejects.toThrow('Failed to stage supplied dependency graph into artifact directory: Disk full');
-    });
-
-    it('generates graph when graphPath is omitted', async () => {
-        const mockModules = [{ source: 'src/b.ts', dependencies: [], dependents: [] }];
-        const mockCruiseResult = { modules: mockModules, summary: {} } as unknown as ICruiseResult;
-
-        vi.spyOn(adapters, 'generateDependencyGraph').mockResolvedValue({
-            modules: mockModules,
-            cruiseResult: mockCruiseResult,
-            configSource: 'fallback'
-        });
-
-        const result = await resolveGraphInput({
-            graphPath: undefined,
-            targetGraphPath: '.maritime/dependency-graph.json',
             rawSources: ['src'],
-            depcruiseConfig: undefined,
-            manifestDir,
             workingDir
         });
 
-        expect(result.isGraphSupplied).toBe(false);
-        expect(result.configSource).toBe('fallback');
-        expect(result.modules).toEqual(mockModules);
-        expect(result.effectiveGraphPath).toBe(path.resolve(workingDir, '.maritime/dependency-graph.json'));
-        expect(adapters.generateDependencyGraph).toHaveBeenCalledWith({
-            sourceRoots: ['src'],
-            configPath: undefined,
-            cwd: workingDir
-        });
-        expect(fsPromises.writeFile).toHaveBeenCalledWith(
-            path.resolve(workingDir, '.maritime/dependency-graph.json'),
-            JSON.stringify(mockCruiseResult, null, 2)
+        expect(result.effectiveGraphPath).toBe(path.join(manifestDir, 'maritime-dependency-graph.json'));
+        expect(await fsPromises.readFile(inputPath, 'utf8')).toBe(originalBytes);
+        expect(await fsPromises.readFile(result.effectiveGraphPath, 'utf8')).toBe(
+            JSON.stringify(result.graph, null, 2)
         );
     });
 });

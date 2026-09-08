@@ -11,7 +11,7 @@ import {
   applyEdgeChanges
 } from '@xyflow/react';
 import Graph from 'graphology';
-import { type ICruiseResult } from '../../schema/dependency-cruiser';
+import { type MaritimeCruiseResult } from '../../schema/dependency-cruiser';
 import { createGraphFromCruiseResult, transformToReactFlow } from './logic/transformer';
 import { FOLDER_DESCENDANTS_CACHE_KEY, createNodesById } from './logic/graph-utils';
 import { applyElkLayout } from './logic/layout-elk';
@@ -68,7 +68,7 @@ interface GraphState {
 
   // Actions
   setInspectorOpen: (isOpen: boolean) => void;
-  setGraphData: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
+  setGraphData: (data: MaritimeCruiseResult, complexityMetrics?: ComplexityMetricsMap) => void;
   calculateMetrics: (version?: number) => void;
   layoutGraph: (direction?: 'TB' | 'LR') => Promise<void>;
   setLayoutEngine: (engine: LayoutEngine) => void;
@@ -260,7 +260,7 @@ export const useGraphStore = create<GraphState>()(
           void get().layoutGraph();
         },
 
-        setGraphData: (data: ICruiseResult, complexityMetrics?: ComplexityMetricsMap) => {
+        setGraphData: (data: MaritimeCruiseResult, complexityMetrics?: ComplexityMetricsMap) => {
           set((state) => ({
             loading: true,
             metricsVersion: state.metricsVersion + 1,

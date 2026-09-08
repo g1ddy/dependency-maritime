@@ -49,7 +49,7 @@
     "test:screenshots": "playwright test -c config/playwright.screenshots.config.ts"
   },
   "dependencies": {
-    "dependency-cruiser": "^17.3.7",
+    "dependency-cruiser": "^18.2.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

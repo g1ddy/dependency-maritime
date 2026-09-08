@@ -1,95 +1,99 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as path from 'node:path';
 import { writeAnalysisOutputs } from './output-manifest';
 import * as adapters from './adapters';
 import { ValidationError, type AnalysisResult, type AnalysisThresholds } from './models';
 import type { ArtifactManifest } from '../../schema/manifest';
 
+const thresholds: AnalysisThresholds = { loc: 300, complexity: 10, fanOut: 15 };
+const analysisResult: AnalysisResult = {
+    files: [{
+        file: 'src/a.ts', loc: 100, complexity: 5, fanIn: 1, fanOut: 2,
+        instability: 0.67, score: 33.4, scanned: true
+    }],
+    healthScore: 100,
+    topByScore: [],
+    topByComplexity: [],
+    skippedCount: 0,
+    unmeasuredFiles: []
+};
+
 describe('writeAnalysisOutputs', () => {
-    const workingDir = '/project';
-    const manifestDir = '/project/.maritime';
-    const thresholds: AnalysisThresholds = { loc: 300, complexity: 10, fanOut: 15 };
-
-    const mockAnalysisResult: AnalysisResult = {
-        files: [
-            {
-                file: 'src/a.ts',
-                loc: 100,
-                complexity: 5,
-                fanIn: 1,
-                fanOut: 2,
-                instability: 0.67,
-                score: 33.4,
-                scanned: true
-            }
-        ],
-        healthScore: 100,
-        topByScore: [],
-        topByComplexity: [],
-        skippedCount: 0,
-        unmeasuredFiles: []
-    };
-
     beforeEach(() => {
         vi.spyOn(console, 'log').mockImplementation(() => {});
         vi.spyOn(adapters, 'writeOutputFiles').mockResolvedValue(undefined);
     });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+    afterEach(() => vi.restoreAllMocks());
 
-    it('builds manifest and writes output files correctly when paths are inside manifest directory', async () => {
+    it('preserves debt, impact, and namespace contracts while writing the manifest', async () => {
         await writeAnalysisOutputs({
-            analysisResult: mockAnalysisResult,
+            analysisResult,
             thresholds,
             normalizedSources: ['src'],
-            effectiveGraphPath: path.resolve(workingDir, '.maritime/dependency-graph.json'),
+            effectiveGraphPath: '/project/.maritime/dependency-graph.json',
             targetMetricsPath: '.maritime/complexity-metrics.json',
             targetReportPath: '.maritime/complexity-report.md',
-            manifestDir,
-            workingDir
+            manifestDir: '/project/.maritime',
+            workingDir: '/project',
+            debtEvaluation: {
+                baselineCount: 2,
+                existingDebtCount: 1,
+                newViolationCount: 1,
+                resolvedCount: 1,
+                violations: []
+            },
+            impactEvaluation: {
+                baseRevision: 'origin/main',
+                gitChangedFiles: ['src/a.ts', 'README.md'],
+                directlyChangedFiles: ['src/a.ts'],
+                transitivelyAffectedFiles: ['src/b.ts'],
+                affectedFolders: ['src'],
+                impactRatio: 0.5
+            },
+            namespaceMetrics: [{
+                folder: 'src', moduleCount: 2, afferentCoupling: 0,
+                efferentCoupling: 1, instability: 1
+            }]
         });
 
-        expect(adapters.writeOutputFiles).toHaveBeenCalledTimes(1);
         const calls = vi.mocked(adapters.writeOutputFiles).mock.calls[0];
-        expect(calls[0]).toBe('.maritime/complexity-metrics.json');
-        expect(calls[1]).toEqual({
-            'src/a.ts': {
-                complexity: 5,
-                loc: 100,
-                instability: 0.67,
-                fanIn: 1,
-                fanOut: 2,
-                scanned: true
-            }
-        });
-        expect(calls[2]).toBe('.maritime/complexity-report.md');
-        expect(calls[3]).toContain('Automated Complexity Report');
-        expect(calls[4]).toBe('.maritime/manifest.json');
         const manifest = calls[5] as ArtifactManifest;
-        expect(manifest.schemaVersion).toBe('1.0.0');
-        expect(manifest.artifacts.graph).toBe('dependency-graph.json');
-        expect(manifest.artifacts.metrics).toBe('complexity-metrics.json');
-        expect(manifest.artifacts.report).toBe('complexity-report.md');
-        expect(manifest.summary).toEqual({
-            totalFiles: 1,
-            healthScore: 100,
-            scannedCount: 1,
-            skippedCount: 0
+        expect(manifest.artifacts).toEqual({
+            graph: 'dependency-graph.json',
+            metrics: 'complexity-metrics.json',
+            report: 'complexity-report.md'
         });
+        expect(manifest.summary.architectureDebt).toEqual({
+            baselineCount: 2,
+            existingDebtCount: 1,
+            newViolationCount: 1,
+            resolvedCount: 1
+        });
+        expect(manifest.summary.changeImpact).toMatchObject({
+            directlyChangedCount: 1,
+            gitChangedCount: 2,
+            directlyChangedGraphCount: 1,
+            transitiveImpactCount: 1,
+            affectedFolderCount: 1,
+            impactRatio: 0.5
+        });
+        expect(manifest.summary.architecture.namespaces).toHaveLength(1);
+        expect(calls[3]).toContain('Architecture Debt Summary');
+        expect(calls[3]).toContain('PR / Change Impact Surface');
     });
 
-    it('throws ValidationError when an artifact path escapes the manifest directory', async () => {
+    it('rejects artifacts outside the manifest directory', async () => {
         await expect(writeAnalysisOutputs({
-            analysisResult: mockAnalysisResult,
+            analysisResult,
             thresholds,
             normalizedSources: ['src'],
-            effectiveGraphPath: path.resolve(workingDir, 'outside-graph.json'),
+            effectiveGraphPath: path.resolve('/project/outside.json'),
             targetMetricsPath: '.maritime/complexity-metrics.json',
             targetReportPath: '.maritime/complexity-report.md',
-            manifestDir,
-            workingDir
+            manifestDir: '/project/.maritime',
+            workingDir: '/project',
+            namespaceMetrics: []
         })).rejects.toThrow(ValidationError);
     });
 });

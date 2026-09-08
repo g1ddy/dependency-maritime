@@ -1,6 +1,6 @@
 import Graph from 'graphology';
 import { type Node, type Edge } from '@xyflow/react';
-import { type ICruiseResult, type IModule, type IDependency } from '../../../schema/dependency-cruiser';
+import { type MaritimeCruiseResult, type MaritimeModule, type MaritimeDependency } from '../../../schema/dependency-cruiser';
 import { classifyNode, type ModuleCategory } from './filters';
 import { generateUUID } from './uuid';
 
@@ -8,12 +8,12 @@ import { generateUUID } from './uuid';
  * Converts the dependency-cruiser output into a Graphology graph.
  * This acts as the "Headless" logic layer.
  */
-export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
+export function createGraphFromCruiseResult(data: MaritimeCruiseResult): Graph {
   const graph = new Graph({ type: 'directed', allowSelfLoops: true, multi: false });
   const pathMap = new Map<string, string>(); // Maps original file path -> Node GUID
 
   // 1. Add all nodes
-  data.modules.forEach((mod: IModule) => {
+  data.modules.forEach((mod: MaritimeModule) => {
     // We use a GUID as the unique ID for file nodes
     if (!pathMap.has(mod.source)) {
       const guid = generateUUID();
@@ -28,8 +28,8 @@ export function createGraphFromCruiseResult(data: ICruiseResult): Graph {
   });
 
   // 2. Add all edges
-  data.modules.forEach((mod: IModule) => {
-    mod.dependencies.forEach((dep: IDependency) => {
+  data.modules.forEach((mod: MaritimeModule) => {
+    mod.dependencies.forEach((dep: MaritimeDependency) => {
       // Ensure the target node exists
       const sourceId = pathMap.get(mod.source);
       let targetId = pathMap.get(dep.resolved);
@@ -219,6 +219,7 @@ export function transformToReactFlow(
 
   // Add group nodes to the nodes list
   // We place group nodes FIRST so they render BEHIND the file nodes
+  // and assign explicit zIndex to ensure correct stacking in WebKit/Mobile Safari
   const groupNodes = Array.from(groupNodesMap.values())
     .map((node) => {
       let depth = 0;
@@ -228,7 +229,10 @@ export function transformToReactFlow(
         }
       }
       return {
-        node,
+        node: {
+          ...node,
+          zIndex: depth,
+        },
         depth,
       };
     })
@@ -238,7 +242,12 @@ export function transformToReactFlow(
     })
     .map((item) => item.node);
 
-  const finalNodes = [...groupNodes, ...nodes];
+  const appNodes = nodes.map((node) => ({
+    ...node,
+    zIndex: 1000,
+  }));
+
+  const finalNodes = [...groupNodes, ...appNodes];
 
   graph.forEachEdge((_edgeId, attributes, source, target) => {
     // 1. Filter out edges where source or target is hidden

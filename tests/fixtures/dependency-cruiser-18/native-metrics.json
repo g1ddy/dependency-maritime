@@ -1,0 +1,44 @@
+{
+  "generatedBy": {
+    "name": "dependency-cruiser",
+    "version": "18.2.0",
+    "command": "npx depcruise src --no-config --metrics --output-type json"
+  },
+  "modules": [
+    {
+      "source": "src/features/auth/login.ts",
+      "dependencies": [
+        { "resolved": "src/shared/http.ts", "valid": true },
+        { "resolved": "src/features/auth/utils.ts", "valid": true }
+      ],
+      "dependents": [],
+      "instability": 1
+    },
+    {
+      "source": "src/shared/http.ts",
+      "dependencies": [],
+      "dependents": ["src/features/auth/login.ts"],
+      "instability": 0
+    },
+    {
+      "source": "src/features/auth/utils.ts",
+      "dependencies": [],
+      "dependents": ["src/features/auth/login.ts"],
+      "instability": 0
+    }
+  ],
+  "folders": [
+    {
+      "name": "src/features/auth",
+      "afferentCouplings": 0,
+      "efferentCouplings": 1,
+      "instability": 1
+    },
+    {
+      "name": "src/shared",
+      "afferentCouplings": 1,
+      "efferentCouplings": 0,
+      "instability": 0
+    }
+  ]
+}

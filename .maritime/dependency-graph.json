@@ -1063,6 +1063,7 @@
         "src/features/visualization/store.ts",
         "src/features/visualization/logic/transformer.ts",
         "src/cli/analyze/adapters.ts",
+        "src/cli/analyze/graph-input.ts",
         "src/cli/commands/graph.ts",
         "src/cli/graph/render-dot.ts",
         "src/cli/validate/validate.ts"
@@ -2385,7 +2386,6 @@
       ],
       "dependents": [
         "src/cli/analyze/graph-input.ts",
-        "src/cli/analyze/output-manifest.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
       ],
@@ -2397,12 +2397,13 @@
       "dependencies": [],
       "dependents": [
         "src/cli/analyze/adapters.ts",
+        "src/cli/analyze/architecture-debt.ts",
         "src/cli/analyze/calculate-metrics.ts",
         "src/cli/analyze/environment.ts",
         "src/cli/analyze/graph-input.ts",
-        "src/cli/analyze/output-manifest.ts",
-        "src/cli/analyze/render-markdown-report.ts",
+        "src/cli/analyze/impact.ts",
         "src/cli/analyze/parse-eslint.ts",
+        "src/cli/analyze/render-markdown-report.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/validate/validate.ts",
         "src/cli/commands/validate.ts",
@@ -2411,7 +2412,7 @@
       "orphan": false
     },
     {
-      "source": "src/cli/analyze/calculate-metrics.ts",
+      "source": "src/cli/analyze/architecture-debt.ts",
       "valid": true,
       "dependencies": [
         {
@@ -2434,6 +2435,39 @@
         }
       ],
       "dependents": [
+        "src/cli/analyze/graph-input.ts",
+        "src/cli/commands/analyze.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/cli/analyze/calculate-metrics.ts",
+      "valid": true,
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        }
+      ],
+      "dependents": [
+        "src/cli/analyze/impact.ts",
+        "src/cli/analyze/render-markdown-report.ts",
         "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
       ],
@@ -2478,6 +2512,26 @@
           "couldNotResolve": false,
           "dependencyTypes": [
             "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../../schema/dependency-cruiser",
+          "resolved": "src/schema/dependency-cruiser.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
             "import"
           ],
           "dynamic": false,
@@ -2488,6 +2542,26 @@
           "resolved": "src/cli/analyze/adapters.ts",
           "valid": true,
           "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./architecture-debt",
+          "resolved": "src/cli/analyze/architecture-debt.ts",
+          "valid": true,
+          "preCompilationOnly": true,
           "matchesDoNotFollow": false
         },
         {
@@ -2517,7 +2591,7 @@
       "orphan": false
     },
     {
-      "source": "src/cli/analyze/output-manifest.ts",
+      "source": "src/cli/analyze/impact.ts",
       "valid": true,
       "dependencies": [
         {
@@ -2532,26 +2606,8 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "../../schema/manifest",
-          "resolved": "src/schema/manifest.ts",
-          "valid": true,
-          "preCompilationOnly": false,
-          "matchesDoNotFollow": false
-        },
-        {
-          "circular": false,
-          "coreModule": false,
-          "couldNotResolve": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "followable": true,
-          "moduleSystem": "es6",
-          "module": "./adapters",
-          "resolved": "src/cli/analyze/adapters.ts",
+          "module": "./calculate-metrics",
+          "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2573,24 +2629,6 @@
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
-        },
-        {
-          "circular": false,
-          "coreModule": false,
-          "couldNotResolve": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "followable": true,
-          "moduleSystem": "es6",
-          "module": "./render-markdown-report",
-          "resolved": "src/cli/analyze/render-markdown-report.ts",
-          "valid": true,
-          "preCompilationOnly": false,
-          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
@@ -2599,12 +2637,32 @@
       "orphan": false
     },
     {
-      "source": "src/schema/manifest.ts",
+      "source": "src/cli/analyze/parse-eslint.ts",
       "valid": true,
-      "dependencies": [],
+      "dependencies": [
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import",
+            "pre-compilation-only"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "./models",
+          "resolved": "src/cli/analyze/models.ts",
+          "valid": true,
+          "preCompilationOnly": true,
+          "matchesDoNotFollow": false
+        }
+      ],
       "dependents": [
-        "src/cli/analyze/output-manifest.ts",
-        "src/cli/validate/validate.ts",
+        "src/cli/commands/analyze.ts",
         "src/cli/index.ts"
       ],
       "orphan": false
@@ -2627,23 +2685,12 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "./models",
-          "resolved": "src/cli/analyze/models.ts",
+          "module": "./calculate-metrics",
+          "resolved": "src/cli/analyze/calculate-metrics.ts",
           "valid": true,
           "preCompilationOnly": true,
           "matchesDoNotFollow": false
-        }
-      ],
-      "dependents": [
-        "src/cli/analyze/output-manifest.ts",
-        "src/cli/index.ts"
-      ],
-      "orphan": false
-    },
-    {
-      "source": "src/cli/analyze/parse-eslint.ts",
-      "valid": true,
-      "dependencies": [
+        },
         {
           "circular": false,
           "coreModule": false,
@@ -2687,8 +2734,44 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
+          "module": "../../schema/manifest",
+          "resolved": "src/schema/manifest.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
           "module": "../analyze/adapters",
           "resolved": "src/cli/analyze/adapters.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../analyze/architecture-debt",
+          "resolved": "src/cli/analyze/architecture-debt.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2759,8 +2842,8 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "../analyze/models",
-          "resolved": "src/cli/analyze/models.ts",
+          "module": "../analyze/impact",
+          "resolved": "src/cli/analyze/impact.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2777,8 +2860,8 @@
           "exoticallyRequired": false,
           "followable": true,
           "moduleSystem": "es6",
-          "module": "../analyze/output-manifest",
-          "resolved": "src/cli/analyze/output-manifest.ts",
+          "module": "../analyze/models",
+          "resolved": "src/cli/analyze/models.ts",
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
@@ -2800,11 +2883,40 @@
           "valid": true,
           "preCompilationOnly": false,
           "matchesDoNotFollow": false
+        },
+        {
+          "circular": false,
+          "coreModule": false,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "followable": true,
+          "moduleSystem": "es6",
+          "module": "../analyze/render-markdown-report",
+          "resolved": "src/cli/analyze/render-markdown-report.ts",
+          "valid": true,
+          "preCompilationOnly": false,
+          "matchesDoNotFollow": false
         }
       ],
       "dependents": [
         "src/cli/index.ts",
         "src/cli/main.ts"
+      ],
+      "orphan": false
+    },
+    {
+      "source": "src/schema/manifest.ts",
+      "valid": true,
+      "dependencies": [],
+      "dependents": [
+        "src/cli/commands/analyze.ts",
+        "src/cli/validate/validate.ts",
+        "src/cli/index.ts"
       ],
       "orphan": false
     },
@@ -3602,8 +3714,8 @@
     "error": 0,
     "ignore": 0,
     "info": 0,
-    "totalCruised": 67,
-    "totalDependenciesCruised": 156,
+    "totalCruised": 68,
+    "totalDependenciesCruised": 161,
     "violations": [],
     "warn": 0,
     "optionsUsed": {
@@ -3714,6 +3826,152 @@
           },
           "to": {},
           "scope": "module"
+        }
+      ]
+    },
+    "environment": {
+      "version": "18.2.0",
+      "nodeVersionSupported": "^22||^24||>=26",
+      "nodeVersionFound": "v22.13.0",
+      "osVersionFound": "x64 linux@6.17.0-1022-azure",
+      "transpilersFound": [
+        {
+          "name": "javascript",
+          "version": "*",
+          "available": true,
+          "currentVersion": "acorn@8.18.0"
+        },
+        {
+          "name": "babel",
+          "version": ">=7.0.0 <8.0.0",
+          "available": true,
+          "currentVersion": "@babel/core@7.28.6"
+        },
+        {
+          "name": "coffee-script",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "coffeescript",
+          "version": ">=1.0.0 <3.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "livescript",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "svelte",
+          "version": ">=3.0.0 <6.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "swc",
+          "version": ">=1.0.0 <2.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "typescript",
+          "version": ">=2.0.0 <7.0.0",
+          "available": true,
+          "currentVersion": "typescript@5.9.3"
+        },
+        {
+          "name": "vue-template-compiler",
+          "version": ">=2.0.0 <3.0.0",
+          "available": false,
+          "currentVersion": "-"
+        },
+        {
+          "name": "@vue/compiler-sfc",
+          "version": ">=3.0.0 <4.0.0",
+          "available": false,
+          "currentVersion": "-"
+        }
+      ],
+      "extensionsFound": [
+        {
+          "extension": ".js",
+          "available": true
+        },
+        {
+          "extension": ".cjs",
+          "available": true
+        },
+        {
+          "extension": ".mjs",
+          "available": true
+        },
+        {
+          "extension": ".jsx",
+          "available": true
+        },
+        {
+          "extension": ".ts",
+          "available": true
+        },
+        {
+          "extension": ".tsx",
+          "available": true
+        },
+        {
+          "extension": ".d.ts",
+          "available": true
+        },
+        {
+          "extension": ".cts",
+          "available": true
+        },
+        {
+          "extension": ".d.cts",
+          "available": true
+        },
+        {
+          "extension": ".mts",
+          "available": true
+        },
+        {
+          "extension": ".d.mts",
+          "available": true
+        },
+        {
+          "extension": ".vue",
+          "available": false
+        },
+        {
+          "extension": ".svelte",
+          "available": false
+        },
+        {
+          "extension": ".ls",
+          "available": false
+        },
+        {
+          "extension": ".coffee",
+          "available": false
+        },
+        {
+          "extension": ".litcoffee",
+          "available": false
+        },
+        {
+          "extension": ".coffee.md",
+          "available": false
+        },
+        {
+          "extension": ".csx",
+          "available": false
+        },
+        {
+          "extension": ".cjsx",
+          "available": false
         }
       ]
     }

@@ -1,72 +1,77 @@
 import * as fsPromises from 'node:fs/promises';
 import * as path from 'node:path';
-import { readDependencyGraph, generateDependencyGraph } from './adapters';
+import { generateDependencyGraph, readDependencyGraph } from './adapters';
+import type { ViolationInput } from './architecture-debt';
 import type { DependencyCruiserModule } from './models';
+import type { MaritimeCruiseResult } from '../../schema/dependency-cruiser';
 
-export interface ResolveGraphInputOptions {
-    graphPath?: string;
+export interface ResolveAnalysisGraphOptions {
+    suppliedGraphPath?: string;
     targetGraphPath: string;
+    manifestDir: string;
     rawSources: string[];
     depcruiseConfig?: string;
-    manifestDir: string;
     workingDir: string;
 }
 
-export interface GraphInputResult {
+export interface ResolveAnalysisGraphResult {
     modules: DependencyCruiserModule[];
+    graph: MaritimeCruiseResult;
+    violations: ViolationInput[];
     effectiveGraphPath: string;
-    isGraphSupplied: boolean;
-    configSource?: string;
+    stagedSuppliedGraph: boolean;
+    configSource?: 'explicit' | 'discovered' | 'fallback';
 }
 
-export async function resolveGraphInput(options: ResolveGraphInputOptions): Promise<GraphInputResult> {
-    const { graphPath, targetGraphPath, rawSources, depcruiseConfig, manifestDir, workingDir } = options;
-    const isGraphSupplied = graphPath !== undefined;
-    let modules: DependencyCruiserModule[];
-    let effectiveGraphPath: string;
-    let configSource: string | undefined;
+async function writeCanonicalGraph(graphPath: string, graph: MaritimeCruiseResult): Promise<void> {
+    await fsPromises.mkdir(path.dirname(graphPath), { recursive: true });
+    await fsPromises.writeFile(graphPath, JSON.stringify(graph, null, 2));
+}
 
-    if (isGraphSupplied && graphPath !== undefined) {
-        console.log('   - Reading Supplied Dependency Cruiser JSON...');
-        modules = await readDependencyGraph(graphPath, workingDir);
-
-        const absGraphPath = path.resolve(workingDir, graphPath);
-        const relGraphToManifest = path.relative(manifestDir, absGraphPath);
-        const isOutside = relGraphToManifest.startsWith('..') || path.isAbsolute(relGraphToManifest);
-
-        if (isOutside) {
-            console.log('   - Staging supplied graph into artifact directory...');
-            effectiveGraphPath = path.join(manifestDir, path.basename(absGraphPath));
-            try {
-                await fsPromises.mkdir(manifestDir, { recursive: true });
-                await fsPromises.copyFile(absGraphPath, effectiveGraphPath);
-            } catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err);
-                throw new Error(`Failed to stage supplied dependency graph into artifact directory: ${message}`);
-            }
-        } else {
-            effectiveGraphPath = absGraphPath;
-        }
-    } else {
-        console.log('   - Generating Dependency Graph with dependency-cruiser...');
-        const genResult = await generateDependencyGraph({
-            sourceRoots: rawSources,
-            configPath: depcruiseConfig,
-            cwd: workingDir
-        });
-        configSource = genResult.configSource;
-        console.log(`   - Dependency-Cruiser Config Source: ${configSource}`);
-        modules = genResult.modules;
-
-        effectiveGraphPath = path.resolve(workingDir, targetGraphPath);
-        await fsPromises.mkdir(path.dirname(effectiveGraphPath), { recursive: true });
-        await fsPromises.writeFile(effectiveGraphPath, JSON.stringify(genResult.cruiseResult, null, 2));
+function resolveCanonicalGraphPath(options: ResolveAnalysisGraphOptions, inputGraphPath: string): string {
+    const requestedGraphPath = path.resolve(options.workingDir, options.targetGraphPath);
+    if (requestedGraphPath !== inputGraphPath) {
+        return requestedGraphPath;
     }
 
+    return path.join(path.dirname(requestedGraphPath), `maritime-${path.basename(requestedGraphPath)}`);
+}
+
+export async function resolveAnalysisGraph(
+    options: ResolveAnalysisGraphOptions
+): Promise<ResolveAnalysisGraphResult> {
+    if (options.suppliedGraphPath) {
+        const readResult = await readDependencyGraph(options.suppliedGraphPath, options.workingDir);
+        const inputGraphPath = path.resolve(options.workingDir, options.suppliedGraphPath);
+        const effectiveGraphPath = resolveCanonicalGraphPath(options, inputGraphPath);
+
+        // The supplied path is read-only caller input. Canonical evidence is always serialized to
+        // a distinct output path after readDependencyGraph() validates and normalizes the graph.
+        await writeCanonicalGraph(effectiveGraphPath, readResult.graph);
+
+        return {
+            modules: readResult.modules,
+            graph: readResult.graph,
+            violations: readResult.graph.summary.violations,
+            effectiveGraphPath,
+            stagedSuppliedGraph: true
+        };
+    }
+
+    const generated = await generateDependencyGraph({
+        sourceRoots: options.rawSources,
+        configPath: options.depcruiseConfig,
+        cwd: options.workingDir
+    });
+    const effectiveGraphPath = path.resolve(options.workingDir, options.targetGraphPath);
+    await writeCanonicalGraph(effectiveGraphPath, generated.cruiseResult);
+
     return {
-        modules,
+        modules: generated.modules,
+        graph: generated.cruiseResult,
+        violations: generated.cruiseResult.summary.violations,
         effectiveGraphPath,
-        isGraphSupplied,
-        configSource
+        stagedSuppliedGraph: false,
+        configSource: generated.configSource
     };
 }
