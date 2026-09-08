@@ -1,20 +1,13 @@
 import { parseArgs } from 'node:util';
-import {
-    runEslintComplexityScan,
-    countLinesOfCode,
-    writeOutputFiles,
-    getToolVersion
-} from '../analyze/adapters';
+import * as path from 'node:path';
+import { runEslintComplexityScan, countLinesOfCode } from '../analyze/adapters';
 import { calculateMetrics, calculateNamespaceMetrics, isSupportedTypeScriptFile } from '../analyze/calculate-metrics';
 import { parseEslintComplexityReport } from '../analyze/parse-eslint';
-import { renderMarkdownReport } from '../analyze/render-markdown-report';
 import { validateEslintEnvironment } from '../analyze/environment';
-import { ValidationError, type AnalysisThresholds } from '../analyze/models';
-import { MANIFEST_SCHEMA_VERSION, type ArtifactManifest } from '../../schema/manifest';
-import { readBaselineFile, writeBaselineFile, evaluateArchitectureDebt } from '../analyze/architecture-debt';
-import { calculateChangeImpact, type ImpactAnalysisResult } from '../analyze/impact';
 import { resolveAnalysisGraph } from '../analyze/graph-input';
-import * as path from 'node:path';
+import { evaluateArchitectureAnalysis } from '../analyze/architecture-analysis';
+import { writeAnalysisOutputs } from '../analyze/output-manifest';
+import { ValidationError, type AnalysisThresholds } from '../analyze/models';
 
 const DEFAULT_THRESHOLDS: AnalysisThresholds = {
     loc: 300,
@@ -22,25 +15,25 @@ const DEFAULT_THRESHOLDS: AnalysisThresholds = {
     fanOut: 15
 };
 
-export async function runAnalyzeCommand(args: string[]): Promise<number> {
-    let values: {
-        source?: string[];
-        graph?: string;
-        metrics?: string;
-        report?: string;
-        output?: string;
-        'depcruise-config'?: string;
-        cwd?: string;
-        'fail-on-unmeasured'?: boolean;
-        baseline?: string;
-        'write-baseline'?: string;
-        'fail-on-new-violations'?: boolean;
-        base?: string;
-        help?: boolean;
-    };
+type AnalyzeValues = {
+    source?: string[];
+    graph?: string;
+    metrics?: string;
+    report?: string;
+    output?: string;
+    'depcruise-config'?: string;
+    cwd?: string;
+    'fail-on-unmeasured'?: boolean;
+    baseline?: string;
+    'write-baseline'?: string;
+    'fail-on-new-violations'?: boolean;
+    base?: string;
+    help?: boolean;
+};
 
+function parseAnalyzeArgs(args: string[]): AnalyzeValues | number {
     try {
-        const parsed = parseArgs({
+        return parseArgs({
             args,
             allowPositionals: true,
             options: {
@@ -58,16 +51,16 @@ export async function runAnalyzeCommand(args: string[]): Promise<number> {
                 base: { type: 'string' },
                 help: { type: 'boolean', short: 'h' }
             }
-        });
-        values = parsed.values;
+        }).values;
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         console.error(`Error parsing arguments: ${message}`);
         return 2;
     }
+}
 
-    if (values.help) {
-        console.log(`
+function printHelp(): void {
+    console.log(`
 Usage: maritime analyze [options]
 
 Options:
@@ -99,30 +92,43 @@ Exit Codes:
   0 - Successful analysis
   1 - Operational or runtime failure
   2 - Invalid CLI arguments, environment, or invalid input artifact/schema
-        `);
-        return 0;
-    }
+    `);
+}
 
+function validateAnalyzeMode(values: AnalyzeValues): number | undefined {
     if (values['write-baseline'] && (values.baseline || values['fail-on-new-violations'])) {
         console.error('Error: --write-baseline is an initialization mode and cannot be combined with --baseline or --fail-on-new-violations.');
         return 2;
     }
-
     if (values['fail-on-new-violations'] && !values.baseline) {
         console.error('Error: --fail-on-new-violations requires --baseline <file>.');
         return 2;
     }
+    return undefined;
+}
+
+export async function runAnalyzeCommand(args: string[]): Promise<number> {
+    const parsed = parseAnalyzeArgs(args);
+    if (typeof parsed === 'number') return parsed;
+    const values = parsed;
+
+    if (values.help) {
+        printHelp();
+        return 0;
+    }
+
+    const invalidMode = validateAnalyzeMode(values);
+    if (invalidMode !== undefined) return invalidMode;
 
     const workingDir = values.cwd ? path.resolve(values.cwd) : process.cwd();
-
     let targetGraphPath: string | undefined;
     let targetMetricsPath = values.metrics;
     let targetReportPath = values.report;
 
     if (values.output) {
         targetGraphPath = path.join(values.output, 'dependency-graph.json');
-        targetMetricsPath = targetMetricsPath ?? path.join(values.output, 'complexity-metrics.json');
-        targetReportPath = targetReportPath ?? path.join(values.output, 'complexity-report.md');
+        targetMetricsPath ??= path.join(values.output, 'complexity-metrics.json');
+        targetReportPath ??= path.join(values.output, 'complexity-report.md');
     }
 
     if (!targetMetricsPath || !targetReportPath) {
@@ -130,25 +136,20 @@ Exit Codes:
         return 2;
     }
 
-    if (!targetGraphPath) {
-        targetGraphPath = path.join(path.dirname(targetMetricsPath), 'dependency-graph.json');
-    }
+    targetGraphPath ??= path.join(path.dirname(targetMetricsPath), 'dependency-graph.json');
 
-    const rawSources = (values.source && values.source.length > 0)
-        ? values.source.flatMap(s => s.split(',').map(item => item.trim())).filter(Boolean)
+    const rawSources = values.source?.length
+        ? values.source.flatMap(source => source.split(',').map(item => item.trim())).filter(Boolean)
         : ['src'];
-
-    const normalizedSources = rawSources.map(rawSrc => {
-        let norm = path.relative(workingDir, path.resolve(workingDir, rawSrc)).replace(/\\/g, '/');
-        if (norm === '') norm = '.';
-        return norm;
+    const normalizedSources = rawSources.map(rawSource => {
+        const relative = path.relative(workingDir, path.resolve(workingDir, rawSource)).replace(/\\/g, '/');
+        return relative || '.';
     });
 
     try {
         console.log('📊 Starting Complexity Analysis...');
         console.log('   - Validating Environment & Configuration...');
         const { mode: eslintConfigMode } = validateEslintEnvironment(workingDir);
-
         console.log(`   - Working Directory: ${workingDir}`);
         console.log(`   - Source Root (raw): ${rawSources.join(', ')}`);
         console.log(`   - Source Root (normalized): ${normalizedSources.join(', ')}`);
@@ -171,27 +172,13 @@ Exit Codes:
             depcruiseConfig: values['depcruise-config'],
             workingDir
         });
+        if (graphResult.stagedSuppliedGraph) console.log('   - Staging supplied graph into artifact directory...');
+        if (graphResult.configSource) console.log(`   - Dependency-Cruiser Config Source: ${graphResult.configSource}`);
 
-        if (graphResult.stagedSuppliedGraph) {
-            console.log('   - Staging supplied graph into artifact directory...');
-        }
-        if (graphResult.configSource) {
-            console.log(`   - Dependency-Cruiser Config Source: ${graphResult.configSource}`);
-        }
-
-        const modules = graphResult.modules;
-        const cruiseSummaryViolations = graphResult.violations;
-        const effectiveGraphPath = graphResult.effectiveGraphPath;
-
-        const sourceFiles = modules
-            .map(m => m.source)
-            .filter(src => {
-                const isSource = normalizedSources.some(norm => {
-                    if (norm === '.') return true;
-                    return src === norm || src.startsWith(`${norm}/`);
-                });
-                return isSource && isSupportedTypeScriptFile(src);
-            });
+        const sourceFiles = graphResult.modules
+            .map(module => module.source)
+            .filter(source => normalizedSources.some(root => root === '.' || source === root || source.startsWith(`${root}/`)))
+            .filter(isSupportedTypeScriptFile);
 
         console.log('   - Running ESLint for Complexity...');
         const eslintResults = await runEslintComplexityScan(rawSources, sourceFiles, workingDir);
@@ -200,52 +187,30 @@ Exit Codes:
         console.log('   - Counting Lines of Code...');
         const locMap = await countLinesOfCode(sourceFiles, workingDir);
 
-        let debtEvaluation;
-        if (values.baseline) {
-            console.log(`   - Evaluating Architecture Debt against baseline: ${values.baseline}`);
-            const baselineData = await readBaselineFile(values.baseline, workingDir);
-            debtEvaluation = evaluateArchitectureDebt(cruiseSummaryViolations, baselineData);
-        } else if (cruiseSummaryViolations.length > 0) {
-            debtEvaluation = evaluateArchitectureDebt(cruiseSummaryViolations);
-        }
-
-        if (debtEvaluation && values['fail-on-new-violations'] && debtEvaluation.newViolationCount > 0) {
-            throw new ValidationError(
-                `Analysis failed because ${debtEvaluation.newViolationCount} new architecture violation(s) were introduced (--fail-on-new-violations).`
-            );
-        }
-
-        if (values['write-baseline']) {
-            console.log(`   - Writing Architecture Debt baseline to: ${values['write-baseline']}`);
-            await writeBaselineFile(values['write-baseline'], cruiseSummaryViolations, workingDir);
-        }
-
-        let impactEvaluation: ImpactAnalysisResult | undefined;
-        if (values.base) {
-            console.log(`   - Evaluating PR Change Impact relative to base revision: ${values.base}`);
-            impactEvaluation = calculateChangeImpact(modules, {
-                baseRevision: values.base,
-                cwd: workingDir
-            });
-        }
+        const architecture = await evaluateArchitectureAnalysis({
+            violations: graphResult.violations,
+            modules: graphResult.modules,
+            baselinePath: values.baseline,
+            writeBaselinePath: values['write-baseline'],
+            failOnNewViolations: values['fail-on-new-violations'],
+            baseRevision: values.base,
+            workingDir
+        });
 
         console.log('   - Aggregating Metrics...');
         const analysisResult = calculateMetrics(
-            modules,
+            graphResult.modules,
             locMap,
             complexityMap,
             DEFAULT_THRESHOLDS,
             normalizedSources
         );
-
-        const namespaceMetrics = calculateNamespaceMetrics(modules);
+        const namespaceMetrics = calculateNamespaceMetrics(graphResult.modules);
 
         console.log(`   - Skipped / Unmeasured Source Files: ${analysisResult.skippedCount}`);
-
         if (analysisResult.skippedCount > 0) {
             console.warn(`⚠️ Warning: ${analysisResult.skippedCount} graph source file(s) were skipped or ignored by ESLint and could not be measured:`);
-            analysisResult.unmeasuredFiles.forEach(f => console.warn(`   - ${f}`));
-
+            analysisResult.unmeasuredFiles.forEach(file => console.warn(`   - ${file}`));
             if (values['fail-on-unmeasured']) {
                 throw new ValidationError(
                     `Analysis failed because ${analysisResult.skippedCount} graph source file(s) were not scanned by ESLint (--fail-on-unmeasured).`
@@ -253,113 +218,25 @@ Exit Codes:
             }
         }
 
-        console.log('   - Generating Outputs...');
-
-        const metricsMap = analysisResult.files.reduce((acc, f) => {
-            acc[f.file] = {
-                complexity: f.complexity,
-                loc: f.loc,
-                instability: f.instability,
-                fanIn: f.fanIn,
-                fanOut: f.fanOut,
-                scanned: f.scanned
-            };
-            return acc;
-        }, {} as Record<string, unknown>);
-
-        const reportContent = renderMarkdownReport(
+        await writeAnalysisOutputs({
             analysisResult,
-            DEFAULT_THRESHOLDS,
-            new Date(),
-            debtEvaluation ? {
-                baselineCount: debtEvaluation.baselineCount,
-                existingDebtCount: debtEvaluation.existingDebtCount,
-                newViolationCount: debtEvaluation.newViolationCount,
-                resolvedCount: debtEvaluation.resolvedCount
-            } : undefined,
-            impactEvaluation ? {
-                baseRevision: impactEvaluation.baseRevision,
-                gitChangedCount: impactEvaluation.gitChangedFiles.length,
-                directlyChangedGraphCount: impactEvaluation.directlyChangedFiles.length,
-                transitiveImpactCount: impactEvaluation.transitivelyAffectedFiles.length,
-                affectedFolderCount: impactEvaluation.affectedFolders.length,
-                impactRatio: impactEvaluation.impactRatio
-            } : undefined,
-            namespaceMetrics
-        );
-
-        const targetManifestPath = path.relative(workingDir, path.join(manifestDir, 'manifest.json')).replace(/\\/g, '/');
-
-        const relGraph = path.relative(manifestDir, effectiveGraphPath).replace(/\\/g, '/');
-        const relMetrics = path.relative(manifestDir, path.resolve(workingDir, targetMetricsPath)).replace(/\\/g, '/');
-        const relReport = path.relative(manifestDir, path.resolve(workingDir, targetReportPath)).replace(/\\/g, '/');
-
-        const artifactRelPaths = { graph: relGraph, metrics: relMetrics, report: relReport };
-        for (const [key, relPath] of Object.entries(artifactRelPaths)) {
-            if (relPath.startsWith('..') || path.isAbsolute(relPath)) {
-                throw new ValidationError(`Manifest artifact path for "${key}" escapes the artifact directory: "${relPath}"`);
-            }
-        }
-
-        const manifest: ArtifactManifest = {
-            schemaVersion: MANIFEST_SCHEMA_VERSION,
-            toolVersion: getToolVersion(),
-            generatedAt: new Date().toISOString(),
-            sourceRoots: normalizedSources,
-            artifacts: {
-                graph: relGraph,
-                metrics: relMetrics,
-                report: relReport
-            },
-            summary: {
-                totalFiles: analysisResult.files.length,
-                healthScore: analysisResult.healthScore,
-                scannedCount: analysisResult.files.filter(f => f.scanned).length,
-                skippedCount: analysisResult.skippedCount,
-                ...(debtEvaluation ? {
-                    architectureDebt: {
-                        baselineCount: debtEvaluation.baselineCount,
-                        existingDebtCount: debtEvaluation.existingDebtCount,
-                        newViolationCount: debtEvaluation.newViolationCount,
-                        resolvedCount: debtEvaluation.resolvedCount
-                    }
-                } : {}),
-                ...(impactEvaluation ? {
-                    changeImpact: {
-                        baseRevision: impactEvaluation.baseRevision,
-                        directlyChangedCount: impactEvaluation.directlyChangedFiles.length,
-                        gitChangedCount: impactEvaluation.gitChangedFiles.length,
-                        directlyChangedGraphCount: impactEvaluation.directlyChangedFiles.length,
-                        transitiveImpactCount: impactEvaluation.transitivelyAffectedFiles.length,
-                        affectedFolderCount: impactEvaluation.affectedFolders.length,
-                        impactRatio: impactEvaluation.impactRatio
-                    }
-                } : {}),
-                architecture: {
-                    namespaces: namespaceMetrics
-                }
-            }
-        };
-
-        await writeOutputFiles(
+            thresholds: DEFAULT_THRESHOLDS,
+            normalizedSources,
+            effectiveGraphPath: graphResult.effectiveGraphPath,
             targetMetricsPath,
-            metricsMap,
             targetReportPath,
-            reportContent,
-            targetManifestPath,
-            manifest,
-            workingDir
-        );
+            manifestDir,
+            workingDir,
+            debtEvaluation: architecture.debtEvaluation,
+            impactEvaluation: architecture.impactEvaluation,
+            namespaceMetrics
+        });
 
         console.log('✅ Complexity Report Updated and Metrics Exported!');
         return 0;
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         console.error(`Error analyzing project: ${message}`);
-
-        if (e instanceof ValidationError) {
-            return 2;
-        }
-        return 1;
+        return e instanceof ValidationError ? 2 : 1;
     }
 }
