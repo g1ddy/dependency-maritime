@@ -358,6 +358,9 @@ The prerelease workflow is tag-driven. A `cli-vX.Y.Z[-pre]` tag is the release-v
 
 The authoritative PR/main contract proof is `.github/workflows/cli-contract.yml`: it runs the packed CLI consumer matrix on Node 22 and 24 plus the composite Action compact-render smoke. Real consumer cutover remains repository-owned so Catan, Crawler, and Maritime can retain their own triggers and evidence/write policies.
 
+The pinned package, Action, consumer revisions, commands, and observed Catan/Crawler results for the
+Dependency-Cruiser 18 acceptance run are recorded in [Real consumer verification](./CONSUMER_VERIFICATION.md).
+
 ## Related documentation
 
 - [Graph Presentation Profiles](./GRAPH_PROFILES.md) — profile matrix and presentation-setting semantics.

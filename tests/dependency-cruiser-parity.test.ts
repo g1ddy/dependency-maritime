@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
   calculateMetrics,
-  calculateNamespaceMetrics,
-  calculateInstability
+  calculateNamespaceMetrics
 } from '../src/cli/analyze/calculate-metrics';
 import type { DependencyCruiserModule } from '../src/cli/analyze/models';
+import nativeMetrics from './fixtures/dependency-cruiser-18/native-metrics.json';
 
 /**
  * Native Metric Parity Suite & Documentation
@@ -32,32 +32,7 @@ import type { DependencyCruiserModule } from '../src/cli/analyze/models';
  */
 
 describe('Dependency-Cruiser Native Metric Parity', () => {
-  const fixtureModules: DependencyCruiserModule[] = [
-    {
-      source: 'src/features/auth/login.ts',
-      dependencies: [
-        {
-          resolved: 'src/features/auth/utils.ts',
-          valid: true
-        },
-        {
-          resolved: 'src/shared/http.ts',
-          valid: true
-        }
-      ],
-      dependents: []
-    },
-    {
-      source: 'src/features/auth/utils.ts',
-      dependencies: [],
-      dependents: ['src/features/auth/login.ts']
-    },
-    {
-      source: 'src/shared/http.ts',
-      dependencies: [],
-      dependents: ['src/features/auth/login.ts']
-    }
-  ];
+  const fixtureModules = nativeMetrics.modules as DependencyCruiserModule[];
 
   it('matches module-level fan-in and fan-out exactly against Dependency-Cruiser signals', () => {
     const locMap = {
@@ -74,37 +49,31 @@ describe('Dependency-Cruiser Native Metric Parity', () => {
 
     const result = calculateMetrics(fixtureModules, locMap, complexityMap, thresholds, 'src');
 
-    const login = result.files.find(f => f.file === 'src/features/auth/login.ts')!;
-    const authModule = fixtureModules.find(m => m.source === 'src/features/auth/login.ts')!;
+    expect(nativeMetrics.generatedBy).toMatchObject({
+      name: 'dependency-cruiser',
+      version: '18.2.0'
+    });
 
-    // Fan-out parity
-    expect(login.fanOut).toBe(authModule.dependencies.length);
-    expect(login.fanOut).toBe(2);
+    for (const nativeModule of nativeMetrics.modules) {
+      const maritimeModule = result.files.find(file => file.file === nativeModule.source);
 
-    // Fan-in parity
-    expect(login.fanIn).toBe(authModule.dependents.length);
-    expect(login.fanIn).toBe(0);
-
-    // Instability parity
-    const expectedInstability = calculateInstability(login.fanIn, login.fanOut);
-    expect(login.instability).toBe(expectedInstability);
-    expect(login.instability).toBe(1.0); // 2 / (0 + 2) = 1.0
+      expect(maritimeModule, nativeModule.source).toBeDefined();
+      expect(maritimeModule!.fanOut).toBe(nativeModule.dependencies.length);
+      expect(maritimeModule!.fanIn).toBe(nativeModule.dependents.length);
+      expect(maritimeModule!.instability).toBe(nativeModule.instability);
+    }
   });
 
   it('calculates namespace-level coupling across boundaries without counting intra-namespace edges', () => {
     const namespaceMetrics = calculateNamespaceMetrics(fixtureModules);
 
-    const authNs = namespaceMetrics.find(n => n.folder === 'src/features/auth')!;
-    const sharedNs = namespaceMetrics.find(n => n.folder === 'src/shared')!;
+    for (const nativeFolder of nativeMetrics.folders) {
+      const maritimeNamespace = namespaceMetrics.find(namespace => namespace.folder === nativeFolder.name);
 
-    // src/features/auth has 1 external dependency (src/shared/http.ts), ignore intra-auth login -> utils
-    expect(authNs.efferentCoupling).toBe(1);
-    expect(authNs.afferentCoupling).toBe(0);
-    expect(authNs.instability).toBe(1.0);
-
-    // src/shared has 1 external dependent (src/features/auth/login.ts)
-    expect(sharedNs.efferentCoupling).toBe(0);
-    expect(sharedNs.afferentCoupling).toBe(1);
-    expect(sharedNs.instability).toBe(0.0);
+      expect(maritimeNamespace, nativeFolder.name).toBeDefined();
+      expect(maritimeNamespace!.efferentCoupling).toBe(nativeFolder.efferentCouplings);
+      expect(maritimeNamespace!.afferentCoupling).toBe(nativeFolder.afferentCouplings);
+      expect(maritimeNamespace!.instability).toBe(nativeFolder.instability);
+    }
   });
 });
