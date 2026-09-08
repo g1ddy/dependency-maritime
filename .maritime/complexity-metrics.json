@@ -393,9 +393,9 @@
   },
   "src/cli/analyze/environment.ts": {
     "complexity": 12,
-    "loc": 119,
-    "instability": 0.33,
-    "fanIn": 2,
+    "loc": 120,
+    "instability": 0.25,
+    "fanIn": 3,
     "fanOut": 1,
     "scanned": true
   },
@@ -448,8 +448,8 @@
     "scanned": true
   },
   "src/cli/commands/graph.ts": {
-    "complexity": 14,
-    "loc": 249,
+    "complexity": 13,
+    "loc": 256,
     "instability": 0.67,
     "fanIn": 2,
     "fanOut": 4,
@@ -504,11 +504,11 @@
     "scanned": true
   },
   "src/cli/main.ts": {
-    "complexity": 5,
-    "loc": 53,
+    "complexity": 7,
+    "loc": 61,
     "instability": 1,
     "fanIn": 0,
-    "fanOut": 3,
+    "fanOut": 4,
     "scanned": true
   },
   "src/components/theme-provider.tsx": {
