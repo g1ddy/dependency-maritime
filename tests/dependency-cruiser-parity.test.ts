@@ -35,46 +35,25 @@ describe('Dependency-Cruiser Native Metric Parity', () => {
   const fixtureModules: DependencyCruiserModule[] = [
     {
       source: 'src/features/auth/login.ts',
-      valid: true,
       dependencies: [
         {
-          module: './utils',
           resolved: 'src/features/auth/utils.ts',
-          moduleSystem: 'es6',
-          dependencyTypes: ['local'],
-          valid: true,
-          followable: true,
-          couldNotResolve: false,
-          coreModule: false,
-          exoticallyRequired: false,
-          circular: false,
-          dynamic: false
+          valid: true
         },
         {
-          module: '../../shared/http.ts',
           resolved: 'src/shared/http.ts',
-          moduleSystem: 'es6',
-          dependencyTypes: ['local'],
-          valid: true,
-          followable: true,
-          couldNotResolve: false,
-          coreModule: false,
-          exoticallyRequired: false,
-          circular: false,
-          dynamic: false
+          valid: true
         }
       ],
       dependents: []
     },
     {
       source: 'src/features/auth/utils.ts',
-      valid: true,
       dependencies: [],
       dependents: ['src/features/auth/login.ts']
     },
     {
       source: 'src/shared/http.ts',
-      valid: true,
       dependencies: [],
       dependents: ['src/features/auth/login.ts']
     }
