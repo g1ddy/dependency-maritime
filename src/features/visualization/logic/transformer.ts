@@ -219,6 +219,7 @@ export function transformToReactFlow(
 
   // Add group nodes to the nodes list
   // We place group nodes FIRST so they render BEHIND the file nodes
+  // and assign explicit zIndex to ensure correct stacking in WebKit/Mobile Safari
   const groupNodes = Array.from(groupNodesMap.values())
     .map((node) => {
       let depth = 0;
@@ -228,7 +229,10 @@ export function transformToReactFlow(
         }
       }
       return {
-        node,
+        node: {
+          ...node,
+          zIndex: depth,
+        },
         depth,
       };
     })
@@ -238,7 +242,12 @@ export function transformToReactFlow(
     })
     .map((item) => item.node);
 
-  const finalNodes = [...groupNodes, ...nodes];
+  const appNodes = nodes.map((node) => ({
+    ...node,
+    zIndex: 1000,
+  }));
+
+  const finalNodes = [...groupNodes, ...appNodes];
 
   graph.forEachEdge((_edgeId, attributes, source, target) => {
     // 1. Filter out edges where source or target is hidden

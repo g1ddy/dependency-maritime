@@ -47,7 +47,13 @@ export const ModuleSchema = z.object({
   orphan: z.boolean().optional(),
 }).passthrough();
 
-/** Validation schema for an upstream architecture violation. */
+/**
+ * Validation schema for an upstream architecture violation.
+ * Supports Dependency-Cruiser 18 instability/stable-dependency violations (`type: 'instability'`).
+ * Maritime exposes upstream `moreUnstable` violations when configured in consumer policy,
+ * while deterministically calculating module/namespace instability ($I = C_e / (C_a + C_e)$)
+ * from canonical graph evidence without forcing or silently injecting policy rules.
+ */
 export const ViolationSchema = z.object({
   type: z.enum(['dependency', 'module', 'cycle', 'reachability', 'instability']).optional(),
   from: z.string(),
