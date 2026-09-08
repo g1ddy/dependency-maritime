@@ -2,6 +2,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { ArchitectureBaselineSchema } from './architecture-debt';
 import { evaluateArchitectureAnalysis } from './architecture-analysis';
 import { ValidationError } from './models';
 
@@ -34,7 +35,10 @@ describe('evaluateArchitectureAnalysis', () => {
         });
 
         expect(result.debtEvaluation?.newViolationCount).toBe(1);
-        const baseline = JSON.parse(await readFile(path.join(workingDir, '.maritime/baseline.json'), 'utf8'));
+        const baselineRaw: unknown = JSON.parse(
+            await readFile(path.join(workingDir, '.maritime/baseline.json'), 'utf8')
+        );
+        const baseline = ArchitectureBaselineSchema.parse(baselineRaw);
         expect(baseline.violations).toEqual([{
             ruleName: 'no-layer-violation',
             severity: 'error',
