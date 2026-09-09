@@ -1,85 +1,46 @@
 # Project Roadmap
 
-This document contains work that is still outstanding. Current behavior and supported contracts belong in the documents linked below; do not duplicate completed implementation checklists here.
+This document outlines future product intent, architectural enhancements, and deliberate deferrals. Current behavior and supported contracts belong in the authoritative documents linked below.
 
-## Delivered foundations
+## Delivered Foundations
 
-- [Architecture](./ARCHITECTURE.md): headless graph logic, shared schemas, Zustand state, Graphology transformation, React Flow rendering, and Dagre/ELK layout.
-- [CLI and Artifact Contract](./CLI.md): the packaged analyzer, generated .maritime artifact directory, validation command, consumer configuration, and supported runtime contract.
-- [Complexity and Health Metrics](./COMPLEXITY.md): authoritative repository metric evidence and definitions.
-- [README](../README.md): the implemented interactive graph, node inspection, upload, and visualization controls.
+* [Architecture](./ARCHITECTURE.md) — Headless CLI analyzer, shared Zod schemas, Zustand store, Graphology metrics, React Flow rendering, and Dagre/ELK layout engines.
+* [CLI Analyzer Decomposition](./ARCHITECTURE.md#cli) — CLI command orchestration decomposed into `graph-input.ts`, `architecture-analysis.ts`, and `output-manifest.ts`.
+* [CLI & Artifact Contract](./CLI.md) — Packaged analyzer (`@dependency-maritime/cli`), `.maritime` artifact bundle, validation command, composite GitHub Action, baseline comparison, and PR change impact analysis.
+* [Graph Presentation Profiles](./GRAPH_PROFILES.md) — Named presets (`default`, `local-architecture`, `compact-architecture`, `architecture-overview`) and presentation override switches.
+* [Code Complexity & Health Metrics](./COMPLEXITY.md) — Metric definitions, thresholds, compound health score formulas, and canonical repository evidence.
+* [Development Guide](./DEVELOPMENT.md) — Contributor environment setup, verification matrix, and documentation ownership.
 
-## UI roadmap
+---
 
-### Complete core Inspector; add analysis tools
+## Active & Future Intent
 
-The core inspector is implemented: it shows a selected node's path, metrics, dependencies, and dependents, and supports navigation between them.
+### Architecture Analysis Parity
+- **Dependency-Cruiser 18 Parity:** Maintain parity with Dependency-Cruiser 18 rule engine, architecture debt evaluation, and external package grouping behaviors.
 
-- [ ] Add a shortest-path tool for two selected nodes.
-- [ ] Add impact analysis that reports the affected portion of the graph.
+### Richer Code Health & Dead-Code Metrics
+- **Knip / Unused Code Integration:** Integrate unused file, export, and dependency detection into Maritime metrics and hotspot reports.
+- **Advanced Coupling Metrics:** Expand architectural namespace metrics (e.g., distance from main sequence, abstractness vs. instability).
 
-### Export and presentation
+### UI Inspector & Visualization Capabilities
+- **Shortest Path Analysis:** Add a path-finding tool between two selected graph nodes in the Inspector panel.
+- **Sub-Graph Impact Highlighting:** Visually highlight downstream impact paths when inspecting a selected node or folder.
+- **Graph & Health Export:** Support exporting current graph layouts as standalone SVG/PNG files and downloading structured health summaries from the UI.
+- **Force / Compact Layout Option:** Evaluate force-directed layout algorithms for high-density, multi-thousand-node graphs.
 
-- [ ] Export the current graph visualization as PNG or SVG.
-- [ ] Offer a user-facing health-report export/download.
+### Interactive Refactoring Simulator
+- **Cycle & Constraint Validation:** Validate simulated node/folder reparenting against architectural rules without blocking visual exploration.
+- **Metric Delta Preview:** Dynamically calculate and display LOC, complexity, and coupling score deltas after simulated refactoring moves.
+- **Refactoring Plan Export:** Export simulated structural changes as Markdown refactoring checklists or migration scripts.
+- **Undo / Redo State:** Add history tracking for simulation sessions.
 
-### Optional layout scaling
+### Cohesion Assistant
+- **Community Detection:** Identify logical module clusters from coupling and cohesion patterns using graph algorithms.
+- **Structural Drift Analysis:** Highlight discrepancies between physical folder layout and cohesive logical clusters.
+- **Refactoring Suggestions:** Generate actionable, reviewable structural recommendations.
 
-Dagre and ELK layouts are implemented.
-
-- [ ] Evaluate and, if justified, add a force/compact layout for large graphs.
-
-## Refactoring simulator
-
-A simulation foundation exists: the store maintains an original graph, supports node reparenting, and can reset the draft state.
-
-- [ ] Validate simulated moves for cycles and documented architectural rules without blocking exploration.
-- [ ] Clearly mark simulated violations in the graph.
-- [ ] Produce a refactoring manifest from original versus simulated paths.
-- [ ] Recalculate and display metric deltas after a simulated move.
-- [ ] Add undo/redo for a simulation session.
-
-## Cohesion assistant
-
-- [ ] Detect logical communities from coupling/cohesion data.
-- [ ] Show drift between physical structure and those communities.
-- [ ] Turn findings into concrete, reviewable refactoring suggestions.
-- [ ] Export manual and suggested plans as Markdown checklists and optional shell/PowerShell scripts.
-
-## CLI and artifact delivery
-
-These are the unfinished delivery items previously tracked in [CLI.md](./CLI.md).
-
-### Consumer confidence
-
-- [x] Validate one immutable CLI build against the real Catan Hex Mastery and Crawler Command Interface revisions; see the pinned [consumer verification evidence](./CONSUMER_VERIFICATION.md).
-
-### Artifact archive and UI bundle upload
-
-- [ ] Define a standard archive form for a validated .maritime directory without coupling archive creation to normal analysis.
-- [ ] Preserve raw graph upload and add complete .zip bundle upload to the UI.
-
-### Baseline comparison and regression policy
-
-- [ ] Add maritime compare --baseline with absolute and percentage deltas.
-- [ ] Add configurable regression-policy gates.
-- [ ] Support checked-in and downloaded CI baselines.
-- [ ] Demonstrate before/after refactoring evidence in real pull requests.
-
-### CI adapter and public release
-
-- [x] Add a reusable GitHub Actions composite action built on the packed/published CLI artifact contract.
-- [ ] Publish the exact prerelease CLI selected by the action and pass the tag-triggered clean external consumer smoke test before declaring distribution self-contained.
-- [ ] Cut Catan Hex Mastery over from its hand-rolled Maritime orchestration to the shared action while preserving its Graphviz documentation and baseline-commit behavior.
-- [ ] Cut Crawler Command Interface over from its hand-rolled Maritime orchestration to the shared action while preserving its source-root, trigger, and baseline-commit behavior.
-- [ ] Remove the private/pre-release package state when release criteria are satisfied.
-- [ ] Publish with semantic versioning, provenance, changelog/release automation, and a compatibility policy.
-
-### ESLint 10 compatibility
-
-- [ ] Upgrade and validate ESLint 10 through the distributed integration suite.
-
-## Documentation consolidation
-
-- [ ] Keep the README's user-facing CLI and upload guidance aligned with the supported maritime analyze and artifact workflow.
-- [ ] Replace historical coverage snapshots in [Quality](./QUALITY.md) with current test strategy, evidence, and prioritized gaps.
+### CLI Distribution & Artifact Enhancements
+- **Artifact Bundle Packaging:** Define a standardized `.zip` archive format for `.maritime` output directories for browser upload and CI artifact persistence.
+- **Complete ZIP Upload in UI:** Enable loading complete zipped `.maritime` artifact bundles directly in the UI.
+- **ESLint 10 Compatibility:** Upgrade and verify ESLint 10 flat configuration support across distributed CLI test suites.
+- **Package Distribution & Provenance:** Maintain automated npm publishing with provenance, semantic versioning, and changelog generation.

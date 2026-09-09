@@ -7,36 +7,37 @@ Dependency Maritime produces the repository's authoritative complexity and hotsp
 - [Current dependency graph](../.maritime/dependency-graph.json)
 - [Artifact manifest](../.maritime/manifest.json)
 
-The repository-evidence workflow rebuilds this bundle with the public CLI, requires complete measurement coverage, validates it, and then renders the dependency graph SVG presentation (`docs/images/dependency-graph.svg`) from the same graph artifact. Do not hand-edit or duplicate these generated values elsewhere in the repository.
+The repository-evidence workflow rebuilds this bundle with the public CLI, requires complete measurement coverage, validates it, and then renders derived presentations (such as `docs/images/dependency-graph.svg`) from that same graph artifact. Machine-readable `.maritime/` artifacts are canonical generated evidence; SVG/DOT and Markdown reports are derived presentations. Do not hand-edit or duplicate generated values in prose.
 
-## Metrics
+## Metrics & Health Formulas
 
-| Dimension | Metric | Source | Warning threshold |
+| Dimension | Metric | Source | Warning Threshold |
 | :--- | :--- | :--- | :--- |
 | Length | LOC | ESLint analysis | > 300 LOC |
-| Coupling | Fan-out | dependency-cruiser graph | > 15 local dependencies |
-| Stability | Instability | local graph metrics | context-dependent |
 | Logic | Cyclomatic complexity | ESLint analysis | > 10 |
-| Importance | Centrality/PageRank | UI graph metrics | context-dependent |
-| Measurement coverage | scanned/unmeasured | Maritime artifact manifest/report | 0 unmeasured for authoritative CI |
+| Coupling | Fan-out ($C_{efferent}$) | dependency-cruiser graph | > 15 local dependencies |
+| Coupling | Fan-in ($C_{afferent}$) | dependency-cruiser graph | Context-dependent |
+| Stability | Instability ($I$) | local graph metrics | Context-dependent |
+| Importance | Centrality / PageRank | UI graph metrics | Context-dependent |
+| Measurement Coverage | scanned / unmeasured | Maritime artifact manifest/report | 0 unmeasured for authoritative CI |
 
-### Definitions
+### Definitions & Health Formulas
 
-**Instability** is calculated as $I = \frac{C_{efferent}}{C_{afferent} + C_{efferent}}$, where:
+* **Instability:** $I = \frac{C_{efferent}}{C_{afferent} + C_{efferent}}$
+  * $I = 0$ indicates a stable foundation module (many depend on it, it depends on few).
+  * $I = 1$ indicates a volatile top-level module (depends on many, few depend on it).
 
-- **Fan-out** ($C_{efferent}$) is the number of local files a file depends on.
-- **Fan-in** ($C_{afferent}$) is the number of local files that depend on it.
-- $I = 0$ is a stable foundation layer; $I = 1$ is volatile top-level logic.
+* **Compound Complexity Score:** Hotspots and node health statuses are ranked using the compound formula:
+  $$\text{Score} = \left(\frac{\text{LOC}}{10}\right) + (\text{Complexity} \times 2) + (\text{FanOut} \times 2) + (\text{Instability} \times 20)$$
 
-**Centrality/PageRank** estimates a node's importance from its connections. It is useful for visual prioritization, not by itself a refactoring mandate.
+* **Health Thresholds:**
+  * 🟢 **Healthy:** Score < 20
+  * 🟡 **Warning:** Score between 20 and 50
+  * 🔴 **Unhealthy:** Score > 50
 
-The Markdown report ranks hotspots with the compound score:
+## Regenerating Repository Evidence
 
-```text
-(LOC / 10) + (Complexity * 2) + (FanOut * 2) + (Instability * 20)
-```
-
-## Regenerating repository evidence
+To regenerate and validate canonical evidence locally:
 
 ```bash
 npm run build:cli
@@ -46,4 +47,4 @@ node dist/cli/main.js validate .maritime
 npm run generate:graph
 ```
 
-For the portable consumer contract and artifact validation rules, see [CLI and Artifact Contract](./CLI.md). For testing strategy and prioritized gaps, see [Quality](./QUALITY.md).
+For the portable CLI consumer contract and artifact validation rules, see [CLI & Artifact Contract](./CLI.md). For testing strategy and quality expectations, see [Quality](./QUALITY.md).
