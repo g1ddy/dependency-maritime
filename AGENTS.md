@@ -17,16 +17,17 @@ placing it in Zustand state.
 
 Read these documents before changing their corresponding areas:
 
-1. [CLI and artifact contract](docs/CLI.md) — public commands, artifact contract, compatibility,
+1. [CLI & Artifact Contract](docs/CLI.md) — public commands, artifact contract, compatibility,
    and release criteria.
-2. [Architecture](docs/ARCHITECTURE.md) — headless-logic/interactive-UI design and the intended
+2. [Graph Presentation Profiles](docs/GRAPH_PROFILES.md) — presentation preset profiles and override semantics.
+3. [Architecture](docs/ARCHITECTURE.md) — headless-logic/interactive-UI design and the intended
    data flow.
-3. [Roadmap](docs/ROADMAP.md) — planned and completed product work.
-4. [Design decisions](docs/DESIGN_DECISIONS.md) — repository structure, local-first behavior, and
-   performance choices.
-5. [Jules context](.jules/context.md) — canonical dependency-cruiser exchange shape and project
-   boundaries.
-6. [README](README.md) — user-facing setup and current usage.
+4. [Code Complexity & Health Metrics](docs/COMPLEXITY.md) — metric definitions, thresholds, compound health score formulas, and canonical evidence.
+5. [Quality & Test Strategy](docs/QUALITY.md) — test layers, canonical test commands, and quality strategy.
+6. [Development Guide](docs/DEVELOPMENT.md) — contributor setup, verification matrix, and documentation ownership.
+7. [Design Decisions](docs/DESIGN_DECISIONS.md) — status-bearing architectural decision records (ADRs).
+8. [Roadmap](docs/ROADMAP.md) — unfinished product capabilities, intent, and deferrals.
+9. [README](README.md) — user-facing setup, quick start, and feature overview.
 
 ## Repository map
 

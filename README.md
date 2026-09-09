@@ -4,11 +4,10 @@
 ![React](https://img.shields.io/badge/react-19.2.3-blue)
 ![Vite](https://img.shields.io/badge/vite-7.3.1-purple)
 ![TypeScript](https://img.shields.io/badge/typescript-5.9.3-blue)
-![Status](https://img.shields.io/badge/status-Phase%201%20Complete-green)
 
 **Chart, navigate, and refactor your application's architecture.**
 
-Dependency Maritime is an interactive visualization tool for [dependency-cruiser](https://github.com/sverweij/dependency-cruiser). It transforms complex dependency graphs into navigable, interactive maps, helping you enforce boundaries, identify tangles, and plan refactoring efforts.
+Dependency Maritime is a local-first dependency analysis tool and interactive visualization environment for [dependency-cruiser](https://github.com/sverweij/dependency-cruiser). It transforms complex code dependency graphs into navigable interactive maps and machine-readable evidence, helping you enforce architectural boundaries, identify tangles, analyze complexity, and plan refactoring efforts.
 
 ## 📸 Visuals
 
@@ -17,153 +16,77 @@ Visualize your project's structure with an interactive graph. Zoom, pan, and fil
 ![Dashboard View](docs/images/screenshot-dashboard.png)
 
 ### Node Inspector
-Select any file to view detailed metrics, including incoming and outgoing dependencies.
+Select any file to view detailed metrics, including incoming and outgoing dependencies, lines of code, and cyclomatic complexity.
 ![Node Inspector](docs/images/screenshot-inspector.png)
 
 ### Bring Your Own Data
-Easily upload your own `dependency-cruiser` JSON output to visualize your codebase.
+Easily upload your own `.maritime` artifact bundle or `dependency-cruiser` JSON output to visualize your codebase.
 ![Upload Data](docs/images/screenshot-upload.png)
 
 ## ✨ Features
 
-*   **Interactive Visualization:** Zoom, pan, and drag nodes to explore your architecture.
-*   **Deep Inspection:** Click any node to see its full path, metrics, and direct neighbors.
-*   **Dependency Filtering:** Toggle between "Product" and "Test" code (planned) or specific folders.
-*   **Isolate Modules:** Focus on specific sub-graphs to declutter the view.
-*   **Metrics (Phase 2):** Analyze instability, centrality, and **Cyclomatic Complexity & Lines of Code (LOC)**.
-*   **Compound Health Score:** Automatically assesses node health (Healthy, Warning, Unhealthy) based on a compound formula combining LOC, Complexity, Fan-Out, and Instability.
-*   **100% Client-Side:** Your code structure is analyzed locally; no data leaves your machine.
+* **Interactive Visualization:** Explore your architecture with interactive React Flow and Graphology-powered layouts.
+* **Deep Inspection:** Select nodes to inspect dependency paths, metrics, fan-in, fan-out, complexity, and direct connections.
+* **Architecture Debt & PR Change Impact:** Evaluate violations against baselines and track transitive change impact across pull requests.
+* **100% Local-First Processing:** Code structure is analyzed locally on your machine or in your CI runner; no source code or metrics leave your environment.
 
-## 🛠 Installation
+## 🚀 Quick Start
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/your-username/dependency-maritime.git
-    cd dependency-maritime
-    ```
+### 1. Local CLI Analysis
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Start the development server:**
-    ```bash
-    npm run dev
-    ```
-
-## 🚀 Usage
-
-### 1. Analyze with Maritime CLI
-
-Install the headless CLI in the repository you want to analyze, then generate one validated canonical
-evidence bundle. This is the recommended local and non-GitHub-CI path.
+Install the headless analyzer in your project to produce validated `.maritime` evidence:
 
 ```bash
-npm install --save-dev @dependency-maritime/cli@<version>
+npm install --save-dev @dependency-maritime/cli
 npx maritime analyze --source src --output .maritime --fail-on-unmeasured
 npx maritime validate .maritime
 ```
 
-Render an optional presentation from the same evidence without a second scan:
+Optionally render an SVG presentation from the validated evidence:
 
 ```bash
-npx maritime graph --input .maritime --output docs/images/dependency-graph.svg \
-  --graph-profile local-architecture
+npx maritime graph --input .maritime --output docs/images/dependency-graph.svg --graph-profile local-architecture
 ```
 
-See [CLI and Artifact Contract](./docs/CLI.md) for supported environments, Graphviz requirements,
-profiles, and advanced overrides.
+### 2. GitHub Actions CI
 
-### GitHub Actions
-
-Use the composite Action when GitHub Actions should run the same CLI contract. Consumers own workflow
-triggers, paths, and review policy; the Action runs analysis, validation, and optional rendering.
+Automate analysis, validation, and optional rendering in GitHub Actions using the composite action:
 
 ```yaml
-- uses: g1ddy/dependency-maritime@cli-v<version>
+- uses: g1ddy/dependency-maritime@cli-v0.1.0-beta.8
   with:
     source-roots: src
     render-graph: 'true'
     graph-profile: local-architecture
 ```
 
-#### Integrating Complexity Metrics (Optional)
-To view Cyclomatic Complexity and LOC in the Node Inspector, generate a metrics file using the provided script (if available in your project) or construct a JSON map matching the schema:
+For supported runtime environments, full CLI flags, baseline modes, and profile details, see [CLI and Artifact Contract](docs/CLI.md) and [Graph Presentation Profiles](docs/GRAPH_PROFILES.md).
 
-```json
-{
-  "src/App.tsx": { "complexity": 5, "loc": 120 },
-  "src/utils.ts": { "complexity": 2, "loc": 45 }
-}
+### 3. Local UI Development
+
+To run the interactive visualization dashboard locally:
+
+```bash
+git clone https://github.com/g1ddy/dependency-maritime.git
+cd dependency-maritime
+npm install
+npm run dev
 ```
 
-The built-in **Project Graph** loads the validated `.maritime/dependency-graph.json` and `.maritime/complexity-metrics.json` artifacts generated by the repository workflow. Uploaded graphs may optionally include a metrics map using this same schema.
+Open `http://localhost:5173` in your browser, then click the **Upload** button to load a `.maritime` evidence bundle or dependency graph JSON file.
 
-#### Compound Score & Health Status
-The application calculates a **Compound Complexity Score** for each node to determine its health status:
+## 📚 Documentation Index
 
-**Formula:**
-`Score = (LOC / 10) + (Complexity * 2) + (FanOut * 2) + (Instability * 20)`
-
-**Health Thresholds:**
-*   🟢 **Healthy:** Score < 20
-*   🟡 **Warning:** Score between 20 and 50
-*   🔴 **Unhealthy:** Score > 50
-
-Nodes will visually reflect their status with colored borders and backgrounds.
-
-### 2. Loading Data
-1.  Open **Dependency Maritime** in your browser (default: `http://localhost:5173`).
-2.  Click the **Upload** icon (cloud/arrow) in the header.
-3.  Drag and drop your `dependency-graph.json` file or click to select it.
-4.  The graph will automatically render your data.
-
-## 🏗 Architecture & Phases
-
-The project is being built in 4 phases:
-1.  **Phase 1: The "Chartroom" (MVP)** - Core visualization (Complete).
-2.  **Phase 2: The "Inspector"** - Metrics and health heatmaps (In Progress).
-3.  **Phase 3: The "Simulator"** - Refactoring playground.
-4.  **Phase 4: The "Cohesion" Assistant** - AI-assisted suggestions.
-
-For more details, check out the documentation:
-*   [Architecture](./docs/ARCHITECTURE.md)
-*   [CLI and Artifact Contract](./docs/CLI.md)
-*   [Roadmap](./docs/ROADMAP.md)
-*   [Development Guide](./docs/DEVELOPMENT.md)
-*   [Design Decisions](./docs/DESIGN_DECISIONS.md)
-
-## 🤝 Contributing
-
-This project uses **npm** for package management. Please ensure you lock files are updated accordingly.
-
-1.  Fork the repo.
-2.  Create a feature branch.
-3.  Commit your changes.
-4.  Push to the branch.
-5.  Create a Pull Request.
+* [Agent Guide](AGENTS.md) — Contributor & agent invariants and operating rules.
+* [Architecture](docs/ARCHITECTURE.md) — System boundaries, layer responsibilities, and data flow.
+* [CLI & Artifact Contract](docs/CLI.md) — Public commands, manifest schema, GitHub Action mapping, and exit codes.
+* [Code Complexity & Health Metrics](docs/COMPLEXITY.md) — Metric definitions, thresholds, compound health score formulas, and canonical evidence.
+* [Graph Presentation Profiles](docs/GRAPH_PROFILES.md) — Presentation presets and rendering override semantics.
+* [Quality & Test Strategy](docs/QUALITY.md) — Verification layers, test commands, and quality strategy.
+* [Development Guide](docs/DEVELOPMENT.md) — Setup instructions, canonical verification commands, and documentation ownership.
+* [Design Decisions](docs/DESIGN_DECISIONS.md) — Key architectural decision records and historical rationale.
+* [Product Roadmap](docs/ROADMAP.md) — Unfinished product capabilities, intent, and deferrals.
 
 ## 📝 License
 
 Distributed under the MIT License.
-
-### Render existing graph evidence
-
-With Graphviz `dot` installed, render without performing a second analysis:
-
-```bash
-maritime graph --input .maritime --output docs/images/dependency-graph.svg
-maritime graph --input .maritime --output docs/images/architecture.svg \
-  --external-packages none --folder-grouping nested --edge-labels none
-```
-
-`.maritime/dependency-graph.json` is canonical evidence; SVG (and transient DOT) outputs are derived
-presentations. The composite Action's reproducible committed-SVG contract is limited to its pinned
-Ubuntu Graphviz path; other runners must provide and pin `dot` themselves because layout can vary
-between Graphviz versions.
-
-The rendering flags are presentation-only: `--external-packages` accepts `none`, `summary`, or
-`direct`; `--folder-grouping` accepts `none`, `top-level`, or `nested`; and `--edge-labels` accepts
-`none` or `types`. Defaults (`direct`, `nested`, `types`) preserve existing output. The canonical
-`.maritime/dependency-graph.json` stays complete and is never rescanned or rewritten.

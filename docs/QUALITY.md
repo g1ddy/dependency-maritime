@@ -1,54 +1,68 @@
-# Quality Analysis
+# Quality & Test Strategy
 
-## Overview
+Dependency Maritime uses a layered verification strategy to ensure reliability across both its headless CLI package and interactive React UI application. This document defines the testing layers, verification expectations, canonical commands, and guidelines for identifying quality gaps without relying on static coverage snapshots in prose.
 
-After configuring the test coverage report to exclude boilerplate and non-essential files, we have identified several critical areas of the codebase that lack sufficient test coverage. This document outlines the high-priority modules that require thorough testing to ensure application stability and prevent regressions.
+## Verification Layers
 
-## Crucial Classes/Modules Needing Tests
+### 1. Unit & Logic Tests
+* **Purpose:** Validate pure functions, Graphology graph transformations, metric calculations, layout algorithms, filtering rules, and Zod schema parsing in isolation.
+* **Scope:** `src/**/*.test.ts`, `src/features/**/logic/*.test.ts`, `src/schema/*.test.ts`.
+* **Execution:** Executed via Vitest (`npm test` / `npx vitest run`).
 
-### 1. Graph Layout Logic (`src/features/visualization/logic/layout.ts`)
-- **Current Coverage:** 0%
-- **Criticality:** High
-- **Reasoning:** This module is responsible for positioning nodes in the visualization. Any bug here directly breaks the primary user experience (the graph). It likely involves complex calculations for DAG (Directed Acyclic Graph) layout that should be verified with unit tests covering various graph structures (empty, single node, complex trees, cycles).
+### 2. UI Component & State Integration Tests
+* **Purpose:** Verify React component rendering, user interactions, Zustand store state transitions, data dialog parsing, and error handling without full browser overhead.
+* **Scope:** `src/components/**/*.test.tsx`, `src/features/**/*.test.tsx`, `src/features/**/store.test.ts`.
+* **Execution:** Executed via Vitest with JSDOM environment (`npm test`).
 
-### 2. Data Loading & Parsing (`src/features/visualization/components/DataSourceDialog.tsx`)
-- **Current Coverage:** 0%
-- **Criticality:** High
-- **Reasoning:** This component handles the entry point for data into the application (parsing JSON, validating schema, handling file uploads). If this fails, the user cannot use the app at all.
-- **Recommendation:** Tests should verify:
-    - Successful parsing of valid JSON.
-    - Error handling for invalid JSON or schema violations.
-    - Drag-and-drop event handling (can be unit tested or E2E).
+### 3. CLI Package & Packed Consumer Tests
+* **Purpose:** Prove that `@dependency-maritime/cli` is self-contained and functions correctly when built and published. Ensures no UI or browser dependencies pollute the CLI runtime.
+* **Scope:** `src/cli/**/*.test.ts`, `tests/cli-pack-smoke.test.ts`, `tests/runtime-contract.test.ts`.
+* **Execution:** `npm run build:cli && npm run test:cli-package`. Packed smoke tests test analysis, validation, fallback configuration, multi-root inputs, and Graphviz rendering against isolated consumer fixtures.
 
-### 3. Graph State Management (`src/features/visualization/store.ts`)
-- **Current Coverage:** ~59%
-- **Criticality:** High
-- **Reasoning:** While some tests exist, there is significant missing coverage (e.g., lines 240-253, 323-329). This store acts as the "brain" of the application, managing the graph data, user interactions (selection, filtering), and computed state.
-- **Recommendation:** Improve coverage to handle edge cases in actions like `reparentNode`, `setGraphData` (async flow), and complex filter combinations.
+### 4. Workflow & Evidence Contract Checks
+* **Purpose:** Guarantee that repository workflows, composite GitHub Action steps, and canonical `.maritime` evidence generation behave reproducibly across supported Node.js versions (`22.13.0` and `24.x`).
+* **Scope:** `tests/evidence-workflow.test.ts`, `tests/action-ref-resolution.test.ts`, `.github/workflows/cli-contract.yml`.
+* **Execution:** `.github/workflows/cli-contract.yml` in CI, or locally via `npm run test:cli-package`.
 
-### 4. Metrics Calculation (`src/features/visualization/logic/metrics.ts`)
-- **Current Coverage:** 25%
-- **Criticality:** Medium-High
-- **Reasoning:** This module calculates software metrics (likely instability, centrality, etc.). Incorrect calculations leads to misleading insights for the user. These are pure functions and are ideal candidates for high-coverage unit tests.
+### 5. End-to-End (E2E) & Visual Verification
+* **Purpose:** Validate full end-to-end user workflows in real browser environments, including file upload, graph interaction, layout switching, and inspector rendering.
+* **Scope:** `tests/e2e/*.spec.ts`, Playwright configuration.
+* **Execution:** `npm run test:e2e` (requires built application or Vite server).
 
-### 5. Node Rendering Logic (`src/features/visualization/components/AppNode.tsx`)
-- **Current Coverage:** ~5%
-- **Criticality:** Medium
-- **Reasoning:** This component renders the individual file nodes. It contains logic for interactivity (clicks, dragging) and conditional rendering based on node state.
-- **Recommendation:** Verify that interactions trigger the correct store actions and that props map correctly to visual elements (labels, colors).
+## Canonical Verification Commands
 
-## Summary Table
+| Command | Purpose | When to Run |
+| :--- | :--- | :--- |
+| `npm run lint` | ESLint static code analysis | Before every commit / PR |
+| `npm test` | Run all Vitest unit, logic, and component tests | During active development |
+| `npm run build:cli` | Bundle CLI binaries (`main.js`, `index.js`) and generate d.ts | Before CLI testing |
+| `npm run test:cli-package` | Run packed CLI and runtime contract integration tests | When touching `src/cli/`, `src/schema/`, or Action code |
+| `npm run build` | Full production build (CLI + TypeScript check + Vite) | Handoff before PR submission |
+| `npm run test:e2e` | Run Playwright browser end-to-end suite | Frontend/UI changes affecting user flows |
 
-| Module | Type | Current Coverage | Priority |
-|--------|------|------------------|----------|
-| `layout.ts` | Logic | 0% | 🚨 Critical |
-| `DataSourceDialog.tsx` | Component/Feature | 0% | 🚨 Critical |
-| `store.ts` | State | ~59% | 🔥 High |
-| `metrics.ts` | Logic | 25% | 🔥 High |
-| `AppNode.tsx` | Component | ~5% | ⚠️ Medium |
+## Test Expectations & Guidelines
 
-## Next Steps
+* **CLI Isolation Invariant:** The CLI package must never import React, Vite, DOM APIs, or UI components. Packed smoke tests enforce this boundary.
+* **Deterministic Logic:** Graph algorithms, layout engines, and metric calculations must remain pure, side-effect-free, and independently testable without React rendering.
+* **Schema Validation:** All graph JSON inputs, metrics maps, and artifact manifests must be validated with shared Zod schemas at system boundaries (CLI file loading, UI upload).
+* **Async & Event Test Hygiene:** UI and store tests must await state rehydration or async worker execution explicitly rather than using arbitrary time-based waits.
 
-1.  **Immediate Action:** Write unit tests for `layout.ts` and `metrics.ts` as they are pure logic and high risk.
-2.  **Secondary Action:** Add integration tests for `DataSourceDialog.tsx` to ensure data loading robustness.
-3.  **Ongoing:** Gradually increase `store.ts` coverage as new features touch state management.
+## Identifying & Prioritizing Quality Gaps
+
+Rather than recording static line-coverage percentages in documentation (which become stale quickly), developers should identify test coverage gaps using executable tooling:
+
+1. **Generate Coverage Report:**
+   ```bash
+   npx vitest run --coverage
+   ```
+2. **Review Hotspots:** Inspect generated HTML reports in `coverage/` or terminal summary metrics for low-coverage modules.
+3. **Prioritize Gaps by Risk:**
+   * **High Risk (Critical Path):** Public CLI entry points, artifact schema parsing, graph transformation logic, and Zustand store actions.
+   * **Medium Risk:** UI dialogs, visual node rendering, complex filter combinations.
+   * **Low Risk:** Presentation primitives and boilerplate setup.
+
+## Related Documentation
+
+* [Development Guide](./DEVELOPMENT.md) — Contributor setup, workflow, and documentation ownership.
+* [CLI & Artifact Contract](./CLI.md) — CLI requirements and contract validation.
+* [Architecture](./ARCHITECTURE.md) — System boundaries and dependency direction rules.
