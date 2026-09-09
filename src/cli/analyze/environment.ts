@@ -1,7 +1,9 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { createRequire } from 'node:module';
 import { ValidationError } from './models';
+
+export const SUPPORTED_NODE_ENGINES = '^22.13.0 || ^24.0.0';
 
 const LEGACY_CONFIG_FILES = [
     '.eslintrc',
@@ -28,11 +30,10 @@ export function validateNodeVersion(nodeVersionStr: string = process.versions.no
     const major = parts[0] || 0;
     const minor = parts[1] || 0;
 
-    // Supported runtime contract: ^22.13.0 || ^24.0.0
     const isValid = (major === 22 && minor >= 13) || major === 24;
     if (!isValid) {
         throw new ValidationError(
-            `Maritime requires Node.js ^22.13.0 || ^24.0.0 (current version: v${cleanVersion}).`
+            `Maritime requires Node.js ${SUPPORTED_NODE_ENGINES} (current version: v${cleanVersion}).`
         );
     }
 }

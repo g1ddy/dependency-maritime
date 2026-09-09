@@ -70,8 +70,12 @@ A successful output directory contains:
 
 Important invariants:
 
-- Node `>=22.13.0`, ESLint 9+ flat config, and TypeScript frontend repositories are the current
+- Node `^22.13.0 || ^24.0.0`, ESLint 9+ flat config, and TypeScript frontend repositories are the current
   supported environment.
+- Treat Node 22.13 as the API/runtime/type floor and Node 24 as the forward-compatibility target.
+  Odd-numbered non-LTS majors are unsupported. Keep `engines.node`, runtime validation, `.nvmrc`,
+  the Action/CI baselines, and the `@types/node` 22.13-family pin synchronized; do not require APIs
+  newer than the floor. Prefer stable `node:util` formatting to a color-only dependency.
 - Legacy `.eslintrc.*` and `eslintConfig` metadata are unsupported.
 - Consumers may supply dependency-cruiser configuration; otherwise the CLI uses its portable
   fallback. Never assume Maritime's `src/`, `tsconfig.app.json`, or architecture rules.

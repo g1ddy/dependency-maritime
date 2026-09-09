@@ -2,8 +2,16 @@ import { parseArgs } from 'node:util';
 import { runAnalyzeCommand } from './commands/analyze';
 import { runValidateCommand } from './commands/validate';
 import { runGraphCommand } from './commands/graph';
+import { validateNodeVersion } from './analyze/environment';
 
 async function main() {
+    try {
+        validateNodeVersion();
+    } catch (error) {
+        console.error(`Maritime runtime error: ${error instanceof Error ? error.message : String(error)}`);
+        process.exit(1);
+    }
+
     const { positionals } = parseArgs({
         args: process.argv.slice(2),
         allowPositionals: true,

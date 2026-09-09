@@ -15,13 +15,37 @@ The primary artifact is a versioned Node CLI package, `@dependency-maritime/cli`
 
 The first public contract is intentionally modern and frontend-specific:
 
-- Node.js `>=22.13.0`.
+- Node.js `^22.13.0 || ^24.0.0`. Node 22.13 is the API and runtime floor; Node 24 is the
+  forward-compatibility target. Odd-numbered, non-LTS majors are unsupported unless explicitly
+  added to this range.
 - ESLint 9+ with flat configuration.
 - TypeScript frontend repositories.
 - dependency-cruiser as the dependency-graph engine and `ICruiseResult` as the canonical graph exchange format.
 - Legacy `.eslintrc.*` and `eslintConfig` package metadata are unsupported.
 
 ESLint is required at runtime and must resolve from a clean consumer installation. ESLint 10 remains a post-MVP compatibility target.
+
+APIs introduced after Node 22.13 cannot become required behavior until Maritime raises its runtime
+floor. Compile-time Node APIs follow the same rule: `@types/node` is pinned to the 22.13 minor
+family rather than tracking the newest release. Keep that pin synchronized with `engines.node`,
+runtime validation, `.nvmrc`, the composite Action baseline, and the CI matrix. When terminal styling
+materially improves a diagnostic, use the stable `node:util` `styleText()` API instead of adding a
+color-only dependency.
+
+### Permission Model capability reference
+
+Node's stable Permission Model is executable capability documentation and defense in depth; it is
+not a sandbox for running malicious repository configuration. Packaged smoke tests exercise these
+minimum command capabilities:
+
+- `analyze` reads the selected project inputs plus its installed package/tooling tree, and receives
+  write access only to the configured artifact directory. Repository-supplied analyzer or ESLint
+  configuration may itself require additional capabilities.
+- `validate` reads the evidence directory and installed Maritime runtime metadata, with no file
+  write access.
+- `graph` reads canonical evidence and installed Maritime runtime metadata, and writes only the
+  requested output directory. DOT output needs no subprocess capability; SVG output additionally
+  requires `--allow-child-process` so Maritime can invoke Graphviz `dot`.
 
 ## CLI contract
 

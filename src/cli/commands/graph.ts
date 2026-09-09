@@ -56,6 +56,13 @@ type GraphCommandValues = {
     'aggregation-depth'?: string;
 };
 
+function formatOperationalError(error: unknown): string {
+    if (!(error instanceof Error)) return String(error);
+    const permissionError = error as Error & { code?: string; permission?: string };
+    const details = [permissionError.code, permissionError.permission].filter(Boolean).join(' / ');
+    return details ? `${error.message} (${details})` : error.message;
+}
+
 function validatePolicy<T extends string>(
     flag: string,
     value: string | undefined,
@@ -242,7 +249,7 @@ export async function runGraphCommand(args: string[]): Promise<number> {
         console.log(`✅ Dependency graph rendered from ${graphPath} to ${output}`);
         return 0;
     } catch (error) {
-        console.error(`Error rendering dependency graph: ${error instanceof Error ? error.message : String(error)}`);
+        console.error(`Error rendering dependency graph: ${formatOperationalError(error)}`);
         return 2;
     }
 }
