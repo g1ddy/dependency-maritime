@@ -27,7 +27,7 @@ This document records the key durable architectural decisions made in Dependency
 * **Status:** Accepted
 * **Context:** Complex dependency graphs require clear hierarchical representation. Early planning considered starting with Dagre and evaluating ElkJS later if Dagre proved insufficient.
 * **Decision:** Support both Dagre (default fast hierarchical layout) and ELK (Eclipse Layout Kernel via `elkjs` for complex compound/nested folder graph layouts) directly within the visualization store.
-* **Consequences:** Users can switch layout engines in the UI based on graph size and structure. Web Workers execute layout algorithms asynchronously to prevent DOM thread freezing on large codebases.
+* **Consequences:** Users can switch layout engines in the UI based on graph size and structure. Dagre layout calculation is offloaded to a Web Worker to prevent UI thread blocking on large graphs, while ELK layout executes asynchronously.
 
 ---
 

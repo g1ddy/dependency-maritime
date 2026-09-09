@@ -9,7 +9,7 @@ Analysis does not require React, a browser, or a running Dependency Maritime ser
 
 ## Ownership Boundary
 
-* **`docs/CLI.md` (This Document) Owns:** Public CLI commands, arguments, artifact bundle schemas, manifest envelope, validation rules, Action input/output mapping, runtime requirements, and exit behavior.
+* **`docs/CLI.md` (This Document) Owns:** Public CLI commands, arguments, artifact bundle schemas, manifest envelope, validation rules, Action input/output mapping, runtime requirements, release criteria, and exit behavior.
 * **`docs/GRAPH_PROFILES.md` Owns:** Named graph presentation profiles (`default`, `local-architecture`, `compact-architecture`, `architecture-overview`), rendering presets, and presentation-only override switch semantics.
 
 ---
@@ -75,7 +75,7 @@ maritime analyze --source src --output .maritime --base origin/main
 
 Graph generation supports repository-supplied dependency-cruiser configuration without assuming Dependency Maritime's own `src/`, `tsconfig.app.json`, or architectural rules.
 
-The package also exposes side-effect-free programmatic APIs:
+The package also exposes programmatic APIs:
 
 ```ts
 import { analyzeProject, renderMarkdownReport } from '@dependency-maritime/cli';
@@ -210,6 +210,16 @@ The reusable CLI contract workflow executes:
 2. `npm run test:cli-package`
 
 across the supported Node.js compatibility matrix (`22.13.0`, `24.x`). It also runs the composite-action graph render smoke.
+
+## Release requirements
+
+A public release requires all of the following criteria to be satisfied:
+
+1. A clean consumer can install the packed/published CLI without UI or browser dependencies.
+2. The normal CLI analyzer can generate its own dependency graph or consume a caller-supplied graph file.
+3. Representative external consumers pass end-to-end through the packed CLI outside the Maritime repository tree.
+4. Local graph scoping and ESLint measurement integrity are enforced.
+5. The required Node, ESLint, and dependency-cruiser runtime compatibility matrix passes in CI.
 
 ## GitHub Actions Integration
 
