@@ -44,17 +44,17 @@ This document records the key durable architectural decisions made in Dependency
 
 * **Status:** Accepted (Supersedes planned switch to pnpm)
 * **Context:** An early roadmap entry considered migrating package management from `npm` to `pnpm`.
-* **Decision:** Retain `npm` as the official repository package manager with `package-lock.json`.
+* **Decision:** Retain `npm` as the official repository package manager with `package-lock.json`. Delete `pnpm-lock.yaml` to ensure package manager policy consistency across local and CI environments.
 * **Consequences:** Ensures consistency across CI workflows, developer documentation, and composite Action setup. The proposal to switch to `pnpm` is explicitly superseded to maintain repository stability.
 
 ---
 
-### ADR-006: Local-First Processing & Privacy
+### ADR-006: Local-First Processing & Privacy Policy
 
 * **Status:** Accepted
 * **Context:** Source code structure and internal dependency metrics are sensitive intellectual property.
-* **Decision:** Perform all analysis and rendering 100% locally on the user's machine or within their private CI runner.
-* **Consequences:** No source code, ASTs, metrics, or telemetry are transmitted to external servers. The React UI operates entirely client-side in the browser.
+* **Decision:** Perform all analysis and rendering locally on the user's machine or within their private CI runner. No source code, ASTs, metrics, or telemetry are transmitted to any external Maritime-hosted service.
+* **Consequences:** Privacy and security are preserved by default. Note that CI workflows executing Maritime may be configured to upload generated `.maritime` evidence artifacts to the repository's host platform (e.g. GitHub Actions artifacts) according to caller workflow rules.
 
 ---
 

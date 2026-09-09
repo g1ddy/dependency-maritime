@@ -5,6 +5,7 @@ This document outlines future product intent, architectural enhancements, and de
 ## Delivered Foundations
 
 * [Architecture](./ARCHITECTURE.md) — Headless CLI analyzer, shared Zod schemas, Zustand store, Graphology metrics, React Flow rendering, and Dagre/ELK layout engines.
+* [CLI Analyzer Decomposition](./ARCHITECTURE.md#cli) — CLI command orchestration decomposed into `graph-input.ts`, `architecture-analysis.ts`, and `output-manifest.ts`.
 * [CLI & Artifact Contract](./CLI.md) — Packaged analyzer (`@dependency-maritime/cli`), `.maritime` artifact bundle, validation command, composite GitHub Action, baseline comparison, and PR change impact analysis.
 * [Graph Presentation Profiles](./GRAPH_PROFILES.md) — Named presets (`default`, `local-architecture`, `compact-architecture`, `architecture-overview`) and presentation override switches.
 * [Code Complexity & Health Metrics](./COMPLEXITY.md) — Metric definitions, thresholds, compound health score formulas, and canonical repository evidence.
@@ -14,9 +15,8 @@ This document outlines future product intent, architectural enhancements, and de
 
 ## Active & Future Intent
 
-### Architecture Analysis Parity & Analyzer Refactoring
+### Architecture Analysis Parity
 - **Dependency-Cruiser 18 Parity:** Maintain parity with Dependency-Cruiser 18 rule engine, architecture debt evaluation, and external package grouping behaviors.
-- **CLI Analyzer Orchestration Decomposition:** Keep CLI command orchestration modular and maintainable, separating graph input resolution, architecture analysis, and artifact manifest assembly.
 
 ### Richer Code Health & Dead-Code Metrics
 - **Knip / Unused Code Integration:** Integrate unused file, export, and dependency detection into Maritime metrics and hotspot reports.

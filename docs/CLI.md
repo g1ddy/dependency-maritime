@@ -172,7 +172,7 @@ A versioned envelope containing schema version, tool version, source roots, gene
 }
 ```
 
-`directlyChangedCount` is the schema `1.0.0` compatibility name for directly changed graph modules. New producers also emit `directlyChangedGraphCount` with the same value and optionally report `gitChangedCount` for all files changed in Git.
+`directlyChangedCount` is the schema `1.0.0` compatibility name for directly changed graph modules. New producers also emit `directlyChangedGraphCount` with the same value and optionally report `gitChangedCount` for all files changed in Git; consumers must continue accepting manifests that contain only the compatibility field (`directlyChangedCount`).
 
 ## Validation contract
 
