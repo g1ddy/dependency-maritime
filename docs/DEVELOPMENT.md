@@ -8,7 +8,9 @@ Package scripts are the executable source of truth; verify the current commands 
 
 Prerequisites:
 
-- Node.js 22.13.x or Node.js 24.x (22.13 is the API/type floor; 24 is the forward-compatibility target)
+- Node.js `^22.13.0 || ^24.0.0`. Node 22.13 is the minimum API, runtime, and type
+  baseline; later Node 22 releases are supported, and Node 24 is the forward-compatibility target.
+  Odd-numbered majors remain unsupported unless they are explicitly added to the runtime contract.
 - npm
 
 ~~~bash

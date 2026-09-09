@@ -262,18 +262,36 @@ describe('CLI npm pack clean-install smoke tests', () => {
         writePackage(dir, 'permission-model-smoke');
         fs.writeFileSync(path.join(dir, 'src', 'index.ts'), 'export const safe = true;\n');
         installPacked(dir);
+        const toolDir = path.join(dir, 'tools');
+        const graphvizExecutable = path.join(toolDir, 'dot');
+        fs.mkdirSync(toolDir);
+        fs.writeFileSync(
+            graphvizExecutable,
+            '#!/bin/sh\ncat >/dev/null\nprintf \'<svg xmlns="http://www.w3.org/2000/svg"><title>permission smoke</title></svg>\\n\'\n'
+        );
+        fs.chmodSync(graphvizExecutable, 0o755);
 
         const cli = path.join(dir, 'node_modules', '@dependency-maritime', 'cli', 'dist', 'cli', 'main.js');
-        const run = (args: string[], read: string[], write: string[] = []): string => execFileSync(
+        const run = (
+            args: string[],
+            read: string[],
+            write: string[] = [],
+            allowChildProcess = false
+        ): string => execFileSync(
             process.execPath,
             [
                 '--permission',
                 ...read.map(value => `--allow-fs-read=${value}`),
                 ...write.map(value => `--allow-fs-write=${value}`),
+                ...(allowChildProcess ? ['--allow-child-process'] : []),
                 cli,
                 ...args
             ],
-            { cwd: dir, encoding: 'utf8' }
+            {
+                cwd: dir,
+                encoding: 'utf8',
+                env: { ...process.env, PATH: `${toolDir}${path.delimiter}${process.env.PATH ?? ''}` }
+            }
         );
 
         const outputDir = path.join(dir, '.maritime');
@@ -306,6 +324,17 @@ describe('CLI npm pack clean-install smoke tests', () => {
         expect(svgFailure.exitCode).toBe(2);
         expect(svgFailure.output).toContain('ERR_ACCESS_DENIED');
         expect(svgFailure.output).toContain('ChildProcess');
+
+        const svgOutput = run(
+            ['graph', '--input', '.maritime', '--output', 'derived/permitted-graph.svg'],
+            [outputDir, dependencyDir, graphvizExecutable],
+            [derivedDir],
+            true
+        );
+        const svgPath = path.join(derivedDir, 'permitted-graph.svg');
+        expect(svgOutput).toContain('Dependency graph rendered');
+        expect(fs.existsSync(svgPath)).toBe(true);
+        expect(fs.readFileSync(svgPath, 'utf8')).toContain('<svg');
     }, 60000);
 
     it('packed executable rejects unsupported Node versions with the package engine range', () => {
