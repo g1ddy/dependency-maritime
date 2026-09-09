@@ -4,7 +4,7 @@ import { readDependencyGraph, runEslintComplexityScan, resolveDepcruiseConfig, g
 import { ValidationError } from './models';
 import { ESLint } from 'eslint';
 
-vi.mock('fs/promises', () => ({
+vi.mock('node:fs/promises', () => ({
     readFile: vi.fn(),
     access: vi.fn(),
     mkdir: vi.fn(),
