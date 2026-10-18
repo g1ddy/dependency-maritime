@@ -35,11 +35,10 @@ describe('Card Component', () => {
   })
 
   interface TestCase {
-    Component: ElementType;
+    Component: ElementType<{ ref?: React.Ref<HTMLElement>, 'data-testid'?: string }>;
     name: string;
     testId: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expectedInstance: any;
+    expectedInstance: typeof HTMLElement;
   }
 
   const testCases: TestCase[] = [
@@ -55,11 +54,7 @@ describe('Card Component', () => {
     // but they all inherit from HTMLElement
     const ref = createRef<HTMLElement>()
 
-    // We cast the Component to any to bypass strict prop type checks for this generic test loop
-    // knowing that all our components accept a ref.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-    const Comp = Component as any
-
+    const Comp = Component as unknown as React.ElementType<{ ref?: React.RefObject<HTMLElement | null>, 'data-testid'?: string }>;
     render(<Comp ref={ref} data-testid={testId} />)
 
     expect(ref.current).toBeInstanceOf(expectedInstance)
