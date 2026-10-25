@@ -1,4 +1,5 @@
 import { render, screen, cleanup } from '@testing-library/react'
+import type React from 'react'
 import { createRef, type ElementType } from 'react'
 import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card'
 import { describe, it, expect, afterEach } from 'vitest'
@@ -35,11 +36,10 @@ describe('Card Component', () => {
   })
 
   interface TestCase {
-    Component: ElementType;
+    Component: ElementType<{ ref?: React.Ref<HTMLElement>; 'data-testid'?: string }>;
     name: string;
     testId: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expectedInstance: any;
+    expectedInstance: typeof HTMLElement;
   }
 
   const testCases: TestCase[] = [
@@ -55,10 +55,10 @@ describe('Card Component', () => {
     // but they all inherit from HTMLElement
     const ref = createRef<HTMLElement>()
 
-    // We cast the Component to any to bypass strict prop type checks for this generic test loop
-    // knowing that all our components accept a ref.
+    // To prevent TypeScript assignability errors when testing an array of generic React components
+    // that render different DOM nodes, we must type cast the Component to bypass strict prop checks.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-    const Comp = Component as any
+    const Comp = Component as any;
 
     render(<Comp ref={ref} data-testid={testId} />)
 
